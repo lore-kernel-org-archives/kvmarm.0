@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.197
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.198
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795114356;
-	b=yEselb7XOv+X/vI4hSfztl2lH4wi9pcTRFrI8pj5wnrcXBU3E/Q5ADzaDiKB8XqGDXNn
-	 0QM9GduhrhOmp7VWDNiOIHHRTTSQ0iuMI2fC5Vqt5HSeYEjGCVKmn6A54+tkq0G7PgyUt
-	 jsga9cDNigENI6k9/AIhJ2jDTbJoYKe+9CQHQHyC2bovKO1PpAq0B453DowrvyIkgKSMc
-	 vEOhehzaWt6k7Vr3XNeiK3ehTwdYx4macPGOogAwvQIiT/lRH1n1MbAu8qxWpR4kZE3tU
-	 ZM7toXCC+YlqkUvjuBQzj0Oru2K1GUkOPushlv+Pb+z5TEkveC6Zo3Jp2gLxAnX0OxQ==
+	t=1795114357;
+	b=RJFcHg24bwx7ZI0rcPyaXdiM5msVAM//hyf5Kp+Sx1bUKGO0jzqdEb8TFE4yUz9ZtDbT
+	 xrEm9oxoUXKGVQW99txO7316ULohA/ruKhoYofjfF344g89yKRj9TEwL4SdnjXp4q1grs
+	 F3TW6PiF7ytuqvbfuQGfASY9g6xhQqCpE4x42+n4ZGfmVHISHyQVeHYIc8fKrjRCsiZ0p
+	 P6vQw5Q8bgFUITDgWzL2bfmlEstrqvbYlRYq0Igu+6dNyPVTdvwjSNCu3I8ftIcq5Q5nM
+	 ApLo6Cag9NyLLdtdYvq+JBDU/nhx48FSpcHhDOPI1yrYHPZcd/exeSoEQbr4mCMAPzQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795114356;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795114357;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=tt34GVe7kBng/bcouD1dbLOnNpNCEkhyJnpoNOTfYBg=;
-	b=lbWAw5OYb/KgUG8fsxrjwOMLx7rrxABWTAyP3VquYTb8R9kyZ4nMf11Qn0Dg25tcTxaS
-	 3K0jJGFWnhDKa6OQSKmpmwpfJ6EDHZYi56EA98g6ELb09+hi5C1dkvrI8KqgpsKLdqC9A
-	 SrnyErWQ7DjyJ/Kp+D6/LChzG7fbFgZo3vMiAkG4vgHZBjupsnM2JbipcxjNXztGgtT85
-	 QV79gsBO2agWL5tHqVu0y9S6P3nzUQrjA+IcLsebW5lfUknRQpEBZlQZ2j7JYxf4fm68n
-	 xYYsCYCRAHX02gIDipvrSlXQyZ3ySjaAoD6zpEP4hbC+CP2oNGYs41nKMf/KY1JK/Wg==
+	bh=RoqvmCK2qkOodjdsXGnbvnsvP/GHWBE0XmbngxrSrDA=;
+	b=EKGoCUjZay5nuw9rrBkCoGvlhjJm4Ct5NuCeffCytCmlUfPjACVbBSxq9KKUlkyW58D6
+	 9pSMssCNnXCq1WH5sNXlrEL+ToCxwnWVwy3HZaBULWI64Rick52k8nAVnzVKcCViaCWHp
+	 xOZu1ZND0inBGOyvY2hhkMCctmGRX1GF65QPIrf8T799+bVZ913TpsBCwA2BgPDHnWFJQ
+	 SxZacbbIsNjYBpyLIA0WSNJqCD1zmVsE37kWP1vgz1lR83ZVvlAP6RB6PxLxEzBbPWNNP
+	 sBbSlpXSGhKT2kmwhU3iPFg2fUbgpMRvmM1i/YhIde2ceGKrevifYR1yklGSODW/LCQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ABn9q9my;
-	arc=none smtp.remote-ip=209.85.167.197
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=g6s8Q5ld;
+	arc=none smtp.remote-ip=209.85.167.198
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7647606DC9A
-	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 18:52:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D7647606DC9A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F2B606DC99
+	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 18:52:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E3F2B606DC99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ABn9q9my
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-57489477aabso177705b6e.1
-        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 10:52:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=g6s8Q5ld
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-5713cd0fb42so1649187b6e.0
+        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 10:52:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795114355; x=1795719155; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1795114356; x=1795719156; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=tt34GVe7kBng/bcouD1dbLOnNpNCEkhyJnpoNOTfYBg=;
-        b=ABn9q9my5KConK84p4MptIGzbY44SRr6F5DfwyvRUfb2KBoxVDPtdW78Kn8hf5PGXv
-         r9E0GsKc30BfSKZ14TmbnHG7bMmCK1aGWham0behX6OlSSjs8r1uyZ/4nUmOjGL+Jrmv
-         C49nmf4gdI02ReP2QQNAVtNurm7iTGK1+bxP2LgyIsGNCOn6RA9sQW7kv76V/L2pRZSq
-         sFuOTrWqzeWsxpehzG/ATWzdhrNKixZn36sb43UI499gNJNq4Kp+4lDz+LHQNY8ePJ02
-         JUQ5UzReWptdYhuRC0+jn3vKlUqHlgxY5LiXIZSP4eUCbIyE4hQKBV/R3mrPbq1sh+LP
-         9whQ==
+        bh=RoqvmCK2qkOodjdsXGnbvnsvP/GHWBE0XmbngxrSrDA=;
+        b=g6s8Q5ld24/s6K1r/acWuRbsRH4vy2xWnBZa5UguRtO+sTCRBa0pwrUgCN4dZ+f/Ko
+         bEGYS8hHZTU3qzSDKcHgKvNeJUUEAbvY6wjjd89lL/CimVdeF7h+eNb/fxN93ErrtNWb
+         kPBd4PV+z6v+T0BTc0r1V7fIwIH2VG9xkNs7RDX+rFP67nOOX3QZrb43Lgca1kKKTPLd
+         lekKQDe5sk+BT0q35OoA12EEf1Y9Z1QOiXKdo4rKUb3LP+NZ2WbT+e18Putsnj1txGUj
+         XfVe6y8UgH9ylKAkZLu9wUb1UMQJhAUjc/FWekbtvBlms9CmN96KzOcDf+o7m1cevQ2/
+         7Q+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795114355; x=1795719155;
+        d=1e100.net; s=20260707; t=1795114356; x=1795719156;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=tt34GVe7kBng/bcouD1dbLOnNpNCEkhyJnpoNOTfYBg=;
-        b=WttGf2/d0Y06jUxGo8Eokt+ofV5SpfPvpJoZCJj3ouKhxYQGHyY+v3HHpM73OVOSAw
-         hYrRcunf0ymzDU6xM/CyXiz6RuV68InbY5FPRE6l/aBz3hgTvlBWinYm5ux48k7egFLr
-         sCZdVD+cBssxoXWxQbx1ElOuDdn7RH4Q09CLy5j5ArUqhyEIuOFtIhSrMPgQdymNlBxP
-         72q2pc1l6Mf80X/361zEfMYBs2i9wvS/nNwyC3RiLQou1NTOTCufc3130LfT/AuX5CF4
-         k35HjqtaPx5fYAKogfBVOi3yzeQOw7D+KA5csh98Ce7mSylIhYZ7VS477uKCE252IyEY
-         E0xQ==
-X-Forwarded-Encrypted: i=1; AL+hErFiWD+YdbQhLQsHbbja7gCGmwiMjM6uK+WvK42yyc3zV8a127q6ySeVo4CYRhZ+biLrmjtYUUA=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8em30IVg7PzoyFTkmDxIk8nKg56OKq28x0tZP/PiIo5vK3s0Rp
-	FxnDO/hyZOKYRI/DbDrYMmrkMTVO9NBqGXe5o2QlCVuYdbTnEJ8AxEMROawUYtx8wvUZtR4M9rc
-	Y0US10dE+eu6Hc//KfTjK4EaEvQ==
-X-Received: from jaho5-n1.prod.google.com ([2002:a05:6638:67c5:10b0:621:d005:6f2c])
+        bh=RoqvmCK2qkOodjdsXGnbvnsvP/GHWBE0XmbngxrSrDA=;
+        b=m0EkpJX9/e2XcDIqneKttH+nQr7sSBvxVXw+B4gesXNLan0EO9NX/P3oo9HmHcETjL
+         67/HB47aY8QzhqRy/zFBeMwzAblaMhwhEXdxlTmMbRaN9X6yx6Gr6MG8OWuy6z2pXhGo
+         af033tTXW8nqIpn86OTUH6NVdmXtDDqnbeNrwpP8h0yHmgEYnunmoqL+nzD8CYcz1mL2
+         wwB1F9VCpq8itD9Eh5nIUGQ0UGkPN3kO8qBUVJu34VAm10N/6AIMXMPs/P12WBhXTWUo
+         f1RJ9zgVwaXZZLDdmNixjAiYdarCvGKCAOtWT638rCYVErIOC/AAT2QtvvuwLUGFxwwk
+         3tLA==
+X-Forwarded-Encrypted: i=1; AL+hErFqZ+ogsKuIiJGKMxNHiEB1Uc+V/HWDQKZl1IB8xq6+24p3iLoXOX7R/Jvl8pqmJu9m5TmmWNc=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/ePV3tCGj5eLRlYAOl2vwcgtDvbMUHyl+HtTXHFX6hwzXVwWuk
+	+1daj3EbAG/T9kz02yiVQwZfPdaNJ6g9s/1SSgD6w4S+jlZSEhwF0spXhnltuvH6Rx63dhLpoSs
+	bctjN5AmhctJy+RMRtOL5mfGB5w==
+X-Received: from ilen3.prod.google.com ([2002:a05:6e02:13a3:b0:524:d8ac:6887])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:3c47:b0:4b9:e65b:8c33 with SMTP id 5614622812f47-57a09212719mr1036647b6e.33.1795114354568;
- Thu, 19 Nov 2026 10:52:34 -0800 (PST)
-Date: Thu, 19 Nov 2026 18:52:01 +0000
+ 2002:a05:6808:6b8e:b0:521:561a:8e8c with SMTP id 5614622812f47-5797d6add74mr1519937b6e.33.1795114355656;
+ Thu, 19 Nov 2026 10:52:35 -0800 (PST)
+Date: Thu, 19 Nov 2026 18:52:02 +0000
 In-Reply-To: <20261119185215.632334-1-coltonlewis@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,8 +81,9 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261119185215.632334-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.56.1.809.ga0b61035b5-goog
-Message-ID: <20261119185215.632334-20-coltonlewis@google.com>
-Subject: [PATCH v10 19/33] perf: Add perf_pmu_resched_update()
+Message-ID: <20261119185215.632334-21-coltonlewis@google.com>
+Subject: [PATCH v10 20/33] perf/core: Prioritize kernel-owned pinned events
+ when scheduling groups
 From: Colton Lewis <coltonlewis@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
@@ -99,98 +100,118 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
 	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-To modify PMU guest counter reservations dynamically, the per-CPU
-available counter mask must be updated while host perf events are
-temporarily scheduled out.
+When scheduling event groups in visit_groups_merge(), pinned and
+flexible groups are ordered by group_index (creation order). Normally,
+kernel-owned pinned events such as the hardlockup NMI watchdog are
+created at boot with group_index 0 and are scheduled ahead of userspace
+events.
 
-Introduce perf_pmu_resched_update() to update PMU state while holding
-cpuctx->ctx.lock in between scheduling perf events out and scheduling
-them back in. It accepts a callback invoked between ctx_sched_out() and
-perf_event_sched_in(), accomplishing atomic counter mask updates with
-minimal perf API expansion.
+However, if the NMI watchdog is disabled and re-enabled at runtime
+after a userspace pinned per-CPU event is already active, the
+watchdog's group_index is larger than the userspace event's
+group_index. When hardware counters are constrained (for example, when
+PMU partitioning reserves counters for a guest and leaves only one
+general-purpose counter for the host), the userspace pinned event
+claims the remaining counter first and merge_sched_in() transitions the
+kernel watchdog event into PERF_EVENT_STATE_ERROR.
 
-Refactor ctx_resched() into __ctx_resched() to invoke the callback at
-the appropriate point.
+Order pinned kernel-owned events (is_pinned_kernel_event()) ahead of
+userspace pinned events in perf_event_groups_cmp() and
+perf_less_group_idx() while leaving flexible groups ordered by
+group_index for normal round-robin rotation.
 
-Tested-by: James Clark <james.clark@linaro.org>
+Suggested-by: James Clark <james.clark@linaro.org>
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- include/linux/perf_event.h |  3 +++
- kernel/events/core.c       | 33 ++++++++++++++++++++++++++++++---
- 2 files changed, 33 insertions(+), 3 deletions(-)
+ kernel/events/core.c | 28 +++++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-index e1e11500df097..8140457939658 100644
---- a/include/linux/perf_event.h
-+++ b/include/linux/perf_event.h
-@@ -1242,6 +1242,9 @@ extern int perf_event_task_disable(void);
- extern int perf_event_task_enable(void);
- 
- extern void perf_pmu_resched(struct pmu *pmu);
-+extern void perf_pmu_resched_update(struct pmu *pmu,
-+				    void (*update)(struct pmu *, void *),
-+				    void *data);
- 
- extern int perf_event_refresh(struct perf_event *event, int refresh);
- extern void perf_event_update_userpage(struct perf_event *event);
 diff --git a/kernel/events/core.c b/kernel/events/core.c
-index e870f12c3ad81..dbc42ded5f698 100644
+index dbc42ded5f698..6b82029b8ebc5 100644
 --- a/kernel/events/core.c
 +++ b/kernel/events/core.c
-@@ -3010,9 +3010,10 @@ static void perf_event_sched_in(struct perf_cpu_context *cpuctx,
-  * event_type is a bit mask of the types of events involved. For CPU events,
-  * event_type is only either EVENT_PINNED or EVENT_FLEXIBLE.
-  */
--static void ctx_resched(struct perf_cpu_context *cpuctx,
--			struct perf_event_context *task_ctx,
--			struct pmu *pmu, enum event_type_t event_type)
-+static void __ctx_resched(struct perf_cpu_context *cpuctx,
-+			  struct perf_event_context *task_ctx,
-+			  struct pmu *pmu, enum event_type_t event_type,
-+			  void (*update)(struct pmu *, void *), void *data)
+@@ -237,11 +237,16 @@ class_perf_ctx_lock_constructor(struct perf_cpu_context *cpuctx,
+ 
+ #define TASK_TOMBSTONE ((void *)-1L)
+ 
+-static bool is_kernel_event(struct perf_event *event)
++static bool is_kernel_event(const struct perf_event *event)
  {
- 	bool cpu_event = !!(event_type & EVENT_CPU);
- 	struct perf_event_pmu_context *epc;
-@@ -3048,6 +3049,9 @@ static void ctx_resched(struct perf_cpu_context *cpuctx,
- 	else if (event_type & EVENT_PINNED)
- 		ctx_sched_out(&cpuctx->ctx, pmu, EVENT_FLEXIBLE);
- 
-+	if (update)
-+		update(pmu, data);
-+
- 	perf_event_sched_in(cpuctx, task_ctx, pmu, 0);
- 
- 	for_each_epc(epc, &cpuctx->ctx, pmu, 0)
-@@ -3059,6 +3063,29 @@ static void ctx_resched(struct perf_cpu_context *cpuctx,
- 	}
+ 	return READ_ONCE(event->owner) == TASK_TOMBSTONE;
  }
  
-+static void ctx_resched(struct perf_cpu_context *cpuctx,
-+			struct perf_event_context *task_ctx,
-+			struct pmu *pmu, enum event_type_t event_type)
++static bool is_pinned_kernel_event(const struct perf_event *event)
 +{
-+	__ctx_resched(cpuctx, task_ctx, pmu, event_type, NULL, NULL);
++	return event->attr.pinned && is_kernel_event(event);
 +}
 +
-+void perf_pmu_resched_update(struct pmu *pmu, void (*update)(struct pmu *, void *), void *data)
-+{
-+	struct perf_cpu_context *cpuctx;
-+	struct perf_event_context *task_ctx;
-+	unsigned long flags;
-+
-+	local_irq_save(flags);
-+	cpuctx = this_cpu_ptr(&perf_cpu_context);
-+	task_ctx = cpuctx->task_ctx;
-+	perf_ctx_lock(cpuctx, task_ctx);
-+	__ctx_resched(cpuctx, task_ctx, pmu, EVENT_ALL | EVENT_CPU, update, data);
-+	perf_ctx_unlock(cpuctx, task_ctx);
-+	local_irq_restore(flags);
-+}
-+EXPORT_SYMBOL_GPL(perf_pmu_resched_update);
-+
- void perf_pmu_resched(struct pmu *pmu)
+ static DEFINE_PER_CPU(struct perf_cpu_context, perf_cpu_context);
+ 
+ struct perf_event_context *perf_cpu_task_ctx(void)
+@@ -1781,7 +1786,8 @@ static inline struct cgroup *event_cgroup(const struct perf_event *event)
+  */
+ static __always_inline int
+ perf_event_groups_cmp(const int left_cpu, const struct pmu *left_pmu,
+-		      const struct cgroup *left_cgroup, const u64 left_group_index,
++		      const struct cgroup *left_cgroup, const bool left_kernel,
++		      const u64 left_group_index,
+ 		      const struct perf_event *right)
  {
- 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+ 	if (left_cpu < right->cpu)
+@@ -1824,6 +1830,9 @@ perf_event_groups_cmp(const int left_cpu, const struct pmu *left_pmu,
+ 	}
+ #endif
+ 
++	if (left_kernel != is_pinned_kernel_event(right))
++		return left_kernel ? -1 : 1;
++
+ 	if (left_group_index < right->group_index)
+ 		return -1;
+ 	if (left_group_index > right->group_index)
+@@ -1839,7 +1848,8 @@ static inline bool __group_less(struct rb_node *a, const struct rb_node *b)
+ {
+ 	struct perf_event *e = __node_2_pe(a);
+ 	return perf_event_groups_cmp(e->cpu, e->pmu_ctx->pmu, event_cgroup(e),
+-				     e->group_index, __node_2_pe(b)) < 0;
++				     is_pinned_kernel_event(e), e->group_index,
++				     __node_2_pe(b)) < 0;
+ }
+ 
+ struct __group_key {
+@@ -1853,8 +1863,9 @@ static inline int __group_cmp(const void *key, const struct rb_node *node)
+ 	const struct __group_key *a = key;
+ 	const struct perf_event *b = __node_2_pe(node);
+ 
+-	/* partial/subtree match: @cpu, @pmu, @cgroup; ignore: @group_index */
+-	return perf_event_groups_cmp(a->cpu, a->pmu, a->cgroup, b->group_index, b);
++	/* partial/subtree match: @cpu, @pmu, @cgroup; ignore: @kernel, @group_index */
++	return perf_event_groups_cmp(a->cpu, a->pmu, a->cgroup,
++				     is_pinned_kernel_event(b), b->group_index, b);
+ }
+ 
+ static inline int
+@@ -1863,9 +1874,9 @@ __group_cmp_ignore_cgroup(const void *key, const struct rb_node *node)
+ 	const struct __group_key *a = key;
+ 	const struct perf_event *b = __node_2_pe(node);
+ 
+-	/* partial/subtree match: @cpu, @pmu, ignore: @cgroup, @group_index */
++	/* partial/subtree match: @cpu, @pmu, ignore: @cgroup, @kernel, @group_index */
+ 	return perf_event_groups_cmp(a->cpu, a->pmu, event_cgroup(b),
+-				     b->group_index, b);
++				     is_pinned_kernel_event(b), b->group_index, b);
+ }
+ 
+ /*
+@@ -4024,6 +4035,9 @@ static bool perf_less_group_idx(const void *l, const void *r, void __always_unus
+ 	const struct perf_event *le = *(const struct perf_event **)l;
+ 	const struct perf_event *re = *(const struct perf_event **)r;
+ 
++	if (is_pinned_kernel_event(le) != is_pinned_kernel_event(re))
++		return is_pinned_kernel_event(le);
++
+ 	return le->group_index < re->group_index;
+ }
+ 
 -- 
 2.56.1.708.g77570a6a1d-goog
 
