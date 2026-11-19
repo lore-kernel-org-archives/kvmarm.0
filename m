@@ -1,87 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795107773;
-	b=i8k4y1ckT3it763LupVmF4s8Mc0dA7HitZ+AUsu8MjhuxSn9avbgFSF9tJMHCSVPeTbM
-	 cCvDzE71xWftyFtCYf5FzE2HoI6Ba7SDRQ3EQy5NcHUOTejup7Nq20waoMVOa7Jn3i7yQ
-	 QAWxNDMqLiKz5yVt64G7kzft/9pl66MTc5he4dtzYqn7jcZpTJ0+yh/xlLLr5aJ/AoLcX
-	 oCzNwZpnvrDRMFM3rzFe5QY3eTwUNJ7sZQdS+GBJptdGz15YwUQTzfYEj4TSNAGD6FVYd
-	 FGGH6kLQ3LxitHCFquGjTt8LlSWH9CngnABvE7nlLlNLJPAAzsgPStcNibqtPdwgsiw==
+	t=1795107787;
+	b=3y8w1vv58Z/+rGdMtL+sQi0XH0CtuL2X++zSQsy5YGXnSGeOKHqk2rJZtAGGGX5+K6BP
+	 AZHAJG1f9XMGr192thD8UXRl9lGR9pDjSq4Jt1IqqPfc4HPUYVWqlookQA57qennfvdBV
+	 Nw0P3tC68poHncqL9RcLCHQxt5LlieYzshNF8RFbRlZIueKOLC8YtksuUhado6i1K0Q72
+	 r9OQOJAzi3UI5uh1t79umhyglNDq2yFoSgaPBIOWXQjakFgteZwil3huqgfeYto47XyZJ
+	 wRaZiWTVr5slaoJWLECVAiazj/K84AZtRvLkERQ5M2VvqGI/Bxr/Hdam7fIz+DgruGg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795107773;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 X-Received:MIME-Version:References:In-Reply-To:From:Date:
-	 X-Gm-Features:Message-ID:Subject:To:Cc:X-Mimecast-Spam-Score:
-	 X-Mimecast-MFC-PROC-ID:X-Mimecast-Originator:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=tuaICnb7sTsU3uMtAf1IdzJMLdxwJHMKKBVbfNsG8e0=;
-	b=C0BxPgAXJ3GCZ7qq4GMR1pfIYrueiMavNiSKZn/jkJLq5XFjGVGUH1bSdrnjKd6Cj+z3
-	 ++kXSdK/RUprvsMl+JWCAbqO7jhB8MckXDgrKvcL/BFc93R9IfKoujGHoB6rEbmLTZHjM
-	 PTQo2VGSfDKFYAvMXqzPnmc1xwTgwiVnq/WrSclS+V5VWssndHPlz1Obg9jklmG6aPXkb
-	 WISBkomLq+2BPKwdY85WEceJek7pIxnRf9X4SEWwZwDwkIguglHg0x/zpiVe8yIMQLFfm
-	 Ew6DMzhMzYziZjsMy3aUCgmVEFfq0rrN99EFNP211ETQmyl6ZRLhcXxIVdGb8fVuaBQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795107787;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=TDoDlhIOMIYb5fQsoaguqAMfZB63GoDqNNpIN0amubQ=;
+	b=A9KCstUOUeL0IuwdRzQw0uOcxmzkshaCPWtRshsBngVKNvqnueeugihrklojQWy/gUOO
+	 d6OzC1gR0rUERq2lu6lADiBH3GY7X/8uIgOIJYd7GMxtYhbVUqYIxw4hvi0NQCI/eYUia
+	 ggLqkfDX6vRgkfaWeMiRc1An9QUEoHmWp2M5f0Ua08xUpO2D39piQeNANMdEOUxymVy/c
+	 fap9yJ+31G449JsA4EeATebajbQ0IgNO8qnpiPuk6gZMbrZK2aMcKV9a+7Q18ACiqiv9i
+	 xICacQqxfvWpy8mgb6HQzEDocZ0UaddPQEfaweKO5CbYKAjKK48alJV5e40uZuYPe0g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ICYGkKDh;
-	arc=none smtp.remote-ip=170.10.129.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC20C606A324
-	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 17:02:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DC20C606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=uUeawjRk;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B0C606A320;
+	Thu, 19 Nov 2026 17:03:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 78B0C606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ICYGkKDh
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1795107771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tuaICnb7sTsU3uMtAf1IdzJMLdxwJHMKKBVbfNsG8e0=;
-	b=ICYGkKDh04Lulop5yJc7OBezrOoW7weJu90F0CpPqCvjzhoAYGsB+PUuUURpqZgxgjkvFy
-	30OMS3bjkSbJqFZm0f1k6oskKp10RdVNEfCm+eODbuLd6JFPufXCuEY4BuPa/DSyZG29/c
-	8H3boQ7lkWBruUL1jB9ucFN9ajIXqek=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-297-ngZT-CSgNUyAEsHWSr941g-1; Thu, 19 Nov 2026 12:02:49 -0500
-X-MC-Unique: ngZT-CSgNUyAEsHWSr941g-1
-X-Mimecast-MFC-AGG-ID: ngZT-CSgNUyAEsHWSr941g_1795107768
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-cdaf2073b0cso568a12.0
-        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 09:02:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795107768; x=1795712568;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=tuaICnb7sTsU3uMtAf1IdzJMLdxwJHMKKBVbfNsG8e0=;
-        b=ooGFkJ3FUFM2MVTcmz4+Xinf+6V7AeoBOPB1BI2v10u2Wmt7e3f7lcEeso7hA9o4q4
-         af4K2862ZatiCDgIbvWFqao1/1nWakB8lPU4DKsRi5OHfNb6PE44gJ7ctwtcxvJKtpUx
-         xkppqon7CfwRIftLgHvBwXeGX7avnDP1WX9g5nxIT85MxLYhs9E490DAlgxDzTb5jrfc
-         QwcwJbD1auyqUQqy45CqFK04u2QZsxT+4DHW37669naKtToQNbeV4jclFs1dlxwzxKG7
-         uAcoBAf5hPEjoBM9y87kxe3coI79h17UjvtTqOdS+smNEQtv+10iEflbymP0EaXMHnwq
-         UzYw==
-X-Forwarded-Encrypted: i=1; AL+hErHOpxtE32s4GHGmEkK7LLSRKl0RXkad90Ih6209kga3ZgytSLCt51ZQrNzBbXYsuG0Aa6ICIi4=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8y7H99Pi4e5r/4N58Ef8RS5kd6uWHtsxJsqDCMgjJASTBKhbBP
-	NopvlBrrgXpMkIyaAw9uesO5403+lLimRwWKBN5jsMUZO7hKDl0XlXh/0jISD6Ha44nys2uKZXF
-	254WeBFfHZdFpiOmhUU6iKWxv9WtvVKphwEhb4EdB0qoYc9o/o67a70nrG6VxHO3bj9OmH/Vly1
-	0HiofoDELp6NvAcRPRloL+FlWhBe9u26bd
-X-Gm-Gg: AZFdTZdHDi+JEuOwLXgNEmPXkdgTJVroglmfbxCXbBYoddnjJZZ65M9j7cbWOonbtrq
-	DUUVNqQ/iTqnfqsUGUX8i93wtRv4i83wKobt0irRHnoTJkY/CAA5lWy+3mHMPBlyXcAjeq1TMYi
-	PZCelttk5uMhr7dKqqdAkHr74yW7nOOLlGEKzTHVLDxh/sH1bQaFFN8U5fzdLPvtrkX9MGnxcJe
-	DQQ6klqf2OMsqdpXPo3nVMkwQSMQFTErVmotifhi9JLZpUhPkVmj2aQy3Az
-X-Received: by 2002:a17:903:1c9:b0:2e9:6352:6c61 with SMTP id d9443c01a7336-2f03f15511fmr4875125ad.19.1795107767401;
-        Thu, 19 Nov 2026 09:02:47 -0800 (PST)
-X-Received: by 2002:a17:903:1c9:b0:2e9:6352:6c61 with SMTP id
- d9443c01a7336-2f03f15511fmr4874595ad.19.1795107766796; Thu, 19 Nov 2026
- 09:02:46 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=uUeawjRk
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 00DC11575;
+	Thu, 19 Nov 2026 09:03:03 -0800 (PST)
+Received: from [10.0.129.37] (e122027.cambridge.arm.com [10.0.129.37])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DC3963F673;
+	Thu, 19 Nov 2026 09:03:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795107785; bh=j2oLgYBzGMrRinjcK3J9nR0lauyqlTOxrOfoe5V349o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=uUeawjRkSNxcvOgiySNXBpeqUHhAKABd5KofhwleokPjXB4bH9EyxpgcwNppazqy4
+	 /eilMHccIycz3sxexcyS4r/SWHPVj6vmoOh76QjBrGxHnKhZ4CfzmtweSO+4bD1kZM
+	 0hZHiEVrGU+fK+PW6KjybwANfq4bNKrfPZvJSn5g=
+Message-ID: <13ba7597-6f78-43ef-9521-05a7d92b1c5c@arm.com>
+Date: Thu, 19 Nov 2026 17:03:02 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -91,172 +53,215 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261119125608.3939330-1-maz@kernel.org>
-In-Reply-To: <20261119125608.3939330-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 19 Nov 2026 18:02:34 +0100
-X-Gm-Features: AclHuK9gLqjDXNyNzrRYpnTsqE3NQnqKer4SP-4ZAj4I36D5tykUXBkj1PxU_-4
-Message-ID: <CABgObfaXpZsZ32L7gkW1EhuYwt0mkwTueyW9=BDBpZr71NCmuw@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.4, take #3
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Colton Lewis <coltonlewis@google.com>, 
-	Dan Carpenter <dan@pereq.eu>, Fuad Tabba <fuad.tabba@linux.dev>, 
-	Michael Reeves <michael.reeves077@gmail.com>, Mostafa Saleh <smostafa@google.com>, 
-	Myria Sarvay <myrialsarvay@gmail.com>, Oliver Upton <oupton@kernel.org>, 
-	Vincent Donnefort <vdonnefort@google.com>, Will Deacon <will@kernel.org>, 
-	Xuheng Li <xuheng@cs.columbia.edu>, Yureka Lilian <yureka@cyberchaos.dev>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: XO3Pje2wUuXGn9_If0au-hdz2aVM0dZ3qkboPXWeOq0_1795107768
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 05/11] KVM: arm64: CCA: Tear down RTTs
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+References: <20261116164358.142785-1-steven.price@arm.com>
+ <20261116164358.142785-6-steven.price@arm.com>
+ <sashiko-outbox-217410@kernel.org>
+ <bbd8332b-1b2a-4a87-9232-4463d5e5a904@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <bbd8332b-1b2a-4a87-9232-4463d5e5a904@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 19, 2026 at 1:56=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> Paolo,
->
-> As promissed in my previous missive, I'm back with a few more
-> presents...
->
-> This round of fixes is mostly a Dan Carpenter special, as they seem to
-> have hit the jackpot with some new formal analysis tool, and found a
-> number of issues in NV. I am very surprised (/s).
->
-> The rest is a bunch of pKVM fixes and workarounds for ugly hardware.
+On 19/11/2026 10:51, Suzuki K Poulose wrote:
+> On 16/11/2026 17:08, sashiko-bot@kernel.org wrote:
+>> Thank you for your contribution! Sashiko AI review found 4 potential
+>> issues to consider:
+>> - [High] KVM: arm64: unclamped stage-2 levels in get_start_level() on
+>>    64K pages
+>> - [Medium] KVM: arm64: CCA: unlocked kvm_realm_is_created() check in
+>>    kvm_uninit_stage2_mmu()
+>> - [Low] KVM: arm64: mix of guard() and goto cleanup in
+>>    kvm_destroy_realm()
+>> - [Low] KVM: arm64: possible skipped parent retry in
+>>    realm_tear_down_rtt_level()
+>> -- 
+>>
+>> commit 80a462fb8b46e04c72060d069b1296caf72d83ff
+>> Author: Steven Price <steven.price@arm.com>
+>>
+>> KVM: arm64: CCA: Tear down RTTs
+>>
+>> This commit adds stage-2 unmapping and Realm Translation Table (RTT)
+>> teardown for Arm CCA Realms during stage-2 MMU uninitialization and final
+>> Realm destruction.
+>>
+>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>> index ac72db3d4505f..9baf2352d2a8f 100644
+>>> --- a/arch/arm64/kvm/mmu.c
+>>> +++ b/arch/arm64/kvm/mmu.c
+>>> @@ -1145,9 +1145,25 @@ int kvm_init_stage2_mmu(struct kvm *kvm,
+>>> struct kvm_s2_mmu *mmu, unsigned long t
+>>>       return err;
+>>>   }
+>>>   +static void kvm_realm_uninit_stage2(struct kvm_s2_mmu *mmu)
+>>> +{
+>>> +    struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>>> +
+>>> +    mutex_lock(&kvm->arch.config_lock);
+>>> +    if (kvm_realm_state(kvm) == REALM_STATE_NEW ||
+>>> +        kvm_realm_state(kvm) == REALM_STATE_ACTIVE) {
+>>> +        kvm_set_realm_state(kvm, REALM_STATE_DYING);
+>>> +        WARN_ON(kvm_realm_teardown_stage2(kvm));
+>>> +    }
+>>> +    mutex_unlock(&kvm->arch.config_lock);
+>>> +}
+>>> +
+>>>   void kvm_uninit_stage2_mmu(struct kvm *kvm)
+>>>   {
+>>> -    kvm_free_stage2_pgd(&kvm->arch.mmu);
+>>> +    if (kvm_realm_is_created(kvm))
+>>> +        kvm_realm_uninit_stage2(&kvm->arch.mmu);
+>>> +    else
+>>> +        kvm_free_stage2_pgd(&kvm->arch.mmu);
+>>>       kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+>>>   }
+>>
+>> [Severity: Medium]
+>> Can kvm_uninit_stage2_mmu() race with Realm creation by checking
+>> kvm_realm_is_created() outside kvm->arch.config_lock?
+>>
+>> If kvm_mmu_notifier_release() -> kvm_arch_flush_shadow_all() runs before
+>> or concurrently with Realm creation, kvm_uninit_stage2_mmu() takes the
+>> else branch without holding config_lock, freeing mmu->pgt and clearing
+>> mmu->pgd_phys while leaving realm.state at REALM_STATE_NONE.  Checking
+>> kvm_vm_is_realm(kvm) here and handling all realm.state transitions inside
+>> kvm_realm_uninit_stage2() under config_lock (including moving
+>> REALM_STATE_NONE to REALM_STATE_DEAD and freeing the PGD) would avoid the
+>> race.
+>>
+>>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>>> index 57f59b618a96e..74b89da4e8015 100644
+>>> --- a/arch/arm64/kvm/rmi.c
+>>> +++ b/arch/arm64/kvm/rmi.c
+>>> @@ -16,22 +16,213 @@ u32 kvm_rmm_ipa_limit(void)
+>>>       return u64_get_bits(rmi_feat_reg(0), RMI_FEATURE_REGISTER_0_S2SZ);
+>>>   }
+>>>   +static int get_start_level(struct realm *realm)
+>>> +{
+>>> +    /*
+>>> +     * kvm_init_ipa_range() enforces a minimum of 32 IPA bits
+>>> +     * (ARM64_MIN_PARANGE_BITS).
+>>> +     */
+>>> +    return 4 - stage2_pgtable_levels(realm->ia_bits);
+>>> +}
+>>
+>> [Severity: High]
+>> Does get_start_level() return 3 instead of 2 for a 32-bit or 33-bit IPA
+>> Realm on CONFIG_ARM64_64K_PAGES?
+>>
+>> stage2_pgtable_levels(ipa) evaluates ARM64_HW_PGTABLE_LEVELS((ipa) - 4),
+>> which is 1 for 32 or 33 IPA bits with 64K pages, whereas kvm_get_vtcr()
+>> clamps the stage-2 levels to at least 2:
+>>
+>> arch/arm64/kvm/hyp/pgtable.c:kvm_get_vtcr() {
+>>      ...
+>>     lvls = stage2_pgtable_levels(phys_shift);
+>>     if (lvls < 2)
+>>         lvls = 2;
+>>      ...
+>> }
+>>
+>> When get_start_level() returns 3, realm_tear_down_rtt_range() calls
+>> realm_tear_down_rtt_level() with level = 4 (> KVM_PGTABLE_LAST_LEVEL),
+>> triggering WARN_ON() and returning -EINVAL, which causes
+>> kvm_destroy_realm() to abort and leak the Realm Descriptor, RTT granules
+>> and stage-2 PGD pages.
+> 
+> My bad. There is already a helper, VTCR_EL2_LVLS() to convert vtcr back
+> to levels. We could as well save it in realm, as we seem to need it
+> more than once.
 
-Pulled, thanks.
+Actually that's probably the best option - use VTCR_EL2_LVLS() (to
+side-step all the issues that Sashiko found), but stash the result in
+struct realm (to avoid having to pass the kvm pointer around to get to
+the VTCR). I'll make that change for v4.
 
-> I will be back next week same time for more of the same!
+Thanks,
+Steve
 
-I can't wait for it!
-
-Paolo
-
-> Please pull,
->
->         M.
->
-> The following changes since commit 181a701fc14d3d468c603b5ecfb9f12115c5fb=
-72:
->
->   Merge branch kvm-arm64/misc-7.4-1 into kvmarm-master/fixes (2026-11-03 =
-18:14:37 +0000)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-7.4-3
->
-> for you to fetch changes up to 3385a832525527801012f5993d1f6a7a3d23092c:
->
->   Merge branch kvm-arm64/mmu-fixes-7.4-2 into kvmarm-master/fixes (2026-1=
-1-19 11:16:29 +0000)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 7.4, take #3
->
-> * MMU fixes:
->
->   - Fix arbitrary truncation to 32bit when dealing with pool size
->
->   - Correctly order page pin refconting
->
->   - Prevent a HYP block mapping from being replaced with a table
->
->   - Fix NV Range invalidation by extending the boundaries to the
->     next block mapping
->
->   - Make sure the correct hw_mmu gets picked on the first run,
->     should userspace restore a nested context between init and
->     the first vcpu_load().
->
->   - Reject TLBI IPAS2E1 that fall outside of the S2 range
->
-> * System register fixes:
->
->   - Correctly forward POE/PIE/TVAL EL2 register traps
->
->   - Add a sanity check for missing trap forwarding
->
->   - Correctly hide generic PAuth for pKVM protected guests when
->     the feature PAuth has been exluced from the feature set
->
->   - Make sure that HCR_EL2.NV1 is always RES0
->
-> * Misc fixes:
->
->   - Flag Apple M3, M4 and M6 CPUs as having a broken vgic and
->     a wonky PMUv3 emulation.
->
->   - Correctly handle 64bit offsets into an MMIO region from
->     userspace
->
->   - Ensure that a vcpu is loaded when injecting an event
->
-> ----------------------------------------------------------------
-> Colton Lewis (2):
->       KVM: arm64: Force HCR_EL2.NV1 to RES0 unconditionally
->       KVM: arm64: selftests: Verify HCR_EL2.NV1 is RES0 when E2H0 is NI_N=
-V1
->
-> Dan Carpenter (9):
->       KVM: arm64: nv: Invalidate whole L1 blocks on TLBI RIPAS2E1
->       KVM: arm64: vgic: Don't truncate offsets in vgic_find_mmio_region()
->       KVM: arm64: nv: Initialize hw_mmu to NULL for nested vCPUs
->       KVM: arm64: nv: Forward PIR_EL2, PIRE0_EL2 and POR_EL2 traps
->       KVM: arm64: nv: Forward CNTP_TVAL_EL02 and CNTV_TVAL_EL02 traps
->       KVM: arm64: nv: Report EL2 registers with no trap forwarding
->       KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
->       KVM: arm64: nv: Fix NULL dereference in kvm_pmu_nested_transition()
->       KVM: arm64: nv: Ignore TLBI IPAS2E1 above the IPA limit
->
-> Fuad Tabba (1):
->       KVM: arm64: Hide generic ptrauth from protected VMs without ptrauth
->
-> Marc Zyngier (3):
->       Merge branch kvm-arm64/misc-7.4-2 into kvmarm-master/fixes
->       Merge branch kvm-arm64/sysreg-fixes-7.4-2 into kvmarm-master/fixes
->       Merge branch kvm-arm64/mmu-fixes-7.4-2 into kvmarm-master/fixes
->
-> Michael Reeves (1):
->       arm64: Apply existing Apple Silicon CPU workarounds to newer CPUs
->
-> Mostafa Saleh (1):
->       KVM: arm64: Use consistent type for pool size
->
-> Myria Sarvay (1):
->       arm64: Add CPU part numbers for newer Apple Silicon CPUs
->
-> Xuheng Li (2):
->       KVM: arm64: Don't replace a valid hyp block mapping with a table
->       KVM: arm64: Order a later pinner's accesses after the hyp mapping
->
->  arch/arm64/include/asm/cputype.h              | 28 +++++++++++++++++++
->  arch/arm64/include/asm/kvm_host.h             |  2 +-
->  arch/arm64/include/asm/kvm_pgtable.h          |  2 +-
->  arch/arm64/kernel/cpu_errata.c                | 12 +++++++++
->  arch/arm64/kernel/cpufeature.c                | 12 +++++++++
->  arch/arm64/kvm/arm.c                          |  8 ++++--
->  arch/arm64/kvm/config.c                       |  7 +----
->  arch/arm64/kvm/emulate-nested.c               | 10 ++++++-
->  arch/arm64/kvm/hyp/include/nvhe/early_alloc.h |  2 +-
->  arch/arm64/kvm/hyp/include/nvhe/gfp.h         |  4 +--
->  arch/arm64/kvm/hyp/nvhe/early_alloc.c         |  2 +-
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  8 ++++++
->  arch/arm64/kvm/hyp/nvhe/page_alloc.c          |  6 ++---
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c            |  4 +--
->  arch/arm64/kvm/hyp/pgtable.c                  | 10 ++++++-
->  arch/arm64/kvm/nested.c                       |  8 ++++++
->  arch/arm64/kvm/pmu-emul.c                     |  3 +++
->  arch/arm64/kvm/sys_regs.c                     | 39 +++++++++++++++++++++=
-+++---
->  arch/arm64/kvm/vgic/vgic-mmio.c               |  4 +--
->  arch/arm64/kvm/vgic/vgic-mmio.h               |  2 +-
->  tools/testing/selftests/kvm/arm64/hello_el2.c | 15 +++++++++++
->  21 files changed, 161 insertions(+), 27 deletions(-)
->
+>>
+>> [ ... ]
+>>
+>>> +static int realm_tear_down_rtt_level(struct realm *realm, int level,
+>>> +                     unsigned long start, unsigned long end)
+>>> +{
+>>> +    ssize_t map_size;
+>>> +    unsigned long addr, next_addr;
+>>> +
+>>> +    if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
+>>> +        return -EINVAL;
+>>> +
+>>> +    map_size = kvm_granule_size(level - 1);
+>>> +    if (WARN_ON(!IS_ALIGNED(start, map_size)))
+>>> +        return -EINVAL;
+>>> +
+>>> +    for (addr = start; addr < end; addr = next_addr) {
+>>> +        phys_addr_t rtt_granule;
+>>> +        long ret;
+>>> +        unsigned long align_addr = ALIGN(addr, map_size);
+>>> +
+>>> +        next_addr = ALIGN(addr + 1, map_size);
+>>> +
+>>> +        if (next_addr > end || align_addr != addr) {
+>>> +            /*
+>>> +             * The target range is smaller than what this level
+>>> +             * covers, recurse deeper.
+>>> +             */
+>>> +            ret = realm_tear_down_rtt_level(realm,
+>>> +                            level + 1,
+>>> +                            addr,
+>>> +                            min(next_addr, end));
+>>> +            if (ret)
+>>> +                return ret;
+>>> +            continue;
+>>> +        }
+>>> +
+>>> +        ret = realm_rtt_destroy(realm, addr, level,
+>>> +                    &rtt_granule, &next_addr);
+>>> +        if (ret < 0)
+>>> +            return ret;
+>>> +
+>>> +        switch (RMI_RESULT_STATUS(ret)) {
+>>> +        case RMI_SUCCESS:
+>>> +            free_rtt(rtt_granule);
+>>> +            break;
+>>> +        case RMI_ERROR_RTT:
+>>> +            if (next_addr > addr) {
+>>> +                /* Missing RTT, skip */
+>>> +                break;
+>>> +            }
+>>> +            /*
+>>> +             * We tear down the RTT range for the full IPA
+>>> +             * space, after everything is unmapped. Also we
+>>> +             * descend down only if we cannot tear down a
+>>> +             * top level RTT. Thus RMM must be able to walk
+>>> +             * to the requested level. e.g., a block mapping
+>>> +             * exists at L1 or L2.
+>>> +             */
+>>> +            if (WARN_ON(RMI_RESULT_DATA_LEVEL(ret) != level))
+>>> +                return -EBUSY;
+>>
+>> [Severity: Low]
+>> This question rests on an Arm CCA RMM specification detail that could not
+>> be confirmed from the kernel source: when SMC_RMI_RTT_DESTROY fails with
+>> RMI_ERROR_RTT because the RTT at @level still has live child table
+> 
+> If the RTT entry at @level is live, RMM returns (RMI_ERROR_RTT, level)
+> with out_top == addr.
+> 
+> 
+>> entries, can the RMM return out_top > addr (with addr < next_addr <
+>> addr + map_size) if the initial entries in that RTT are non-live, or
+>> report
+>> RMI_RESULT_DATA_LEVEL(ret) == level - 1?
+> 
+> 
+> Suzuki
+> 
 
