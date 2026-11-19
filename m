@@ -1,95 +1,174 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.47
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795076305;
-	b=331vaL5KLaQhm+sOuIF1zNlgcuU1oECdR0RzEBOBU3CmW4qPy0zslLdP8iSr68cYbdQU
-	 XkViOSBlJgxdLHGnaE+TP9U36PmgNb5npICsFdK1e0I2xl14u7ZLZIsw9+Fy+RtwcrVC2
-	 X8drb3GZ2WwVV/8twgTqWPnWImecrG6bpEvOms40bvKjBpGaw/4OwHhjCjOKcjF2XI3o8
-	 2ROrHF2FdsKAJ+rCOkHreD1RTQUthqz83NXtebOOVUhWDfjbbGq6RhaT+SK3hIIXZGkwB
-	 J79MPI6loHHQttzApJX5oCGpTA0oNTL574TwV/UTtkvH9F8wa3JYz/NmSCH7x31yEKw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795076305;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=fN32snRSV36lEFPD1aw7PskPfU8Y7+zoH5BNPUXA4wM=;
-	b=phnuKa9yOyYogd4/Qexbfpwkzzy235iklbH5ayY+VklNzue6kh8YZ+rDwWfXm6atj3w5
-	 AduEYUhR7XbIoWkybsBYFzrGdDNVH9AgL0D9QTbXPSqD0H2F7fIgxhYmEBHl4AO5Lufeu
-	 pGjFZMYSWypruUpX2C3Lh7dU8S27LgsGaz7iNyUdpxuo+SZoBm8rluj4wGABcITCz7wjD
-	 DX4rq+uM+R7PVIM6oE9NUnejRcu7XjYvL+zw67K4eiMRkvG4gAFKaEIexdWFKCrgP2auN
-	 ws3wz7ltWs3IIj4br3k/8t9zTmvKQh+zI+qrjXcR+F8yFp19y4gKibpzUsTa96P7vGw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=pereq.eu;
-	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=DD+hejfA;
-	arc=none smtp.remote-ip=209.85.128.47
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.74.67
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795077220;
+	b=Nxt8sOUDfAjDLbHZCtAYAtz+FK5HE1jKqRi/TaiHfeHx8Nzha7cGK1GBapP/ISDUptaE
+	 u2e+M80B7J5erOt3UsCfkJ0zPkuIgrjFqj9DAj23TA53xHDzgoyEgOgGrF6fH1IyBji6+
+	 4LnRRcabdEdNMrstKB1dErSUR0VT9qjClI0So1DnTB4fv4Mb/Y8x+ebk4oc5k47TsE8JX
+	 zvtF6f86CTGvr4MW+ns28zUMJXuY7sxqJhmyTZ3fYmGTbELXGTlio3c78n64egJ9XyF8b
+	 mS+/Mtnu7DBE5PPZiJBNCxOMoxdyF/98ARmlu/zM/Q6VJ0g6rmq2f7N0jwi7IPPjeVQ==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795077220;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:CC:Subject:
+	 Thread-Topic:Thread-Index:Date:Deferred-Delivery:Message-ID:
+	 References:In-Reply-To:Accept-Language:Content-Language:
+	 X-MS-Has-Attach:X-MS-TNEF-Correlator:msip_labels:
+	 x-ms-publictraffictype:x-ms-traffictypediagnostic:
+	 x-ms-office365-filtering-correlation-id:x-ms-exchange-senderadcheck:
+	 x-ms-exchange-antispam-relay:x-microsoft-antispam:
+	 x-microsoft-antispam-message-info:x-forefront-antispam-report:
+	 x-ms-exchange-antispam-messagedata-chunkcount:
+	 x-ms-exchange-antispam-messagedata-0:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version:
+	 X-Exchange-RoutingPolicyChecked:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-AuthAs:X-MS-Exchange-CrossTenant-AuthSource:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-originalarrivaltime:
+	 X-MS-Exchange-CrossTenant-fromentityheader:
+	 X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
+	 X-MS-Exchange-CrossTenant-userprincipalname:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=ttm0gDuIKrA3Sg1LDmojVPqASUe8+Og0gkkEN7Hwod4=;
+	b=SeBKHodHZgq4ZDnfXCO2M6O8Npj2V98BebC7Sef2TbKxGyiUOAM4zsCsCgMVaW1z7sva
+	 u0ljtuufboy3jsVkOeFxTks90gz3s+lAiyxcbju432m9HPTO+XwOKL8eJPcuVScJb1Q6R
+	 mjFWryHDWV6RoM1PzyjlMAbDNDpDVZVOXeZnu4M4Lh49EmE0jXxPHL51WLp/7M4ydZ9uD
+	 NjpJ2YRtXZw0YZK5L849UDN114GLkzespIGdpd2sFj3oCai9o+Ctgl05G3eLKFO2nAE2k
+	 nH8DTm80+TmQpiFZ2qO80JRDAvL8WjdYtDz8gslBhb2+VTq1XYkUIVKXOuFgpPc5HAw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=fujitsu.com;
+	spf=pass smtp.mailfrom=fujitsu.com;
+	dkim=pass header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=selector1 header.b=ZCbJ07Gd;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.74.67
+Received: from OS0P286CU010.outbound.protection.outlook.com (mail-japanwestazon11011067.outbound.protection.outlook.com [40.107.74.67])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DF6606A320
-	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 08:18:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 49DF6606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC08606A324
+	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 08:33:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9FC08606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=DD+hejfA
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4a2d6d01ecbso11813335e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 00:18:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1795076303; x=1795681103; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=fN32snRSV36lEFPD1aw7PskPfU8Y7+zoH5BNPUXA4wM=;
-        b=DD+hejfA2jGqwD9Z8nSuNcgCX0xz8MWC89+eZzM40NQ304e6j9PxBSuVMXZzJSOAru
-         6QxgIsCgcwr+/rQVSLQVGc6gJxv8kVKcsoQCAVtTj9Otsilkv3UgIRdveE2aeDSW59d0
-         e5LmcsP4bpOoTpPWKMcCNLa3llkJtelx6WHjrgknpN7+qfYJfghPo1TDMVbJsL26gA+Z
-         lL3QTj6O+ZsxXMKG6A+/g20DNMTvkbgSktzC8q/gel6gCV2OSuvRz4HeO9dk3fLf+jfW
-         V06I13cokic71XgxfC1z/ylqINGX9NKNZn4C3hrBGOMqg7ls3wxTgLAuE50Rd5+fc/wI
-         FI4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795076303; x=1795681103;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=fN32snRSV36lEFPD1aw7PskPfU8Y7+zoH5BNPUXA4wM=;
-        b=D6Tc1n/mtOF/3O2znY3EIkaOgIq33s26Se0TVs5CxUjrX/0ScMjKAzg1ssejRGBLNk
-         m8LafZr74c9XvSlwzDl7BFuX/E7WLR5jF/1ebCt1K1QP01bvWos/lkM45lREHNFlzWqF
-         C9PqGeY6A/AcO3+Uf/BddSYcnKz5lWlj6lRMLSz4E6Y87Z9Xq1kzcN2cf/IjmXhvkZLn
-         IkkjPuiPPK+kk47Sl0sVh1ki58hocPAbr+4RgRajqMCl1htsvWxrtWjaMP7QENEr0UYV
-         /9wy7VlZgpopHCP5jlqNVwDQ4IPtfDwLfn5S2w6LQPkcfEuD0ZX2r4C4Ta6mYw0QgfmX
-         XTLg==
-X-Forwarded-Encrypted: i=1; AL+hErHM+QXQUxwNi11tHaYEvfBHweyVhfgLR4wAvfT0ghpZGtqROvBPDkyObUELyVSgGGQLGI4J5eg=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9hokFu+k8MSNOQeqlS3444jeAtVm5k35orwewK+na844EAygax
-	YzYJfpn1pRXLeajgY0MWRil2D2SIuIaci1i/opPnxM1tHSpqtRz5Ky/DsH1fG1W4JTA=
-X-Gm-Gg: AYBFou0R9p37P/Vpm72umGhk3adldIP0GT0mgsC/yIMxVncvYlzXiHctcHmo107LnM0
-	ehWyCAEpaPVV8Cqhr/t56S1OGKhulI/lXqC2/Aa0wZD1ERZ+c6PYYDzDJOW9iYdhz0c/YG3aMpD
-	mJsp4q1dmpJ2O85Iwb2yVi0Ck7b3wMwVfi2HDYqZyHBFlJ+xe9+x1BICzCBU6a4h2YgOybowpgN
-	5C3Aicx0nrR5N0dtc/ZUrQiG9rqogNsfauUnNDQM4n8lyTs9K+RmXjfq1mQ8dajDmk/v8xmT6WX
-	7OYADpXiJRtPjJQlAmSN9epOOXN0YgRkYZpHDHOe4rssLOA5GiWOmRpBUF1BHM4gqotZ26b1Bzb
-	klAU/YwtuzEOk9zwb0m2aR2Qun8cCdnMimuUTctQ0y8xXiVtKmG1/Z8511sDM3fKWgHIepER7EP
-	w19e6VtJdBfh7Q/5KJBxbujBGvI5FzVQeUmD0PfctWDFmrunp5s7rdTCzOjVt3xvpUugkggSsBQ
-	wsYSZz0KdJoH1UEM92oV0ipbSk+Qc7qut3L48zeUhjoGb8oR7p5LVfM9sy2G3M2lEqirI+sj630
-	0tv/fmF0U8hSHt7bbloqwSxuGW3PdLmAsy7xCnX9
-X-Received: by 2002:a05:600c:4e4d:b0:4bb:69b2:d3df with SMTP id 5b1f17b1804b1-4bb7da362e1mr102872455e9.25.1795076303220;
-        Thu, 19 Nov 2026 00:18:23 -0800 (PST)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb85399e2esm22139735e9.7.2026.11.19.00.18.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 00:18:22 -0800 (PST)
-Date: Thu, 19 Nov 2026 11:18:18 +0300
-From: Dan Carpenter <dan@pereq.eu>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev,
-	sashiko-reviews@lists.linux.dev
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
-Message-ID: <av6wypzwAJxIyKOU@stanley.mountain>
-References: <cover.1795006659.git.dan@pereq.eu>
- <033a2d49e0f48426281b46eb1131ae64012aba18.1795006659.git.dan@pereq.eu>
- <sashiko-outbox-221074@kernel.org>
- <86zev6yqzd.wl-maz@kernel.org>
+	dkim=pass (2048-bit key, unprotected) header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=selector1 header.b=ZCbJ07Gd
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jXxz1tNu8ms8gr3E4xXautFuMjiaRPDlkGBCfvtFFgb3SZtHYcm3eQMr1J7rsrZQaOmusd+ZyYC6jjB0N+TRrvO3kA3dT0j9Ccpb3DyhU8AVyMm9qVMjGW1evJrxau6Bl1Dhq4tH7ybwwogqqrW8TcuWD28ekG84Bupn3Ga90XDR9oMjYci7zs5/bDmwRtLbMj2Y5oe0DqgFAkrbhUZcsXNUslq7vVnPPysrV8Biqcis9F5v1u843hRSed0oITIKQMiyXyZZLWcsTVscM1NI2GemO2JAhopVmXZjlZlmo+geqUGeTicICcy6rs42wiM7w1nxYg4DBstARC1eZRPIhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ttm0gDuIKrA3Sg1LDmojVPqASUe8+Og0gkkEN7Hwod4=;
+ b=lh8iLWjJ6aDToqFuj9Aov/DaGOZdwLDriZ+SqTfCdYNK9ds+VqjhbzWQs4D+oCUMggv3yetpOyBbap50y015dTyvlbUTF9hStsC8G+Nx6EmpI87ey8ppaOhHqtS2KXqNoeRSWHT4ApBnsnwGJBz5HPK/TqPMd+6IuGIg7YXJWnOaExx1gl5GVEos74HcJYQXi+m5bbG65BIvjoBWKxmBipcstfUPxAtjdQgh/PdMKRWMGoG7uyNMtzyxIP0v8HTBaGPenYKGc2G1+h4rY+mbRGia74sPbWM2vEqFzjG40blTrui41kgamPaZ4J8aY/j1tkQBjOMxfcviZ509ZvoWww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fujitsu.com; dmarc=pass action=none header.from=fujitsu.com;
+ dkim=pass header.d=fujitsu.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fujitsu.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ttm0gDuIKrA3Sg1LDmojVPqASUe8+Og0gkkEN7Hwod4=;
+ b=ZCbJ07GdGr93hknyfiEdeIFdlkxKprOAFJibCaqwFkMQJJxXVhBoccw5FulqA/1m7SvYALMhHapwQdSo1UTweHa85B94LzIYosZ2+lMFfLdKBllCoJKz/zk2Klg7raqRQl0phVX0m0pWkOkHom1GJWI4iFor5Tl1o636SHIojsw0z69VogYwnSq16VX3HtNd9K0pnIEVrBTpv/hACwpm7lUnpyhdPkqCzgYrJukKnQfZv/snFGHgpil7dXBm9jtLteSgImPs4yKJa5GNbrrMOgJu4wdbzVxu+uKYvSdgVCm6Zx2EjoMLzv06krqVMvsfCSPQZyMVbOZLTFH1Btxrpg==
+Received: from TY7PR01MB15746.jpnprd01.prod.outlook.com (2603:1096:405:290::6)
+ by TYCPR01MB10335.jpnprd01.prod.outlook.com (2603:1096:400:243::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.639.10; Thu, 19 Nov
+ 2026 08:33:36 +0000
+Received: from TY7PR01MB15746.jpnprd01.prod.outlook.com
+ ([fe80::bc79:d427:b0a9:a793]) by TY7PR01MB15746.jpnprd01.prod.outlook.com
+ ([fe80::bc79:d427:b0a9:a793%5]) with mapi id 15.21.0639.010; Thu, 19 Nov 2026
+ 08:33:36 +0000
+From: "Tomohiro Misono (Fujitsu)" <misono.tomohiro@fujitsu.com>
+To: 'Marc Zyngier' <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+CC: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>, Thomas Gleixner <tglx@kernel.org>, Radu
+ Rendec <radu@rendec.net>, Oliver Upton <oupton@kernel.org>, Fuad Tabba
+	<fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden
+	<seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+	<yuzenghui@huawei.com>, "Kohei Enju (Fujitsu)" <enju.kohei@fujitsu.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-perf-users@vger.kernel.org"
+	<linux-perf-users@vger.kernel.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>
+Subject: RE: [PATCH v2 2/4] arm64: tlb: Add tlbi workaround for FUJITSU-MONAKA
+ Erratum E#030001
+Thread-Topic: [PATCH v2 2/4] arm64: tlb: Add tlbi workaround for
+ FUJITSU-MONAKA Erratum E#030001
+Thread-Index: AQHdXVVYZhIvVbstSUigINbLGWcO0LcADluAgAAMrgCANSF8kA==
+Date: Thu, 19 Nov 2026 08:33:17 +0000
+Deferred-Delivery: Thu, 19 Nov 2026 08:33:17 +0000
+Message-ID:
+ <TY7PR01MB15746879988FA46744145AE1CE5792@TY7PR01MB15746.jpnprd01.prod.outlook.com>
+References: <20261016-monaka-fix-for-upstream-v2-0-fc7ede7f9f48@fujitsu.com>
+	<20261016-monaka-fix-for-upstream-v2-2-fc7ede7f9f48@fujitsu.com>
+	<atIPeT7SLSLjQIcl@J2N7QTR9R3.cambridge.arm.com>
+ <86bj8t257n.wl-maz@kernel.org>
+In-Reply-To: <86bj8t257n.wl-maz@kernel.org>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_ActionId=5106d246-5fa0-4806-a8db-e8e1a1b6061b;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_ContentBits=0;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_Enabled=true;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_Method=Privileged;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_Name=FUJITSU-PUBLIC?;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_SetDate=2026-11-19T07:57:25Z;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_SiteId=a19f121d-81e1-4858-a9d8-736e267fd4c7;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_Tag=10,
+ 0, 1, 1;
+authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=fujitsu.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TY7PR01MB15746:EE_|TYCPR01MB10335:EE_
+x-ms-office365-filtering-correlation-id: a03f50df-a043-4152-864e-08df4617cdcf
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|7416014|376014|1800799024|366016|22082099003|18002099003|3023799007|1580799027|11063799006|4143699003|5023799004|56012099006|10067099003|261026140227099003|261026121527099003|261028144727099003|261022105027099003|261021121427099003|261022075727099003|261102123227099003|38070700021;
+x-microsoft-antispam-message-info:
+ dJO1qvsUWwA8MeKRNt1VdhwCSAMeDMuM2fhjCfgziaGQI6jBcSgaDfafB9GuJc52wCkM1IpNAwylTvHakpRA4BLlyVdjO0EAIc+gbph8Xu1ySa0OPne9mp4Yvuqh4qHeiu3nE84HIr1mWEHSstPMK2W0eKIs++B3zlcMmt88E+cgLmfj/wCCoMng9z+JSYnbbVk6ozrtKXPzLJiEYLq8skqaFxgVpTxDQ9eQc8MBpKk0Sj3RCk5xdYuGZ2Ms4Y21K6+91+0D1k7PWpyUKzg0cQtaSzpGWcRySqyDIq45NqeLC4rJL+9HR2F7by5a7eoqRro+3uJmxscxr+UIrTH0+HfAgsaRuWN95fotL8wjg35HVn/cBKVCdKPl9+s2YtH5NPOHkCSWWRnzuWmMP2bE/E/KJqYbDiKbABssGsx8YXdnbCjkQwavjVx7AYcM6E0KVaTcKe5M8OB5BGQ7cCu4dRlq4BPPN6sk7hIS3XklkHBbN3+gxsUJDxIleDEg5phVUNlm0u2kpDDT6b8KSWwdDTAMuW/O2zLELUljNCSs2i1bgbRhNjVdEEYLQEJiTdoCkZ4+O5UXaX6zgnBOlyl0F3evoq2I33NP1OaoIbYIgISUGQX1US8MF7A4V38aev+Gcw04IaKnTPskPYQSls94XWCsGcYMbnbDCKNELeXtAmJTf13deIaqbwBxGihAhKWzVACtsiCf+VOeDV7x8LHGksKeKiS80pKaaoNurzgxjqUKdN5upUGdJl8F4wpuZvNG
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:ja;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY7PR01MB15746.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(1800799024)(366016)(22082099003)(18002099003)(3023799007)(1580799027)(11063799006)(4143699003)(5023799004)(56012099006)(10067099003)(261026140227099003)(261026121527099003)(261028144727099003)(261022105027099003)(261021121427099003)(261022075727099003)(261102123227099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-2022-jp?B?RktEU09qUXlIdndMaVE2S3dneUV6OGFMTHlqSmllQWQxek9RY1ljMTUw?=
+ =?iso-2022-jp?B?Ukc0ZmV4WWRxRk5MdEh5SVRJUGlWa0wvaXh2L2hFTlpFcU1POTdIL0x6?=
+ =?iso-2022-jp?B?bXZVazR5aTVJbzRpSUI0b0txY3NKWC9pcGJKcHlKWDViYVB2R1g0NENj?=
+ =?iso-2022-jp?B?b2twS1pjand1eUJqeStTMHVzT2FWNHRYYk4yVUgwTDkxVyt0ZlV6UXpv?=
+ =?iso-2022-jp?B?K1Y4WWhaSXM2UlVJRFZqY0lMaW1laGJ6NlIvMWdqWC9LcTVIb0dmdmFl?=
+ =?iso-2022-jp?B?MnBQNHdwWlA0RnZnVndONjJPbU9jR25UVTYxV2ZON0UydkdaZjNHTzJ5?=
+ =?iso-2022-jp?B?b25KTGJhc0ltTTJSdjJhR3hwb0RaRm1MV1p0UUFHMUZGS3JLelZYUzFt?=
+ =?iso-2022-jp?B?UHk3c2Fwd1J2bDFzeVBTTGtITDVwdjFJZ1JHOXg5MTRRZ2xsK0x3c2Fo?=
+ =?iso-2022-jp?B?dmhzTm5zYkFObExzcDJ4SlZBajlvdTErM2FJY25ac2tMMnRFZWdBTmpS?=
+ =?iso-2022-jp?B?VmwxMTQwZzhsRnd4NE45eEpxM0hEUzg5T3RpdDRPSlgweTUxRmxkMklp?=
+ =?iso-2022-jp?B?U0dES2NtSHcvSUhZYjJvVjcyNnVuUlprR25qVUl2VTRwaERoMllreWJG?=
+ =?iso-2022-jp?B?ZnpMV3RpdzNMV0MwL1h4Y08weFIxYnFwQkp1R1IxSW1tNW5nRFE5UHNi?=
+ =?iso-2022-jp?B?ZnNQNUo4Sk51ZWxZSlVuRU9nb2xSVEJqYVVsenp6VUttVmxzVS91YWtV?=
+ =?iso-2022-jp?B?eVVMTG1BM25qc1dURHB2Q294V0gzUmp0YmVJOGNZSG9ZRnpwYmhSU3Rz?=
+ =?iso-2022-jp?B?c2ZlR1ZtdE5aRHArKzY2dHZxVStUSzc5NVNEOFJRamZURU9UVjZISDJ6?=
+ =?iso-2022-jp?B?UlpWRW1yUSt1RUtSK3dsOVVhQVFIWDNOMnJPVFpQQjU3eFdGc1ZyN2ht?=
+ =?iso-2022-jp?B?THh6WEVoVkRCK0VHZ0FQTTREZlpsZTI2SkJ2ZGRmeEdLYkRIK25WMmVx?=
+ =?iso-2022-jp?B?VU9pV040bmZPaHlsZHFaZ1R3UlF1NTNwcmJ4VTRIRGNxQmFYMFlQSWIx?=
+ =?iso-2022-jp?B?Y2xKZXdKT082dTBtL2lnbG12Rit1aEhFSG1NN1hEWFpuS2ZUeGpITnM2?=
+ =?iso-2022-jp?B?RXFsQVZrWmcwYVU4d2cxVkpCKzFXOFdtTnVISUNMekZBNFRGdUl1ZUlE?=
+ =?iso-2022-jp?B?RUR5SVNEa2ltZjFUVUFBU3Z4L3d4aEhmbi9YTUI0U2Vubm1RK0wxMmVG?=
+ =?iso-2022-jp?B?MUk2MGFWZ2MxVnozQTZhdUgreHYrUEdrZ25PaDBacFBnSTFQU2t4M1FK?=
+ =?iso-2022-jp?B?QU82NW5ibDdEVDRyUmFyelpOWjRQRW5XalU1aFlMekttQVM4WG9WSHE3?=
+ =?iso-2022-jp?B?RXYrWWJEMDRTRHJZYWc5TU51ZWVIZnVhQXRaaWRGM0svNW1oNzhnT0xM?=
+ =?iso-2022-jp?B?bTMrMWJFcUhlbXRyOGt5all4R1BveXJqb3pla1Vpc0x6SGhaeDZ4U1dU?=
+ =?iso-2022-jp?B?YzRjb01lNGhmZyt4L0ovY21lb1FQWjVncEdUc2I0YnVLbUFISDQ5ek1C?=
+ =?iso-2022-jp?B?U0lTNFk1NXR0NGxETUpFUEFRTlhYYVBYaEJEMUJyNFZzU3ZJekxrblBp?=
+ =?iso-2022-jp?B?ci96alJOejAzTE9Cc24yNHNDdW0reVd2dCtTL2VxWG1pbzdBbHZjbENK?=
+ =?iso-2022-jp?B?aDcwS2M5SEJ1a0tsMXhYUUwvR2tmT1J0ZEszcGtDNnpIbUJWUSt6elA0?=
+ =?iso-2022-jp?B?b3hFSEVWczNTWk5jVXlDQktXWnRTazk1YjdxRWVxbHZCd2hBdVZJOVY1?=
+ =?iso-2022-jp?B?SUl3aFhBWTNGbnJJbW1aR1RhK3oxa3BEU3hSK3RReGpZRzhPU2RaMDRV?=
+ =?iso-2022-jp?B?MXYxOEpjcTYzcGJHb1BjeFBSQTdPYWZmQU5sRDNTYVY4S1FDUmVxN0pn?=
+ =?iso-2022-jp?B?QXp6OG1vQ21kNVBSbUF5UElxUlJwVlRNelpMODZyTWRkeDNYQTRyRWFh?=
+ =?iso-2022-jp?B?WXpBR0pLeUdxTlBKWHBVUVRneHNNSS9RK21HUGZZdng3cTlBbnBVcStC?=
+ =?iso-2022-jp?B?eHl5YkE3eVpIaWszMEt1Zm9Qb1NnVkErRWNEejFVWTB0U2NvVS9lTVBL?=
+ =?iso-2022-jp?B?SXVhckRtZUVhTGVId3JLcGg2Y2luMHBiYU9OSmdUa0xPa1BvMTI0ZGFk?=
+ =?iso-2022-jp?B?Q0t2dWdlRjZ4VVZnNkJycXlucFlzemdxeWZ1dkFKdUhzdm1PNnd5NFFn?=
+ =?iso-2022-jp?B?QXFIaGpKQnZPd1p5L1U4RFlSb2pXSFhrM2ZEZkdCQUpsa3IxK09pUjJU?=
+ =?iso-2022-jp?B?ZDlwSVJaVHY4a3MrMHRwODBkRFI3Ukp4RkNZeWYxd1YvYkpPcU5TYmRZ?=
+ =?iso-2022-jp?B?bG8yM2MyODJCVXhNQlIzcVRZVEtmbytQbXYveldzTlJ6RHR5MzNGVzJB?=
+ =?iso-2022-jp?B?clFZMllZamNUMFRhbTBhSTJSaWRoMTVyUGRaWGp1Q0c1aDVnUnFuQXJi?=
+ =?iso-2022-jp?B?L1Y5dWkzVWJNcG82WEdnSlplOExpM0o4OUVUbVVaNlEvNVRreGRDZUkr?=
+ =?iso-2022-jp?B?NERCL3Y3Zz0=?=
+Content-Type: text/plain; charset="iso-2022-jp"
+Content-Transfer-Encoding: quoted-printable
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -99,431 +178,76 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="SiI1FD/O0lCfvQZp"
-Content-Disposition: inline
-In-Reply-To: <86zev6yqzd.wl-maz@kernel.org>
+X-Exchange-RoutingPolicyChecked:
+	3al62UTYG7QHy/PJeSO4tWnIY/kSt/vUUMgeVZUaQclPHb0vKjR1eCIvRu9r4affa91R6kGxY22FF7s/BaPsbnrZnTzPAAtOoPn+OxqHbXhl7TeOHLSTMyPjm7j0tBDrgGgMP8rhybra6+OeykdnwAt2l9cxh5OzTltSpSu3wQ9FZ9x1a+eDIcY/J07IbG56J2AYBc1rLv8TWq2DKfIiXuaNgbbeF47aJdWY0bSQZTZ4ODoxAJN+f0a5KW8rOQjuMqiDdEozyDVH30Dm1qXvP81v7H4Rk2c9Bu44rnvG3MWHhMzawSwXq3SREzR9d218iZubib4ab6TxhnqnXRjujg==
+X-OriginatorOrg: fujitsu.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TY7PR01MB15746.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a03f50df-a043-4152-864e-08df4617cdcf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2026 08:33:36.0713
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a19f121d-81e1-4858-a9d8-736e267fd4c7
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LfIY7iN6tkrfj1uqqsHMY7gFB1dE1SXzcvPuuuwiYBYGyVG5YhL3lp9laH5uS+wEvgchfna3syB/DF0yYFGjAy+QoSqw1a8YWBZ5D0pH44E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCPR01MB10335
 
---SiI1FD/O0lCfvQZp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> Subject: Re: [PATCH v2 2/4] arm64: tlb: Add tlbi workaround for FUJITSU-M=
+ONAKA Erratum E#030001
+>=20
+> On Fri, 16 Oct 2026 12:50:17 +0100,
+> Mark Rutland <mark.rutland@arm.com> wrote:
+> >
+> > On Fri, Oct 16, 2026 at 07:00:46PM +0900, Tomohiro Misono wrote:
+> > > FUJITSU-MONAKA Erratum E#030001 affects FUJITSU-MONAKA CPU
+> > > when using TLBI range operations.
+> > >
+> > > On affected FUJITSU-MONAKA CPUs, range-based TLBI operations
+> > > targeting a VA or IPA may fail to invalidate TLB entries when
+> > > addr[34:29] =3D=3D all 1 && addr[28:0] =3D=3D 0 for 512MB mappings.
+> > > The affected instructions are:
+> > >   RVA[L]E{1,2,3}*, RVAA[L]E1*, and RIPAS2[L]E1*.
+> > >
+> > > Work around the erratum by issuing additional non-range
+> > > TLBI instructions corresponding to the affected VA or IPA
+> > > range-based TLBI operations.
+> > >
+> > > Signed-off-by: Tomohiro Misono <misono.tomohiro@fujitsu.com>
+> >
+> > As Will and I suggested last time, we'd prefer to disable range
+> > operations on these parts (and ensure that the relevant ID field is
+> > hidden from KVM guests).
+> >
+> > Regardless of whether eventually accept the approach you propose here,
+> > we first need something simple to backport to stable trees (as I assume
+> > you'll want to run standard Linux distributions on this hardware). The
+> > TLB invalidation code has changed a lot over time, and I don't think
+> > it's practical or sensible to backport this patch.
+> >
+> > As a first step, I think we should simply disable the use of range
+> > operations on these parts, and ensure that KVM hides the relevant ID
+> > field. After that, we can consider optimizing the workaround, as you
+> > propose here.
+> >
+> > Marc, does that align with your expectations?
+>=20
+> Yes. I'd rather we start with a clean slate so that an unsuspecting
+> guest cannot get things wrong because it doesn't know about the
+> erratum. Anything else is icing on the cake that is not desirable at
+> this stage.
+>=20
+> > Is there an existing pattern to follow for hiding the ID field?
+>=20
+> Ideally, TLBI_RANGE would be removed from the ID_AA64ISAR0_EL1 copy
+> that the kernel has, and KVM would simply inherit this. I'm not sure
+> we have a good way to do that other than doing horrible things with
+> the override masks.
+>=20
+> Otherwise, something as simple as forcing the ID_AA64ISAR0_EL1 reset
+> value in sys_regs.c would work.
 
-On Wed, Nov 18, 2026 at 05:44:06PM +0000, Marc Zyngier wrote:
-> On Wed, 18 Nov 2026 13:45:34 +0000,
-> sashiko-bot@kernel.org wrote:
-> > 
-> > Thank you for your contribution! Sashiko AI review found 1 potential
-> > issue to consider:
-> > - [Medium] KVM: arm64: stale mmio_needed after kvm_inject_nested() in
-> >   KVM_SET_VCPU_EVENTS
-> > --
-> > 
-> > commit 178d0de7451612b8ddf14a943cb82094efbd77d1
-> > Author: Dan Carpenter <dan@pereq.eu>
-> > 
-> > KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
-> > 
-> > This commit wraps __kvm_arm_vcpu_set_events() in vcpu_load() and vcpu_put()
-> > so that kvm_inject_nested() operates on a loaded vCPU during
-> > KVM_SET_VCPU_EVENTS.
-> > 
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index 84a52e27ed859..a148e80d0aef7 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -2002,7 +2002,7 @@ static int kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
-> > >  static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
-> > >  				   struct kvm_vcpu_events *events)
-> > >  {
-> > > -	int i;
-> > > +	int i, ret;
-> > >  
-> > >  	/* check whether the reserved field is zero */
-> > >  	for (i = 0; i < ARRAY_SIZE(events->reserved); i++)
-> > > @@ -2014,7 +2014,11 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
-> > >  		if (events->exception.pad[i])
-> > >  			return -EINVAL;
-> > >  
-> > > -	return __kvm_arm_vcpu_set_events(vcpu, events);
-> > > +	vcpu_load(vcpu);
-> > > +	ret = __kvm_arm_vcpu_set_events(vcpu, events);
-> > > +	vcpu_put(vcpu);
-> > > +
-> > > +	return ret;
-> > >  }
-> > 
-> > [Severity: Medium]
-> > Does vcpu->mmio_needed remain set when KVM_SET_VCPU_EVENTS injects an
-> > exception from L2 that routes to L1 EL2?
-> > 
-> > When an L2 guest exits with KVM_EXIT_MMIO and userspace aborts the access via
-> > KVM_SET_VCPU_EVENTS (for example with ext_dabt_pending = 1 while HCR_EL2.TEA
-> > is set), kvm_inject_sea_dabt() -> kvm_inject_nested() commits the EL2
-> > exception entry directly via __kvm_adjust_pc(), which clears
-> > PENDING_EXCEPTION.  When __kvm_arm_vcpu_set_events() then calls
-> > commit_pending_events(), PENDING_EXCEPTION is already clear, so it returns
-> > early without clearing vcpu->mmio_needed:
-> > 
-> > arch/arm64/kvm/guest.c:commit_pending_events() {
-> > 	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
-> > 		return;
-> > 
-> > 	vcpu->mmio_needed = false;
-> > 	kvm_call_hyp(__kvm_adjust_pc, vcpu);
-> > }
-> > 
-> > On the next KVM_RUN, kvm_handle_mmio_return() sees vcpu->mmio_needed still
-> > set, writes the MMIO read value into L1 EL2's destination register and
-> > advances L1 EL2's exception vector PC by 4 bytes via kvm_incr_pc().
-> 
-> I think this is a separate issue, which doesn't intersect with the
-> current patch.
+It seems this approach is simpler so I will implement this in v3.
+Thanks for the suggestion.
 
-Yep.
-
-> The problem is that we have multiple ways to "commit'
-> the state on exception delivery, and that we miss MMIO handling in the
-> EL1->EL2 path.
-> 
-> Oliver, WDYT?
-> 
-
-I have a reproducer for the bug Sashiko found and this patch doesn't
-work.  Attached.  Claude wanted to just set vcpu->mmio_needed = false;
-but I told it to call commit_pending_events() instead.
-
-I can send that.
-
-regards,
-dan carpenter
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 0614c3b3a40dfd..c75b0c62382444 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1354,6 +1354,7 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 
- int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events);
-+void commit_pending_events(struct kvm_vcpu *vcpu);
- 
- void kvm_arm_halt_guest(struct kvm *kvm);
- void kvm_arm_resume_guest(struct kvm *kvm);
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 39136a89d74bb6..5a7019bb719b2a 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2921,7 +2921,7 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
- 	 * Make sure the exception actually took place before we load
- 	 * the new context.
- 	 */
--	__kvm_adjust_pc(vcpu);
-+	commit_pending_events(vcpu);
- 
- 	kvm_arch_vcpu_load(vcpu, smp_processor_id());
- 	vcpu_clear_flag(vcpu, IN_NESTED_EXCEPTION);
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index ba4570c52a9162..b7d36c2abfdf9b 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -770,7 +770,7 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
--static void commit_pending_events(struct kvm_vcpu *vcpu)
-+void commit_pending_events(struct kvm_vcpu *vcpu)
- {
- 	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
- 		return;
--- 
-2.53.0
-
---SiI1FD/O0lCfvQZp
-Content-Type: application/x-sh
-Content-Disposition: attachment; filename=build.sh
-Content-Transfer-Encoding: quoted-printable
-
-#!/bin/sh=0A# build.sh: builds stale_mmio, a static arm64 binary, in this d=
-irectory.=0A# On an arm64 machine it uses CC (default gcc); elsewhere the c=
-ross compiler=0A# (CC, default aarch64-linux-gnu-gcc).=0Acd "$(dirname "$0"=
-)" || exit 1=0Aif [ "$(uname -m)" =3D aarch64 ]; then=0A	CC=3D${CC:-gcc}=0A=
-else=0A	CC=3D${CC:-aarch64-linux-gnu-gcc}=0Afi=0A$CC -O2 -Wall -static -o s=
-tale_mmio stale_mmio.c=0A
---SiI1FD/O0lCfvQZp
-Content-Type: text/x-csrc; charset=us-ascii
-Content-Disposition: attachment; filename=stale_mmio.c
-
-/*
- * stale_mmio: after an L2 MMIO exit, the KVM_SET_VCPU_EVENTS ioctl with
- * serror_pending routes the SError to L1 (L1's HCR_EL2.AMO is set), and
- * kvm_inject_nested() performs the exception entry straight away.  That
- * must also drop the pending MMIO emulation: otherwise the next KVM_RUN
- * completes the L2 access in L1's context, skips the first instruction of
- * L1's SError vector and, for a read, writes the MMIO data to an L1
- * register.
- *
- * The vcpu is put in L2 context with KVM_SET_ONE_REG (HCR_EL2 = E2H | RW |
- * AMO, PSTATE = EL1h) and run once: L2 does one access to an address with
- * no memslot, which exits to userspace as MMIO.  Then the SError is set
- * pending, the vcpu must be at L1's SError vector (VBAR_EL2 + 0x580), and
- * it is run again.  L1's vector is
- *
- *	+0x580	str	x0, [x3]	// MMIO at L1_MMIO: the vector ran from its start
- *	+0x584	str	x0, [x4]	// MMIO at SKIP_MMIO: its first instruction was skipped
- *
- * Usage: stale_mmio write|read
- *   write: L2 does str x0, [x2].
- *   read:  L2 does ldr x5, [x2]; userspace answers with MMIO_DATA, and x5
- *          must keep its value, as the load never completed.
- *
- * Exit 0 when L1's vector runs from its start (and x5 is untouched), 1
- * when the stale MMIO emulation shows, 2 on a set-up error or another
- * result.  Kernels without "KVM: arm64: Load the vcpu in
- * KVM_SET_VCPU_EVENTS" oops in the ioctl instead (see
- * nv-set-vcpu-events-put-load-unloaded).
- */
-#include <errno.h>
-#include <fcntl.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <unistd.h>
-#include <linux/kvm.h>
-
-#ifndef KVM_ARM_VCPU_HAS_EL2
-#define KVM_ARM_VCPU_HAS_EL2	7
-#endif
-#ifndef KVM_CAP_ARM_EL2
-#define KVM_CAP_ARM_EL2		240
-#endif
-
-#define MEM_BASE	0x40000000UL		/* the memslot: 64K of guest memory */
-#define MEM_SIZE	0x10000UL
-#define CODE		(MEM_BASE + 0x0)	/* L2 code */
-#define VECTORS		(MEM_BASE + 0x800)	/* L1's EL2 vectors, 2K aligned */
-#define MMIO		0x10000000UL		/* no memslot here */
-#define L1_MMIO		0x10001000UL
-#define SKIP_MMIO	0x10002000UL
-#define MMIO_DATA	0x1234567876543210ULL
-#define X5_INIT		0x5555555555555555ULL
-
-#define GICD_BASE	0x08000000UL
-#define GICR_BASE	0x080a0000UL
-
-#define HCR_AMO		(1ULL << 5)
-#define HCR_RW		(1ULL << 31)
-#define HCR_E2H		(1ULL << 34)
-
-/* PSR_MODE_MASK, PSR_MODE_EL1h and PSR_MODE_EL2h come from asm/ptrace.h. */
-#define PSR_EL1h_DAIF	0x3c5ULL		/* EL1h, D, A, I and F masked */
-
-#define SERROR_LOWER_A64	0x580		/* lower EL using AArch64, SError */
-
-#define CORE_REG(name)	(KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | \
-			 KVM_REG_ARM_CORE_REG(name))
-#define REG_HCR_EL2	ARM64_SYS_REG(3, 4, 1, 1, 0)
-#define REG_VBAR_EL2	ARM64_SYS_REG(3, 4, 12, 0, 0)
-#define REG_ESR_EL2	ARM64_SYS_REG(3, 4, 5, 2, 0)
-
-static int fail(const char *what)
-{
-	fprintf(stderr, "%s: %s\n", what, strerror(errno));
-	return 2;
-}
-
-static int set_reg(int vcpu, uint64_t id, uint64_t val)
-{
-	struct kvm_one_reg reg = { .id = id, .addr = (uint64_t)(uintptr_t)&val };
-
-	return ioctl(vcpu, KVM_SET_ONE_REG, &reg);
-}
-
-static int get_reg(int vcpu, uint64_t id, uint64_t *val)
-{
-	struct kvm_one_reg reg = { .id = id, .addr = (uint64_t)(uintptr_t)val };
-
-	return ioctl(vcpu, KVM_GET_ONE_REG, &reg);
-}
-
-static int dev_attr(int fd, uint32_t group, uint64_t attr, void *val)
-{
-	struct kvm_device_attr a = {
-		.group = group, .attr = attr, .addr = (uint64_t)(uintptr_t)val,
-	};
-
-	return ioctl(fd, KVM_SET_DEVICE_ATTR, &a);
-}
-
-int main(int argc, char **argv)
-{
-	struct kvm_userspace_memory_region region;
-	struct kvm_create_device gic = { .type = KVM_DEV_TYPE_ARM_VGIC_V3 };
-	struct kvm_vcpu_events events;
-	struct kvm_vcpu_init init;
-	struct kvm_run *run;
-	uint64_t gicd = GICD_BASE, gicr = GICR_BASE, pc, pstate, esr, x5;
-	int kvm, vm, vcpu, run_size, i, read;
-	uint32_t *code;
-	uint8_t *mem;
-
-	if (argc != 2 || (strcmp(argv[1], "write") && strcmp(argv[1], "read"))) {
-		fprintf(stderr, "usage: %s write|read\n", argv[0]);
-		return 2;
-	}
-	read = !strcmp(argv[1], "read");
-
-	kvm = open("/dev/kvm", O_RDWR);
-	if (kvm < 0)
-		return fail("/dev/kvm");
-	if (ioctl(kvm, KVM_CHECK_EXTENSION, KVM_CAP_ARM_EL2) <= 0) {
-		fprintf(stderr, "KVM_CAP_ARM_EL2 missing: boot with kvm-arm.mode=nested\n");
-		return 2;
-	}
-	vm = ioctl(kvm, KVM_CREATE_VM, 0);
-	if (vm < 0)
-		return fail("KVM_CREATE_VM");
-
-	mem = mmap(NULL, MEM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-	if (mem == MAP_FAILED)
-		return fail("mmap");
-	region = (struct kvm_userspace_memory_region) {
-		.slot = 0, .guest_phys_addr = MEM_BASE, .memory_size = MEM_SIZE,
-		.userspace_addr = (uint64_t)(uintptr_t)mem,
-	};
-	if (ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region))
-		return fail("KVM_SET_USER_MEMORY_REGION");
-
-	/* L2: one access that exits as MMIO.  L1's vectors: spin, except SError. */
-	code = (uint32_t *)(mem + (CODE - MEM_BASE));
-	code[0] = read ? 0xf9400045 :	/* ldr x5, [x2] */
-			 0xf9000040;	/* str x0, [x2] */
-	code[1] = 0x14000000;		/* b . */
-	for (i = 0; i < 0x800 / 4; i++)
-		((uint32_t *)(mem + (VECTORS - MEM_BASE)))[i] = 0x14000000;
-	code = (uint32_t *)(mem + (VECTORS + SERROR_LOWER_A64 - MEM_BASE));
-	code[0] = 0xf9000060;		/* str x0, [x3] */
-	code[1] = 0xf9000080;		/* str x0, [x4] */
-
-	if (ioctl(vm, KVM_CREATE_DEVICE, &gic))
-		return fail("KVM_CREATE_DEVICE (vGICv3)");
-	if (dev_attr(gic.fd, KVM_DEV_ARM_VGIC_GRP_ADDR, KVM_VGIC_V3_ADDR_TYPE_DIST, &gicd) ||
-	    dev_attr(gic.fd, KVM_DEV_ARM_VGIC_GRP_ADDR, KVM_VGIC_V3_ADDR_TYPE_REDIST, &gicr))
-		return fail("setting the vGIC addresses");
-
-	vcpu = ioctl(vm, KVM_CREATE_VCPU, 0);
-	if (vcpu < 0)
-		return fail("KVM_CREATE_VCPU");
-	if (ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init))
-		return fail("KVM_ARM_PREFERRED_TARGET");
-	init.features[0] |= 1U << KVM_ARM_VCPU_HAS_EL2;
-	if (ioctl(vcpu, KVM_ARM_VCPU_INIT, &init))
-		return fail("KVM_ARM_VCPU_INIT with KVM_ARM_VCPU_HAS_EL2");
-	if (dev_attr(gic.fd, KVM_DEV_ARM_VGIC_GRP_CTRL, KVM_DEV_ARM_VGIC_CTRL_INIT, NULL))
-		return fail("initialising the vGIC");
-
-	/* L2 context, with L1 asking for SErrors (AMO).  No stage 2 (VM=0). */
-	if (set_reg(vcpu, REG_HCR_EL2, HCR_E2H | HCR_RW | HCR_AMO) ||
-	    set_reg(vcpu, REG_VBAR_EL2, VECTORS) ||
-	    set_reg(vcpu, CORE_REG(regs.regs[2]), MMIO) ||
-	    set_reg(vcpu, CORE_REG(regs.regs[3]), L1_MMIO) ||
-	    set_reg(vcpu, CORE_REG(regs.regs[4]), SKIP_MMIO) ||
-	    set_reg(vcpu, CORE_REG(regs.regs[5]), X5_INIT) ||
-	    set_reg(vcpu, CORE_REG(regs.pc), CODE) ||
-	    set_reg(vcpu, CORE_REG(regs.pstate), PSR_EL1h_DAIF))
-		return fail("KVM_SET_ONE_REG");
-
-	run_size = ioctl(kvm, KVM_GET_VCPU_MMAP_SIZE, 0);
-	run = mmap(NULL, run_size, PROT_READ | PROT_WRITE, MAP_SHARED, vcpu, 0);
-	if (run == MAP_FAILED)
-		return fail("mmap kvm_run");
-
-	if (ioctl(vcpu, KVM_RUN, 0))
-		return fail("KVM_RUN");
-	if (run->exit_reason != KVM_EXIT_MMIO || run->mmio.phys_addr != MMIO ||
-	    run->mmio.is_write == read) {
-		fprintf(stderr, "unexpected exit: reason %u (expected an MMIO %s at 0x%lx)\n",
-			run->exit_reason, argv[1], MMIO);
-		return 2;
-	}
-	if (get_reg(vcpu, CORE_REG(regs.pstate), &pstate))
-		return fail("KVM_GET_ONE_REG PSTATE");
-	if ((pstate & PSR_MODE_MASK) != PSR_MODE_EL1h) {
-		fprintf(stderr, "after the run the vCPU is not in L2's EL1 (PSTATE 0x%llx)\n",
-			(unsigned long long)pstate);
-		return 2;
-	}
-	printf("%s: ran L2 and exited to userspace (MMIO %s at 0x%llx); now KVM_SET_VCPU_EVENTS serror_pending\n",
-	       argv[1], argv[1], (unsigned long long)run->mmio.phys_addr);
-	fflush(stdout);
-
-	memset(&events, 0, sizeof(events));
-	events.exception.serror_pending = 1;
-	if (ioctl(vcpu, KVM_SET_VCPU_EVENTS, &events))
-		return fail("KVM_SET_VCPU_EVENTS");
-
-	if (get_reg(vcpu, CORE_REG(regs.pc), &pc) ||
-	    get_reg(vcpu, CORE_REG(regs.pstate), &pstate) ||
-	    get_reg(vcpu, REG_ESR_EL2, &esr))
-		return fail("KVM_GET_ONE_REG after the injection");
-	printf("KVM_SET_VCPU_EVENTS returned: PC 0x%llx, PSTATE 0x%llx, ESR_EL2 0x%llx\n",
-	       (unsigned long long)pc, (unsigned long long)pstate, (unsigned long long)esr);
-
-	if (pc != VECTORS + SERROR_LOWER_A64 || (pstate & PSR_MODE_MASK) != PSR_MODE_EL2h) {
-		fprintf(stderr, "the ioctl returned, but the vCPU is not at L1's SError vector\n");
-		return 2;
-	}
-	printf("the SError was delivered to L1's EL2; running again\n");
-
-	/* What a VMM would hand back for the read, had it not aborted it. */
-	if (read)
-		memcpy(run->mmio.data, &(uint64_t){ MMIO_DATA }, sizeof(uint64_t));
-
-	if (ioctl(vcpu, KVM_RUN, 0))
-		return fail("second KVM_RUN");
-	if (run->exit_reason != KVM_EXIT_MMIO) {
-		fprintf(stderr, "second run: unexpected exit: reason %u (expected MMIO)\n",
-			run->exit_reason);
-		return 2;
-	}
-	if (get_reg(vcpu, CORE_REG(regs.regs[5]), &x5))
-		return fail("KVM_GET_ONE_REG x5");
-	printf("%s: second run: MMIO at 0x%llx, x5 0x%llx\n", argv[1],
-	       (unsigned long long)run->mmio.phys_addr, (unsigned long long)x5);
-
-	if (run->mmio.phys_addr == L1_MMIO && x5 == X5_INIT) {
-		printf("%s: L1's SError vector ran from its first instruction\n", argv[1]);
-		return 0;
-	}
-	if (run->mmio.phys_addr == SKIP_MMIO || (read && x5 == MMIO_DATA)) {
-		printf("%s: stale MMIO emulation: %s%s\n", argv[1],
-		       run->mmio.phys_addr == SKIP_MMIO ? "L1's first vector instruction was skipped" : "",
-		       read && x5 == MMIO_DATA ? ", x5 got the aborted read's data" : "");
-		return 1;
-	}
-	fprintf(stderr, "%s: unexpected result\n", argv[1]);
-	return 2;
-}
-
---SiI1FD/O0lCfvQZp
-Content-Type: application/x-sh
-Content-Disposition: attachment; filename=run_on_L1.sh
-Content-Transfer-Encoding: quoted-printable
-
-#!/bin/sh=0A# run_on_L1.sh: runs stale_mmio (write and read) on an arm64 L1=
- booted with=0A# kvm-arm.mode=3Dnested (build it first with build.sh).  Nee=
-ds /dev/kvm (the=0A# kvm group) and sudo for the kernel log.  Prints "Bug r=
-eproduced." or=0A# "Unable to reproduce the bug.".=0A#=0A# The L1 kernel ne=
-eds "KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS";=0A# without it the =
-ioctl oopses first (the NULL hw_mmu bug), and the L1 should=0A# be rebooted=
-=2E=0Acd "$(dirname "$0")" || exit 1=0Auname -r=0Abefore=3D$(sudo dmesg | g=
-rep -c 'Unable to handle kernel')=0Abug=3D0=0Afor mode in write read; do=0A=
-	timeout 30 ./stale_mmio $mode=0A	rc=3D$?=0A	after=3D$(sudo dmesg | grep -c=
- 'Unable to handle kernel')=0A	if [ "$after" -gt "$before" ]; then=0A		echo=
- "The kernel oopsed: this L1 lacks the KVM_SET_VCPU_EVENTS load fix.  Reboo=
-t it."=0A		exit 2=0A	fi=0A	case $rc in=0A	0) ;;=0A	1) bug=3D1 ;;=0A	*) echo=
- "$mode: set-up error or unexpected result (exit $rc)"; exit 2 ;;=0A	esac=
-=0Adone=0Aif [ $bug -eq 1 ]; then=0A	echo "Bug reproduced."=0A	exit 0=0Afi=
-=0Aecho "Unable to reproduce the bug."=0Aexit 1=0A
---SiI1FD/O0lCfvQZp--
+Regards,
+Tomohiro Misono
