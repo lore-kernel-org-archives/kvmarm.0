@@ -1,55 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.20
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795168071;
-	b=1OLbTVWqhLEYL8uC/SPGthx1uRW/1AkdDtC88DOHTR6LBr82ddOKJiJsWD+EJ9gcvDno
-	 SozU9rLcqshk3iGnfPkdjhyOjkiNVHtjiGFZQaDMPUyIyMLuiPeJHzEv6lbkIAkyrxN8P
-	 JadeNUiTKPv2UfEVkc/kUNnXgUN6O8zjR5HJK3Yw3D8OwFc2u648b79GsMgopiFt6PZt3
-	 5L3KT5l6DwbT47bea7rTw8o0Pn0JmII0xS8Jg+u2vZgL2jB/iHj+Xjve6aQfuJXrMyuzR
-	 sjy3ssPWd7iZ5PgVIgvedWpFJhyVFOE9BrNLbFFShaNjjEG7265rKNQUCvCJQLQbSEQ==
+	t=1795168460;
+	b=fz2kIMeY1ahGosypp5aVg812eqmrnAaIq3egQIka2mYmC8PALRq3mkctK9KSmT5ioaKI
+	 G85nJXprgJYvi13rupQUCsUGKKWQtfz3hJopP3zcWDzCQheip4Zdgb9HNv8OJToS3B4ME
+	 lR1daaMHjLDMTJwycB2+TJsuEd4Ug3Dnk4rVXffvSuzq+kNh7sHc2g7uERck/u8MXJAaB
+	 wIaj+nZ0M4KeOMvf2YHtXbQiJX4hiI7CW+fv+DY3tu7dbsCf+pTyYB79+No2EloIPoP1f
+	 c2y6pzV01sVvJnd+ZjQuOb67p3CDSCl8+o0m37nkXMWXhT2dfIPBDzi3OpZ7ypgaQBg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795168071;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=YU5P8Wuc2M6bZTL3XK84wjuebJ0zvL/QXfNPgZyOqi0=;
-	b=A8pZl/jWjMixP1FwLrKWrbCKpwUiMAsPfWRMf711jpRwhSQSMZAweRjWUxl/ApbEjkl8
-	 DE6kfy19QhgfACfrhH3RPPeV4ZxtTzu831hDXDdVmymTxPQWKOAOV0ATSyxNSLakj32rw
-	 6+X+0Wj4dWNQma6UFHNKDUomOHZr4dwB/JQVsYCzX2fY8eAMoBOQofeGT46QSQdnc1t32
-	 Dfsf3pi6NMYe4/LncOgMb6wIyqD3J2LR+jcSTprungw1hXDEmJU0eLLKy0+H6Dhj+l8ax
-	 z+Rz4JExIVK/25e3V09RXTRPejWa+Tlhb0YN93G9Htl9H0sP3SbzXAqNA5gi52xBISw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795168460;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=toC7g/mQwam01PNWnVEE4EXGk05THrMqM14HugAXhgw=;
+	b=FWJPojHqOc0oDQh2p/zxXfcS5/Hl02xjsfSPEh24acKy+tPpV0ghgi8FUPY7Kl1f0rfb
+	 f2lbKVoBtpMZJ9sJD5IjT8EyKpUAgpWcEL8Xv1LKFMXbWmFViJg3g0usYVxFhZHrJlJpT
+	 U4EkABcJAJm6vbN0f1odZom5W1RV0I/Bxh0ZC7eRdR41NTywnKL953PtgzupRI8TDw5Ue
+	 IIwsqCcDL/0ejIDtlOf0XXb5NzTTYn+A3aXANUxesarrxaT00wRY2oBAFJ7D/b5egWNhL
+	 k2ozQr5O8hrkdtoZlImbqPz1G/0p2NmE3ZTx3bvkj+fmXekHbxNcI9WjFcqdLXLIyAA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TTQIJQdF;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=d5uKR4ys;
+	arc=none smtp.remote-ip=198.175.65.20
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16D2606A325
-	for <kvmarm@lists.linux.dev>; Fri, 20 Nov 2026 09:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215D960A261B;
+	Fri, 20 Nov 2026 09:54:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 215D960A261B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TTQIJQdF
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B5111F000EB
-	for <kvmarm@lists.linux.dev>; Fri, 20 Nov 2026 09:47:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795168071;
-	bh=YU5P8Wuc2M6bZTL3XK84wjuebJ0zvL/QXfNPgZyOqi0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=TTQIJQdFmsgcCJvZ5orSt7w0DatjFVZQwcM9IEaWaC+WjWprBbCupEHBw2ZEdEY5b
-	 BIBCQ8gTLt9anGc3R+WoUEP/8X0wqmmRyUA0Is+/tDt6D0Coe+GssnIRmwyUztMzR9
-	 n9c4oX6NDEhgWoC9wYM7VnNjMV3ikjcOOi9DiBzT4NUIQQANyKjVCwoQ9tX93LQ4Td
-	 Wyq5vz3a4GnOFKlXnvezyfJNzLPLOgMgy6KV/q8eVLSgE7z+o4JrHPe3rMwYrkadWP
-	 lboTcbWu9QSv9dLAlRzQXsDKcewPjqfaR/lq9p/AjBDOYgb+cEVXKzHr7WrFntR/Gm
-	 Qp/UOxFXEysyQ==
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-3adef977ad9so5319851fa.1
-        for <kvmarm@lists.linux.dev>; Fri, 20 Nov 2026 01:47:51 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErGCcLecyMPWtJjCEsdx6Afxt6novrdVbjz8aVvVPfHZxp+mKGNi5ARObuBON+Gw+w8Pfu8JXsM=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9Qd3V+co/5qrETTSG3WxSG58hqsjADUSAANZb1qQqSKpKRwz5y
-	do/KwaQo2sVnx3lqzrMESG4TysrCqoC2k6QrqTEI0Nm1CSIh29ZpJ5Fe8gErTlxViS9ecvqDupe
-	80V9yLkCk7ki9eLcBx529MzHSjrGHARU=
-X-Received: by 2002:a05:6512:6d0:b0:5c0:463:7b4d with SMTP id
- 2adb3069b0e04-5c1bc85f15fmr656116e87.46.1795168069914; Fri, 20 Nov 2026
- 01:47:49 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=d5uKR4ys
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1795168461; x=1826704461;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=2IgmBcIuK8iKdSO/EWf2izgDQSehVeqYibGtFqL+DMg=;
+  b=d5uKR4ys9sPMhqillYSYfjaPgSl5pJy/++stb93cvLtIvyGlrPE+88DY
+   HYS1TbaBpocwC9XiGq5pUqHYmYmYIFIVrEb6EfX0YKSPp9u7OZRU6M8kA
+   sBJhdAfYmqE3oAHGtq1cx5N16H0vHQ3WSLhCwNw40npDPnCTPoMFt0sRr
+   Efj+bEJrWtDip8yLtbs+vkR7fpYJvy3stAHyWj63Ka8V1kIcpZlMD1pcw
+   qfblMvJnzl0qK4Jla5e7zRAXzIzIcM4hKeeeOmnrHYy9cd+4WboWW8TH2
+   ub43RI9IEL5yGeVK1iWVmEjyHt0H6+7oXGmpJhCGx4OTjQWuEnAbkDRrj
+   w==;
+X-CSE-ConnectionGUID: OVbCBOY8SqWhC22wFqSvOg==
+X-CSE-MsgGUID: Pwt32V9ORsC+6+otIZFN+A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11971"; a="4085328"
+X-IronPort-AV: E=Sophos;i="6.27,222,1787036400"; 
+   d="scan'208";a="4085328"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2026 01:54:20 -0800
+X-CSE-ConnectionGUID: fZlQO3tfSKq+pWuRGHALcA==
+X-CSE-MsgGUID: yBxFOHSZQdaGaldQSiVmTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,222,1787036400"; 
+   d="scan'208";a="10802136"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 20 Nov 2026 01:54:14 -0800
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xULJq-00000001HWp-2jPC;
+	Fri, 20 Nov 2026 09:54:10 +0000
+Date: Fri, 20 Nov 2026 17:53:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tomohiro Misono <misono.tomohiro@fujitsu.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>, Marc Zyngier <maz@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Radu Rendec <radu@rendec.net>,
+	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Kohei Enju <enju.kohei@fujitsu.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 4/5] irqchip/gicv3: Add workaround for FUJITSU-MONAKA
+ Erratum E#030003
+Message-ID: <202611201734.HqRvXW7Q-lkp@intel.com>
+References: <20261119-monaka-fix-for-upstream-v3-4-057df4d2ca3c@fujitsu.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,68 +98,43 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261015142552.4128028-1-ryan.roberts@arm.com> <20261015142552.4128028-2-ryan.roberts@arm.com>
-In-Reply-To: <20261015142552.4128028-2-ryan.roberts@arm.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Fri, 20 Nov 2026 10:47:37 +0100
-X-Gmail-Original-Message-ID: <CAD++jLkrWojU3FeTPGOCFHHsbmTGYG0Tz3b2nrn7mMfsDssCQw@mail.gmail.com>
-X-Gm-Features: Aa3M54rOrfZtY95RmYFxRv97HUcFxeSdg2w3O8Cm90EYC1dabPW2gsgZ-nnS-cY
-Message-ID: <CAD++jLkrWojU3FeTPGOCFHHsbmTGYG0Tz3b2nrn7mMfsDssCQw@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 01/15] misc/arm-cla: Add driver skeleton and documentation
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@nvidia.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jean-Philippe Brucker <jpb@kernel.org>, Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261119-monaka-fix-for-upstream-v3-4-057df4d2ca3c@fujitsu.com>
 
-On Thu, Oct 15, 2026 at 4:26=E2=80=AFPM Ryan Roberts <ryan.roberts@arm.com>=
- wrote:
+Hi Tomohiro,
 
-> +Inter-Accelerator Communication
-> +-------------------------------
-> +
-> +On some platforms, multiple accelerators, each attached to a separate CL=
-A within
-> +a cluster, are also directly connected to each other via a shared bus to
-> +accelerate cooperation between accelerators. The accelerators sharing a =
-bus
-> +cannot be isolated from each other. When collaborative operations are la=
-unched
-> +on each of the participating accelerators, they synchronize over the bus=
-,
-> +stalling until all are ready.
+kernel test robot noticed the following build warnings:
 
-What the patch series needs to do is tell us how this topology is discovere=
-d.
-I.e. will it be discoverable from the hardware itself, or will this topolog=
-y be
-described in device tree or ACPI for example?
+[auto build test WARNING on aebb7274476403040d582c61478df8f4a7bf9cd3]
 
-The kernel must certainly know this topology to be able to synchronize
-work across several cores? What happens if an asynchronous acceleration
-task is running on some cores and no actual CPU load is on any of them
-and the kernel want to put them to idle or shut them down? Same problem
-on the cluster level?
+url:    https://github.com/intel-lab-lkp/linux/commits/Tomohiro-Misono/arm64-cputype-Add-FUJITSU-MONAKA-definition/20261119-180433
+base:   aebb7274476403040d582c61478df8f4a7bf9cd3
+patch link:    https://lore.kernel.org/r/20261119-monaka-fix-for-upstream-v3-4-057df4d2ca3c%40fujitsu.com
+patch subject: [PATCH v3 4/5] irqchip/gicv3: Add workaround for FUJITSU-MONAKA Erratum E#030003
+config: arm-randconfig-1003-20261120 (https://download.01.org/0day-ci/archive/20261120/202611201734.HqRvXW7Q-lkp@intel.com/config)
+compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 3b14d7c370558b46e5f0c6494a05c492e59bf32c)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261120/202611201734.HqRvXW7Q-lkp@intel.com/reproduce)
 
-Further since this appears to be hardware topology userspace must obtain
-this information from the kernel, not the other way around: we cannot
-have a situation where userspace "just knows" stuff about the hardware,
-keeping the kernel in the dark.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202611201734.HqRvXW7Q-lkp@intel.com/
 
-I think this is a wider question about the discovery of these CLA:s:
-there must be a coherent story about how userspace finds it and maps
-it topology and that information must come from the kernel, so the
-kernel and userspace have the same map of the world.
+All warnings (new ones prefixed by >>):
 
-Right now IIUC the driver probes from discovery in the hardware from
-CPU-specific registers so does this discovery also include the topology?
+>> drivers/irqchip/irq-gic-v3.c:83:32: warning: unused variable 'gic_fujitsu_030003_erratum' [-Wunused-variable]
+      83 | static DEFINE_STATIC_KEY_FALSE(gic_fujitsu_030003_erratum);
+         |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   1 warning generated.
 
-Yours,
-Linus Walleij
+
+vim +/gic_fujitsu_030003_erratum +83 drivers/irqchip/irq-gic-v3.c
+
+    82	
+  > 83	static DEFINE_STATIC_KEY_FALSE(gic_fujitsu_030003_erratum);
+    84	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
