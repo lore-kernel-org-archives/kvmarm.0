@@ -1,55 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.218
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795166712;
-	b=yX7298hrcod+Ky+5Whlvm1CVnMQ5GGz4XGqQVzZnvX91o6tnnQIJUs+Q42F1A++hB8cc
-	 jgiQUDVOeIuh7pyfBaJ7Bv27rb6SrfHpw96vNJd+CPSZ0Z5a9HByhnicBuLQf0mHonprF
-	 krX9MmHnwnCblCr+IJ456TFIf6qgGYmuWTK0flqzFi9k5ELuTolz72yjgWW+3cu0u3zM8
-	 NavrR3uBF30mI1natkQMlVWGHHK8KLJXi/pYEGeqe7Sl7iT7bBc5P2I9Xt9lkwUaAEuPl
-	 FWrQU/vbGySCiqTQt0h218ehVPjmDFGQ5HlfH8QKmm1YQktZxraCL7v9kuOclM+V6hw==
+	t=1795167697;
+	b=BcpjT0ezkcYEsp6FHcJej4ZL4mbCFrrc9AlUgELBE+TZUzXi69LnW8ojkjsvg4zb7jM7
+	 feHkWkU0nIpXQHyOOqc46/NuzWziAMaVfjFboRg4sZqKv60EJ/JHS1HMOtqYo3KlvSXnp
+	 VQ8TWp0FM9UjcNEnA11hgrDv7EZdGlBFORTZJaBjsZksDgXvmHsiTop0IwhNJsk7mTuWP
+	 tgYFhrnmtTnQsdTntlI2pM9o0aVgNowpU3Zjep5x40/WKJDopHdeclUpVya/XjC7WOGE+
+	 tb3kjg6MODMBjaut38ZSKPmKKCjvcTaI5MeVzd+SDJwHxDnp3pja+JPHWBjWr8/v/LQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795166712;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=8SzIHclfGO7rIjAKlxWY7h5C1tqRdUP4RNaZqN79MuM=;
-	b=rlV+U9MBqzO0WfmXqnT3gH2jd0bT+2g8fgE0nEGKGY/XeEajb5SDgCSF4x4GH2ZqCb4T
-	 dzifrB6CqzjKnphF8KEax6qWtk5QKu1V2mN8b+VWtNu1CoRf8ZDU0qMrUbNTvAZsYdeWm
-	 8XEKc91JgH5R3zJhlZv4sO/gcdbEvA0SPi9EFJZZUBh9QCeyv5pSiSY4T7Oa7e9k+71ok
-	 jSFMvny2WFnm/yzIt0BvyPkcx8Tdtzbqf+rg1uYq2yfDJUg5aEDv1Vx3wxiqBIAvRfAPf
-	 xtANWsPItYUm4rFLo51y+m3QLiTN+vi++vmGQJbKLgq9pqS4AkV+9mTeOlEeT9SQCwQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795167697;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=yzbdGeu2fn9Y9C1c+3jErX28oGARGq2CQCtYtowsmfA=;
+	b=UMbwQSP73d3ogo/m3WAON9z4Ji6K+PfaF4DoAa/YE4iRyLIo18SSS0JECWJ3OxROZ8lG
+	 rPc3MifxcGZhCXi6s8oXRbkX7MQR6U6stmq4g2kEqlwJSuU/PQvEZ2pKkBzcS2yKTYdqa
+	 JGvxRKb8qBIRRW7p5AhVZAB517Sn6sjRd7r5ksl5kXuwcmsP4RVpomCS709mPOqGlGhke
+	 9M3U4Eoxphaz3kJawD0JSRjMvlCqA0BGC7Ql/q6K3JSwlduqjiy4i7sQq9nR8TsGQfAhj
+	 HCtmxvcFbO0RVQ5Jo38yGSAccCeRKVUwNg07lNmo/LgLVy/+oeKx1zoL7yaxe5lbDKA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B5ZDMOWE;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=u8UQV2QT;
+	arc=none smtp.remote-ip=113.46.200.218
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AF3606A320
-	for <kvmarm@lists.linux.dev>; Fri, 20 Nov 2026 09:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46617606A32A
+	for <kvmarm@lists.linux.dev>; Fri, 20 Nov 2026 09:41:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 46617606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B5ZDMOWE
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27A5C1F000E6
-	for <kvmarm@lists.linux.dev>; Fri, 20 Nov 2026 09:25:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795166712;
-	bh=8SzIHclfGO7rIjAKlxWY7h5C1tqRdUP4RNaZqN79MuM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=B5ZDMOWEHdnhh2/umOUmDyebT2Q50s1hgR4xDpum/5dqqoMqtjXVEdU8aCG9sLmQA
-	 7A6AoINlMkFawC02saPlGU/UG/hx+Ve8Q49Ae/eZlx2izAu6qkxYbT8PBExCep30Qc
-	 cIKFHKeYrow0KilYBJXAu05Oo1CIxqWoGzdcAB4xOFdSnA5ipUK+6pmAZZGQKczT57
-	 5U5FYX0g1tEu7APgsdhwFuInYTVpzswscUD4Z8Qs45W2nDr1nbveiYtNzYB4TrppYV
-	 8pctZ+ScqMMKXovSWloMW7pcezlqSREFM6P5p3mvobzMNRf9HWvMu2KMDKw0zP2X5m
-	 a5xa8vTyeJJhw==
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5c1465bbbdaso476759e87.3
-        for <kvmarm@lists.linux.dev>; Fri, 20 Nov 2026 01:25:12 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErFvWnGgzezk+1VZB7yTeCfOz2IazFiTygDcA64dpNc6YjDh60P8NjCba4fpeGMJhRgb4Av19uE=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9PCGND7+s3RjSYIsQ8m3eC+kUPTQ2wPlwqPkd2GQNqKyDXeuMF
-	UdWdBGcOMnyghz7jkFWJzENcHSLMb5d/x6rq96ZhmKm5wbV0k7pk34qeoo7xKnvmsPVPSUfD8xg
-	k9/s2e7Mc5Dv8Io1XnvC7n/JxiVAiy5M=
-X-Received: by 2002:a05:6512:3e26:b0:5bf:dfb9:33db with SMTP id
- 2adb3069b0e04-5c1bc894b28mr761513e87.38.1795166710840; Fri, 20 Nov 2026
- 01:25:10 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=u8UQV2QT
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=yzbdGeu2fn9Y9C1c+3jErX28oGARGq2CQCtYtowsmfA=;
+	b=u8UQV2QTaZykzbQnjwd0wnW5WSx2hpJjxpRDfV56W/g4Lbc5kPhrrMfWdQnkl9QnpdKT1i1lS
+	2C39dUkWTA/76Q4eqIp0UHvtkafvwJITP/42FbHAZb3G/UeC6Lww4tB64npAja3ctVsuLcOpNyP
+	jdH9+vGji2P+0NsyN75IChU=
+Received: from mail.maildlp.com (unknown [172.19.163.0])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4jW9LR4mkZzpSvM;
+	Fri, 20 Nov 2026 17:40:31 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2C01240561;
+	Fri, 20 Nov 2026 17:41:25 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Fri, 20 Nov 2026 17:41:24 +0800
+Message-ID: <371fe5a8-d831-4a86-897e-3bf9541b0c26@huawei.com>
+Date: Fri, 20 Nov 2026 17:41:23 +0800
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,59 +62,143 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261015142552.4128028-1-ryan.roberts@arm.com>
-In-Reply-To: <20261015142552.4128028-1-ryan.roberts@arm.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Fri, 20 Nov 2026 10:24:58 +0100
-X-Gmail-Original-Message-ID: <CAD++jLnXQHkYvCO4raM8enm2NNwU5WDNE4cFhvcVUnUZVHMPLA@mail.gmail.com>
-X-Gm-Features: Aa3M54qJyeIPO-XfHd9glHLeVqDiREjcacNXijYh3kod1cJY-VZmSyNAF3F7zP0
-Message-ID: <CAD++jLnXQHkYvCO4raM8enm2NNwU5WDNE4cFhvcVUnUZVHMPLA@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/15] Arm Core Local Accelerator Driver
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@nvidia.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jean-Philippe Brucker <jpb@kernel.org>, Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 06/15] KVM: arm64: Add support for FEAT_HDBSS
+To: Leonardo Bras <leo.bras@arm.com>
+CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <corbet@lwn.net>, <pbonzini@redhat.com>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>,
+	<caijian11@h-partners.com>, <liuyonglong@huawei.com>,
+	<tangchengchang@huawei.com>, <yezhenyu2@huawei.com>, <yubihong@huawei.com>,
+	<linuxarm@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>, <fuad.tabba@linux.dev>, <mark.rutland@arm.com>,
+	<seanjc@google.com>, <rdunlap@infradead.org>, <linux-doc@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <skhan@linuxfoundation.org>
+References: <20260929103655.85107-1-zhengtian10@huawei.com>
+ <20260929103655.85107-7-zhengtian10@huawei.com> <at-X_hFbsBU_Dsgr@LeoBrasDK>
+ <a301e884-f6d1-4082-8551-8d8a17276dc3@huawei.com>
+ <auSml6yTVYIQe7NZ@LeoBrasDK>
+ <ceb91298-3d05-486e-a900-1291963dde24@huawei.com>
+ <av8xblyy3GzgbNwf@LeoBrasDK>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <av8xblyy3GzgbNwf@LeoBrasDK>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-Hi Ryan,
 
-please keep me on CC for future series for an SoC perspective
-on this.
 
-On Thu, Oct 15, 2026 at 4:26=E2=80=AFPM Ryan Roberts <ryan.roberts@arm.com>=
- wrote:
+On 11/20/2026 1:27 AM, Leonardo Bras wrote:
+> On Thu, Nov 19, 2026 at 03:52:37PM +0800, Tian Zheng wrote:
+>>
+>>
+>> On 10/30/2026 10:15 PM, Leonardo Bras wrote:
+>>> On Fri, Oct 30, 2026 at 10:53:57AM +0800, Tian Zheng wrote:
+>>>>
+>>>>
+>>>> On 10/27/2026 2:12 AM, Leonardo Bras wrote:
+>>>>> On Tue, Sep 29, 2026 at 06:36:46PM +0800, Tian Zheng wrote:
+>>>>>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>>>>>> index 32102c3912fa..12fa37328dd2 100644
+>>>>>> --- a/arch/arm64/kernel/cpufeature.c
+>>>>>> +++ b/arch/arm64/kernel/cpufeature.c
+>>>>>> @@ -2158,6 +2158,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
+>>>>>>     	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
+>>>>>>     }
+>>>>>>
+>>>>>> +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int scope)
+>>>>>> +{
+>>>>>> +	return is_kernel_in_hyp_mode() && has_cpuid_feature(entry, scope);
+>>>>>> +}
+>>>>>> +
+>>>>>
+>>>>
+>>>> Hi leo,
+>>>>
+>>>>> IIUC you run this on every cpu in the system, to make sure it's matching
+>>>>> the feature. Is there any chance the kernel is in EL2 only on some of the
+>>>>> cpus here?
+>>>>>
+>>>>
+>>>> It's impossible for the system to have only some CPUs in EL2 and others
+>>>>    not.
+>>>>
+>>>>> If not, maybe we can run it on system_supports_hdbss() instead, which would
+>>>>> be easier for the user to understand it only runs in EL2, on top of not
+>>>>> needing the above.
+>>>>>
+>>>>
+>>>> However, The question is whether a cap should mean "this system can use
+>>>> the feature" or "this hardware supports the feature". If the cap only
+>>>> tracks hardware support, users may be confused when the hardware
+>>>> supports HDBSS but the system runs in nVHE mode — they would mistakenly
+>>>> believe they can use the feature.
+>>>>
+>>>> So I think we should keep is_kernel_in_hyp_mode() in has_vhe_hdbss(),
+>>>> and add a comment in system_supports_hdbss() explaining this.
+>>>>
+>>>> Does that work for you? Looking forward to your reply.
+>>>
+>>> Well,
+>>> That's just my personal view of this:
+>>>
+>>> If we have a function called "has_hdbss" it should only report if the
+>>> system has the feature available.
+>>>
+>>> On the "system_supports_*" we have to figure out if the system itself
+>>> supports the feature, which checks the feature bits itself and could mean
+>>> checking for other features being there, such as hyp_mode.
+>>>
+>>> What do you think?
+>>>
+>>> Thx,
+>>> Leo
+>>
+>> Hi Leo,
+> 
+> Hi Tian,
+>   
+>> Sorry for the slow reply. I've been looking into how other cpufeatures
+>> are configured on arm64, on and off, and that's why it took a while.
+> 
+> I took some time to study it as well, and to be clear, my previous
+> understanding of this was incorrect, and it looks like the has_vhe_hdbss
+> (.matches callback) is only called once during boot, and once per hot-added
+> cpu.
+>   
+>> My reading is that detected: HDBSS should mean "this system can use
+>> HDBSS", not just "the silicon has it".
+>>
+>> Several caps already add conditions beyond the ID bits. CNP returns
+>> false for kdump and under ARM64_WORKAROUND_DISABLE_CNP, NV and pKVM
+>> match on kvm_get_mode(), and can_trap_icv_dir_el1() starts with
+>> is_hyp_mode_available(). So in practice a SYSTEM_FEATURE cap answers
+>> "can this kernel use it on this system".
+> 
+> Humm, or maybe "can this kernel, booted as it is, use it on this system"...
+>   
+>> HDBSS is EL2-only (HDBSSBR_EL2/HDBSSPROD_EL2, VTCR_EL2.HDBSS),
+>> implemented only under hyp/vhe, and used only by KVM, so "the hardware
+>> is there" is not the same as "this kernel can use it". That is why I'd
+>> keep the gate in has_vhe_hdbss() rather than moving it to the consumer.
+>>
+>> I'd be interested to hear how you see it.
+> 
+> I agree, that looks better this way.
+> 
+> I don't think I understand enough of what 'system' means in
+> system_supports_*(), but I think your version explains it enough based on
+> other similar functions.
+> 
+> Thanks!
+> Leo
 
-> * The location of the driver: although most accelerators will likely be c=
-ompute
->   ones, CLA is a generic MMIO interface that could handle any kind of
->   accelerator. It's currently implemented as a misc driver. accel is anot=
-her
->   potential option, but given the current SVA approach, we would not use =
-any of
->   the services (memory-management or otherwise) that accel provides.
+Hi leo,
 
-Given the extremely ARM64-specific nature of the accelerator it has a
-lot to do with arch/arm64 but then again it is a platform device + driver
-associated with the cores and we don't want platform device drivers
-under arch/*, so it kind of falls between the chairs.
+Awesome, thanks for taking the time to study it.
 
-My spontaneous placement would be to put this in drivers/soc/arm/*
-what do you think about this option?
-
-The argument would be that this is arm-specific, we do not expect
-the code to be reused by other archs, and it is used on some specific
-ARM SoCs, so it goes under drivers/soc/arm.
-
-If a very similar feature arrives on other archs which use very similar
-code we may have to rethink this but for now I believe this is the best
-option.
-
-Yours,
-Linus Walleij
+Thanks!
+Tian
