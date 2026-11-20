@@ -1,58 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.70
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795116400;
-	b=RFV1KzbtVsYKNPDTuxEnKFEQFZX1cHZVuMIcxIpZmYfAn2zuGTcrc1iQR6D1BWLkkh+F
-	 G2IkVXHYuzBuILhNGv2ZVkqJN/vgJzfpNG2dUA9ekd5U8ceJuRKJ23dXM+NCtOM4kYCzp
-	 ih6Yo8H0IXwOIYToxgULxOgfzutbhb6WZVg3Ia3/qDpu6neQikTvkcoDggnXCYDqnBUkN
-	 ZL1gGEbvYADZHtrEW+6Cxr1AM4KjK4XdUOc77khBw6r5/YOlBAlhEp2YG+a/Kxs06o6Ut
-	 Wn5KlwmwMnGnGmtr6BMS95JfolM2oCP3gF5ZH0oqgY97qse0JU7on2mIG7/Prq+Hs4A==
+	t=1795147224;
+	b=5LGHq5G+xNKJ480eoid5b1YyQktXxxVcvqKtxzyU9YcNmlhUi1bLywPP0cQZZLLrvO/T
+	 0ro7vl0mAqj1K6T9qCFQCBTHt4hVkod7Q5rgfZAsHzVJrd/ZLpaHZrQK0+bc+g/3PcpOy
+	 vBk/j1HqWaX13Dm6RIuH3i8FE8jgIdYS985fkXBmvVeo0LByj4hW6Z4yidMfmu34C4bRV
+	 nXAwWC7fcnA94aHILalO5A4uUQQwo96hAZeO5/JvNPURzkh2rhrNE35z2Cw9srlFX3ip3
+	 dajVxzZpWbqis/PusTp7knSxCZNpdiP9M0vtNKHkMKW6cDhXGlfwMcYQ0S2cWtxYG/g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795116400;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=bGM09ejDI5kGHlif/2JC4UNWlr5V6vigz3EsNtX81Lc=;
-	b=dROKmyaCxwA4TwyepTPb+H229Zb6uRbky/N94jvzXoz+uoZL4CkxPMLR1nXncqWef2NC
-	 iN8lk3yzN4x4zhCy12r5WFsTCZzYOo2bOvoCw+sZdsf9gGBkWwmZi7hVdsNLdb51062qg
-	 XUovDXw0F5IqlxY36i/3vnfWrixibsJ56Cd0vgxbtDNtZhfXDk0pTncrrKZqeN1Loczv0
-	 jTpiYk4D5KHczgiKraPykXWTC5yacKKKg3ygsN+wBofS67hM8+VmgJB+MdZLFW2SaFEeB
-	 4pVkQ4WOg4KUe0SKPBVHMziggWiY7/3e/hHf1NibemXUguOfyRo6Kt6XlSwViDFxE5g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795147224;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=K98FROqv30LP4AMm6nG2V0NGt/4i9m8U/QmIKGR/nHA=;
+	b=Ci22iYSPyfwCLDDnFnrMDjoH9os2ZTp5gRw4xv5klGunW3TcN8/Od4w6xPOBWZ4SuZ4X
+	 dF7KiAGsOdJ05wQsJzw7HORRoFIXLqWZeQPtSYGIpwznkfoIqHTrBKpVfBo62CSnhgEgA
+	 yAIIoDhHawfWVJhQCZixxHEX4LXkinK6a5eRHHw8cukfVnYTBDcxX3/6rxBvsFdHJrf5y
+	 uUCpGECQDArOdZlrvWyB8iDbuBoSe+50KCPtNGj+7WTuxNaLaD3UaKx8JHxwNPQTkKQkP
+	 iXhn3s0edx49GG6b4a0VgYMR1PrfL/ogR7jpnPKkhLdF9lUaM9NHKUR7oyiUNUWifDw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LHY4oZiz;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="Zxf/yV9a";
+	arc=none smtp.remote-ip=209.85.208.70
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com [209.85.208.70])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C0A606A331;
-	Thu, 19 Nov 2026 19:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D626606A325
+	for <kvmarm@lists.linux.dev>; Fri, 20 Nov 2026 04:00:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8D626606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LHY4oZiz
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D6CB1F000C6;
-	Thu, 19 Nov 2026 19:26:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795116400;
-	bh=bGM09ejDI5kGHlif/2JC4UNWlr5V6vigz3EsNtX81Lc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=LHY4oZiz2Qdqur9bcmXsQwZPWuhhGPQn7JBmPD2C+7yXjb+UYeUfveGn3O0K1zNnR
-	 BvNTbPD9IfYeYtcjLz0MzBTUCXrGhiLa+2V6ohSpYsEBpHi8zaegFXRwsJgANF5UqA
-	 3hA963mL4a3vObpG+dhJM6oY3tZgG2YkySubUXWJ3AMMLwY1E/c1wMEK5ZfgH2okl9
-	 a6j9HmKIsEeiNPOM98SZ7K2E2U7vXUOcNGRyxoT4YU0mlNYzzSs7d+YOvx766pWYVz
-	 1Hhjni+F3Om94zyjOfsNgfB9ejZnWQo7qA9C2a8Kw3LoINRqXM1DVP2D0vPZdCJVdP
-	 knm61M6aPaz5Q==
-Message-ID: <sashiko-outbox-223880@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v10 27/33] KVM: arm64: Emulate mismatched LP and HLP
- overflow widths for sub-partitioned L1
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Colton Lewis" <coltonlewis@google.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261119185215.632334-28-coltonlewis@google.com>
-References: <20261119185215.632334-1-coltonlewis@google.com>
- <20261119185215.632334-28-coltonlewis@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Nov 2026 19:26:39 +0000
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Zxf/yV9a
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-6b5654ad27fso298371a12.1
+        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 20:00:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1795147223; x=1795752023; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=K98FROqv30LP4AMm6nG2V0NGt/4i9m8U/QmIKGR/nHA=;
+        b=Zxf/yV9aaHa2VV29USdqQ5n9t9Guir4IrounD0aY1RI7xjEo8exCh6WyN2v2S7oYX4
+         dEVSUxvMnO+XtBgUETzkInEiRpMOM2ytqqIwIy6PLC+5WaqAk9P19AqSd7VCzjGqqabe
+         2i4TbuC32GrkrMcT2u7ZdzmgWebIr7If7okkxbCFnBAuPlJyMM0laFntEs/sbAvyInkw
+         8uVHtlMKNR6w5lD3g2pzhMR3G2ARnfXXB8a0/7u2Ip327GOmujUUd9GsAghdmyXNakvR
+         uM7ioTrUIXIm9RcLzGwNgstIz757Mt0owRz4eMU0PdTkv/DDfs3BNM7WyQd6HmmUUTDu
+         CJSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795147223; x=1795752023;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=K98FROqv30LP4AMm6nG2V0NGt/4i9m8U/QmIKGR/nHA=;
+        b=I7zmpO/m6EASMzkVo7x3p4MZ9eACrbxPVv/tD+XY4Q5R+jAFk9Z8RqfvFeyIvhTX9a
+         ogsnsmguEdl1mXLsJNtfBMXu5vBWsRKHMld7z/xbLmO9T7vuonkUOTeb5ctw90ISnEcX
+         bE4uadNqdou75embldLyhVn6XKSPLFCYvwEMbyP3oQSDuyt0/+mjvN7ih9tP483wG7o/
+         CJ9ZgQ8nwiyJ+JLnJJbqbOzs5WEMRz86OwYV/4dMp/puOjhX8vZ4tE8Z5FxAd5m3kYlA
+         ECEX8N5hs4fxC1G02JvTe4BDDA9pFc7J7SBWqhhkZYaee+ZqrTQJzHleTgKBOIzx77st
+         rYGg==
+X-Forwarded-Encrypted: i=1; AL+hErEve3gqIepVN5g+YXLds/Yb1/uf7A5gjaUPjXF+blbubqGrKiWlHlo18LJSaSXWhfzA2AKM83E=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/qvsiPshZo52+NgSmq44yoNobIR5l/ueQ+/iFK7I9AUJ1UvJT0
+	TLJx+M0Q/DDWCS4bJowhfJqkRrVVHAUjXA/o9no8owRkTzdStIgULVtXaaEbvzkBZe+cb9ce7Km
+	C1cOlbQTdJTXorkIcug==
+X-Received: from edeg3.prod.google.com ([2002:a05:6402:5643:b0:6b8:a08a:8bad])
+ (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6402:501c:b0:6b8:afbd:64e6 with SMTP id 4fb4d7f45d1cf-6ba37edaf1cmr1021371a12.42.1795147222675;
+ Thu, 19 Nov 2026 20:00:22 -0800 (PST)
+Date: Fri, 20 Nov 2026 04:00:21 +0000
+In-Reply-To: <20261115203421.38c206b35f5b12e6@chrisdown.name>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -61,60 +77,54 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+Mime-Version: 1.0
+References: <20261110050202.529473-1-tarunsahu@google.com> <20261110050202.529473-6-tarunsahu@google.com>
+ <DMRMLZSZ0LAZ.D4P70QWX0IHB@soleen.com> <9huz5wy4tufo.fsf@tarunix.c.googlers.com>
+ <20261115203421.38c206b35f5b12e6@chrisdown.name>
+Message-ID: <9huzmrr4f8yy.fsf@tarunix.c.googlers.com>
+Subject: Re: [PATCH v4 05/19] kho: Add feature header for fine-grained ABI compatibility
+From: tarunsahu@google.com
+To: Chris Down <chris@chrisdown.name>
+Cc: Pasha Tatashin <pasha.tatashin@soleen.com>, Mike Rapoport <rppt@kernel.org>, robin.murphy@arm.com, 
+	maz@kernel.org, will@kernel.org, David Matlack <dmatlack@google.com>, 
+	Alexander Graf <graf@amazon.com>, seanjc@google.com, jgg@nvidia.com, loganodell@google.com, 
+	arnd@arndb.de, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
+	Bjorn Helgaas <bhelgaas@google.com>, oupton@kernel.org, alex@shazbot.org, 
+	gle.com@google.com, pbonzini@redhat.com, 
+	Andrew Morton <akpm@linux-foundation.org>, kevin.tian@intel.com, joro@8bytes.org, 
+	kvmarm@lists.linux.dev, linux-pci@vger.kernel.org, 
+	Pratyush Yadav <pratyush@kernel.org>, kexec@lists.infradead.org, kvm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	skhawaja@google.com, sagis@google.com, linux-arch@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] KVM: arm64: broken PMU counter chaining for ovf32_mask
-  counters
---
+Chris Down <chris@chrisdown.name> writes:
 
-commit 210ea84a824c63596df96f6f9ef557724dabffcb
-Author: Colton Lewis <coltonlewis@google.com>
+> Hi Tarun,
+>
+> tarunsahu@google.com writes:
+>>Techinically this is just for readability.
+>>
+>>WDYT?
+>
+> It doesn't help readability in the generated docs, though. kernel-doc
+> splits the parameter list on the comma inside the macro, so
+> kho_preserve_vmalloc() comes out as
+>
+>      int kho_preserve_vmalloc (void *ptr, DECLARE_KHO_SER_HDR(kho_vmalloc# *fhdr))
+>
+> and the struct memfd_luo_ser and struct luo_session_ser definitions in the
+> ABI docs end up with a member like
+>
+>      DECLARE_KHO_SER_HDR(kho_vmalloc folios_fhdr;
+>
+> I'd go with Pasha's suggestion and use struct kho_ser_hdr directly. The
+> pointer can then say which payload follows it with a comment.
 
-KVM: arm64: Emulate mismatched LP and HLP overflow widths for sub-partition=
-ed L1
+Okay that works. Thanks Chris, I will update it.
 
-This commit emulates mismatched 32-bit and 64-bit counter overflow widths
-(vPMCR_EL0.LP !=3D vMDCR_EL2.HLP) when an L1 guest sub-partitions a
-Partitioned PMU by forcing physical PMCR_EL0.LP to 1, biasing the 32-bit
-counter sub-range by 2^32 events below 64-bit overflow, and trapping
-PMEVCNTR<n>_EL0 accesses to translate counter values.
+~Tarun
 
-> diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
-> index 725b5fc17533e..b7bec06b36b0a 100644
-> --- a/arch/arm64/kvm/pmu-direct.c
-> +++ b/arch/arm64/kvm/pmu-direct.c
-[ ... ]
-> @@ -123,12 +160,109 @@ static void kvm_pmu_part_sync_hw_enables(struct kv=
-m_vcpu *vcpu)
->  	pmcr &=3D pmcr_mask;
->  	if (mdcr & MDCR_EL2_HPME)
->  		pmcr |=3D ARMV8_PMU_PMCR_E;
-> +	if (kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, V3P5)) {
-> +		if (ev_mask && !(ev_mask & ~hyp_mask)) {
-> +			if (mdcr & MDCR_EL2_HLP)
-> +				pmcr |=3D ARMV8_PMU_PMCR_LP;
-> +			else
-> +				pmcr &=3D ~ARMV8_PMU_PMCR_LP;
-> +		} else if (vcpu->arch.pmu.ovf32_mask) {
-> +			pmcr |=3D ARMV8_PMU_PMCR_LP;
-> +		}
-> +	}
-
-[Severity: Medium]
-Does forcing physical PMCR_EL0.LP to 1 break counter chaining for counters
-in ovf32_mask?
-
-Counters in ovf32_mask are architecturally configured for 32-bit overflow,
-where an even counter overflowing at 32 bits increments an adjacent odd
-counter programmed with ARMV8_PMUV3_PERFCTR_CHAIN (compare
-kvm_pmu_counter_can_chain() in arch/arm64/kvm/pmu-emul.c).  Because all
-guest counters sit below physical MDCR_EL2.HPMN, setting physical
-PMCR_EL0.LP to 1 puts the 32-bit sub-range into 64-bit overflow mode in
-hardware, which disables hardware chaining, and
-kvm_pmu_part_rebias_single() does not propagate the 32-bit overflow to a
-chained odd counter in software.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261119185215.6323=
-34-1-coltonlewis@google.com?part=3D27
+>
+> Chris
