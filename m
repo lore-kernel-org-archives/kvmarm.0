@@ -1,55 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.72
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795382950;
-	b=EEHbfg33P0gu4QgPw70e/r15ITAFlYSUHzhFcfxMnfd8KJ/pXCJeNu/b04YdSoqqsXNI
-	 RIVtjExYk6EvZpQlzVaQpR/TYVJBcijRt8s+a/d/VdPNG9hbfyee1UCy5gSpnxVTR4DE3
-	 J4f768NFPOqzCEcQAR2Ky1smxqpsIEz4J2g7LPpqe6sk+mZnkSofkeIIZ01UMvglkiV1d
-	 YxUGoJR19LcO96MhVGeoOIMpMB9zZfhLfH2eNGvTEQKE+9QLT35vloa7hKEh6NhdkGDXB
-	 ev73I84TsOf2d7OSyfa2i+9sklJ/EHKRZ7/kcIive6imjiTaZAF4W8VISPZ/YEd31EQ==
+	t=1795391915;
+	b=g+C/2QcyxQFliav85+A2hiKxRuvCllsu8caxfS69LcL5xByDNIq8GoCK7CmlmIGR5/YF
+	 7IaDVaSwfIXR45NF0j1Gz7F9qpqlge13jucHUY7lYhqA09747WDlseoz87s9VabkH70rC
+	 Y4hjGqOLeZZ/85F56koHq7X7O7mCZ2XPiLSMSZgzsUwfw6yTflXG65AgnJXIW69v+73M/
+	 mZIIskeTJVxuxMxxpbK9NUl7Ednde655+FfCZTBD8YzYmYp64PhfH7zeSI5zLDSV2qI3M
+	 u+6bAXG/ceS4r10fIc0wgDnchb8asNQAlGSDpCTKc8psPdPyU859eXrioEAwX8S/BCg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795382950;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=BTV0zF8Ij6zUMNBE+Oz8/N1ZVrqV9XG9B7wmhsB51vI=;
-	b=oXwAI/fJ0xrfgw4b/kdqV5jcn7bE0kOTIjwnW4gCz+Lt7nzUVHHl7pznFFxiQBFQeidJ
-	 BJrLcGN54Vd/PGqY9F5mTgOOT5Kw8XeC2CbX1UwPnGH0PoIfjcOcs2t2gHdOe6cXW8kZ0
-	 fNIpMf0092V1I8Ta2/rUiFPTwxcxwdroDtQrSbO3T3Xdb9yY/tPiwHurP1nAuVSKdrgkq
-	 CEfH7R2GoCFsURTcqIUr4gQ3fsBH5Mt7Ns/GN/Z5n4Bi+ryd9pfiWTqoBZpStH95E64SG
-	 tbmD6fc3VE0LrKcwbu72j9r0wD1UZNkkNcQqaUvhfpKC3W4zEW98io7B5+Lfl0hjPsQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795391915;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=Dtc+fr/sr1dsNGUgfanyNVkvmYSADCII8gwg+poCDMI=;
+	b=rSunVYA1Wnu7+54uj0VrgplMBa1ZvZ3STG6+RLalgT95Ku8g3Wc88P66SNbUYzVdg3dG
+	 QxFqmdvHMafAR1ZjYvGWLbTi0jGae6j3N5AdD7PjjX6r3Wt4r+J2X8/t1nxsa438xvoJt
+	 NnRqkjGLhzeYgdl11ajhEuZEdK2VIihNLHtm/Xwa1W2fgZX7mskmrqh322kQ1ddpaME2V
+	 IuBPo7wKtR/Het8T9cYL0cqkIBNWgoJMo93pGuZ9eB+FUVAb6nAKC/IPJj4sDqQuGm4Rf
+	 wMmsiegRIY/F3C22izjLyQ9HPYTcaIEFEx5rhEgvOF9CXCRZ37RDVkkNHMMgEI34Aaw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WG54opzt;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--irogers.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=oJfbxefR;
+	arc=none smtp.remote-ip=74.125.82.72
+Received: from mail-dl1-f72.google.com (mail-dl1-f72.google.com [74.125.82.72])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0F1606A31E
-	for <kvmarm@lists.linux.dev>; Sun, 22 Nov 2026 21:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF8B606A32A
+	for <kvmarm@lists.linux.dev>; Sun, 22 Nov 2026 23:58:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2CF8B606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WG54opzt
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1F301F000D0
-	for <kvmarm@lists.linux.dev>; Sun, 22 Nov 2026 21:29:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795382949;
-	bh=BTV0zF8Ij6zUMNBE+Oz8/N1ZVrqV9XG9B7wmhsB51vI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=WG54opztWi+ll7+PUc6eBXqw494LZjxIVJ0DKsOEfPBVjJTxRSg1R7ywaqbRHIXza
-	 VazTaVz5alcKWtxPjpyt9HYyPuJTofmTz+8e/maD+l2IpS8DqfZjP0zUXVTezJDte0
-	 SjZsXl9DSYkB8/hove8ERjgLKOc+ZHNEs6IDjDzHL7NxRuWchw69iLDkGo0NLU2xdo
-	 8Hzau6EhHX6AhVk1259DZeOfEqoymIG0dhHjJsBRCeEcaYjJk3ioWBZwitbEi/yBjj
-	 IA20Phq6/J8wU/WfLd6OgMcWvRFunqG5FUMxAlFCKFdiywCWLU+exJ7jprSB+jKsuv
-	 X2O/DctYxrKAA==
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-3ae2fb3fe2fso23496511fa.2
-        for <kvmarm@lists.linux.dev>; Sun, 22 Nov 2026 13:29:08 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErEhopZ4Re30b5Ea6edJms+siEjQ1I5nS8naQW1V4ltRiAizXlwaZJ7OLNr4Damvo7MUDeTaFjk=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+Mu+jMmc0LaGdeVwrkoi7jALH7zvzrmfich98VvD4oApUvKdlW
-	XJPnLNisCTBluJyCsVlBypLu44drHnb+jaAtSoc3GuOqwTupbyGSmTJcToNyOmPOP7u7IpAm3yQ
-	xwX/TlIKmQBTrXbNXAujhs5HlZPjIcnY=
-X-Received: by 2002:a05:6512:4207:b0:5bf:ce41:b440 with SMTP id
- 2adb3069b0e04-5c1bc7d6de5mr2517796e87.31.1795382947589; Sun, 22 Nov 2026
- 13:29:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=oJfbxefR
+Received: by mail-dl1-f72.google.com with SMTP id a92af1059eb24-1b3a348a6dbso27535c88.1
+        for <kvmarm@lists.linux.dev>; Sun, 22 Nov 2026 15:58:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1795391913; x=1795996713; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Dtc+fr/sr1dsNGUgfanyNVkvmYSADCII8gwg+poCDMI=;
+        b=oJfbxefRmDmhxDtHDh/etmlIqnmoPoib6jbLg1KhskxpOCJe3pBgD9axobarqbbKEy
+         i485HI3XTGnd8PEjgtFBNXZZdmUv0CxBf/iC6ZkQ6lDx4g3i69xY/wObt0aoCkO3EpZ8
+         Aq+oNJKswGvJljkN5qtcan3xRzyWfzMJAE1MNY477vhjrsvEfuLdeFFNP8GALv/+TeC5
+         eGcbnFvrGoMR1kPJ9l6qzcRK4hRUngwKs0Qm/4dBeU2xtczIWujA4WvcezVFV2k7b1VN
+         MqRQiMTfrk3LMiGYQ2wccjhuoM7Z4lN2zHuGWxypIBBpUsGtJWhSIXaxJT+g408gl0ix
+         38lA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795391913; x=1795996713;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Dtc+fr/sr1dsNGUgfanyNVkvmYSADCII8gwg+poCDMI=;
+        b=rEYASyM3khnKxavRHcaoa7WQbE9jkNNbA4BjtL4bf8n7+oo5A6OroZcGLK6yFd675/
+         Br3d+o+xzuIfHLgOtbUEPa91cF/MTNELBuoLkKE1igz3peZhLnQ2ZezBOENrW8HHNa6u
+         0AEKW+5X7SGReCSp9qxZ3nUUC7Vc0hIqKADIAnS82Wcdvr2UgFj267T+yklHio0o0Lfl
+         5mDRG4bNT3OfyY9w+/RcT/LsYJzrRIz1pn/cYlrVlkbDebXahX5sKjK/lgbpOt5bIaTS
+         f8IjyMB7oJ0kr2JQV1aPrvsrYPpOJvcmfOzG4jt1nYJnTJJaoSVrXq8CkhUVChijZ62w
+         xcPw==
+X-Forwarded-Encrypted: i=1; AL+hErERsIjrzHz1TWTT2P16u5Q/bn+WKg6Xttj1D8nUAuvlRoJ5SpCLxTNyVdtIelIV5nJ6tJb/QFw=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/E7DciJ/GlCCfor2yvYV9O26vha1TO1KyBAHk05gU0WlUJJhu4
+	2hbJC7SKv3Mz+9S1QKWd1icO+5zEYJnokucJtCnf5f6AbMQG4UZO2NuDbw4C22fKeWAkgltf995
+	fAjkqy61C+g==
+X-Received: from dldyq15-n1.prod.google.com ([2002:a05:701b:454f:10b0:1b5:1d0c:b35a])
+ (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:701b:4513:10b0:1b5:56d8:d596
+ with SMTP id a92af1059eb24-1b556d8d6fdmr10404927c88.12.1795391912777; Sun, 22
+ Nov 2026 15:58:32 -0800 (PST)
+Date: Sun, 22 Nov 2026 15:57:46 -0800
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -58,437 +75,592 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <20261015142552.4128028-1-ryan.roberts@arm.com> <20261015142552.4128028-9-ryan.roberts@arm.com>
-In-Reply-To: <20261015142552.4128028-9-ryan.roberts@arm.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Sun, 22 Nov 2026 22:28:54 +0100
-X-Gmail-Original-Message-ID: <CAD++jLnY3dagTQDzBa5e=g3fJ1rDOvyRHPKVtpadV4c0nXYV4Q@mail.gmail.com>
-X-Gm-Features: Aa3M54r6B7e9BLC1UO5yqTkRPrBtuKJXzOWhi_mL44xox65BnkoSkli_lYPdSwU
-Message-ID: <CAD++jLnY3dagTQDzBa5e=g3fJ1rDOvyRHPKVtpadV4c0nXYV4Q@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 08/15] misc/arm-cla: Manage domain contexts
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@nvidia.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jean-Philippe Brucker <jpb@kernel.org>, Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.1.750.gf70dc682cf-goog
+Message-ID: <20261122235757.3456048-1-irogers@google.com>
+Subject: [RFC PATCH v1 00/11] unwind: Minimal DWARF CFI stack unwinding for
+ x86, arm64, and riscv
+From: Ian Rogers <irogers@google.com>
+To: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org
+Cc: jpoimboe@kernel.org, rostedt@goodmis.org, peterz@infradead.org, 
+	mingo@redhat.com, tglx@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, 
+	x86@kernel.org, catalin.marinas@arm.com, will@kernel.org, 
+	mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, pjw@kernel.org, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, 
+	linux-riscv@lists.infradead.org, acme@kernel.org, namhyung@kernel.org, 
+	linux-perf-users@vger.kernel.org, mhiramat@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, bpf@vger.kernel.org, 
+	nathan@kernel.org, nsc@kernel.org, linux-kbuild@vger.kernel.org, 
+	ojeda@kernel.org, rust-for-linux@vger.kernel.org, ardb@kernel.org, 
+	linux-efi@vger.kernel.org, maz@kernel.org, oupton@kernel.org, 
+	kvmarm@lists.linux.dev, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	indu.bhagat@oracle.com, jremus@linux.ibm.com, wnliu@google.com, 
+	dylanbhatch@google.com, Ian Rogers <irogers@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Ryan,
+Overview
+========
+
+This RFC series introduces Minimal DWARF Call Frame Information (CFI)
+stack unwinding in the Linux kernel for both user-space deferred
+callchains (unwind_user / PERF_RECORD_CALLCHAIN_DEFERRED) and
+kernel-space stack traces (stacktrace.h / HAVE_RELIABLE_STACKTRACE)
+across x86-64, ARM64, and RISC-V, paired with an optional standalone C
+build-time .eh_frame minifier (scripts/min_eh_frame.c).
+
+It enables reliable stack unwinding across kernel and user-space
+binaries compiled with or without frame pointers (-fomit-frame-pointer),
+without introducing duplicate .sframe sections in user-space ELF files
+or requiring new compiler, assembler, or dynamic-loader formats.
+
+
+Motivation
+==========
+
+1. Limitations of Frame-Pointer-Only Unwinding
+----------------------------------------------
+ - Ecosystem defaults: Many Linux distributions (e.g., Debian, RHEL,
+   Alpine), language toolchains, and prebuilt third-party shared
+   libraries compile with -fomit-frame-pointer by default. A single
+   frameless shared library in a call path breaks frame-pointer walks.
+ - Completeness and reliability: Even with -fno-omit-frame-pointer,
+   frame-pointer chains miss callers inside leaf functions, function
+   prologues/epilogues, and hand-written assembly routines (such as
+   libc string/math/crypto primitives), and cannot guarantee reliable
+   kernel stack traces across asynchronous boundaries without external
+   validation such as objtool.
+
+2. Drawbacks of SFrame (PT_GNU_SFRAME)
+--------------------------------------
+SFrame was proposed as a simplified out-of-band unwind format to avoid
+placing a full DWARF .eh_frame virtual machine in the kernel. In
+practice, introducing a second unwind format carries substantial costs:
+
+ - ~2x user-space unwind metadata bloat: User-space ELF executables and
+   shared libraries must already ship .eh_frame and .eh_frame_hdr
+   (PT_GNU_EH_FRAME) for C++ exceptions, Rust panics, pthread_cancel
+   forced unwinding, and _Unwind_Backtrace(). Because SFrame omits
+   callee-saved register locations, personality routines, and LSDA
+   pointers, it cannot replace .eh_frame. On binaries built with GNU
+   Binutils 2.47 (SFRAME_VERSION_3), .sframe is nearly the same size as
+   .eh_frame + .eh_frame_hdr combined (e.g., +123.9 KB atop 124.1 KB in
+   /bin/bash, and +164.5 KB atop 163.5 KB in aarch64-linux-gnu-gcc-15),
+   roughly doubling unwind table footprint on disk.
+ - Toolchain and architecture gaps: SFrame has gone through incompatible
+   binary format revisions (v1 -> v2 -> v3), lacks upstream Clang/LLVM
+   support, lacks RISC-V -mrelax linker-relaxation support in standard
+   binutils, and requires new build flags (-Wa,--gsframe) across the
+   entire user-space ecosystem before profiling benefits materialize.
+ - Expressiveness gaps and dropped FDEs: SFrame cannot represent
+   dynamically realigned DRAP stack frames (CFA = *(fp + off), e.g.,
+   64-byte aligned locals in mm/vmscan.c:shrink_lruvec()), and GNU as
+   --gsframe silently omits .sframe FDEs when hand-written assembly uses
+   non-standard CFI patterns (for example, warning "no SFrame FDE
+   emitted; FP without RA on stack" on ARM64's return_to_handler).
+
+3. Core Insight of Minimal DWARF CFI
+------------------------------------
+Historically, in-kernel DWARF .eh_frame unwinding was rejected for two
+reasons:
+
+ 1. Execution context (predating deferred stack traces): Earlier
+    proposals predated deferred user-space stack tracing for perf and
+    BPF (unwind_deferred / PERF_RECORD_CALLCHAIN_DEFERRED). When user
+    callchains could only be captured synchronously inside NMI/atomic
+    context under pagefault_disable(), the kernel could neither take
+    mmap_lock to locate PT_GNU_EH_FRAME VMAs nor fault in cold
+    .eh_frame pages (forcing perf --call-graph dwarf to copy 8-64 KB of
+    raw user stack per sample). Upstream's deferred task_work unwind
+    infrastructure now solves that faultability barrier for any
+    table-based user unwinder.
+ 2. Unrestricted DWARF state-machine complexity: Full DWARF permits
+    Turing-complete DW_OP_* expressions, arbitrary N-register tracking
+    arrays, DW_CFA_set_loc backward PC jumps, and DW_EH_PE_indirect
+    pointer dereferences.
+
+With deferred unwinding solving (1) for user space (while kernel
+.eh_frame tables remain pinned in RAM for NMI/atomic walks), (2) is
+solved if an in-kernel .eh_frame_hdr / .eh_frame interpreter restricts
+its state machine to the exact state model of SFrame -- tracking only
+CFA, Frame Pointer (FP), and Return Address (RA), plus link-register
+leaf state, ARM64 PAC-RET signing (0x2d), a 4-entry remember_state
+stack, and a fixed 3-byte pattern match for DRAP/sigreturn frames while
+decoding and discarding general callee-saved GPR spill opcodes:
+
+ - O(1) stack memory, zero heap allocations, zero locks in the core
+   interpreter, and strictly bounded single-pass execution;
+ - Smaller unwind metadata than SFrame by construction: SFrame stores
+   materialized table rows (re-emitting full CFA/FP/RA offsets on every
+   FRE, plus an explicit PC+0 entry FRE per function because there is no
+   shared CIE), whereas DWARF encodes delta-compressed bytecodes (6-bit
+   packed PC advances, alignment-scaled LEB128 deltas for only the rule
+   that changed, 1-byte remember/restore_state, and a single 20-24 B CIE
+   shared across ~70,000 FDEs). Once unneeded GPR spill ops are stripped,
+   minified DWARF is naturally smaller than SFrame;
+ - Immediate compatibility with existing unmodified Linux binaries and
+   libc.so.6 across x86 (64/32-bit), ARM64 (AArch64/AArch32), and
+   RISC-V (RV64/RV32) built with either GCC or Clang/LLVM;
+ - 100.00% FDE coverage across x86_64, arm64, and riscv vmlinux builds
+   (195,019 / 195,019 functions).
+
+(ARM64 already has in-tree precedent in arch/arm64/kernel/pi/patch-scs.c,
+which parses .eh_frame CIEs/FDEs in ~180 lines with zero allocations;
+this series preserves __pi___eh_frame_* so Dynamic Shadow Call Stack
+boot-time patching continues to work unchanged.)
+
+
+Benefits vs. Drawbacks and Trade-offs
+=====================================
+
+Benefits
+--------
+ 1. Zero duplicate user-space metadata: Reuses existing PT_GNU_EH_FRAME
+    tables already present in standard ELF binaries (~50% smaller total
+    unwind metadata than shipping both .eh_frame* and .sframe).
+ 2. Toolchain and ecosystem readiness: Works out of the box with GCC and
+    Clang/LLVM, C and Rust kernel code, RISC-V -mrelax linker
+    relaxation, x86 IA32 and ARM32/RV32 compat user binaries, and
+    existing distro root filesystems.
+ 3. Smaller kernel unwind tables: With build-time .eh_frame minification
+    (scripts/min_eh_frame.c), kernel .eh_frame tables are 18%-28%
+    smaller than SFrame v3 (.sframe) in .o objects and 26.5% smaller
+    than x86-64 ORC (~3.16 MB for .eh_frame + .eh_frame_hdr vs. ~4.30 MB
+    for .orc_unwind* on x86-64 vmlinux). On ARM64 vmlinux, even combined
+    minified .eh_frame + .eh_frame_hdr (2.72 MB) is smaller than linked
+    .sframe alone (2.80 MB).
+ 4. Full frame-shape coverage: Unwinds SP-based frames, VLA/alloca FP
+    frames, 64-byte DRAP stack-realigned frames, shrink-wrapped
+    prologues/epilogues, ARM64 PAC-RET frames, signal trampolines
+    (including SA_ONSTACK and interrupted leaf functions), and mixed
+    CFI + JIT frame-pointer stacks.
+
+Drawbacks and Limitations
+-------------------------
+ 1. Higher per-frame CPU cost than FP, ORC, or SFrame: Interpreting
+    linear FDE CFA bytecodes from function entry to target PC takes
+    ~47-51 ns/frame (~185-202 cycles) in the hardened C interpreter,
+    compared to ~1 ns/frame for frame pointers and ~19 ns/frame for
+    fixed-record SFrame/ORC lookups. This is negligible for crash/oops
+    dumps, /proc/<tid>/stack, livepatch transitions, and amortized
+    task_work user walks, though slightly costlier than ORC if kernel
+    callchains are sampled at very high PMU NMI frequencies.
+ 2. User-space CFI requires deferred task_work context (not NMI): Just
+    like user-space SFrame, user .eh_frame* sections live in cold,
+    demand-paged user VMAs that cannot be faulted in or VMA-resolved
+    under NMI/IRQ (pagefault_disable() / mmap_lock). Synchronous
+    perf_callchain_user() in NMI remains FP-only; user CFI runs via
+    PERF_RECORD_CALLCHAIN_DEFERRED on return to user space. If an NMI
+    fires mid-syscall before execve(), munmap()/dlclose(), or pending
+    signal delivery, exit-time user state can differ slightly from
+    NMI-time state. (Note: the kernel also must not auto-enable
+    defer_callchain behind unaware perf_event_open() callers, as doing
+    so alters the PERF_RECORD_SAMPLE ips[] ABI; defaulting belongs in
+    user-space tools/perf after probing kernel support.)
+ 3. Build-time minifier host pass and stripped GPR rules: Achieving
+    smaller-than-SFrame kernel .eh_frame sizes uses a fast host C pass
+    (scripts/min_eh_frame.c) on .o files until compilers offer an
+    optional -funwind-tables=minimal flag under -fno-exceptions. When
+    minification is enabled on vmlinux, PC/SP/FP backtraces in gdb/crash
+    work normally, but inspecting spilled callee-saved GPRs in outer
+    frames requires .debug_frame (or leaving CONFIG_UNWINDER_DWARF_CFI_MINIFY
+    disabled on debug builds).
+ 4. Reliance on compiler and assembly .cfi_* annotations: Unlike x86
+    objtool (which validates machine instructions directly), .eh_frame
+    (like .sframe) trusts compiler -fasynchronous-unwind-tables output
+    and manual .cfi_* annotations in hand-written .S routines. For this
+    reason, arch_stack_walk_reliable() on ARM64 and RISC-V continues to
+    conservatively reject stacks containing in-kernel asynchronous
+    exception pt_regs boundaries until asynchronous epilogue/.S CFI
+    auditing is established.
+ 5. Hard interpreter bounds: Pathological FDEs with > 4,096 bytes of
+    bytecode or DW_CFA_remember_state depth > 4 are rejected with
+    -EINVAL (falling back to FP in user space). Across all 195,019
+    vmlinux FDEs on x86-64, ARM64, and RISC-V, 0 FDEs hit the size bound
+    and the maximum observed remember_state depth is 1.
+
+
+Execution Contexts and Fallback Mechanics
+=========================================
+
+1. When Kernel-Space vs. User-Space CFI Can Run
+-----------------------------------------------
+  Context                        Kernel CFI   User CFI     Notes
+  -----------------------------  -----------  -----------  -------------------
+  PMU NMI (in_nmi())             Yes (direct) No (defer)   Pinned vmlinux/RCU
+                                                           mod tables vs. cold
+                                                           user VMAs
+  Hardirq / Softirq / BPF        Yes (direct) No (defer)   bpf_get_stack[id];
+                                                           user sync = FP-only
+  Return-to-user task_work       Yes          Yes (faults) mmap_read_lock then
+                                                           copy_from_user()
+  Cross-task /proc/<tid>/stack   Yes          No           current->mm only
+  Livepatch reliable walk        Yes (all 3)  N/A          Kernel-only API
+  Kernel threads / x86 VM86      Yes (kthd)   No           mm == NULL / 16-bit
+
+Whenever user-space CFI cannot run synchronously (for example,
+non-deferred perf_callchain_user() or atomic bpf_get_stack() /
+bpf_get_stackid() with BPF_F_USER_STACK in NMI, IRQ, or preempt-disabled
+context), the kernel falls back to the existing synchronous
+frame-pointer user stack walk (arch_stack_walk_user()) just as it does
+today. When deferred user unwinding is requested in NMI,
+unwind_deferred_request() takes ~10-20 ns and emits
+[PERF_CONTEXT_USER_DEFERRED, cookie]; even if dozens of PMU NMIs fire
+during a slow syscall, unwind_user_faultable() walks the user stack at
+most once on return to user space.
+
+2. Per-Frame User-Space Fallback (CFI -> FP -> CFI)
+---------------------------------------------------
+unwind_user_next() (kernel/unwind/user.c) evaluates each frame
+independently rather than locking an entire walk to one unwinder:
+
+ 1. Architectural signal trampoline hook (unwind_user_sigreturn()):
+    Checked first (bounded to UNWIND_USER_MAX_SIGNALS = 4 per walk so
+    SA_ONSTACK switches cannot loop). On ARM64 (__kernel_rt_sigreturn)
+    and RISC-V (__vdso_rt_sigreturn), where vDSO trampolines omit
+    .eh_frame register rules for libgcc compatibility, recovers pc, sp,
+    fp, and lr/ra (with ra_valid = true) from rt_sigframe. On x86-64,
+    .cfi_signal_frame ('S' augmentation) is handled directly by CFI.
+ 2. Minimal DWARF CFI (highest priority):
+    Resolves PT_GNU_EH_FRAME via a 4-slot per-walk VMA cache (or under
+    mmap_read_lock_killable(), dropped before copy_from_user()):
+     - Explicit bottom of stack (DW_CFA_undefined on RA, or RA == 0):
+       sets state->done = true and stops cleanly without FP fallback.
+     - Missing PT_GNU_EH_FRAME / FDE (-ENOENT, e.g. anonymous RX JIT
+       code) or unsupported bytecode (-EINVAL/-EFAULT): caches a
+       negative VMA entry when no PT_GNU_EH_FRAME exists, leaves
+       state->done = false, and falls through to FP for this frame.
+ 3. Frame pointer fallback: Steps out of the JIT/non-CFI frame via FP.
+ 4. Automatic return to CFI: On the next frame, unwind_user_next() tries
+    Minimal DWARF CFI first again, unwinding mixed stacks seamlessly as
+    CFI -> FP -> CFI -> FP -> CFI.
+
+
+Compatibility with Kernel Livepatching (HAVE_RELIABLE_STACKTRACE)
+=================================================================
+
+All three architectures support arch_stack_walk_reliable() for kernel
+livepatching under CONFIG_UNWINDER_DWARF_CFI, even when compiled with
+-fomit-frame-pointer:
+
+ - x86-64 (arch/x86/kernel/unwind_dwarf.c): Unwinds vmlinux and RCU
+   module .eh_frame tables, traverses %rsp-verified ENCODE_FRAME_POINTER
+   pt_regs frames across task/IRQ/exception stacks, recovers CFA-keyed
+   ftrace_graph and rethook return addresses, and sets state->error on
+   any missing or invalid FDE so arch_stack_walk_reliable() returns
+   -EINVAL rather than guessing.
+ - ARM64 (arch/arm64/kernel/stacktrace.c): Preserves ARM64's existing
+   HAVE_RELIABLE_STACKTRACE and HAVE_LIVEPATCH guarantees without frame
+   pointers. Normal sleeping tasks unwind via kunwind_next_cfi() down to
+   the SP-verified FRAME_META_TYPE_FINAL entry boundary. Every non-CFI
+   fallback (live x30 guess or AArch64 frame-record fallback for JITed
+   eBPF code) sets state->unreliable = true, and in-kernel exception
+   boundaries set KUNWIND_SOURCE_REGS_PC -- both of which are rejected
+   with -EINVAL by arch_reliable_kunwind_consume_entry().
+   Compared to out-of-tree ARM64 SFrame proposals, Minimal DWARF CFI
+   works with both Clang/LLVM and GCC today and achieves 100.00% FDE
+   coverage (including entry-ftrace.S's return_to_handler where GNU as
+   omits .sframe). Moreover, kunwind_next_cfi() already distinguishes
+   live LR (DWARF_CFI_RULE_SAME) vs. stack-saved LR
+   (DWARF_CFI_RULE_OFFSET) at regs->pc, so if asynchronous epilogue/.S
+   CFI is audited across ARM64 in the future, reliable traversal across
+   KUNWIND_SOURCE_REGS_PC requires no format changes.
+ - RISC-V (arch/riscv/kernel/stacktrace.c): Selects
+   HAVE_RELIABLE_STACKTRACE under CONFIG_UNWINDER_DWARF_CFI.
+   walk_stackframe_cfi(..., require_reliable = true) verifies every step
+   via .eh_frame CFI and SP-keyed ftrace_graph/rethook recovery while
+   rejecting handle_exception pt_regs frames and non-CFI fallbacks with
+   -EINVAL.
+
+
+Compatibility with User Space and Kernel Subsystems
+===================================================
+
+ - C++ exceptions, Rust panics, and pthread_cancel: 100% unchanged. The
+   kernel only reads PT_GNU_EH_FRAME in user ELF mappings, skipping
+   'zPLR' personality ('P') and LSDA ('L') augmentations and ignoring
+   callee-saved GPR opcodes. ARM64 and RISC-V vDSO sigreturn trampolines
+   are untouched so libgcc's instruction-matching fallback is preserved.
+ - Debugging (gdb, lldb, kdump/crash): User debugging is untouched.
+   Kernel backtraces (bt), .debug_line, and .debug_info work normally.
+ - Hardware security, sanitizers, and eBPF: Supports ARM64 PAC-RET + BTI
+   (-mbranch-protection=standard), ARM64 Dynamic Shadow Call Stack
+   (patch-scs.c), x86 Kernel IBT (objtool skips .eh_frame* relocations),
+   SW-tag KASAN (__hwasan_tag_mismatch .cfi_* annotations), Spectre v1 /
+   v1.1 nospec bounds clamping, and JITed eBPF programs (bpf_get_stack,
+   bpf_get_stackid).
+
+
+Worked Examples
+===============
+
+Example 1: Single-Function Encoding (Raw vs. Minified .eh_frame vs. SFrame)
+---------------------------------------------------------------------------
+For a 64-byte C function compiled with gcc -O2 -fomit-frame-pointer
+-fasynchronous-unwind-tables -Wa,--gsframe (3 GPR spills: r15, r14, rbx):
+
+  Raw .eh_frame (30 B FDE + 8 B .eh_frame_hdr entry = 38 B; 1 shared CIE):
+    42 0e 10 [8f 02]  # +2:  CFA=rsp+16, [r15 at cfa-16 -> ignored]
+    45 0e 18 [8e 03]  # +5:  CFA=rsp+24, [r14 at cfa-24 -> ignored]
+    44 0e 20 [83 04]  # +4:  CFA=rsp+32, [rbx at cfa-32 -> ignored]
+    47 0e 30          # +7:  CFA=rsp+48
+    66 0e 20 | 41 0e 18 | 42 0e 10 | 42 0e 08   # epilogue pops
+
+  Minified .eh_frame (24 B FDE + 8 B .eh_frame_hdr entry = 32 B):
+    42 0e 10 | 45 0e 18 | 44 0e 20 | 47 0e 30
+    66 0e 20 | 41 0e 18 | 42 0e 10 | 42 0e 08
+
+  SFrame v3 .sframe (27 B FREs + 5 B FRE hdr + 16 B FDE index = 48 B):
+    00 03 08 | 02 03 10 | 07 03 18 | 0b 03 20 | 12 03 30
+    38 03 20 | 39 03 18 | 3b 03 10 | 3d 03 08   # no shared CIE -> +PC=0 FRE
+
+Example 2: Kernel-Space Walk (eBPF + DRAP Module + kretprobe on ARM64)
+----------------------------------------------------------------------
+  [Context: JITed eBPF raw_tracepoint("sched_switch") calls bpf_get_stack()]
+
+  Frame 0: bpf_prog_<tag> (JITed eBPF text, no .eh_frame)
+    -> .eh_frame lookup: -ENOENT -> falls back to FP record [x29, x29+16]
+       (sets state->unreliable = true; allowed for non-reliable bpf walk)
+    -> Recovers caller PC in tracepoint hook, resumes CFI on Frame 1
+
+  Frame 1: __schedule (vmlinux .text, built with -fomit-frame-pointer)
+    -> Binary search __start_eh_frame_hdr at lookup_pc = pc - 4
+    -> Evaluates FDE (skips x19..x28 spills, toggles ra_signed on 0x2d):
+       row = { cfa = SP + 144, fp = *(CFA - 144), ra = *(CFA - 136), pac = 1 }
+    -> Reads saved x30, strips PAC via ptrauth_strip_kernel_insn_pac()
+
+  Frame 2: mod_unwind_drap [test_unwind_mod] (64B stack-realigned DRAP)
+    -> RCU lookup in mod->arch.dwarf_cfi_index matches 3-byte expression
+       [DW_OP_breg(fp), -40, DW_OP_deref] -> CFA = *(fp - 40)
+
+  Frame 3: mod_krp_inner [test_unwind_mod] (hijacked by kretprobe)
+    -> Stack RA == &__kretprobe_trampoline -> kunwind_recover_return_address()
+       matches entry SP == CFA on kretprobe shadow list -> restores real PC
+
+  Frame N: el0t_64_sync_handler (EL0 -> EL1 syscall boundary)
+    -> .eh_frame: -ENOENT -> SP-verified FRAME_META_TYPE_FINAL -> clean stop
+
+Example 3: User-Space Deferred Walk (Signal + SA_ONSTACK + Leaf + JIT)
+----------------------------------------------------------------------
+  [Step A -- In PMU NMI]:
+    unwind_deferred_request() emits [PERF_CONTEXT_USER_DEFERRED, cookie]
+    and queues TWA_NMI_CURRENT task_work (~15 ns).
+
+  [Step B -- Return to User Space (unwind_user_faultable())]:
+    Frame 0: nanosleep() in libc.so.6 (frameless leaf, topmost = true)
+      -> Caches libc PT_GNU_EH_FRAME (slot 0), drops mmap_read_lock
+      -> FDE at exact ip: CFA = SP + 0, RA = SAME -> consumes live LR
+         -> sigusr1_handler + 0x24; clears state->ra_valid = false
+
+    Frame 1: sigusr1_handler (on SA_ONSTACK sigaltstack)
+      -> Caches binary PT_GNU_EH_FRAME (slot 1); reads RA = vDSO sigreturn
+
+    Frame 2: [vdso] rt_sigreturn trampoline
+      -> unwind_user_sigreturn() reads uc_mcontext from rt_sigframe,
+         pivots SP back to main stack, restores ip = dso_leaf_tgkill + 8
+         and live LR (ra_valid = true, signal = true, nr_signals = 1)
+
+    Frame 3: dso_leaf_tgkill in libcleanup.so (interrupted frameless leaf)
+      -> signal == true -> exact ip lookup; RA = SAME consumes restored LR
+
+    Frame 4: c_dso_trigger in libcleanup.so ('zPLR' C++ CIE, frameless)
+      -> Skips personality/LSDA augmentation -> unwinds to jit_bridge
+
+    Frame 5: Anonymous PROT_READ|PROT_EXEC JIT stub (no ELF header, has FP)
+      -> Negative VMA cache hit (slot 3) -> CFI returns -ENOENT -> FP step
+
+    Frames 6..9: 64B DRAP -> alloca() VLA -> main -> _start
+      -> CFI resumes automatically after JIT frame; _start hits
+         DW_CFA_undefined on RA -> state->done = true (clean stop).
+
+
+Empirical Size and Latency Comparisons
+======================================
+
+1. Kernel Unwind Table Sizes (x86_64, arm64, riscv)
+---------------------------------------------------
+  Target               .text     ORC       .sframe   Min .eh    Min .eh+_hdr
+  -------------------  --------  --------  --------  ---------  ------------
+  x86_64 mm/vmscan.o    40.6 KB  14,240 B   7,840 B*   6,432 B       --
+  x86_64 ext4/inode.o   60.3 KB  12,980 B   7,486 B    5,840 B       --
+  x86_64 vmlinux       20.09 MB  ~4.30 MB     --      2.62 MB      3.16 MB
+  arm64 kernel/fork.o   18.5 KB     --      2,617 B    2,040 B     2,548 B
+  arm64 mm/vmscan.o     28.4 KB     --      2,423 B    1,744 B     2,136 B
+  arm64 vmlinux        17.64 MB     --      2.80 MB    2.19 MB      2.72 MB
+  riscv kernel/fork.o   19.8 KB     --        --       2,860 B     3,496 B
+  riscv mm/vmscan.o     35.3 KB     --        --       5,916 B     7,168 B
+  riscv vmlinux        11.49 MB     --        --       1.93 MB      2.35 MB
+  (* SFrame omits DRAP FDEs in x86_64 mm/vmscan.o and ARM64 entry-ftrace.S;
+     Minimal DWARF covers 100.00%: 69,958 x86 + 69,765 arm64 + 55,296 riscv.)
+
+2. User-Space ELF Unwind Metadata Sizes (GCC 15.2 / Binutils 2.47)
+------------------------------------------------------------------
+  Binary                    .text    Raw .eh*  Min .eh*  .sframe  .eh*+.sframe
+  ------------------------  -------  --------  --------  -------  ------------
+  4,038-fn benchmark (x86)   302 KB  162.4 KB  151.4 KB  137.4 K     299.8 KB
+  /bin/bash (Debian x86)     887 KB  124.1 KB  116.5 KB  123.9 K     248.0 KB
+  aarch64-linux-gnu-gcc-15   911 KB  163.5 KB     --     164.5 K     328.0 KB
+  libc.so.6 (x86-64)        1.47 MB  181.7 KB  171.3 KB    --          --
+  /usr/bin/python3 (x86-64) 3.39 MB  548.7 KB  512.5 KB    --          --
+
+3. Unwind Speed (17-Frame Mixed SP/VLA/Shrink-Wrap Walk, 4,038-FDE Binary)
+--------------------------------------------------------------------------
+  Unwinder Implementation                    17-Frame Walk  ns/Frame  Cyc/Frm
+  -----------------------------------------  -------------  --------  -------
+  Frame Pointer (-fno-omit-frame-pointer)          16.3 ns   0.96 ns    2.1 c
+  SFrame v3 (.sframe)                             321.3 ns  18.90 ns   74.7 c
+  Hardened kernel dwarf_cfi.c (Min .eh)           795.9 ns  46.82 ns  185.4 c
+  Hardened kernel dwarf_cfi.c (Raw .eh)           860.5 ns  50.62 ns  201.8 c
+  Full DWARF (libgcc _Unwind_Backtrace)         1,476.2 ns  86.83 ns  342.2 c
+
+
+Testing and Verification
+========================
+
+ - Static & style checks: 0 errors/warnings from scripts/checkpatch.pl,
+   scripts/kernel-doc -Werror -none, and scripts/spdxcheck.py across all
+   11 patches.
+ - Differential equivalence & fuzzing: 100.00% match across 905,231+
+   ASan+UBSan PC probes against reference DWARF evaluation across x86-64,
+   ARM64 (PAC-RET), and RISC-V (-mrelax), plus 500,000 ASan+UBSan fuzzer
+   iterations on kernel/unwind/dwarf_cfi.c and 5,000 mutated ELF .o
+   fuzzer iterations on scripts/min_eh_frame.c with 0 findings.
+ - Live multi-architecture QEMU testing (qemu-system-x86_64,
+   qemu-system-aarch64 -M virt -cpu max with PAC-RET + BTI, and
+   qemu-system-riscv64 -M virt -cpu rv64 with RVC):
+   Passed 7/7 KUnit tests, backtracetest, 10x module load/unload cycles
+   with DRAP + nested kretprobes/rethook + arch_stack_walk_reliable(),
+   50x cross-task /proc/<tid>/stack walks, JITed eBPF bpf_get_stack() +
+   bpf_get_stackid(), unwind_user_cfi kselftest (clobbered FP, VLA, DRAP,
+   shrink-wrap, anonymous RX JIT CFI->FP->CFI fallback), -m32 IA32 compat,
+   'zPLR' DSO + SA_ONSTACK SIGUSR1 rt_sigreturn across interrupted leaf
+   functions, and 4-thread hostile ELF VMA fault injection with 0 failures
+   and clean dmesg across all three architectures.
+
+
+Tool-Assistance Disclosure
+==========================
+
+Per Documentation/process/generated-content.rst and
+Documentation/process/coding-assistants.rst:
+
+ - Tool used: Gemini (AI coding assistant), used interactively across an
+   extended engineering session.
+ - Scope of assistance: Prototyping and refining the bounded DWARF CFA
+   interpreter, user-space PT_GNU_EH_FRAME VMA unwinder, build-time
+   scripts/min_eh_frame.c minifier, x86-64/ARM64/RISC-V kernel and
+   user-space unwinder integrations, KUnit/kselftest suites, differential
+   fuzzers, QEMU multi-arch test harnesses, and series documentation.
+
+Ian Rogers (11):
+  unwind: Add Minimal DWARF CFI bytecode interpreter and KUnit tests
+  unwind_user: Support Minimal DWARF CFI user-space unwinding
+  scripts, unwind: Add build-time .eh_frame minifier
+  objtool/ibt: Ignore .eh_frame relocations during ENDBR validation
+  x86/unwind: Add Minimal DWARF CFI kernel unwinder
+  arm64: unwind_user: Support Minimal DWARF CFI and FP user unwinding
+  arm64/unwind: Add Minimal DWARF CFI kernel unwinder
+  riscv: unwind_user: Support Minimal DWARF CFI and FP user unwinding
+  riscv/unwind: Add Minimal DWARF CFI kernel unwinder
+  selftests/perf_events: Add Minimal DWARF CFI deferred user unwind test
+  scripts: Add eh_frame_min.py .eh_frame coverage and size analyzer
+
+ arch/Kconfig                                  |   31 +
+ arch/arm64/Kconfig                            |    7 +-
+ arch/arm64/Kconfig.debug                      |   32 +
+ arch/arm64/Makefile                           |    5 +
+ arch/arm64/include/asm/ftrace.h               |   10 +-
+ arch/arm64/include/asm/module.h               |   16 +
+ arch/arm64/include/asm/module.lds.h           |    2 +-
+ arch/arm64/include/asm/perf_event.h           |   15 +
+ arch/arm64/include/asm/unwind_user.h          |  126 ++
+ arch/arm64/kernel/Makefile                    |    2 +
+ arch/arm64/kernel/efi-rt-wrapper.S            |   22 +
+ arch/arm64/kernel/entry-ftrace.S              |   35 +-
+ arch/arm64/kernel/entry.S                     |   22 +
+ arch/arm64/kernel/ftrace.c                    |   12 +-
+ arch/arm64/kernel/module.c                    |   17 +-
+ arch/arm64/kernel/probes/kprobes.c            |   14 +-
+ arch/arm64/kernel/signal.c                    |   54 +
+ arch/arm64/kernel/stacktrace.c                |  537 ++++-
+ arch/arm64/kernel/vmlinux.lds.S               |   21 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile              |    1 +
+ arch/arm64/lib/kasan_sw_tags.S                |   16 +
+ arch/arm64/net/bpf_jit_comp.c                 |    9 +-
+ arch/arm64/net/bpf_timed_may_goto.S           |   19 +
+ arch/riscv/Kconfig                            |    7 +-
+ arch/riscv/Kconfig.debug                      |   16 +
+ arch/riscv/Makefile                           |   15 +-
+ arch/riscv/include/asm/module.h               |   22 +
+ arch/riscv/include/asm/perf_event.h           |   15 +
+ arch/riscv/include/asm/signal32.h             |    8 +
+ arch/riscv/include/asm/stacktrace.h           |   11 +
+ arch/riscv/include/asm/unwind_user.h          |   81 +
+ arch/riscv/kernel/Makefile                    |    4 +
+ arch/riscv/kernel/compat_signal.c             |   44 +
+ arch/riscv/kernel/entry.S                     |    2 +
+ arch/riscv/kernel/mcount-dyn.S                |    6 +-
+ arch/riscv/kernel/mcount.S                    |   34 +-
+ arch/riscv/kernel/module.c                    |    9 +
+ arch/riscv/kernel/probes/rethook.c            |   13 +-
+ arch/riscv/kernel/probes/rethook_trampoline.S |   30 +
+ arch/riscv/kernel/signal.c                    |   62 +
+ arch/riscv/kernel/stacktrace.c                |  732 ++++++-
+ arch/riscv/kernel/vmlinux.lds.S               |   13 +
+ arch/riscv/purgatory/Makefile                 |    3 +-
+ arch/x86/Kconfig                              |    3 +-
+ arch/x86/Kconfig.debug                        |   13 +
+ arch/x86/Makefile                             |    7 +
+ arch/x86/boot/startup/Makefile                |    1 +
+ arch/x86/entry/calling.h                      |   17 +
+ arch/x86/include/asm/dwarf2.h                 |    6 +-
+ arch/x86/include/asm/frame.h                  |   42 +-
+ arch/x86/include/asm/module.h                 |    5 +
+ arch/x86/include/asm/unwind.h                 |   15 +-
+ arch/x86/include/asm/unwind_user.h            |   47 +
+ arch/x86/kernel/Makefile                      |    4 +
+ arch/x86/kernel/ftrace_64.S                   |   44 +-
+ arch/x86/kernel/module.c                      |   11 +-
+ arch/x86/kernel/rethook.c                     |   92 +-
+ arch/x86/kernel/unwind_dwarf.c                |  663 ++++++
+ arch/x86/kernel/vmlinux.lds.S                 |   16 +
+ arch/x86/net/bpf_jit_comp.c                   |   12 +-
+ arch/x86/purgatory/Makefile                   |    1 +
+ drivers/firmware/efi/libstub/Makefile         |    7 +-
+ include/asm-generic/vmlinux.lds.h             |    5 +
+ include/linux/unwind_dwarf_cfi.h              |  174 ++
+ include/linux/unwind_user.h                   |   78 +
+ include/linux/unwind_user_types.h             |   92 +-
+ kernel/unwind/Makefile                        |   14 +-
+ kernel/unwind/dwarf_cfi.c                     | 1842 +++++++++++++++++
+ kernel/unwind/dwarf_cfi_kunit.c               |  625 ++++++
+ kernel/unwind/user.c                          |  155 +-
+ kernel/unwind/user_cfi.c                      |  378 ++++
+ rust/Makefile                                 |    4 +-
+ scripts/Makefile                              |    1 +
+ scripts/Makefile.build                        |   12 +-
+ scripts/Makefile.lib                          |   13 +-
+ scripts/Makefile.vmlinux_o                    |    8 +-
+ scripts/eh_frame_min.py                       |  938 +++++++++
+ scripts/min_eh_frame.c                        | 1719 +++++++++++++++
+ tools/objtool/check.c                         |    1 +
+ .../testing/selftests/perf_events/.gitignore  |    1 +
+ tools/testing/selftests/perf_events/Makefile  |    4 +-
+ .../selftests/perf_events/unwind_user_cfi.c   |  447 ++++
+ 82 files changed, 9551 insertions(+), 118 deletions(-)
+ create mode 100644 arch/arm64/include/asm/unwind_user.h
+ create mode 100644 arch/riscv/include/asm/unwind_user.h
+ create mode 100644 arch/x86/kernel/unwind_dwarf.c
+ create mode 100644 include/linux/unwind_dwarf_cfi.h
+ create mode 100644 kernel/unwind/dwarf_cfi.c
+ create mode 100644 kernel/unwind/dwarf_cfi_kunit.c
+ create mode 100644 kernel/unwind/user_cfi.c
+ create mode 100755 scripts/eh_frame_min.py
+ create mode 100644 scripts/min_eh_frame.c
+ create mode 100644 tools/testing/selftests/perf_events/unwind_user_cfi.c
+
+
+base-commit: 4843f6873f7c4835e62f2c73ba0fd538e57a2f22
+-- 
+2.56.1.750.gf70dc682cf-goog
 
-thanks for your patch!
-
-On Thu, Oct 15, 2026 at 4:27=E2=80=AFPM Ryan Roberts <ryan.roberts@arm.com>=
- wrote:
-
-> A CLA domain cannot be used by multiple address spaces concurrently
-
-Which address space? The physical one? The virtual address
-space of the CPU for a certain CLA? The virtual address space
-of the CLA on a certain CPU, as found from it's TTBR0/1?
-I suspect the last one, but it needs clarifying.
-
-And so the domain is definied in hardware but there is
-a footgun waiting to be fired by not defining the virtual
-address space exactly the same on all CLA:s in the domain?
-
-Please elaborate.
-
-> because its devices share a memory translation context and may
-> communicate without isolation.
-
-Again I stumble here. "without isolation". So this kind of resoning
-implies I know of some isolation that I cannot have. But I don't
-know that, I have no idea what kind of isolation I would want here.
-
-This needs to be explained differently.
-
-> Represent each user of a domain with a
-> context keyed by the mm_struct and device file description, and track
-> contexts in a per-domain hash table.
-
-This I understand.
-
-> Add a domain scheduler that queues contexts for assignment
-
-Are these contexts the software abstraction of hardware
-constraints (such as the virtual memory space)
-around a certain domain, and since they are scheduled,
-these constraints are then applied over a certain time window?
-
-> and gives
-> each one a fixed time slice. Before switching, revoke the outgoing
-> context's mappings from all VMAs for the device file. Then save its
-> accelerator state and remove its MTC, before installing the incoming
-> context's MTC and restoring the incoming accelerator state.
-
-I think I start to understand a little...
-
-> Run hardware operations through CPU-bound kthread workers, since each
-> CLA can only be accessed from its local CPU. Coordinate the per-device
-> workers with a domain worker so that every CLA in the domain is switched
-> as a single assignment unit.
->
-> Treat a failure on any device as a failure of the whole domain. Stop
-> further assignments and wake all waiters when a domain becomes unusable.
->
-> Co-developed-by: Jean-Philippe Brucker <jpb@kernel.org>
-> Signed-off-by: Jean-Philippe Brucker <jpb@kernel.org>
-> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
-
-OK this is some kind of scheduler let's look, but right before we
-start you should probably define the principles of this scheduler?
-FIFO? round-robin? Something else?
-
->  extern struct xarray cla_domains;
-
-Nice use of xarray
-
-
-> +static inline void cla_ctx_get(struct cla_ctx *ctx)
-> +{
-> +       kref_get(&ctx->refcnt);
-> +}
-> +
-> +static inline void cla_ctx_put(struct cla_ctx *ctx)
-> +{
-> +       kref_put(&ctx->refcnt, cla_ctx_free);
-> +}
-
-Rename these something like _addref/_dropref or just inline
-the kref calls. These names upsets the kernel conventions
-for _get()/_put() of resources, see below.
-
-> +/**
-> + * cla_ctx_create - Create a context or increase its user count
-
-Something that creates or increase a context should be named
-cla_ctx_get() to avoid ambiguousness.
-
-> +/**
-> + * cla_ctx_destroy - Drop a context user
-
-No it drops the reference and drops the context (destroy it) if the
-usecount =3D=3D 0.
-
-Name it cla_ctx_put() to follow kernel patterns.
-
-> +       /* Release initial reference from cla_ctx_create(). */
-> +       cla_ctx_put(ctx);
-
-So this needs a different name.
-
-> +++ b/drivers/misc/arm-cla/cla-sched.c
-
-I wanna spend some time here since this is RFC and we are looking
-more at design than code details.
-
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Arm CLA driver - domain scheduling
-
-In this header explain the principles for the scheduling, as well as in the
-commit message.
-
-> +#include <linux/cpuhplock.h>
-> +#include <linux/rhashtable.h>
-> +
-> +#include "arm-cla.h"
-> +
-> +static struct cla_ctx invalid_ctx;
-> +
-> +static const struct rhashtable_params ctxs_rht_params =3D {
-> +       .head_offset =3D offsetof(struct cla_ctx, node),
-> +       .key_offset =3D offsetof(struct cla_ctx, key),
-> +       .key_len =3D sizeof(((struct cla_ctx *)0)->key),
-> +       .automatic_shrinking =3D true,
-> +};
-
-Neat!
-
-> +static int __cla_domain_switch_ctx(struct cla_domain *domain,
-> +                                  struct cla_ctx *prev_ctx,
-> +                                  struct cla_ctx *next_ctx)
-
-Is this one of those "__ means __inner_function()"?
-
-Name it for exactly what it does instead.
-
-> +static int cla_domain_switch_ctx(struct cla_domain *domain,
-> +                                struct cla_ctx *prev_ctx,
-> +                                struct cla_ctx *next_ctx,
-> +                                struct cla_ctx **assigned_ctx)
-
-Looks OK.
-
-> +/*
-> + * Run on the cla's local CPU, either in its worker or a CPU hotplug cal=
-lback.
-> + * Work submitters hold cpus_read_lock() until completion, excluding hot=
-plug
-> + * callbacks and keeping the worker bound. Hotplug callbacks hold domain=
-->lock
-> + * to protect the assigned context. Other devices may switch concurrentl=
-y.
-> + * On failure, mark the device broken; the caller handles domain failure=
-.
-> + */
-> +int cla_dev_switch_ctx(struct cla_dev *dev, struct cla_ctx *prev_ctx,
-> +                      struct cla_ctx *next_ctx)
-
-Good explanation and name, easy to understand.
-
-> +void cla_dev_switch_ctx_work(struct kthread_work *work)
-
-Here too
-
-> +static inline struct cla_ctx *cla_domain_get_next_ctx(struct cla_domain =
-*domain)
-> +{
-> +       return list_first_entry_or_null(&domain->queued_ctxs, struct cla_=
-ctx,
-> +                                       queue_node);
-> +}
-
-This looks like a FIFO thing?
-
-> +static inline struct cla_ctx *cla_domain_get_prev_ctx(struct cla_domain =
-*domain,
-> +                                                     struct cla_ctx *nex=
-t_ctx)
-> +{
-> +       if (domain->assigned_ctx && (next_ctx || cla_ctx_is_dying(domain-=
->assigned_ctx)))
-> +               return domain->assigned_ctx;
-> +       return NULL;
-> +}
-> +
-> +static void cla_vma_zap_domain(struct vm_area_struct *vma, struct cla_do=
-main *domain)
-
-"zap" is a very ambiguous word. This function needs to have
-a name that express exactly what it does.
-
-It looks like it should rather be infixed _initialize_?
-
-cla_domain_initialize_vma()?
-cla_domain_reinitialize_vma()?
-
-> +{
-> +       unsigned long vma_start =3D vma->vm_pgoff;
-> +       unsigned long vma_end =3D vma_start + vma_pages(vma);
-> +       unsigned long domain_start =3D domain->pg_offset;
-> +       unsigned long domain_end =3D domain_start + domain->nr_devs;
-> +       unsigned long start =3D max(vma_start, domain_start);
-> +       unsigned long end =3D min(vma_end, domain_end);
-> +       unsigned long addr;
-> +       unsigned long size;
-> +
-> +       if (start >=3D end)
-> +               return;
-> +
-> +       addr =3D vma->vm_start + ((start - vma_start) << PAGE_SHIFT);
-> +       size =3D (end - start) << PAGE_SHIFT;
-> +       zap_special_vma_range(vma, addr, size);
-
-That goes for that function too by the way. Two wrongs does not
-make one right.
-
-It might be that everyone in memory management disagree with
-me and think this is crystal clear, then I can have other opinions.
-
-> +static void cla_domain_zap(struct cla_domain *domain, struct cla_ctx *ct=
-x)
-
-And this one.
-
-cla_domain_init()?
-cla_domain_reinit()?
-
-> +static void cla_domain_reassign(struct kthread_work *work)
-
-What about a comment above this function explaining
-what is being reassigned to what?
-
-> +       /*
-> +        * Exclude cpuhp until assigned_ctx reflects the hardware again. =
-cpuhp
-> +        * callbacks use it to save/restore the local device and must not=
- see
-> +        * invalid_ctx. Take before domain->lock, also used by cpuhp call=
-backs.
-> +        */
-> +       cpus_read_lock();
-> +       mutex_lock(&domain->lock);
-> +       if (domain->broken)
-> +               goto out_unlock;
-> +
-> +       /* Figure out prev_ctx and next_ctx. NULL indicates don't [un]ass=
-ign. */
-> +       next_ctx =3D cla_domain_get_next_ctx(domain);
-> +       prev_ctx =3D cla_domain_get_prev_ctx(domain, next_ctx);
-> +
-> +       if (!prev_ctx && !next_ctx)
-> +               goto out_unlock;
-> +
-> +       /* prev_ctx already holds its assignment reference. */
-> +       if (next_ctx)
-> +               cla_ctx_get(next_ctx);
-> +
-> +       /*
-> +        * We need to grab mmap_lock, but can't do so while holding the d=
-omain
-> +        * lock (since cla_vma_fault() grabs the domain lock while holdin=
-g
-> +        * mmap_lock). The queue may change and contexts may be killed by
-> +        * cla_ctx_destroy() while the lock is dropped.
-> +        *
-> +        * No user is allowed to access CLA while we are reassigning. Dis=
-able
-> +        * assigned_ctx before zapping so cla_vma_fault() won't re-map th=
-e
-> +        * domain during reassignment. The sentinel also defers broken-do=
-main
-> +        * cleanup until we know which context hardware may still access.
-> +        */
-> +       WRITE_ONCE(domain->assigned_ctx, &invalid_ctx);
-> +       mutex_unlock(&domain->lock);
-> +
-> +       /* Prevent prev_ctx from accessing any device in the domain. */
-> +       cla_domain_zap(domain, prev_ctx);
-> +
-> +       /* cpus_read_lock() ensures workers remain cpu-bound and alive. *=
-/
-> +       ret =3D cla_domain_switch_ctx(domain, prev_ctx, next_ctx, &assign=
-ed_ctx);
-> +
-> +       mutex_lock(&domain->lock);
-> +       WRITE_ONCE(domain->assigned_ctx, assigned_ctx);
-> +
-> +       /* Also handle failure reported by another thread during the swit=
-ch. */
-> +       if (ret || domain->broken) {
-> +               cla_domain_set_broken(domain);
-> +               goto out_unlock;
-> +       }
-> +
-> +       /*
-> +        * Remove next_ctx from the queue and wake up all waiters so that=
- the
-> +        * fault handler can map the domain into the newly assigned proce=
-ss.
-> +        * assigned_ctx must have been updated prior to waking the waiter=
-s.
-> +        *
-> +        * If next_ctx was killed while we were assigning it, schedule an=
-other
-> +        * reassignment to deassign it.
-> +        */
-> +       if (next_ctx) {
-> +               if (cla_ctx_is_dying(next_ctx)) {
-> +                       cla_domain_schedule_reassignment(domain);
-> +                       goto out_unlock;
-> +               }
-> +               list_del_init(&next_ctx->queue_node);
-> +               wake_up_all(&next_ctx->waitq);
-> +       }
-> +
-> +       /* If there are more queued ctxs, schedule the next reassignment.=
- */
-> +       if (!list_empty(&domain->queued_ctxs))
-> +               cla_domain_schedule_reassignment(domain);
-> +
-> +out_unlock:
-> +       mutex_unlock(&domain->lock);
-> +       cpus_read_unlock();
-> +
-> +       /* Deliberately put references outside of the locks. */
-> +       if (next_ctx && next_ctx !=3D assigned_ctx)
-> +               cla_ctx_put(next_ctx);
-> +       if (prev_ctx && prev_ctx !=3D assigned_ctx)
-> +               cla_ctx_put(prev_ctx);
-> +}
-
-This function contains a bunch of comments that are hard for me
-to understand without context (ha!) but it's probably all right,
-I bet they are helpful once you get the hang of it.
-
-> +int cla_domain_sched_init(struct cla_domain *domain)
-
-OK.
-
-> +/**
-> + * cla_domain_sched_exit - Tear down scheduling for a CLA domain
-> + * @domain: CLA domain
-> + *
-> + * Drain final deassignment, destroy the domain worker, and destroy the =
-context
-> + * table. All context users must have exited before calling this.
-> + */
-> +void cla_domain_sched_exit(struct cla_domain *domain)
-
-OK.
-
-> +void cla_domain_set_broken(struct cla_domain *domain)
-
-OK.
-
-> +struct cla_ctx *cla_domain_lookup_ctx(struct cla_domain *domain,
-> +                                     struct cla_ctx_key *key)
-(...)
-> +int cla_domain_insert_ctx(struct cla_domain *domain, struct cla_ctx *ctx=
-)
-(...)
-> +void cla_domain_remove_ctx(struct cla_domain *domain, struct cla_ctx *ct=
-x)
-
-Clever use of rhashtable, good names.
-
-> +/**
-> + * cla_domain_schedule_reassignment - Schedule domain reassignment
-> + * @domain: CLA domain
-> + *
-> + * The caller must hold the domain lock. If a live context is currently
-> + * assigned, schedule with a delay (CLA_SLICE_MS), otherwise reassign
-> + * immediately. Do nothing if the domain is broken or a switch is in pro=
-gress;
-> + * the running switch handles new requests before returning. If reassign=
-ment is
-> + * already scheduled, the delay is modified.
-> + */
-> +void cla_domain_schedule_reassignment(struct cla_domain *domain)
-
-Schedule reassign of the domain to ... what?
-
-This use of verbs is really confusing me, I understand for example
-"assign timeslice to process" then I know a timeslice is assigned to
-a process. There is something implicit here making this really
-hard to understand.
-
-> +void cla_domains_sched_exit(void)
-
-OK.
-
-But where is the cla_schedule() function in this scheduler
-akin to Linux' schedule() call? It feels like this is implicit
-in some call order semantic, and the function
-cla_domain_get_next_ctx() implements an implicit
-FIFO scheduling principle.
-
-Alternatively the scheduling isn't actually driven here
-but from somehwere else, like userspace. Then that
-needs to be explained. Then this file doesn't actually
-implement any scheduling, it's a scheduling context
-library nothing more.
-
-This kind of stuff needs to be explained so I can review the
-patch properly.
-
-Yours,
-Linus Walleij
