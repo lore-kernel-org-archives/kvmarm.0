@@ -1,56 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795430583;
-	b=szEKsDrM+JnFuM6Jr1icXm79XB19wrhA9+zIn7ZKvib71Aj1TvZXCfCcv2RHleKXCy0R
-	 yxKPAaDfPgQDuSk45nQ52A1J1CPPKrsN+5/w8VziZRZ+XptkuHruUuKvKnUEaT1BzV58v
-	 gQhQnLA59a4iZ4zCGr9OHLyShEwdeI1RQhau3H0iU5JX7Lh1J5e97rcJoQM0xDT7fDIKa
-	 1/S5/Xiz79+mocrNxmJ4wa3IN6F+7kGpNFsIHlFnFGgu37HcPM6Y0LO2KhH6RXKdJ4zAy
-	 O55C67qMIOuAx85tp9/YPKr1pvhNDIE5ggaxGW/94nOE0+osJaZsamctedBJUP9WG+Q==
+	t=1795430588;
+	b=KRLLdNI06HCkp6XM9PttaxgzcYeoyCPAT2p3KdO/c26aM3r6px7V8z6DKVNTWWQ5/sq6
+	 475dhxbHJagnmLRVrwkfAWDo5En5kxTda8SxR1k7qu5pDJsxj425Cvq/ktbq1qf8hV+oA
+	 75i5nAsXQKgj+KroXcKi2NnZ/U1Q8eBC4l0aO4WcXReKl2bBsA0rXdJuz/evnD2y+hcWW
+	 WDA38n+FcNfbSZMG0DVwbrIHj3s7YK3nLT+CF0UslUvviUGNj+FfPWZK+3/Htdh8KWg+p
+	 yvTlf4HthkhxX9HERC1+H0JBRbHd8lf4vqT2fkdGHR0kXwL+XJvKHNroVH9KrUoJKsA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795430583;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795430588;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=FCt8v5AUxEJfZRcXCfZ7fMW0n1IyPXSrxCtardRFWtQ=;
-	b=uTzpWrrVf4ntqm/ZTFkeniTm6vZCJIwrufj7/60XJHC4EXaM1f0br1M6Bb6rtOSaOAFl
-	 fHVyYFiIciT0N/OjY3/SsMon1W/9rCIefq8apbjVQKWumyRD3UASruSnq/+E71n6jj1xY
-	 TNEId8W9aSc3FUTMTCb7b1FN7bToNt8kXf26n5BFy514OS/tHTxtlnq9nGq2I1UU3giTC
-	 QpDV7HoLLyn9rkY7Jm5LWtTEOL75jzhtAU+iDWf0foJevJPyP8uNcSxCBajhEFw7+X02F
-	 226a42SKSNktD3Czt03GKBEtDD+fbPToqZWJ+fSWj5lo4SCxEr7oMvOFpjGiRb6b7YQ==
+	bh=WbiL5/GYCFyPRi9wxcNOxReRn+PG6ihd/hVXfoyN+yE=;
+	b=21JlIvjjsRpNoyNqSSz5ruYxmYHzD//+qrx9xlFGoKUntrIo3PT4RtCVDkUbwu4g37KW
+	 bWXgqkJctV3QCF17gmehwjt29ojelXX/88hDC9/4Qw/3ghGcSmuSO3Vfp8aq0iu/LmD4B
+	 q/wQwyNzAYex6Qp8U31RaSieIx6IUzS6Gqrpr/vVuHdFEhYbZZ/GTNFc08XNHu19fxflk
+	 phY+y9/XaFlGjxSos62qRdT2NtiKkP5H0vw+4+bWOmeZTCioZfrDMuuakAURBNVV2JnPV
+	 CQAxKGravJpAV2VzTviRKw9jXE2uJd5FdIZn3OhWAxz7qaIJSIdlHI0TtqLUtEltttg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=tz78h8J1;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=eb7d7T6Q;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A93606A32A;
-	Mon, 23 Nov 2026 10:43:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D2A93606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9611C606A332;
+	Mon, 23 Nov 2026 10:43:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9611C606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=tz78h8J1
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=eb7d7T6Q
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 726CC175D;
-	Mon, 23 Nov 2026 02:42:59 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D16419F6;
+	Mon, 23 Nov 2026 02:43:04 -0800 (PST)
 Received: from e122027.arm.com (unknown [10.57.63.212])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EBF523F632;
-	Mon, 23 Nov 2026 02:42:57 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE7143F632;
+	Mon, 23 Nov 2026 02:43:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795430582; bh=PWXQD/tP+7ur3ZyactEtuv2uXbf3M98TwHQAtyBCB4g=;
+	t=1795430587; bh=BuGA/lGbRxntNDSJ5lrDnQcY0TNEaN6MEZe2N7wWYbM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tz78h8J130KfjJA6BFLz3pak3Kmy7z03HS/69zLFRPgrxLuatWitBXjEniBryyjTM
-	 pPq6pmQzG0y2MjhxA3esC56F+bzmlVJrSgQt6wDzUoDu5N0D/5lMjup+MR1kZp3j7A
-	 Ttgq7EEFsTTvPyTT/wvNf+vLHakD2aWiv70tVmuU=
+	b=eb7d7T6QXknPO5Y5o6OC3bX4RMKfl8aezQtbBL6lYkw/fDAgnOxTd3GAMt9N4VzNb
+	 Rk+gfXiUEVXOq2qoAd7Hn+Y0ZFYcrWdfv6AGdyHIONQhLLBu7p6/YgdRsbwHNAAAQa
+	 vo8DNPppbcX9vH79p/LkBO7iHKbWgOn7+1328L5Y=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+Cc: Steven Price <steven.price@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
 	Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -68,12 +69,10 @@ Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Kohei Enju <enju.kohei@fujitsu.com>,
-	Steven Price <steven.price@arm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: [PATCH v4 03/11] KVM: arm64: Pass range filter to stage2_unmap_range
-Date: Mon, 23 Nov 2026 10:42:23 +0000
-Message-ID: <20261123104233.95710-4-steven.price@arm.com>
+	Kohei Enju <enju.kohei@fujitsu.com>
+Subject: [PATCH v4 04/11] KVM: arm64: Dispatch stage-2 destruction by VM flavor
+Date: Mon, 23 Nov 2026 10:42:24 +0000
+Message-ID: <20261123104233.95710-5-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261123104233.95710-1-steven.price@arm.com>
 References: <20261123104233.95710-1-steven.price@arm.com>
@@ -88,126 +87,124 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Select the stage-2 destruction functions through the VM's stage-2
+operations. This keeps the native and pKVM paths explicit and lets a
+Realm provide its own destruction callback when Realm stage-2
+operations are registered.
 
-With the introduction of private memory support, we need to
-handle invalidation requests with filters for a given type.
-Pass the range filter down to the stage-2 unmap operation.
+The Realm callback will only free the root RTT pages, because RMI
+teardown destroys the non-root RTTs separately.
 
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+
 ---
- arch/arm64/include/asm/kvm_host.h |  4 +++-
- arch/arm64/kvm/mmu.c              | 31 +++++++++++++++++++++++--------
- 2 files changed, 26 insertions(+), 9 deletions(-)
+Changes since v3:
+- Move before basic Realm infrastructure and declare the page-table
+  type for the new callback.
+
+Changes since v2:
+- New patch in v3; split stage-2 destruction dispatch out of the
+  Realm stage-2 MMU operations patch.
+---
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/mmu.c              | 30 +++++++++++++++++++++++-------
+ 2 files changed, 25 insertions(+), 7 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8438251e1d1b..9d6258b213d1 100644
+index 9d6258b213d1..3ddeddfacd06 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -233,6 +233,7 @@ struct kvm_vcpu_ops {
- };
+@@ -234,6 +234,7 @@ struct kvm_vcpu_ops {
  
  struct kvm_gfn_range;
-+enum kvm_gfn_range_filter;
+ enum kvm_gfn_range_filter;
++struct kvm_pgtable;
  struct kvm_s2_fault_desc;
  
  struct kvm_vm_s2_ops {
-@@ -243,7 +244,8 @@ struct kvm_vm_s2_ops {
+@@ -242,6 +243,7 @@ struct kvm_vm_s2_ops {
+ 	int (*vm_flush_remote_tlbs)(struct kvm *kvm);
+ 	int (*vm_flush_remote_tlbs_range)(struct kvm *kvm, gfn_t gfn,
  					  u64 nr_pages);
++	void (*vm_stage2_destroy)(struct kvm_pgtable *pgt);
  	void (*vm_stage2_unmap_range)(struct kvm_s2_mmu *mmu,
  				      phys_addr_t start, u64 size,
--				      bool may_block);
-+				      bool may_block,
-+				      enum kvm_gfn_range_filter filter);
- 	int (*vm_mem_abort)(const struct kvm_s2_fault_desc *s2fd);
- };
- 
+ 				      bool may_block,
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 09c831a49ed3..8a9a80c7cfab 100644
+index 8a9a80c7cfab..fab915ddeaab 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -324,7 +324,8 @@ static int kvm_pgtable_stage2_unmap_tracked(struct kvm_pgtable *pgt,
- 
- static void kvm_vm_stage2_unmap_range(struct kvm_s2_mmu *mmu,
- 				      phys_addr_t start,
--				      u64 size, bool may_block)
-+				      u64 size, bool may_block,
-+				      enum kvm_gfn_range_filter filter)
+@@ -1018,26 +1018,39 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+  * cond_resched() periodically to prevent hogging the CPU for a long time
+  * and schedule something else, if required.
+  */
+-static void stage2_destroy_range(struct kvm_pgtable *pgt, phys_addr_t addr,
+-				   phys_addr_t end)
++static void stage2_destroy_range(struct kvm_pgtable *pgt,
++				 void (*destroy_range)(struct kvm_pgtable *pgt,
++						       u64 addr, u64 size))
  {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	int (*fn)(struct kvm_pgtable *, u64, u64);
-@@ -339,14 +340,16 @@ static void kvm_vm_stage2_unmap_range(struct kvm_s2_mmu *mmu,
++	u64 addr = 0;
++	u64 end = BIT(VTCR_EL2_IPA(pgt->mmu->vtcr));
+ 	u64 next;
  
- static void pkvm_stage2_unmap_range(struct kvm_s2_mmu *mmu,
- 				    phys_addr_t start,
--				    u64 size, bool may_block)
-+				    u64 size, bool may_block,
-+				    enum kvm_gfn_range_filter filter)
- {
- 	WARN_ON(stage2_apply_range(mmu, start, start + size,
- 				   pkvm_pgtable_stage2_unmap, may_block));
+ 	do {
+ 		next = stage2_range_addr_end(addr, end);
+-		KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, addr,
+-							     next - addr);
++		destroy_range(pgt, addr, next - addr);
+ 		if (next != end)
+ 			cond_resched();
+ 	} while (addr = next, addr != end);
  }
  
- static void no_stage2_unmap_range(struct kvm_s2_mmu *mmu,
--				  phys_addr_t start, u64 size, bool may_block)
-+				  phys_addr_t start, u64 size, bool may_block,
-+				  enum kvm_gfn_range_filter filter)
++static void kvm_vm_stage2_destroy(struct kvm_pgtable *pgt)
++{
++	stage2_destroy_range(pgt, kvm_pgtable_stage2_destroy_range);
++	kvm_pgtable_stage2_destroy_pgd(pgt);
++}
++
++static void pkvm_stage2_destroy(struct kvm_pgtable *pgt)
++{
++	stage2_destroy_range(pgt, pkvm_pgtable_stage2_destroy_range);
++	pkvm_pgtable_stage2_destroy_pgd(pgt);
++}
++
+ static void kvm_stage2_destroy(struct kvm_pgtable *pgt)
  {
- }
+-	unsigned int ia_bits = VTCR_EL2_IPA(pgt->mmu->vtcr);
++	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
  
-@@ -388,25 +391,36 @@ static int kvm_pgtable_stage2_unmap_tracked(struct kvm_pgtable *pgt, u64 addr, u
+-	stage2_destroy_range(pgt, 0, BIT(ia_bits));
+-	KVM_PGT_FN(kvm_pgtable_stage2_destroy_pgd)(pgt);
++	kvm->arch.vm_s2_ops->vm_stage2_destroy(pgt);
  }
  
  /**
-- * kvm_stage2_unmap_range -- Clear stage2 page table entries to unmap a range
-+ * kvm_stage2_unmap_range_filter -- Clear stage2 page table entries to unmap a
-+ * range
-  * @mmu:   The KVM stage-2 MMU pointer
-  * @start: The intermediate physical base address of the range to unmap
-  * @size:  The size of the area to unmap
-  * @may_block: Whether or not we are permitted to block
-+ * @filter: Filter for the ipa range (private and/or shared)
-  *
-  * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
-  * be called while holding mmu_lock otherwise another faulting VCPU may
-  * come in and mess with things behind our backs.
-  */
--void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
--			    u64 size, bool may_block)
-+static void kvm_stage2_unmap_range_filter(struct kvm_s2_mmu *mmu, phys_addr_t start,
-+					  u64 size, bool may_block,
-+					  enum kvm_gfn_range_filter filter)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 	WARN_ON(size & ~PAGE_MASK);
- 
--	kvm->arch.vm_s2_ops->vm_stage2_unmap_range(mmu, start, size, may_block);
-+	kvm->arch.vm_s2_ops->vm_stage2_unmap_range(mmu, start, size,
-+						   may_block, filter);
-+}
-+
-+void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
-+			    u64 size, bool may_block)
-+{
-+	kvm_stage2_unmap_range_filter(mmu, start, size, may_block,
-+				      KVM_FILTER_PRIVATE | KVM_FILTER_SHARED);
+@@ -3146,6 +3159,7 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
  }
  
- void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
-@@ -2597,7 +2611,8 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- 	if (!kvm->arch.mmu.pgt)
- 		return false;
+ static const struct kvm_vm_s2_ops protected_pkvm_vm_s2_ops = {
++	.vm_stage2_destroy		= pkvm_stage2_destroy,
+ 	.vm_flush_remote_tlbs		= pkvm_flush_remote_tlbs,
+ 	.vm_flush_remote_tlbs_range	= pkvm_flush_remote_tlbs_range,
+ 	.vm_age_gfn			= no_age_gfn,
+@@ -3155,6 +3169,7 @@ static const struct kvm_vm_s2_ops protected_pkvm_vm_s2_ops = {
+ };
  
--	kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, may_block);
-+	kvm_stage2_unmap_range_filter(&kvm->arch.mmu, gpa, size, may_block,
-+				      range->attr_filter);
- 	kvm_nested_unmap_cipa_range(kvm, gpa, size, may_block);
+ static const struct kvm_vm_s2_ops pkvm_vm_s2_ops = {
++	.vm_stage2_destroy		= pkvm_stage2_destroy,
+ 	.vm_flush_remote_tlbs		= pkvm_flush_remote_tlbs,
+ 	.vm_flush_remote_tlbs_range	= pkvm_flush_remote_tlbs_range,
+ 	.vm_age_gfn			= pkvm_age_gfn,
+@@ -3164,6 +3179,7 @@ static const struct kvm_vm_s2_ops pkvm_vm_s2_ops = {
+ };
  
- 	return false;
+ static const struct kvm_vm_s2_ops kvm_default_vm_s2_ops = {
++	.vm_stage2_destroy		= kvm_vm_stage2_destroy,
+ 	.vm_flush_remote_tlbs		= kvm_vm_flush_remote_tlbs,
+ 	.vm_flush_remote_tlbs_range	= kvm_vm_flush_remote_tlbs_range,
+ 	.vm_age_gfn			= kvm_vm_age_gfn,
 -- 
 2.43.0
 
