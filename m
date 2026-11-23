@@ -1,57 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795430531;
-	b=VRSPLRUkJQ59gC8Ny591vHyw7oaNobJVCNdjQgvpPBperwgU1BYvLPad7UPNW8+XAcRN
-	 ZZVdjf2X9WMUyYpsPGuzmAg15pjs+VgyBxF9rG7+5kbhYiTJVfq7KS39ddHHNGthd3FKK
-	 EN3b3S1d0YO2IWv7dYPDln2P69fFeYx94cdFxbFOjHgiTgTkOk77e7knuII1+5Tq3Ph37
-	 JX9S5dnEOHqZihmhMj+Gp0HVfh6ImlzppVEu1eTF/evPpJ8Mj6x7geGMk8cJrCHRjRkPH
-	 B8BASp9YlRHvx3Zw7UK3qot1kVqBcVbKdd7kv61UBBdc0mpmZp3hwE43EGSRTyR9SAQ==
+	t=1795430568;
+	b=kXxJ3rjrz+QyTOeOQlPqRkKlXZhT4ll2SPpMycDXveOiS3tHxcCo/pq61JYsUDskikWX
+	 48vKcmW8It7q6Y5OW7IDL+JO2R0Zb6enIVAEnx7z/mfu+ns+czzv3Yv7Blr+J5Hsai+Wv
+	 1yFAuLXkFg+sR1a/BUq2HZ5eAN/n1vBp19o995ZKJdB1Kk9abwmYqK7rZz0OAkUBOmzAd
+	 OAsTs2GDyddD49+yVz184EfbY89oAD7mlKIzpYXmW/hR5g9wntemQ6k1ncWux0dknUkLN
+	 JR+hvMbojhpyEWgWhNuohlZJ4owRVH18AduBn691RHGTbBJ2wlsNMcXMyxWt0CKgWdw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795430531;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=hnKOtRCqIvyy1sSy8VyZw9gGdPtPJkPBXPX0Mg8ue+4=;
-	b=YJWqLtae6aSHRHl5xFq5EeTyr2QdKdCb7cYJiOZn/jreIWVbEFt0MN1Xk0+FUxMzTu/G
-	 KSyF93f0Telyzukvg9JbnVS/A1QAzuwM2Ahykpf7vM1/se8QIp9p5aPh9u2ZNRbdO6+Jc
-	 Ym93MERIJ2D9MKdZQ3Dklx+3OHTWyznw+W24If+sXB9NQKCHnHhwL/AQ/zUZpsMZFUrcc
-	 Nbfba6fhow8XpD4dg5gm6KNjCf+dseLO0KcDxgSOMRs82N5X4Q/mlUfVnZKKnWovA1Zq1
-	 2E0ztwst07Vx8G0C2KXdbXYBF93P8QYdC+ZVtivGDgGrlPmfHh90AMcpyZYVywc8h/Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795430568;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=Be/8xc5ORGOFPfFJHIrsM95JcXKu+UwLET9LQk3L8R0=;
+	b=jI663lIsT73Qrqa5Kkj5/FQgeKma6DsRWb8DLMrtMNrmlwDV1p/QXMNIZplsHpji/A2V
+	 NSR6cIypVMEfbqVK/nR9UV8W2CQpsNwVoko+dbMjpU0tkqZnsID3gYFnMAUdFw205+Siw
+	 6e+N2Zc8tbXO2O/0EUFS0yxBVEF50nd8iq3x0VVs13eoMzUGnxOz2q5Z5PSv6eeFlhVLS
+	 tFv9J2YMsVi8xdpYbgWy5a3PeMQL8r8/wtuyNebnDI6qUB4S0d5IXJap/8F1e8f6OTHj/
+	 1L7h2mpSoARe6BUMNJ75dao4gMfBmTYmpUb0BOorU6ySgfq9AGGGOwATZ/8p/03TKHw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dnD6Z5pj;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AC0606A31A
-	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 10:42:11 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dMpXN6Jk;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFC35606A336;
+	Mon, 23 Nov 2026 10:42:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AFC35606A336
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dnD6Z5pj
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30FC21F000D1;
-	Mon, 23 Nov 2026 10:42:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795430531;
-	bh=hnKOtRCqIvyy1sSy8VyZw9gGdPtPJkPBXPX0Mg8ue+4=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=dnD6Z5pjdV3QzFjdylzKo/67IxiRbnnkAx2dtz7K49u/C5NaM0h3SDJca9Ad+r/qB
-	 I7aYWtbK2gIIHtr9obI7kVt7we38h3YcQ63tUrKy7me074CguvrABZnuc4J8PUJWAt
-	 6wUNXrzOOZ8j9nUNBNKvnjTKxnfI0RHTtaCIj7UgRG0WcWblcobuXw5O0qKqdv0aWl
-	 zOTnhtCBuNAbehlryM93MnIQpDaBin6UnaWRaRK12YuMH+60gHQPaKH9TMlZs1GV/2
-	 P0RboLoCDjXGCO8Pmi0HRGWfllNjf4PDK0htVwimbnQwVt6MQQVME9520A/GhTdVp1
-	 tPPTL1bo1OlqA==
-Message-ID: <sashiko-outbox-229065@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Re-inject a stored SError after the
- exit is handled
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Dan Carpenter" <dan@pereq.eu>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20261123-double_exception-v1-1-cd82b59a232d@pereq.eu>
-References: <20261123-double_exception-v1-1-cd82b59a232d@pereq.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Nov 2026 10:42:10 +0000
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dMpXN6Jk
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 34B5D175D;
+	Mon, 23 Nov 2026 02:42:44 -0800 (PST)
+Received: from e122027.arm.com (unknown [10.57.63.212])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CF3C3F632;
+	Mon, 23 Nov 2026 02:42:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795430567; bh=6OOoc7VR1HsEaaNieiQpuBPH2IyUlBC3LPyM0eQOoUE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dMpXN6Jk6PaxuEz6PytQ5F57ADGDhjyFXPrjYMqRSTAui9cUTO5hbHLgaDY4/kjH8
+	 MBArU3H5JOUAILQ4JTvpeuq65gngelUudGofuSJJ3bTFQuJDZmEsDB1ym/b4qFzh6W
+	 Owq/mj4aFDUAykFvQc/iN6ynR6YRd22E26as7rNQ=
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Kohei Enju <enju.kohei@fujitsu.com>
+Subject: [PATCH v4 00/11] KVM: arm64: CCA: Prepare Realm memory management
+Date: Mon, 23 Nov 2026 10:42:20 +0000
+Message-ID: <20261123104233.95710-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,125 +81,106 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 2 potential
-issues to consider:
-- [Medium] KVM: arm64: nv: duplicate SError injection when
-  NESTED_SERROR_PENDING is set
-- [Medium] KVM: arm64: nv: premature SError re-injection in
-  kvm_nested_flush_hwstate()
---
+This series adds the memory management plumbing for CCA, building on the
+basic RMM support [1]. Thanks to everyone who reviewed and tested the
+earlier versions.
 
-commit a6e9a58a0688b0de9bbbb40738acfc3f5921f92e
-Author: Dan Carpenter <dan@pereq.eu>
+The patches introduce internal Realm VM state, prepare Realm stage-2
+setup and teardown, and provide RTT mapping and invalidation helpers.
+Realm memslots are restricted to the lower half of the IPA space because
+the protected and shared halves alias each other. The final patch
+connects the helpers to KVM's stage-2 MMU operations.
 
-KVM: arm64: nv: Re-inject a stored SError after the exit is handled
+This is the memory management portion of the larger Realm host series.
+Realm descriptor creation, REC entry and exit, activation, and the new
+uAPI follow in the integration stack. This series alone does not enable
+Realm creation.
 
-This commit defers SError re-injection for nested guests from
-kvm_nested_sync_hwstate() to kvm_nested_flush_hwstate() so that exit
-handlers can record their exception or PC increment before the SError is
-re-injected, and updates kvm_arch_vcpu_runnable() to treat a deliverable
-stored SError as a wakeup condition.
+The integration branch [2] includes Realm creation, REC entry and exit,
+and the remaining host support on top of this series. The MM branch [3]
+contains just this series.
 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 78d5b18dbd2d6..f063c01c565a0 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -2213,8 +2213,11 @@ void kvm_nested_flush_hwstate(struct kvm_vcpu *vcp=
-u)
->  	if (!vcpu_has_nv(vcpu))
->  		return;
-> =20
-> -	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
-> +	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING))) {
-> +		/* Commit the exit handler's exception first */
-> +		__kvm_adjust_pc(vcpu);
->  		kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
-> +	}
-> =20
->  	vgic_v3_nested_update_mi(vcpu);
-> =20
+Changes since v3:
+- Keep pKVM-specific protected VM handling in the nVHE path and move
+  stage-2 destruction dispatch before basic Realm infrastructure.
+- Derive the Realm RTT start level from VTCR, matching KVM's minimum
+  two-level stage-2 layout for narrow IPAs on 64K-page hosts.
+- Split Realm guest_memfd and userspace-backed faults into dedicated
+  paths, leaving the native fault handlers unchanged.
+- Unmap earlier shared mappings when a later RMI map call fails.
+- Clarify the early memslot validation rationale and the arm64-wide
+  effect of in-place guest_memfd conversion.
 
-[Severity: Medium]
-Can re-injecting NESTED_SERROR_PENDING here run prematurely when guest
-entry is subsequently aborted?
+Changes since v2:
+- Move RMM mode reservation and RMI availability and feature checks to
+  the integration stack.
+- Require mmap-capable guest_memfd backing for all arm64 VMs and route
+  all guest_memfd faults through gmem_abort().
+- Store the Realm Descriptor physical address from initial Realm setup,
+  and improve SRO cleanup and RTT teardown error handling.
+- Use a local MMU cache for RTT invalidation, handle failed splits, and
+  validate returned RTT levels.
+- Bound protected RMI mapping calls to the encoded range and tighten
+  RTT creation, retry, and error handling.
+- Split common stage-2 destruction dispatch into its own patch before
+  registering the Realm stage-2 MMU operations.
 
-In kvm_arch_vcpu_ioctl_run(), kvm_nested_flush_hwstate() runs before
-checking ret <=3D 0 or kvm_vcpu_exit_request(), and inside
-kvm_nested_flush_hwstate() the SError is re-injected before
-vgic_v3_nested_update_mi() and the KVM_REQ_GUEST_HYP_IRQ_PENDING check:
+Changes since v1:
+- Add a guest_memfd prerequisite patch that checks whether the backing
+  file supports mmap when preparing an arm64 memslot.
+- Combine the RMI availability and feature checks into one patch, and
+  move Realm vCPU feature restrictions to the integration stack.
+- Correct Realm IPA sizing and RTT teardown, including teardown before
+  activation, RTT accounting, and handling of missing or folded RTTs.
+- Rework RTT mapping to respect IPA and physical alignment, handle
+  partial RMI progress, and retry interrupted operations.
+- Preserve private mappings when a Realm guest_memfd memslot deletion is
+  rejected, and tighten Realm fault handling and stage-2 destruction.
 
-arch/arm64/kvm/nested.c:kvm_nested_flush_hwstate() {
-	...
-	vgic_v3_nested_update_mi(vcpu);
+[1] https://lore.kernel.org/all/20261007073537.2454351-1-suzuki.poulose@arm.com/
+[2] https://gitlab.arm.com/linux-arm/linux-cca
+    branch: cca-host-mm/v4/integration
+[3] https://gitlab.arm.com/linux-arm/linux-cca
+    branch: cca-host-mm/v4/mm
 
-	if (vgic_state_is_nested(vcpu) && kvm_vgic_vcpu_pending_irq(vcpu))
-		kvm_make_request(KVM_REQ_GUEST_HYP_IRQ_PENDING, vcpu);
-}
+Steven Price (6):
+  KVM: arm64: guest_memfd: Check mmap support when preparing memslot
+  KVM: arm64: Dispatch stage-2 destruction by VM flavor
+  KVM: arm64: CCA: Add basic infrastructure for creating a realm
+  KVM: arm64: CCA: Destroy RTTs
+  KVM: arm64: CCA: Add Realm RTT mapping and invalidation helpers
+  KVM: arm64: CCA: Support runtime faulting of memory
 
-If L2 has PSTATE.A =3D=3D 1 (with HCR_EL2.AMO =3D=3D 0 and HCRX_EL2.TMEA =
-=3D=3D 0) and
-NESTED_SERROR_PENDING set while an L1 IRQ or maintenance interrupt is
-pending, kvm_nested_flush_hwstate() clears NESTED_SERROR_PENDING, sets
-HCR_EL2_VSE in *vcpu_hcr(vcpu), and posts KVM_REQ_GUEST_HYP_IRQ_PENDING.
-kvm_vcpu_exit_request() then aborts guest entry without calling
-kvm_nested_sync_hwstate(), and on the next loop iteration
-check_nested_vcpu_requests() -> kvm_inject_nested_irq() switches the vCPU
-to L1 vEL2 with HCR_EL2_VSE still set in vcpu->arch.hcr_el2 even when TGE
-and AMO are clear.  Similarly, if PSTATE.A =3D=3D 0 in L2 or if ret <=3D 0 =
-exits
-to userspace, pend_serror_exception() pends the SError into L2 state that
-gets committed by __kvm_adjust_pc() even though L2 was never entered.
+Suzuki K Poulose (5):
+  KVM: arm64: CCA: Introduce Realms
+  KVM: arm64: Pass range filter to stage2_unmap_range
+  KVM: Allow architectures to reject memslot changes before invalidation
+  KVM: arm64: CCA: Prevent memslot modifications after Realm creation
+  KVM: arm64: CCA: Add Realm stage-2 MMU operations
 
-> @@ -2231,18 +2234,11 @@ void kvm_nested_sync_hwstate(struct kvm_vcpu *vcp=
-u)
-> =20
->  	/*
->  	 * We previously decided that an SError was deliverable to the guest.
-> -	 * Reap the pending state from HCR_EL2 and...
-> +	 * Reap the pending state from HCR_EL2, and re-inject it from
-> +	 * kvm_nested_flush_hwstate() once the exit has been handled.
->  	 */
->  	if (unlikely(__test_and_clear_bit(__ffs(HCR_EL2_VSE), hcr)))
->  		vcpu_set_flag(vcpu, NESTED_SERROR_PENDING);
-> -
-> -	/*
-> -	 * Re-attempt SError injection in case the deliverability has changed,
-> -	 * which is necessary to faithfully emulate WFI the case of a pending
-> -	 * SError being a wakeup condition.
-> -	 */
-> -	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
-> -		kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
->  }
+ arch/arm64/include/asm/kvm_emulate.h |  29 +
+ arch/arm64/include/asm/kvm_host.h    |  27 +-
+ arch/arm64/include/asm/kvm_mmu.h     |   4 +-
+ arch/arm64/include/asm/kvm_rmi.h     | 105 +++
+ arch/arm64/kvm/Kconfig               |   1 +
+ arch/arm64/kvm/Makefile              |   2 +-
+ arch/arm64/kvm/arm.c                 |  13 +-
+ arch/arm64/kvm/mmu.c                 | 368 +++++++++--
+ arch/arm64/kvm/pkvm.c                |   4 +-
+ arch/arm64/kvm/psci.c                |   3 +-
+ arch/arm64/kvm/rmi.c                 | 930 +++++++++++++++++++++++++++
+ drivers/firmware/arm_rmm/rmi.c       |  10 -
+ include/linux/arm-rmi-cmds.h         |   8 +
+ include/linux/kvm_host.h             |   5 +
+ virt/kvm/guest_memfd.c               |   6 +
+ virt/kvm/kvm_main.c                  |  33 +-
+ 16 files changed, 1471 insertions(+), 77 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rmi.h
+ create mode 100644 arch/arm64/kvm/rmi.c
 
-[Severity: Medium]
-Does leaving NESTED_SERROR_PENDING set across handle_exit() and exits to
-userspace cause a duplicate SError injection when kvm_inject_serror_esr()
-is called before the next kvm_nested_flush_hwstate()?
+-- 
+2.43.0
 
-Because kvm_inject_serror_esr() does not clear NESTED_SERROR_PENDING when
-it delivers an SError via kvm_inject_nested_serror(),
-pend_serror_exception(), or HCR_EL2_VSE, a KVM_GET_VCPU_EVENTS followed by
-KVM_SET_VCPU_EVENTS in __kvm_arm_vcpu_set_events() injects and immediately
-commits the SError via commit_pending_events() while NESTED_SERROR_PENDING
-remains set:
-
-arch/arm64/kvm/guest.c:__kvm_arm_vcpu_set_events() {
-	...
-	if (has_esr)
-		ret =3D kvm_inject_serror_esr(vcpu, esr);
-	else
-		ret =3D kvm_inject_serror(vcpu);
-
-	commit_pending_events(vcpu);
-}
-
-On the subsequent KVM_RUN, kvm_nested_flush_hwstate() sees
-NESTED_SERROR_PENDING still set and injects a second SError into the
-guest.  The same double injection happens in-kernel if handle_exit() calls
-kvm_handle_guest_sea() -> kvm_inject_serror() while NESTED_SERROR_PENDING
-is set.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123-double_exc=
-eption-v1-1-cd82b59a232d@pereq.eu?part=3D1
