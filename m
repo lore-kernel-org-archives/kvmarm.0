@@ -1,100 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795432472;
-	b=hqxsHjEevTtG9sBRopr0K8+0QESTWPBRRdz0FXJTgl50CGdaYWyIoO1Lm6nsmadiNukd
-	 WJzr2Dda7rVaAEndtk5AA8YUe9qDOKYRgtE/p4hh++xEad2EKSsi+80M8jwAixTLD28hp
-	 6fIo+Thv+pF0WLmNLBauKLOoZ0IpXj/3i7/JR+3CUeO62ld/M2w+hOlvZP2A612GNB6sY
-	 YZIV3a4ISBTwR2KYi8MyvJdnZOZCNz1aXKmonofKDnpRXqH+Cxatl+hgvxiEUvLNnJsaa
-	 uAIRCObtBw6vtK05CznzQDdD/QETfTCigJxdi5hTTlhDbm44uKaJxgN4OSHqGk9+ZYQ==
+	t=1795432486;
+	b=rTb7lYYl0lwTcSSZioL5pbhjck1dFofS//Uu7Ile8YgRfQEGOQ1AK/sej7nOPbf7+baS
+	 UjuZceTN6t2ThH21vHax1YQP8yV88h4Pskzmg5DHIgL8kXWCEUPeavoxQdKsBfvDrBx7z
+	 RwslRxp3s+ZmKZRTMwwEteWY2kJrc0/HTtiqrlf122VmSratx47UjpfnUwhz5VHJPAr0Z
+	 GhO1rgB3NLqDg6SNTk7Y2njtIs08K6/UUWCSoYynMic8y/EmSc09pT3GiyARSaaOUQR2g
+	 IsKQLunRzenksDbK3Gn8BK1Qz952X1cGgOthR/LZAOm/PnR0TqvBRVTWzn8k3xmnvVA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795432472;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To:X-TUID;
-	bh=M8BgEwiMtUwRuCgZnUVMTSSA8VV5wT5wVfxb83hMYt4=;
-	b=EV74lQf3zKxK/qECQzMEstG8iVszZHQuuZ1jnKzeeODsbjzRjZyps18+O0YyH56tq0Tp
-	 /OHfAKzZ/oMECkX5y33aUWmKhnU9K0eTI9e517WNf/ninFhurCC1jb6sl85C7fdYbl3jq
-	 /qdJs4HtsnDFdhUq/eXrYAJrlmy6M741Zm9hPZOuCgAZkTl0zraMua6sQhr2FyD1SR8Da
-	 MbwiwoCuvIqYzn3BY8Lz5jr7BKQsCBhRhlepyOhdbv/HnrwlsIHxYqoIDueGdXdIcfgIE
-	 xQu+N8kZuN2w1YGWf7ldBlIKDo5wloPgz5gZuw9vNBlagaPZoNbERkqvnXV0IfS+wAQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795432486;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=TGR7nJf9Ig8CkPt4tFeuuk9mGRg/PknkGT5IU6Vkp7c=;
+	b=A0qxMDe5+3haSJDqF4njkJWBXQFz6rfQQyhMeoWGJpCRNrDP0gdVIFnZviMfEAJFfqnC
+	 0CwXLUhz8w07BmVyZARdN6HrXzuj/fGUVOXgQpDoPgPjqBgIglAtImpyOcO47h0J3dBr2
+	 6Vyku4J4XUK9m89voHbOQNqvN9rg00MiZ2wSk6iRRS1IBs/16Y5aNVuFvIf+5pTebpJtu
+	 YvOolCkBxn/mMOoHh1DUSOZaQEHdR0yWF+1NgDQRiHT07V/N1UCzS41nOa3rCMDCPK2rV
+	 t5r7pq0JnHFiL+1m6OlIIFuqdS3FOjiPbhyJ2ptzYiiefEFtErXM5Mb4LbPb0P5jKkA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=cUtfC1HA;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD2F606A31E;
-	Mon, 23 Nov 2026 11:14:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2BD2F606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZoQ9T1Hi;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41586606A31A;
+	Mon, 23 Nov 2026 11:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=cUtfC1HA
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7CE821476;
-	Mon, 23 Nov 2026 03:14:28 -0800 (PST)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1BA2F3F882;
-	Mon, 23 Nov 2026 03:14:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795432471; bh=4UDMjdKhEafTSrkfoMvLUzagh+R4A1yL+W6+zxTSE3g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cUtfC1HA2CZBX5GdLcjS9Fv5iD/xcSaWNNdEjaMRUj8xf0cmPTKcKav27v+CAPLkC
-	 w1bkGxtfk5N0ExzhPBYejU8PO0+4gtg8l1F7GJM4V1zbhqzbrPWAA1+BjvltqwmxMn
-	 LE7OlN/w/0fHifp9euPk5nQuLJbtKZlIitJWjJvE=
-Date: Mon, 23 Nov 2026 11:14:21 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: linux-coco@lists.linux.dev, Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-	Brian Starkey <Brian.Starkey@arm.com>,
-	John Stultz <jstultz@google.com>,
-	Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
-	"T.J. Mercier" <tjmercier@google.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	linaro-mm-sig@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH v10 01/13] mm: Add an allocator for CoCo shared memory
-Message-ID: <awQgDYK2Bq0QGpNU@arm.com>
-References: <20261116091137.94252-1-aneesh.kumar@kernel.org>
- <20261116091137.94252-2-aneesh.kumar@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZoQ9T1Hi
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 318BA1F000C4;
+	Mon, 23 Nov 2026 11:14:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795432485;
+	bh=TGR7nJf9Ig8CkPt4tFeuuk9mGRg/PknkGT5IU6Vkp7c=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=ZoQ9T1HiI/SWPe4Y3tSeNLJlwsaBkrr6LcDpafNXy8anSNM0htBgt6+1Wueu2esI8
+	 Usblb2Hu0wfxebkwIPMk28caB7CP943C1QMoC+NNXHdnXP3WjKtOSlwvMDGkP1m+RV
+	 FY3axUSYWGuTdDGsQz977Vh3lLduw+4aKQrFD5bgy5Mb2lA9r4QhcMp4QtSbtA1rIn
+	 LX8JqTr1Uzjd6JZeaRHUaoirabCUwWDw3PNK3k2LK0kjYos6Q/fNKQshlp7/cNWjfK
+	 DwBRXtpu3u3pA6VRa4ffdGmGVojDQahXgN/x/jrGMdt8ZvbNu2N3BHgS4ogsMFexHN
+	 e1hhT2xBR2HFQ==
+Message-ID: <sashiko-outbox-229104@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v4 10/11] KVM: arm64: CCA: Support runtime faulting of
+ memory
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steven Price" <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261123104233.95710-11-steven.price@arm.com>
+References: <20261123104233.95710-1-steven.price@arm.com>
+ <20261123104233.95710-11-steven.price@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 23 Nov 2026 11:14:44 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -103,33 +60,88 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20261116091137.94252-2-aneesh.kumar@kernel.org>
-X-TUID: 696EyIiS0JVf
 
-On Mon, Nov 16, 2026 at 02:41:24PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 3e626e45d432..5ce879ea2ef4 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -28553,6 +28553,8 @@ F:	drivers/pci/tsm/
->  F:	drivers/virt/coco/guest/
->  F:	drivers/virt/coco/tsm-core.c
->  F:	include/linux/*tsm*.h
-> +F:	include/linux/cc_shared.h
-> +F:	mm/cc_shared.c
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Medium] KVM: arm64: RMI_BLOCKED and start_level mishandled in
+  realm_map_unprotected()
+--
 
-Would it make sense to put these under a separate CoCo memory sharing
-and encryption entry? It should also cover include/linux/mem_encrypt.h
-and include/linux/cc_platform.h. Both are shared interfaces with no
-specific MAINTAINERS entry.
+commit ad7be4b62d117614b38172987f33095d60197e1c
+Author: Steven Price <steven.price@arm.com>
 
-I don’t mind who maintains the entry but I’d list both linux-coco and
-linux-mm. We can leave include/linux/set_memory.h out for now since
-most of that header deals with page permissions and cacheability.
+KVM: arm64: CCA: Support runtime faulting of memory
 
--- 
-Catalin
+This commit adds stage-2 page fault handling for Arm CCA Realm guests,
+delegating private guest_memfd pages to the RMM and mapping shared
+pages at unprotected IPAs.
+
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index b34f5320b50b6..ab606a2dc2f57 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -593,6 +593,274 @@ void kvm_realm_unmap_range_filter(struct kvm *kvm, =
+unsigned long start,
+
+[ ... ]
+
+> +static int realm_map_unprotected(struct kvm *kvm,
+> +				 unsigned long ipa,
+> +				 kvm_pfn_t pfn,
+> +				 unsigned long size,
+> +				 enum kvm_pgtable_prot prot,
+> +				 struct kvm_mmu_memory_cache *memcache)
+> +{
+
+[ ... ]
+
+> +	while (ipa < ipa_top) {
+> +		unsigned long range_desc =3D addr_range_desc(realm, ipa, phys,
+> +							   ipa_top - ipa,
+> +							   RMI_OP_MEM_UNDELEGATED);
+> +		unsigned long call_top =3D ipa + RMI_ADDR_RANGE_COUNT(range_desc) *
+> +			rmi_addr_block_size_to_bytes(RMI_ADDR_RANGE_BLOCK_SIZE(range_desc));
+> +		unsigned long out_top;
+> +
+> +		ret =3D rmi_rtt_unprot_map(rd, ipa, call_top, flags, range_desc,
+> +					 &out_top);
+> +		if (ret < 0)
+> +			goto err_unmap;
+> +
+> +		if (ret) {
+> +			/* Create missing RTTs and retry */
+> +			int level =3D RMI_RESULT_DATA_LEVEL(ret);
+> +			int req_level =3D KVM_PGTABLE_LAST_LEVEL -
+> +				RMI_ADDR_RANGE_BLOCK_SIZE(range_desc);
+> +
+> +			if (RMI_RESULT_STATUS(ret) !=3D RMI_ERROR_RTT ||
+> +			    ++retries > KVM_PGTABLE_LAST_LEVEL + 2) {
+> +				ret =3D -ENXIO;
+> +				goto err_unmap;
+> +			}
+> +
+> +			/* Replace an existing mapping to update its permissions. */
+> +			if (level >=3D req_level) {
+> +				realm_unmap_shared_range(kvm, ipa, ipa_top, false,
+> +							 memcache);
+> +				continue;
+> +			}
+> +
+> +			ret =3D realm_create_rtt_levels(realm, ipa, level,
+> +						      req_level,
+> +						      memcache);
+
+[Severity: Medium]
+Should realm_map_unprotected() translate RMI_BLOCKED into -EAGAIN and
+check level < realm->start_level, matching realm_map_protected()?
+
+When rmi_rtt_unprot_map() returns RMI_BLOCKED under RMM lock contention,
+RMI_RESULT_STATUS(ret) !=3D RMI_ERROR_RTT turns it into -ENXIO, causing
+realm_gmem_abort() or realm_s2_fault_map() to fail KVM_RUN instead of
+dropping mmu_lock and retrying the fault.  Also, on RMI_ERROR_RTT with
+level < req_level, level is not checked against realm->start_level before
+calling realm_create_rtt_levels().
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123104233.9571=
+0-1-steven.price@arm.com?part=3D10
