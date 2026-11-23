@@ -1,45 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.223
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795395418;
-	b=MjdS9M9d+mR3aFIyKGnmAnquUgQxocTrEiiz9KhL1Wkij3jyaKBIW6+iqTpLDFFHnthG
-	 A27mDAJLdXC2KNQLEHuGbQMHrP8HN3HZiCM7+38dKCpJS2XN4iEE7jKJWR2io/ogD7zol
-	 kzttsHV0TPk46jBshZVrKJIT4hCA/o83ARqS2Kkkgt0ITKwwppF1Goh/DNHaOXvOhhxDs
-	 T/OoNiPtU/5xuLpiX4QzSPyA7XMLwoQddMVtOr8a2M1QkqvrObbF3khCYHiUm0zsIOTbR
-	 H4Tf9VH79GwBtDLfhPk0ItiR/PWJTwzF3QnYvO/BVE9XIz0bgb42tfAcT7pkZMOpz4w==
+	t=1795425233;
+	b=B01L5CcbtJPXjBbrinqrDPq/+yaBqWq1rr6Hw91mgwIUEHzKb7R/OIY0IdcJRpL+IyPB
+	 OcJCq3IT9fszbNiKh4L/2Rq1v6s3uvpiT83i1EX8QuOUx1ieuAHUWEanjJMhEdGJ2UWmS
+	 AQvvuHEQN9Oas+0YANRQHSqy3sg+NqC+tjU9aX9BAldbjn0rQCakQBCxP/DFqeX2gUlTA
+	 97kJ2m2viFf0uERkLWVtQxypJIHxfHoxJ4VHJNANW5rNlHYqcRbLvKwXNtpZai1xf/mv0
+	 Vg22wxTuCdikodhQT6kjmhOCHkWIGbpoqBz1eoWe8C9CnCBILSeI9knL+X44ILR6rzQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795395418;
-	h=Received:DKIM-Signature:Content-Type:MIME-Version:Message-Id:
-	 In-Reply-To:References:Subject:From:To:Cc:Date;
-	bh=KA+34nbUB7XMJi78mwUnZXOmvWf/xqj1Zhx5rlyn5JE=;
-	b=l+hBIR5RMDqVq/0jYfzhfkbQLXiymteT22e65PI+3XxmQ6J9nYJO5wTpVHo9mannWkAe
-	 WWcMeWN0O+aF/Eyg3AO++joRuBrgi/VWXX+yhz6QVX//8KRtYQhFCPylhMiYfUFAPEsaL
-	 XpaztUNKuSViTmIYFjYSwhNEmFFkcN0TItHYsu8A31pX3LCK1Jez9/eNZV1tqJUCoVDu9
-	 X9Ow8Y1Bz7d4JAcSW4h0RJ7t7lyROtrYqz8PdlrSx6h3GANorStWHMOl6Ue8O9LOEoSIy
-	 wrgWganVsp0hZXLOBs9mNwgqav9+ZckA86H4+KjdHV79Z2rXPJsMsgZag2mPt9kQgdw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795425233;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=PNz8/jThACatQrxxgBfShzbz4pyu8AsglZobIfmyAmA=;
+	b=A1tJIx+pOJT2rIyYcpDTXTiRlQvdC+uxfW7YqvFnDAfSAKL6HEVi3p43aleHNqne4M8c
+	 +pAQhfPIe4jB9HPpbVF+o2BkGA5SRMUGwdemdAO+rvv2puuLz003KMne7PdfNsoqK13hd
+	 9FZEus34nBt/6TtfI3MusSBpslpk1XAt0km7sgRL65ENeqC7M+Q5HRg5BwZJJOwHpt0B0
+	 UQDjcctJISmC1a52ue0ybQcnhxir3cwtTtGWwy7wRZ3y17lOv1QQrewjbH3eXKvehlPPs
+	 M19eGQeLhm/7SmaCY5sO9N1DxHcXpJha+V9zO51yQQFSFqBkTZ1BoAF/JbdBMhPL2hQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=fail reason="signature verification failed" header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Wwd4xK3u;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=SrDuu9va;
+	arc=none smtp.remote-ip=113.46.200.223
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BAD5606A31A;
-	Mon, 23 Nov 2026 00:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB435606A321;
+	Mon, 23 Nov 2026 09:13:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CB435606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Wwd4xK3u
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2317B1F000D0;
-	Mon, 23 Nov 2026 00:56:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795395418;
-	bh=KA+34nbUB7XMJi78mwUnZXOmvWf/xqj1Zhx5rlyn5JE=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=Wwd4xK3ubjWx19oPCMp9zWlFrE8juKoWZFCxK/5NkekvdxK/qa51b1bI863dR+Jr0
-	 hNY6ijfHa2GZJbWR8L8ohbm82ZIb9vGJLPfnKs0uxlhMz89ds16bo4bjfo7nZzZIvm
-	 CqZ9VBAyrw25Uq0Hnrd96UoU6t7L6WYhpxkClU+iV+3FdDtheHJs0/CcfA5ywqMRip
-	 JknvBJjAGgj29NOZsa/IIqFVqtnBbpCQEJpo98T/sTgLbY88wLRq256Er7gXFaEoa0
-	 3RryNB9N+JudV0I8P2nR949MUFqU+sE/kBpxBYOfmJkfdc0PIREHhrXnQ3vPafsL9R
-	 16I8CrkXe55Eg==
-Content-Type: multipart/mixed; boundary="===============3299975069991723205=="
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=SrDuu9va
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=PNz8/jThACatQrxxgBfShzbz4pyu8AsglZobIfmyAmA=;
+	b=SrDuu9vaZiChaDMfB+FzRKchqdFncFCexaNYmvtoQFjyxz1BtUNyYYBaPKzsZWzyR1mpOTTOl
+	v8goqh8fqTe59eA2QvFKllDS7Lqyq4TJgMgYxOHiNsQ/LzreJ8QlacqSm9kHSsUAJLfWH5RF0R+
+	0p5yBRuUpklU9vchEGU6CUE=
+Received: from mail.maildlp.com (unknown [172.19.163.200])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4jY0bn2TJQzmV7s;
+	Mon, 23 Nov 2026 17:13:25 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id DDD254055B;
+	Mon, 23 Nov 2026 17:13:47 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Mon, 23 Nov 2026 17:13:47 +0800
+Message-ID: <069ff131-882c-43a8-8654-006cb9942eba@huawei.com>
+Date: Mon, 23 Nov 2026 17:13:46 +0800
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -49,208 +62,265 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Message-Id: <446a1b870b63e07c6456e140f4fc260d09bd33cbc94fe9dbed4126be9c1e9844@mail.kernel.org>
-In-Reply-To: <20261122235757.3456048-10-irogers@google.com>
-References: <20261122235757.3456048-10-irogers@google.com>
-Subject: Re: [RFC PATCH v1 09/11] riscv/unwind: Add Minimal DWARF CFI kernel unwinder
-From: bot+bpf-ci@kernel.org
-To: irogers@google.com,linux-kernel@vger.kernel.org,linux-trace-kernel@vger.kernel.org,linux-arch@vger.kernel.org
-Cc: jpoimboe@kernel.org,rostedt@goodmis.org,peterz@infradead.org,mingo@redhat.com,tglx@kernel.org,bp@alien8.de,dave.hansen@linux.intel.com,x86@kernel.org,catalin.marinas@arm.com,will@kernel.org,mark.rutland@arm.com,linux-arm-kernel@lists.infradead.org,pjw@kernel.org,palmer@dabbelt.com,aou@eecs.berkeley.edu,alex@ghiti.fr,linux-riscv@lists.infradead.org,acme@kernel.org,namhyung@kernel.org,linux-perf-users@vger.kernel.org,mhiramat@kernel.org,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,bpf@vger.kernel.org,nathan@kernel.org,nsc@kernel.org,linux-kbuild@vger.kernel.org,ojeda@kernel.org,rust-for-linux@vger.kernel.org,ardb@kernel.org,linux-efi@vger.kernel.org,maz@kernel.org,oupton@kernel.org,kvmarm@lists.linux.dev,shuah@kernel.org,linux-kselftest@vger.kernel.org,indu.bhagat@oracle.com,jremus@linux.ibm.com,wnliu@google.com,dylanbhatch@google.com,irogers@google.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,mas
- on@kernel.org,ihor.solodrai@linux.dev
-Date: Mon, 23 Nov 2026 00:56:54 +0000 (UTC)
-
---===============3299975069991723205==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 14/15] KVM: arm64: Document HDBSS buffer size ioctl
+To: <sashiko-reviews@lists.linux.dev>
+CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>, Marc Zyngier
+	<maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	"tangchengchang@huawei.com" <tangchengchang@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com>
+ <20260929103655.85107-15-zhengtian10@huawei.com>
+ <20260929110638.D19171F000FF@smtp.kernel.org>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <20260929110638.D19171F000FF@smtp.kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-
-> riscv/unwind: Add Minimal DWARF CFI kernel unwinder
-
-TL;DR:
-- struct mod_arch_specific may be redefined (build error) with
-  CONFIG_MODULES=n
-- Stack walk may stop at IRQ stack top, losing frames
-- return_address(n) may be off by one frame (unverified)
-- fprobe comment nit
-
-> diff --git a/arch/riscv/include/asm/module.h b/arch/riscv/include/asm/module.h
-> --- a/arch/riscv/include/asm/module.h
-> +++ b/arch/riscv/include/asm/module.h
-
-[ ... ]
-
-> +#if defined(CONFIG_MODULE_SECTIONS) || defined(CONFIG_UNWINDER_DWARF_CFI)
->  struct mod_arch_specific {
-> +#ifdef CONFIG_MODULE_SECTIONS
->  	struct mod_section got;
->  	struct mod_section plt;
->  	struct mod_section got_plt;
-> +#endif
-> +#ifdef CONFIG_UNWINDER_DWARF_CFI
-> +	struct mod_dwarf_cfi_index __rcu *dwarf_cfi_index;
-> +#endif
->  };
-> +#endif
-
-Can this define struct mod_arch_specific twice when CONFIG_MODULES=n?
-
-UNWINDER_DWARF_CFI only does 'select HAVE_MOD_ARCH_SPECIFIC if MODULES', and
-MODULE_SECTIONS is selected by RELOCATABLE only 'if MODULES'.  With
-CONFIG_MODULES=n and CONFIG_UNWINDER_DWARF_CFI=y, CONFIG_HAVE_MOD_ARCH_SPECIFIC
-is unset, so include/asm-generic/module.h (included first) already provides:
-
-	#ifndef CONFIG_HAVE_MOD_ARCH_SPECIFIC
-	struct mod_arch_specific
-	{
-	};
-	#endif
-
-include/linux/module.h includes <asm/module.h> even with CONFIG_MODULES=n, so
-the block above would then fail with a redefinition of struct
-mod_arch_specific.
-
-Before this patch, MODULE_SECTIONS guarded the struct and also selected
-HAVE_MOD_ARCH_SPECIFIC, so the two always agreed.
-
-Would guarding the struct with CONFIG_HAVE_MOD_ARCH_SPECIFIC, adding
-'&& defined(CONFIG_MODULES)' to the UNWINDER_DWARF_CFI half of the condition,
-or selecting HAVE_MOD_ARCH_SPECIFIC unconditionally from UNWINDER_DWARF_CFI
-be better?
-
-> diff --git a/arch/riscv/kernel/probes/rethook_trampoline.S b/arch/riscv/kernel/probes/rethook_trampoline.S
-> --- a/arch/riscv/kernel/probes/rethook_trampoline.S
-> +++ b/arch/riscv/kernel/probes/rethook_trampoline.S
-
-[ ... ]
-
-> +/*
-> + * Under CONFIG_UNWINDER_DWARF_CFI, PT_EPC(sp) is seeded with
-> + * &arch_rethook_trampoline before rethook_trampoline_handler() overwrites
-> + * regs->epc with the restored caller PC prior to running rethook handlers,
-> + * enabling reliable CFI unwinding across kretprobe and fprobe return hooks.
-> + */
->  SYM_CODE_START(arch_rethook_trampoline)
-
-This isn't a bug, but does fprobe use rethook in this tree?
-
-FPROBE selects FUNCTION_GRAPH_TRACER and kernel/trace/fprobe.c has no rethook
-references; the only rethook_hook() caller is pre_handler_kretprobe() in
-kernel/kprobes.c.  So fprobe exits run through return_to_handler() in
-mcount.S rather than arch_rethook_trampoline().
-
-Should the comment mention only kretprobes, or point fprobe readers at
-return_to_handler?
-
-> diff --git a/arch/riscv/kernel/stacktrace.c b/arch/riscv/kernel/stacktrace.c
-> --- a/arch/riscv/kernel/stacktrace.c
-> +++ b/arch/riscv/kernel/stacktrace.c
-
-[ ... ]
-
-> +		if ((sp & (sizeof(long) - 1)) ||
-> +		    !riscv_stack_bounds(task, sp, /*size=*/0, &cur_low,
-> +					&cur_high))
-> +			return -EINVAL;
-
-Can this reject a valid sp at the top of the IRQ stack?
-
-The CFA check only rejects values above the top:
-
-	if ((cfa & (sizeof(long) - 1)) || cfa < cur_low || cfa > cur_high)
-
-and the call_on_irq_stack() transition accepts the top:
-
-	sp <= irq_low + IRQ_STACK_SIZE &&
-
-but riscv_stack_bounds(task, sp, /*size=*/0, ...) only matches when
-'addr < high'.
-
-When the walker reaches the function that call_on_irq_stack() called while it
-is still at its entry, sp is irq_stack_ptr + IRQ_STACK_SIZE, and the walk
-returns -EINVAL before it can use the entry row.
-
-One way to reach it:
-
-local_bh_enable()
-  do_softirq()
-    do_softirq_own_stack()
-      call_on_irq_stack(NULL, ___do_softirq)
-
-If an ftrace callback on ___do_softirq takes a stack trace (func_stack_trace,
-or an fprobe event with a stacktrace trigger), the ftrace_caller branch sets
-sp to the IRQ stack top, and riscv_stack_bounds() then matches none of the
-task, IRQ or overflow stacks.  The same happens for walks starting from
-ftrace_partial_regs() pt_regs where regs->sp is the top, for example
-fprobe/kprobe_multi BPF programs calling bpf_get_stackid()
--> perf_callchain_kernel() -> walk_stackframe(NULL, regs).  It also happens to
-__do_softirq() when ___do_softirq() tail-calls it.
-
-The trace then stops at ___do_softirq and loses call_on_irq_stack(),
-do_softirq_own_stack() and every frame on the task stack.  There is no
-memory-safety impact, and the old frame-pointer unwinder could not cross the
-IRQ stack either, but this defeats the call_on_irq_stack() transition support
-the commit message describes.
-
-Should riscv_stack_bounds() accept addr == high when size == 0, or should the
-IRQ stack top be special-cased here?
-
-[ ... ]
-
-> +noinline void notrace walk_stackframe(struct task_struct *task,
-> +				      struct pt_regs *regs,
-> +				      bool (*fn)(void *, unsigned long),
-> +				      void *arg)
-> +{
-> +	walk_stackframe_cfi(task, regs, fn, arg, /*require_reliable=*/false);
-> +}
-
-Does return_address(n) now return an address one frame too far up with
-CONFIG_UNWINDER_DWARF_CFI=y?
-
-return_address() in arch/riscv/kernel/return_address.c does:
-
-	data.level = level + 3;
-	...
-	arch_stack_walk(save_return_addr, &data, current, NULL);
-
-The three skipped entries are arch_stack_walk, return_address and the caller
-of return_address, which assumes arch_stack_walk() has its own frame.  That
-held because CONFIG_FRAME_POINTER builds pass -fno-optimize-sibling-calls
-(top-level Makefile).  This patch makes FRAME_POINTER unavailable under
-UNWINDER_DWARF_CFI and adds -fomit-frame-pointer, so sibling-call
-optimisation is back on at -O2.
-
-arch_stack_walk() is a single forwarding call:
-
-	noinline noinstr void arch_stack_walk(stack_trace_consume_fn consume_entry,
-					      void *cookie,
-					      struct task_struct *task,
-					      struct pt_regs *regs)
-	{
-		walk_stackframe(task, regs, consume_entry, cookie);
-	}
-
-which is a candidate for 'tail walk_stackframe', leaving no frame of its own.
-The walk would then report return_address, F, G, H instead of arch_stack_walk,
-return_address, F, G, so return_address(n) yields __builtin_return_address(n+1)
-of F.
-
-That affects get_lock_parent_ip() (current->preempt_disable_ip, shown as
-"Preemption disabled at:") and the preemptirq tracepoints and the
-irqsoff/preemptoff tracers that use CALLER_ADDR1.  s390, which also unwinds
-without frame pointers, adds CFLAGS_stacktrace.o += -fno-optimize-sibling-calls
-in arch/s390/kernel/Makefile for this reason.
-
-I haven't verified this by compiling for RISC-V, so it is inferred from the
-compiler rules and the s390 precedent.  Would adding -fno-optimize-sibling-calls
-for stacktrace.o under UNWINDER_DWARF_CFI, having arch_stack_walk() call an
-always-inline walker directly, or adjusting the skip count in return_address()
-be appropriate?
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
 
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/45087188604
---===============3299975069991723205==--
+On 9/29/2026 7:06 PM, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 4 potential issue(s) to consider:
+> - [Critical] kvm: arm64: missing vCPU kick in kvm_arch_update_hw_dirty_mode causes data corruption
+> - [High] kvm: arm64: stage2_wrprotect_walker clobbers concurrent hardware PTE updates
+> - [Medium] kvm: uapi: enabling dirty ring silently resets HDBSS buffer size
+> - [Low] kvm: uapi: KVM_CHECK_EXTENSION misused to return mutable VM state
+> --
+> 
+> commit ad3d8df658768bdca959742e1b61e3dd3914fdd8
+> Author: Tian Zheng <zhengtian10@huawei.com>
+> 
+> KVM: arm64: Document HDBSS buffer size ioctl
+>      
+> Document KVM_CAP_ARM_HDBSS_BUFFER_SIZE, which lets userspace configure the
+> per-vCPU HDBSS buffer size for hardware-assisted dirty tracking during live
+> migration.
+> 
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>> --- a/Documentation/virt/kvm/api.rst
+>> +++ b/Documentation/virt/kvm/api.rst
+>> @@ -9056,6 +9056,34 @@ enabled, cmma can't be enabled anymore and pfmfi and the storage key
+>>   interpretation are disabled. If cmma has already been enabled or the
+>>   hpage_2g module parameter is not set to 1, -EINVAL is returned.
+>>   
+>> +7.48 KVM_CAP_ARM_HDBSS_BUFFER_SIZE
+>> +-----------------------------------
+>> +
+>> +:Architectures: arm64
+>> +:Target: VM
+>> +:Parameters: args[0] is the per-vCPU HDBSS buffer size in bytes
+>> +:Returns: 0 on success; -EINVAL if the size is invalid or vCPUs have already
+>> +          been created; -EBUSY if the buffer size was already configured.
+>> +
+>> +This capability configures the per-vCPU HDBSS buffer size used for
+>> +hardware-assisted dirty tracking during live migration.
+>> +
+>> +Userspace sets the size in bytes via KVM_ENABLE_CAP. KVM allocates
+>> +per-vCPU HDBSS buffers of the requested size.
+>> +
+>> +KVM_CHECK_EXTENSION returns the maximum supported size (``SZ_2M``)
+>> +when queried without a VM, or the configured per-VM size (default
+>> +``PAGE_SIZE``) when queried with a VM.
+> 
+> [Severity: Low]
+> KVM_CHECK_EXTENSION is designed to advertise static feature support and
+> limits, not to serve as a GET interface for mutable, dynamically configured
+> VM attributes.
+> 
+> Would it be better to use a dedicated interface to read back this dynamic
+> state instead of KVM_CHECK_EXTENSION?
+> 
+>> +
+>> +Constraints:
+>> +
+>> +- The size must be a power of two in [``PAGE_SIZE``, ``SZ_2M``].
+>> +- Dirty-bitmap mode only: rejected with -EINVAL once the dirty ring
+>> +  (``KVM_CAP_DIRTY_LOG_RING``) is enabled, and enabling the ring after
+>> +  a size was set resets it to the default.
+> 
+
+You are right, we will fix this. KVM_CHECK_EXTENSION now returns the 
+maximum supported size only, matching how KVM_CAP_DIRTY_LOG_RING reports 
+the ring size limit:
+
+```
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -519,11 +519,7 @@ int kvm_vm_ioctl_check_extension(str
+        case KVM_CAP_ARM_HDBSS_BUFFER_SIZE:
+-             if (!system_supports_hdbss())
+-                     r = 0;
+-             else if (kvm)
+-                     r = kvm->arch.hdbss_buffer_size;
+-             else
+-                     r = KVM_ARM_HDBSS_MAX_SIZE;
++             r = system_supports_hdbss() ? KVM_ARM_HDBSS_MAX_SIZE : 0;
+                break;
+```
+
+> [Severity: Medium]
+> The KVM guidelines mandate that new memslot and vCPU flags default to
+> immutable.
+> 
+> Instead of silently mutating previously configured state (which can lead to
+> unpredictable state-machine transitions that userspace is not prepared
+> for), should this incompatible capability configuration fail explicitly by
+> returning an error like -EINVAL?
+> >> +- Must be set before any vCPU is created; a second setting is rejected
+>> +  with -EBUSY.
+>>   
+>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+>> --- a/arch/arm64/kvm/hyp/pgtable.c
+>> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> 
+
+You were right, and the reset is gone. The ring enable never touches the 
+buffer size, and the two are now fully decoupled: any buffer size works 
+with any ring size.
+
+> [ ... ]
+> 
+>> @@ -1285,12 +1298,47 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+>>   	return 0;
+>>   }
+>>   
+>> +static int stage2_wrprotect_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>> +				   enum kvm_pgtable_walk_flags visit)
+>> +{
+>> +	kvm_pte_t new = ctx->old & ~KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+>> +
+>> +	/* We remove DBM on blocks so they can fault and get split */
+>> +	if (ctx->level < KVM_PGTABLE_LAST_LEVEL)
+>> +		new &= ~KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+>> +
+>> +	if (kvm_pte_valid(ctx->old) && ctx->old != new &&
+>> +	    (ctx->old & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W) &&
+>> +	    ctx->mm_ops->mark_page_dirty)
+>> +		ctx->mm_ops->mark_page_dirty(kvm_pte_to_phys(ctx->old));
+>> +
+>> +	/*
+>> +	 * The plain WRITE_ONCE races with hardware updates; both are
+>> +	 * benign.
+>> +	 *
+>> +	 * AF: the update may be lost, and is set on the next access.
+>> +	 *
+>> +	 * Dirty state: we only rewrite entries whose old value had S2AP[1]
+>> +	 * set, while hardware only promotes entries with S2AP[1] clear, so
+>> +	 * the two never touch the same entry. The one overlap is DBM removal
+>> +	 * on writable-clean blocks: a racing promotion is demoted back to
+>> +	 * read-only, but the write is still recorded in the HDBSS buffer and
+>> +	 * the folio was marked dirty at fault-in, so nothing is lost.
+>> +	 */
+>> +	if (kvm_pte_valid(ctx->old) && ctx->old != new)
+>> +		WRITE_ONCE(*ctx->ptep, new);
+> 
+> [Severity: High]
+> The global review guidelines strictly mandate: When KVM updates SPTE bits that
+> the hardware page-table walker also writes (Dirty/Access on leaf entries), the
+> update must not clobber a concurrent hardware update.
+> 
+> Since WRITE_ONCE unconditionally overwrites the PTE with the old masked
+> value, could this non-atomic write in stage2_wrprotect_walker() clobber
+> concurrent hardware updates to the Access Flag (AF) or Dirty Bit on leaf
+> PTEs?
+> 
+
+The AF race is real but known and harmless. stage2_attr_walker(), which 
+upstream uses for the same write-protect path, has the exact same 
+read-modify-write pattern and its own comment on it:
+
+"We may race with the CPU trying to set the access flag
+here, but worst-case the access flag update gets lost and
+will be set on the next access instead."
+
+For the dirty bit the two writers are disjoint. The walker only rewrites 
+entries it read as already dirty, while hardware only promotes clean 
+entries, so they never touch the same PTE, and a leaf whose value is 
+unchanged is not written at all.
+
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+> 
+> [ ... ]
+> 
+>> @@ -2581,6 +2629,45 @@ int __init kvm_mmu_init(u32 hyp_va_bits)
+>>   	return err;
+>>   }
+>>   
+>> +/*
+>> + * The VM's hardware dirty-management mode is a derived value, a pure
+>> + * function of the static capabilities and the number of logging
+>> + * memslots, so recomputing it on every event cannot lose an update
+>> + * and needs no locking against racing writers:
+>> + *
+>> + *   logging && HDBSS-capable  ->  HD|HA|HDBSS (hardware tracking)
+>> + *   logging, no HDBSS         ->  off (write-protect faults)
+>> + *   !logging && HAFDBS-cap.   ->  HD|HA (only written pages go dirty)
+>> + */
+>> +void kvm_arch_update_hw_dirty_mode(struct kvm *kvm)
+>> +{
+>> +	unsigned long cur, target;
+>> +	bool logging = atomic_read(&kvm->nr_memslots_dirty_logging) != 0;
+>> +
+>> +	if (logging && kvm_supports_hdbss(kvm))
+>> +		target = VTCR_EL2_HD | VTCR_EL2_HA | VTCR_EL2_HDBSS;
+>> +	else if (logging || !kvm_supports_hafdbs())
+>> +		target = 0;
+>> +	else
+>> +		target = VTCR_EL2_HD | VTCR_EL2_HA;
+>> +
+>> +	cur = kvm->arch.mmu.vtcr & (VTCR_EL2_HD | VTCR_EL2_HA | VTCR_EL2_HDBSS);
+>> +	if (cur == target)
+>> +		return;
+>> +
+>> +	kvm->arch.mmu.vtcr = (kvm->arch.mmu.vtcr &
+>> +			      ~(VTCR_EL2_HD | VTCR_EL2_HA | VTCR_EL2_HDBSS)) |
+>> +			     target;
+>> +
+>> +	kvm_make_all_cpus_request(kvm, KVM_REQ_RELOAD_STAGE2);
+>> +
+>> +	/*
+>> +	 * The request only reloads VTCR_EL2; cached translations keep
+>> +	 * the old permissions until invalidated.
+>> +	 */
+>> +	kvm_flush_remote_tlbs(kvm);
+> 
+> [Severity: Critical]
+> Inside kvm_arch_update_hw_dirty_mode(), kvm_make_all_cpus_request() is issued
+> with KVM_REQ_RELOAD_STAGE2, which is defined as:
+> 
+> #define KVM_REQ_RELOAD_STAGE2 \
+> 	KVM_ARCH_REQ_FLAGS(12, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> 
+> The KVM_REQUEST_NO_WAKEUP flag prevents the request from interrupting running
+> vCPUs. The subsequent kvm_flush_remote_tlbs() executes a hardware broadcast TLBI
+> and also does not send IPIs.
+> 
+> Because running vCPUs are never kicked out of guest mode, won't they
+> continue executing with their physical VTCR_EL2 register holding the
+> stale state (HD=1)?
+> 
+> If software dirty logging is active but HDBSS is not correctly synchronized
+> on the CPU, the hardware page table walker could silently promote
+> writable-clean PTEs to writable-dirty without trapping. Since KVM never
+> sees the write, could this cause silent data loss during live migration?
+> 
+>> +}
+> 
+
+They are kicked out. KVM_REQUEST_NO_WAKEUP only skips waking halted 
+vCPUs, the IPI decision in kvm_request_needs_ipi() never consults it, 
+and with KVM_REQUEST_WAIT the request IPIs every vCPU in guest mode and 
+waits for all of them to leave, the same flag pair KVM_REQ_TLB_FLUSH 
+relies on. Re-entering the guest goes through check_vcpu_requests(), 
+which calls __load_stage2() for this request, and a halted vCPU passes 
+the same check on wakeup, so no guest execution ever runs with the old VTCR.
+
+Thanks,
+Tian
