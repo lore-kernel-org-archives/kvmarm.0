@@ -1,62 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795447922;
-	b=LQ82fJ3oqMtm1fJsX1zP2o2SYQ2eSj0hJwHMfxi6xNagK0bidaJjFgbICaiiToTg62PH
-	 R21uo1E4Pq4+QcUge2zwI1anJk1VCmHMe71jwt8oQgUoIuh9Qu3DesKes6hsYsETHLizL
-	 37SOdIgdxwV+rVtlWCli0XgO5Td2+4luCzQGXYiahetFF54NcsBxHsD6fi/ONFMpEvSlo
-	 dZ7Ko7mH+XPxluxvFRjfshjUmLzwoNBnyM8EedgTh694waivM8DGv96TJ30bpBlqnoqwe
-	 71TvmP+clSZk1AU9IwLrP68p1zuCPi9kZUeuEWpdQx4NZJR9xwFTGuYuQ3llfPMdLow==
+	t=1795449328;
+	b=UbUotpVw4BpzjKfjVimT4FMos3fgwpIPMe2YHxG0n+1JdwdtmPAHmExb74n9D52R6TZg
+	 UlfRPgN5F4mOtGsCSsoGUVVAoLv64GdIGaOormcCevsDA9ZgRcBqC6jcReiDiR91RZ1VL
+	 27l+YaxLJQ3vfJ/eFgM2Yq7KvW3s6Eg7FogFlMXvvwf16Lh4AHJp9gOp7ReuCqY+LVRTW
+	 ABiouepM6i1XldHDh+EUqxADU1oBLyrznmoYFdQw3Q5HTlbKQ0Zfa6EfNFWk89uoyBvJC
+	 5VtecJYHKpdPbhtG4H5KKVKqTTyJ5uMA+fSFskpWKQsKx387o6qxyyCxBJqlIBVFr8Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795447922;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=IcrKa5wszJlz7KzbvkJ6LYVb8H5e9hHDr4RZJLHWMyM=;
-	b=zw4FjeolIBYEgBI/fGD8Fn8d4EFNPE46ORQons1GjpGJMzWtvU+9DbzVFm6TGah7mDRa
-	 10atLbTc+XvRgXx9dcwxluuthPZlxDfJdEfqbY1IK6M5+tG+zVOXBqZNfGmoT3T6Rlf9L
-	 4JpKoVm+vOLOZdwztd6L4tj7/cEs6fYf58Ip+5/gIeBFPlmZU3dBsTyXgZMvPrUEXAQz0
-	 d22ByA93M1u8NPPEouylruIV+1ojuBdYVK8+TEkIMv4lUtXjOPgiqSV/3CJu3QbG3czIN
-	 5SEEOmDI8w2yl2P9/+7a47Ey9WS/7iVVQvYbSRXOhRO8Ci2ajJoUZmnzL0GLmgafggg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795449328;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
+	bh=GRu77aryqF5vVEWWZxA71y1DXs5B7lSaSAU/I9inw/c=;
+	b=Gq6O4fK78nzvddNN3b2p/2v7SnfL7ut73qr4kQi8j8CD1GY0QU1Rc0TbT/K8Yx5LNVML
+	 oeF+iO9I1GPeAoCjq2qFZkA/w06arcN6ckxSOeDlX/M4kBR5J4FcmcDTI6KQcfhbTBC9I
+	 KSXTeZfWycFMHi714NrqUrNpVLM83dDpevaiXX+eof56h3UMdW4jZsJk1EBsBvUSbQKAq
+	 2mgMdfypTSoKNKHtAoHgkcivSriNM7vuNzvnH0fNiGcpL5OC0IR66FwzDcYKukxlWr836
+	 1qIKxkjpm7CCAVLeMJhTPKFm6Fl3yVqq9K3cM7toFOMcaTDLW9riCdilTPqMIhwS4dg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="FTdZLh/o";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F45606A31A;
-	Mon, 23 Nov 2026 15:32:02 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=bvXXNaJh;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691A2606A32C;
+	Mon, 23 Nov 2026 15:55:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 691A2606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FTdZLh/o
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D83C61F000CF;
-	Mon, 23 Nov 2026 15:31:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795447922;
-	bh=IcrKa5wszJlz7KzbvkJ6LYVb8H5e9hHDr4RZJLHWMyM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=FTdZLh/oKelhDZHb27a8Rjnsbjd5T8QMS1HZ8GXSbzFfWDBRtRlPqH4ej2BHiOxGp
-	 WYaG6MaU2vMTrbJ2jSAAcXK9hewWa08MSj8aSICWcGhhEsVOS7vtEyJuqDySVj2hk2
-	 Dkbnv40jW4fYWr27uMMqSLIBFptb63TGD5lwieU/2Yct6tGqap3hZNpP0fJ8syioa/
-	 Bcv7nFUbzMX561fxkGAC1Fjoy5qVB1c4rTAaAEm4FZQKOlm8aqCDLyYqU9w5h9LWcw
-	 0CHylaAYpxeKP3qe2jsGkle32VHGhSGNKBQ2rXU8WUrZTF9cqIvapDfYcuIc2A7kih
-	 sWlm3f0Xg74pw==
-Date: Mon, 23 Nov 2026 15:31:54 +0000
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	Wei-Lin Chang <weilin.chang@arm.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atish.patra@linux.dev>, kvm-riscv@lists.infradead.org, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 2/3] KVM: Warn userspace against ioctls while an exit
- is pending
-Message-ID: <awRcDlU6vFaL3uKt@gremlin>
-References: <20261123113435.1170711-1-fuad.tabba@linux.dev>
- <20261123113435.1170711-3-fuad.tabba@linux.dev>
- <awRKhCne0gG1gKZN@gremlin>
- <CA+EHjTyM4_P5v0cHEiarq5XAb2A0Esshb762BLuuKnyBvH=y+w@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=bvXXNaJh
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A5B4143D;
+	Mon, 23 Nov 2026 07:55:24 -0800 (PST)
+Received: from e142392.arm.com (e142392.arm.com [10.2.213.23])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9F8FE3F632;
+	Mon, 23 Nov 2026 07:55:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795449327; bh=qIDUTgZPRjOyoHLV/9Mx1bnUgGWSH9B5CMYDf/w+HDE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bvXXNaJhs+yditcVabcGrX8VJiyTVfNW2IufiKxWUuj+XksExvOwZrndSo3mxT60d
+	 wbs/SHh76PGFuLny1aEMbleWmCQ3EjBdbQSCVbGkyFPSuscgxQHA38cQA6WQrujpig
+	 jQUpI+4WmOrSdKs0RHNe7GYXMdZzkDOGlWiOBf9o=
+Date: Mon, 23 Nov 2026 15:55:20 +0000
+From: Kristina =?utf-8?Q?Mart=C5=A1enko?= <kristina.martsenko@arm.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	kvmarm@lists.linux.dev
+Subject: Re: [RFC 11/12] arm64: tlbid: Pass domain to TLBI instructions
+Message-ID: <kgq3yuat6i5p2qm4444ssak74e5xfy7uqftxtxukehttv46kbu@l6mcq4jhogfd>
+References: <20261001110655.461473-1-kristina.martsenko@arm.com>
+ <20261001110655.461473-12-kristina.martsenko@arm.com>
+ <20261001125453.BBD291F000FF@smtp.kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,78 +61,113 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTyM4_P5v0cHEiarq5XAb2A0Esshb762BLuuKnyBvH=y+w@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20261001125453.BBD291F000FF@smtp.kernel.org>
 
-On Mon, Nov 23, 2026 at 03:23:58PM +0000, Fuad Tabba wrote:
-> On Mon, 23 Nov 2026 at 15:09, Lorenzo Stoakes (ARM) <ljs@kernel.org> wrote:
-> [...]
-> > Very much agree with Sean's take here that we should instil sufficient fear in
-> > users at doing silly things (also in general not only KVM :).
-> >
-> > I wonder if we could add some specific examples or broad description of why it's
-> > unwise for better effect, though? Comments below.
-> >
-> > In general though:
-> >
-> > Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
->
-> Thanks!
->
-> > > ---
-> > >  Documentation/virt/kvm/api.rst | 11 +++++++----
-> > >  1 file changed, 7 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > > index 89eb6be9bc6e3..980ef0cdc1c91 100644
-> > > --- a/Documentation/virt/kvm/api.rst
-> > > +++ b/Documentation/virt/kvm/api.rst
-> > > @@ -6974,10 +6974,13 @@ to the byte array.
-> > >
-> > >        The pending state of the operation is not preserved in state which is
-> > >        visible to userspace, thus userspace should ensure that the operation is
-> > > -      completed before performing a live migration.  Userspace can re-enter the
-> > > -      guest with an unmasked signal pending or with the immediate_exit field set
-> > > -      to complete pending operations without allowing any further instructions
-> > > -      to be executed.
-> > > +      completed before performing a live migration.  In general, userspace should
-> > > +      exercise extreme caution when invoking ioctls other than KVM_RUN prior to
-> > > +      completing the original operation.
-> >
-> > Perhaps worth saying why? E.g. (as I understand it) that for these exits the
-> > operation is only completed on the next KVM_RUN, and that KVM relies on state
-> > left over from the exit (including parts of struct kvm_run such as exit_reason)
-> > to do so, so any ioctl invoked in between might clobber that state?
-> >
-> > I see you intentionally avoided documenting the pre-fault case on its own, but
-> > with the above stated I think a concrete example might be example here, like
-> > e.g.:
-> >
-> > "For example, if you were to ... that would result in ... which would absolutely
-> > ruin your day because ..."
-> >
-> > Kinda thing :)
->
-> :)
->
-> I'm not sure it would help, tbh. I think a reason or an example would
-> have the effect Sean wanted to avoid [1], where a reader takes an
-> ioctl that doesn't match it to be safe.
+On Thu, Oct 01, 2026 at 12:54:52PM +0000, sashiko-bot@kernel.org wrote:
+> > @@ -418,12 +437,13 @@ static inline void flush_tlb_all(void)
+> >  
+> >  static inline void flush_tlb_mm(struct mm_struct *mm)
+> >  {
+> > -	unsigned long asid;
+> > +	unsigned long arg;
+> >  
+> >  	dsb(ishst);
+> > -	asid = __TLBI_VADDR(0, ASID(mm));
+> > -	__tlbi(aside1is, asid);
+> > -	__tlbi_user(aside1is, asid);
+> > +	arg = __TLBI_VADDR(0, ASID(mm));
+> > +	arg |= get_tlbid_domain(mm);
+> 
+> [Severity: High]
+> Is this barrier sufficient to prevent subsequent MMU Loads from reordering
+> before the domain Store?
+> 
+> The implementation of TLB invalidation domain tracking relies on a Dekker-like
+> synchronization between PTE updates and CPU context switches. The dsb(ishst)
+> used here acts as a Store-Store barrier.
+> 
+> Since ARM64's weakly ordered memory model allows subsequent Loads (like reading
+> the tlbid_domains bitmap) to be reordered before preceding Stores (like the
+> PTE update), could both threads miss each other's updates?
+> 
+> This might cause a TLB invalidation to skip a CPU that subsequently caches a
+> stale page table entry, potentially leading to memory corruption or
+> use-after-free in user space. Would a Store-Load barrier like dsb(ish) be
+> required here?
 
-Ah fair enough, I missed the bit about purposeful fear-inducing vagueness :)
+I think the current barrier should be sufficient, since a DSB ST is
+stronger than a Store-Store barrier. If I’ve understood correctly then
+the PTE update should be "DSB-ordered-before" the domain bitmap read.
 
-I guess the retort to my suggestion is that a user may think 'oh well I'm not
-doing that so it's fine'.
+> 
+> [ ... ]
+> 
+> > @@ -626,6 +661,7 @@ static __always_inline void __do_flush_tlb_range(struct vm_area_struct *vma,
+> >  {
+> >  	struct mm_struct *mm = vma->vm_mm;
+> >  	unsigned long asid, pages;
+> > +	int domain;
+> >  
+> >  	pages = (end - start) >> PAGE_SHIFT;
+> >  
+> > @@ -634,21 +670,23 @@ static __always_inline void __do_flush_tlb_range(struct vm_area_struct *vma,
+> >  		return;
+> >  	}
+> >  
+> > -	if (!(flags & TLBF_NOBROADCAST))
+> > +	if (!(flags & TLBF_NOBROADCAST)) {
+> >  		dsb(ishst);
+> > -	else
+> > +		domain = get_tlbid_domain(mm);
+> 
+> [Severity: High]
+> Similarly, is the dsb(ishst) barrier here sufficient for range TLB
+> invalidations?
+> 
+> Just as in flush_tlb_mm(), this Store-Store barrier may fail to prevent the
+> Load of tlbid_domains from reordering before the PTE Store.
 
-Fine line to tread I guess!
+Same as above.
 
->
-> Cheers,
-> /fuad
->
-> [1] https://lore.kernel.org/all/av5CBjbeidUUWiLq@seanjc-mac.roam.internal/
->
+> 
+> > diff --git a/arch/arm64/mm/tlbid.c b/arch/arm64/mm/tlbid.c
+> > index b44fab2dca20d..c748e710e2ee9 100644
+> > --- a/arch/arm64/mm/tlbid.c
+> > +++ b/arch/arm64/mm/tlbid.c
+> 
+> [ ... ]
+> 
+> > @@ -31,6 +59,14 @@ void update_tlbid_domains(struct mm_struct *mm, unsigned int cpu)
+> >  
+> >  	for (int i = 0; i < BITS_TO_U64(domain_count); i++)
+> >  		atomic64_and(cpu_domains[cpu][i], &mm->context.tlbid_domains[i]);
+> > +
+> > +	/*
+> > +	 * Pairs with the DSB before reading tlbid_domains in the TLBI paths.
+> > +	 * Either a concurrent PTE update is visible to this CPU before it uses
+> > +	 * the mm, or the PTE updater observes the reduced domain bitmap and
+> > +	 * includes this CPU in its TLBI.
+> > +	 */
+> > +	dsb(ishst);
+> >  }
+> 
+> [Severity: High]
+> Is this barrier sufficient on the domain-update side of the Dekker-like
+> synchronization?
+> 
+> As with the PTE-update side, dsb(ishst) is a Store-Store barrier. Could this
+> allow subsequent Loads (like executing a speculative page table walk) to
+> reorder before the preceding domain bitmap Store?
+> 
+> If both the PTE updater and the domain updater use Store-Store barriers, the
+> Dekker-like synchronization lacks the necessary Store-Load ordering,
+> potentially leading to missed TLB invalidations.
 
---
-Cheers, Lorenzo
+As above, I think the current barrier is sufficient, since the domain
+bitmap write is DSB-ordered-before the PTE read.
+
+Thanks,
+Kristina
