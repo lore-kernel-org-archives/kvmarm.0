@@ -1,75 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.69
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.200
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795476412;
-	b=j158NOvo0cP+rD9r6Ng/yaDBieo2/OVUCdo5pwqovS0NL4IsDbM9SnoYuPakcBDZ1bUA
-	 yehASTp0TXZ434v3cgPSCDMZBT2p2qkMGbOcxlSDNj69345vFQbYvtmz7MF6cXmBxoGxj
-	 mndcylEK8WZDfjSFCDECaaqIMnNZoS6LOWkIhx8VrcOie7CiAOlZw04y4DuIrozzD+G/4
-	 p99PQ0VFBzibtNWzCD4Obr0t4mGNDQCwBdmTqED1sxIhSJ23TWkpYvTRW0SHzvaaeL7dq
-	 Hx2uj+KRVVeuz2g3oCmORXqKFryJLXIdP34/9BQXTfCEYOPAQ0iSHN6fjlEFZd600QA==
+	t=1795476409;
+	b=4PyonlvxoSKmZ2ZI48n/jSLzp1qS+SrI1nHzrvINdtUXPVGMb/efNN/+Cz7grc2YKcXr
+	 T9MhqoPlz69hgDhx6vJp24o1mlIt/vyioEQ9aMahxSuD52VPzwQJtVurBQq0ED+iTSq0G
+	 kw7G5RUnfQhq619qIo4iaDZ6CTLLLS+aQLEaFAm3jooQqHCyYFiih1BkGo69s2WOfWKo3
+	 zWR8H6+oYYArKc7sUgTiFaec6lLuWyfk+jTg3NPBMSxaVa1Ke3AO80T9OjoNMnlMxwCm1
+	 udmiY2THAjXIk8HWt/S/PQUIYhDLsZUdiu8x0XYF3X02Uqj4TjWd0dcaB8HEp996jaA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795476412;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795476409;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
-	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
-	 Content-Type;
-	bh=WJVCNKr0SmGP9iVV1suMI71pk9j/vqJGLO6NxitJm1w=;
-	b=4Q1QH4PP73r4E2lBduL6mJn6ciL2wDQAilc9zC/eCk7EFst0IjOSWet9MXHeoV6kEc+O
-	 CPrsIitvuIc0NT9AyOYD6PI/9T9H3CxFWdap7lGm05GeD5f/QH53Zx0BWjVkeS55p2bzq
-	 CuEXABOWuBoZ4ZWb5gK1+7j0wffxLJYx3f63M7iF2txFBOBj27PWMP+EyDB4ZnLhvn1SB
-	 UNHcPeyC3dS936xu3SIVIIvZdQmW8tnENfLBg+ZSpCi8jbXXvZdyMB87HBImKcQ2UWJy+
-	 ECMHRiqgyDEG7qNqcUSS/Oxtz8jptGP2ZRM/PvfsRA8ZtETang2ecX/2pgkQLFlxJTw==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=HseEX6n05FD1veyeX/WRfonp9sQvS52+uztmoZnoKtw=;
+	b=WKoaaMbwkiXTjO+WK3zRUcNPdoR9Hz05acqyyKtF/hdTru7+eMKU4i+m1KSb4Yeo+6XD
+	 E8OaXtSrVgzQKmyGYDVkD9TynOMOFmQa/2MylCKDgdmDoKz82bU9AT/uKmwrNwN+g1fSA
+	 mQwpz2V5ABJ0bXn6+URfMqpYYRYx2Afi9EStUATxGEuQfabAxIZyNdN4uM69hZQFCqV3Q
+	 5luED0XZ8UkicesE4uLU02qr1cORbDgH6YCs/mI7UMigqEIoX71UR+rMMGhQ6oYxOni25
+	 8MfraSkyqrVkFvQVjNVD4GTjknmwyVuqzbiLjh1gZr27wliect0iWHzjh3V7jjAhtxg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=h5hjL9PR;
-	arc=none smtp.remote-ip=209.85.210.69
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="e92/guai";
+	arc=none smtp.remote-ip=209.85.167.200
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B93E606A680
-	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 23:26:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5B93E606A680
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE67606A321
+	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 23:26:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6FE67606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=h5hjL9PR
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-8628955a085so4206075a34.3
-        for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 15:26:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=e92/guai
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4b597558c4cso4648734b6e.1
+        for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 15:26:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795476410; x=1796081210; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WJVCNKr0SmGP9iVV1suMI71pk9j/vqJGLO6NxitJm1w=;
-        b=h5hjL9PR+dh1f24N+tinMiRDbXmLeB1XHgiqV1OHM0R/yeeEzxieWUCu3jMnfhKrjr
-         il0tRB7Mx1qjzBn8DcxwDa2sOXz4IEo4ZvyEFRlwqozCaJBdHH04s4XwoPOguKxzih9a
-         vxHFUgGJ+ZqCbSwSYHowKd9ZknhAt6hApmZemF1qhOlKGBXiV3yJevBuaJVbKZBeZUs5
-         v7rZUVej1HGk17Xj2bJpMcOxjh7xoowqHbl/lJiH1b9vnqSEJ1F1sPvW8DSw5MecfwPK
-         OaGcGvDWzlO1k3Xkoc5fg67nFEpAm1PxDsxf28YqFGaxth2iuArU50aMhbqMn7xlAD4Y
-         5EBw==
+        d=google.com; s=20260707; t=1795476408; x=1796081208; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=HseEX6n05FD1veyeX/WRfonp9sQvS52+uztmoZnoKtw=;
+        b=e92/guaisVjvs/pfCRf9LW/aSNw/HxTW87P9kr7sDJS1fpAzVCspcihYPOd4ItCEJC
+         NxwbfMcwYKrtTlXshokCldqNLNho+ALqyAakkZJzbBMFGfdhmA0xjeEl5ybD+Z3kqWUs
+         T/rPoS6hwyY5BDgQm2KlYCebtjaOG5Ng/za0CwkeUGsPSgjEHRrHyMkCN4uYSIKcuMBC
+         qYpGWL8fhGX4bngA/adgwZKaqwm3HIBcCT5znF4a/752hcSRtCgWpw4JHG247ccyWG0J
+         jBYdXl9skP1fKGU7g+lOLiJ5iv6JlypfSznpMoIjkU2QINrD7IB7BFF99oKQ63BgowDo
+         sxQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795476410; x=1796081210;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=WJVCNKr0SmGP9iVV1suMI71pk9j/vqJGLO6NxitJm1w=;
-        b=1IyofePXmtqPIvBtZAYPaV/hXHrDcAvTwYjootT/BX3kc1zlB6PRuFlJrH7tF4Jkj7
-         LCw1b3dlPRuyqzJlMJX5OBcBLX5m2d76gVLohzcOzLK5XQmLtodA9rKBasI8N9X+D2P1
-         NIbv84hGJze29UM0TbiuY33IBKiKKn5V86JN1aXjR6b6HTjClFfu1kM4dBBPGxIqyLtt
-         NucDpbQfG0VsAjBeeNg2xmb3CF3mwU0AShgxTecoh0BN1qMm8VhtytLnLDDs5N4bwj6a
-         HyRfYZJmnPE4Ls6JCuARftDRcKkveIlLfO2lFOBu9hDLwELfY6Yi/IXHIuW9EB834OVm
-         ojlw==
-X-Forwarded-Encrypted: i=1; AL+hErHosX+mucte5p2leGTV1zQX1w3hHFSTLLf0IbiuuL7cI1qdOhPXadQioQ8AlpD1nwTlpxA9P3g=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9HxLMFC7zXuMQH+ggL//eWZ/lsKRAfhgsOm2pdxT/PePXaODjS
-	FrVUdeD9buPfGiiIgrYLF7LL7MBFCmBLZ4PuoMDe+AF2YIwJOhg0ALKZHBa26K6zI0ANQbruASz
-	BeUygdIJRs8SArXNM1+jMZdGhHA==
-X-Received: from iohk21-n1.prod.google.com ([2002:a05:6602:a615:10b0:9e8:de6c:a5a3])
+        d=1e100.net; s=20260707; t=1795476408; x=1796081208;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=HseEX6n05FD1veyeX/WRfonp9sQvS52+uztmoZnoKtw=;
+        b=UiFhdbbGSldBlgiDKUw6NzpfQzf7BWJm8eC4W8TQ5CxYKU2ToW2VbUxVqGIgmlyXrQ
+         jjmsykPx8G4i8BJ1b5GCuyq+zEemkPjqzLZhRlh9vjlIL3j+7hpsui6wkiuS4ArVtzbN
+         7uEss6g2YCTC5Ks9eqB9+K624BJOW3S4HHfLqGggU7a+cjzO3PIY4byo+q7ahlUxKnfk
+         Zz3nnQO7fF/mWIcX8OGxmbwpa64BYORX9Cv+wQKSyQja96BZlSXa8Px1Cdxi0zkVriI6
+         kFrnAzB9Z6ofCN+gO2RoYL+Ng5gOo5NkYs+poRCo0ttkDi+q5PavDnxb6TLNORuNDgdy
+         chgQ==
+X-Forwarded-Encrypted: i=1; AL+hErElJ57zOs/Y+fmfBc53nczRlOFbn/NyWHtjkPsoJC7nqWX9gmh2qKZIYAA8ZqkcU3g4Ie1O9EU=@lists.linux.dev
+X-Gm-Message-State: APuU4Z9MKrwpsXPwuCwHmk76k0ZAV9PpIngArhaWmPgmFhdmCGr7Ujxg
+	1h1eE0jhpVJAqjXrF2Mn7RZ5IE2RTFG7NSQgivI2bbf2vPz1v/7t4AhYqVXr8ftjNvfYqrWTyDV
+	eGwmAHVc7IiOqXBEGPEbEsf6COA==
+X-Received: from ilbej20-n1.prod.google.com ([2002:a05:6e02:4e14:10b0:53c:d564:3a52])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:1645:b0:567:c9d6:b2b2 with SMTP id 5614622812f47-57a0c3aa32emr13284763b6e.47.1795476409974;
- Mon, 23 Nov 2026 15:26:49 -0800 (PST)
-Date: Mon, 23 Nov 2026 23:26:47 +0000
-In-Reply-To: <20261123232647.3733149-1-coltonlewis@google.com>
+ 2002:a05:6808:c123:b0:4f5:e12:b47c with SMTP id 5614622812f47-57a0be9dc7amr11961032b6e.48.1795476408097;
+ Mon, 23 Nov 2026 15:26:48 -0800 (PST)
+Date: Mon, 23 Nov 2026 23:26:45 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -79,10 +76,10 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 Mime-Version: 1.0
-References: <20261123232647.3733149-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.56.1.839.g22a8290db9-goog
-Message-ID: <20261123232647.3733149-3-coltonlewis@google.com>
-Subject: [PATCH v2 2/2] KVM: arm64: nv: Avoid duplicate guest stage-2 mapping entries
+Message-ID: <20261123232647.3733149-1-coltonlewis@google.com>
+Subject: [PATCH v2 0/2] KVM: arm64: nv: Fix stale and duplicate guest S2
+ tracking entries
 From: Colton Lewis <coltonlewis@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
 Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -94,67 +91,47 @@ Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-kvm_record_guest_s2_mapping() unconditionally inserts a new entry into
-both guest_s2_mappings interval trees. Parallel stage-2 faults on the
-same IPA or retries after -EAGAIN can therefore insert identical
-entries for the same nested and canonical IPA range.
+When an L1 guest issues TLBI IPAS2E1 with a TTL hint smaller than the
+actual mapping, KVM clears the entire block from the shadow stage-2
+page table while leaving the stale tracking entry in guest_s2_mappings.
+Patch 1 drops undersized TTL hints in compute_tlb_inval_range() and
+falls through to the unhinted path so the unmap and tracking removal
+cover the same range. This follows Marc's suggestion [2] on Dan
+Carpenter's sub-page TTL patch [1] (which Patch 1 overlaps with and
+subsumes), fixing WARN_ON(size & ~PAGE_MASK) on 16kB/64kB hosts as well.
 
-Check mmu->guest_s2_mappings under guest_s2_tracking_lock before
-inserting, and free the new entry if an identical one is already
-present.
+Patch 2 avoids inserting identical duplicate entries in
+kvm_record_guest_s2_mapping().
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- arch/arm64/kvm/nested.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+Tool-generated content:
+- Initial bug discovery: automated LLM-assisted audit of the arm64
+  nested stage-2 tracking code.
+- Patch and text drafting: interactive Gemini session (patches, commit
+  messages, and cover letter).
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index d3a19b1db2144..18868e0d701c0 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -930,6 +930,30 @@ static unsigned long s2_mapping_to_nested_start(struct kvm_guest_s2_mapping *map
- 	return mapping->nested.start & ~S2_MMU_IDX_MASK;
- }
- 
-+static bool guest_s2_mapping_exists(struct kvm_s2_mmu *mmu,
-+				    struct kvm_guest_s2_mapping *mapping)
-+{
-+	struct interval_tree_node *node;
-+
-+	for (node = interval_tree_iter_first(&mmu->guest_s2_mappings,
-+					     mapping->nested.start,
-+					     mapping->nested.last);
-+	     node;
-+	     node = interval_tree_iter_next(node, mapping->nested.start,
-+					    mapping->nested.last)) {
-+		struct kvm_guest_s2_mapping *curr;
-+
-+		curr = container_of(node, struct kvm_guest_s2_mapping, nested);
-+		if (curr->nested.start == mapping->nested.start &&
-+		    curr->nested.last == mapping->nested.last &&
-+		    curr->canonical.start == mapping->canonical.start &&
-+		    curr->canonical.last == mapping->canonical.last)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- void kvm_record_guest_s2_mapping(struct kvm_s2_mmu *mmu, gpa_t canonical_ipa,
- 				 gpa_t nested_ipa, size_t map_size,
- 				 struct kvm_guest_s2_mapping *mapping)
-@@ -950,6 +974,11 @@ void kvm_record_guest_s2_mapping(struct kvm_s2_mmu *mmu, gpa_t canonical_ipa,
- 	tag_s2_mapping_mmu(mapping, mmu);
- 
- 	guard(spinlock)(&kvm->arch.guest_s2_tracking_lock);
-+	if (guest_s2_mapping_exists(mmu, mapping)) {
-+		kfree(mapping);
-+		return;
-+	}
-+
- 	interval_tree_insert(&mapping->nested, &mmu->guest_s2_mappings);
- 	interval_tree_insert(&mapping->canonical, &kvm->arch.mmu.guest_s2_mappings);
- }
+Changes since v1:
+- Drop the kvm_remove_guest_s2_mappings() change; discard undersized TTL
+  hints in compute_tlb_inval_range() and fall through to the unhinted
+  path (Marc Zyngier).
+- Split duplicate suppression in kvm_record_guest_s2_mapping() into a
+  separate patch, call kfree() under guard(spinlock), and drop the Fixes
+  tag (Wei-Lin Chang).
+- Rewrite the commit messages and cover letter.
+
+Link to v1: https://lore.kernel.org/r/20261119185105.626343-1-coltonlewis@google.com
+[1] https://lore.kernel.org/r/20261123-inval_range-v1-1-815e15797089@pereq.eu
+[2] https://lore.kernel.org/r/86h5h7zn5a.wl-maz@kernel.org
+
+Colton Lewis (2):
+  KVM: arm64: nv: Discard undersized TTL hints in
+    compute_tlb_inval_range()
+  KVM: arm64: nv: Avoid duplicate guest stage-2 mapping entries
+
+ arch/arm64/kvm/nested.c | 105 ++++++++++++++++++++++++++++++++--------
+ 1 file changed, 84 insertions(+), 21 deletions(-)
+
+
+base-commit: b6a9fa34ce4187cb69d3c588a4bbffc31ce5db8f
 -- 
 2.56.1.839.g22a8290db9-goog
 
