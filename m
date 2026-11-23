@@ -1,101 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795431936;
-	b=HpD9vU7dAVnhSDHe1669hm+G0hl4Z5hdkranDlUec6eajlA2FQbLLwh0x/iNb4S+hlIq
-	 1I1npKg8DZCgNh8AZ4WrSDPYw5hzw9IvnkXwcAIabh16m4AQtoqsKcX0ECruYdE3FZgKf
-	 U32Pf+r27WqI2l5QPB3hzBv64H7mmp+UuKe6LWJV6b42IhvJB2nz74eoQwFptXGNzRo9z
-	 7N4EQTulfcBtCVByhz8HqaHUFH57HI8wO3zaX1C94RW/t7PsX6paaZ2IZgnK6Qs279xl4
-	 Cp3PR4+9d5Kfk8egb0HfeNwY2TQG5LWN5d1mMlhZuFsU/x6bE5TbP6Jc4URhrwMW7VQ==
+	t=1795432118;
+	b=f5iIUr/LWuIAWGgjfuctbRkPd+tWIUAiBqls9tUZZzv0AtiAkp9aVgn+INrrVzCdOBsb
+	 tUHdo3j+GKqYz7IYFMWfgOnnV0tPGqE0KWaZUoIe2DQiokJQFobX5rDCtudgGJYA5Jj/D
+	 qyzSZeVg4Yi7IwyQ16/tFVFLm/cTnYMp3EW/pe2uiv7h7wztO2xodaYNSgTCoLyt5WXmt
+	 u4MXCwtVhhgNSWbmuwNSupUwbbd8MQpSsM4LYqvefCx46yjmEnmB9MfMyWicn6YVuiLWR
+	 ABq3xzQsRZ7SxQtCg9TImZ641SCaMhPngqlPKnFmiMRmeflZfiTRxPTyiU538bqK3qA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795431936;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	a=rsa-sha256; c=relaxed/relaxed; t=1795432118;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=y+pXRncvtOc4nB9TtW4KG6FLyRulzoczl3trVZwKBJI=;
-	b=gKcdcbLrWHqGEd7xqEF/g38O5TEvhEC9iwDwBx/By1vTQlS22oj7k8NWCiuxRkmk1Ch9
-	 MPx0EQCBGbYQwMvr6cihp3rHeVG0s74yMDCgCXg8nAAcysVDLEANjbsW7lImeZuXS2avE
-	 oHWxdHNNvYi+3fzGNXVy3lHnUvxzRS6qtgGd+5L9jQptPCTBaHHH5uYu358WFFahxlJMz
-	 YdHgmaB+ZnAD/6+gBGc15QwRiDNVey52sU/Wfdkpz+seRrcW0cHSKRjrONkfcvHfRT7rQ
-	 n7dtR8hKjSnMPK0kZd3ZfE9/lj12CW3k4wDItMCyVgZwdCVOqum95xW2tHfJrEgcZBg==
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
+	bh=2ahVaClWdiwyy5fxyONnLYFCAROTD31eA1TLqeeKJiU=;
+	b=5mzoCsh0a9JIatAAAAFBgHh3wDaGaINjnqc7xpIUfL+K2wdBgTMpErc+yTRZcek3ELH9
+	 U8ahe1ilnggQn9BiGpdsgE/nFAVrGEa6IlNPAWAvhta3xDUoBnBvf23oPtQIJrQ6YHvqu
+	 v2abzohy+V5SvEClLAhmwU19NqyZAdQW9VrGNw6loE4uRCnsMoqB8wIcjw7fkkmblwkbC
+	 cn8V3vdNrY8/PNVpsTOdnUoueDHNGcLu0BeSx6aDSvSME/L77ihN9VgJcqxBXs7yfesgA
+	 m8bk6SuflTP1d1H6JfCvu8nIF6uqfw54+bmvL1nRVwCX4np0oTuef6QG28k7DXVtVIQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=KvhrT8NK;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0680606A31E;
-	Mon, 23 Nov 2026 11:05:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B0680606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=pereq.eu;
+	spf=pass smtp.mailfrom=cryspen.com;
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=bt2VSFp9;
+	arc=none smtp.remote-ip=209.85.221.42
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420D8606A32C
+	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 11:08:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 420D8606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=KvhrT8NK
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 218E3143D;
-	Mon, 23 Nov 2026 03:05:32 -0800 (PST)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A83273F882;
-	Mon, 23 Nov 2026 03:05:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795431935; bh=kCUeWgNlDSox1V+xXIV0FoQklIwe01iQtQShkTSpFns=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KvhrT8NKkwfUQlN/JVYJ5xdBVy5POFXKjhsTfodMnif/DZoxUXBTRSE+v99DKNllE
-	 5d1fBxUVR51g74P9by/+O7T3jZUmuCzToT2ynvCd+snaLJQPIjfE7jA9gHVgHouzT3
-	 DFYSeENRGheUkSn0CCeE9f0MsFw+W0BZ+uXNA9WQ=
-Date: Mon, 23 Nov 2026 11:05:23 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: linux-coco@lists.linux.dev, Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-	Brian Starkey <Brian.Starkey@arm.com>,
-	John Stultz <jstultz@google.com>,
-	Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
-	"T.J. Mercier" <tjmercier@google.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	linaro-mm-sig@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH v10 04/13] irqchip/gic-v3-its: Allocate shared tables
- using CoCo shared memory allocator
-Message-ID: <awQd81MwZqi55gf8@arm.com>
-References: <20261116091137.94252-1-aneesh.kumar@kernel.org>
- <20261116091137.94252-5-aneesh.kumar@kernel.org>
+	dkim=pass (2048-bit key, unprotected) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=bt2VSFp9
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-490f38e9688so2172092f8f.0
+        for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 03:08:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pereq.eu; s=google; t=1795432116; x=1796036916; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=2ahVaClWdiwyy5fxyONnLYFCAROTD31eA1TLqeeKJiU=;
+        b=bt2VSFp9CIIAltQoi/VreeqHhrjZCe3/unTtCON4zB+A0oZFMGKySEjraE6MUGQN3r
+         m4ILlqbuLaSFqoTdq9ydkf4Py/apERKnFMM/F7WrnH7AhRcEdz6PSVSdiAiufobJ7J1v
+         rFLG1epRyRUkYfSD+Mtqc/Q3BSOesqzC27BSQB6IUS0c2S+Pl+66MtW5RyohXnCA50cc
+         i+ciYSdn+UiMNdFey/9xSHlpjeffIZU2QqCLK704Xf3Z72LwySNEVwY3zT6yO3r4hbg7
+         WAZ3kQVBT4fPV+och1t2W1rFpqG0xKvKvm1T31c9CX1/wUmmzFgur7omWb8fjNb3M82Y
+         sWlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795432116; x=1796036916;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=2ahVaClWdiwyy5fxyONnLYFCAROTD31eA1TLqeeKJiU=;
+        b=KcQpXvoMqjhIp9Xh7B0g7U13hljtvuXtXb6VkfHkizCx6WJGrnESXumMZQa+lsBKzT
+         SJV4Y5XF/0SncL2HWiYy5Lr/sO93CX6xhNi11Y0un61ZrkfHCDwus48pdrNyoEoIacA6
+         ZunKHaeWkApmId67UO3yDWMJhPolX0PGWkDD42ulnLXN4KNIltsgHmlUaK0Dqp+Gcgji
+         I2uTn8GBa4UpUVtMQdQgftph2plo1eqGfjIcexn2n7wdSTnOKeisxP490I8ZcHI7vysQ
+         opmbwa31eKd+8FTWuKfgzKTNKHB2+nYx+BQOGp8JpI9PpXqaDu9+/PcRwUogO0AFDfnd
+         ilOA==
+X-Gm-Message-State: APuU4Z/WZvHdI8XSz7DuOnqrNFEwoQ4zUmH7c9ilTuu1tuueckqXXW6i
+	kpJAlwAFiWvYRmair+SLCDzqu4jV85s0pbuGbrVB7+EuZE7IueOOhe47mjSK/y0aqbg=
+X-Gm-Gg: AZFdTZfbrsuJ8X5PGcbxc42cd+6+9cTAH57AXSANPWoV0NvRFlW8L7neICt6WXtlgmW
+	aY21RFPck2vBcIOrqOfzxUOk+jazWM10zVtfROgGeqw3dZVhru0uIMzhWKyIZ2pUgiSpU3oVcwy
+	AKTP6/WJ7dqn8w4waeA9HaMjRw/UoNrkq2JkXxGqQmy6nAwKFplzQd8wIb5q/unUSPoyFZbS1Qg
+	xZDMTsOahPNVG+ZrPqtrRxQPjgNdeZuRwrY0l3jxo4rXMjLI/RjXbrSHywEpvOTuz8Ub5EDfPGE
+	osEy8EPmmt+SBtnctSfGPrBFkLJRANgF8YDTb4lzn9cBGskrvuURokElpxBacb+5IITmiCxmfCq
+	BuSh+wOOD71LtoZ0J2GjG+MFKL+4Wzf32nfgXirqqtxopjt6XMViWsuLjKp17CSWEUUaZ0oca/B
+	CbI6aMlpxOXy7FRxxJUnZzVbXFmbbHZvlhR5cgOtz4EZunWUXiKRHN9yXeflTkctsrgobjcVefK
+	JI1g+0vj1Z22LW6mTljyS13aY2JS0dnoagffCz19cJK3QTkc8cnEHtgVvBAPnAaIh++nknAeUV1
+	TWvnAikWcoQdX79Qe0buxPqtpPVDnlQuQggO+IX3
+X-Received: by 2002:a05:6000:40ce:b0:488:8347:a110 with SMTP id ffacd0b85a97d-4abafd02fa0mr23222776f8f.7.1795432116203;
+        Mon, 23 Nov 2026 03:08:36 -0800 (PST)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4b34e9c3ffesm5162435f8f.19.2026.11.23.03.08.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Nov 2026 03:08:35 -0800 (PST)
+Date: Mon, 23 Nov 2026 14:08:32 +0300
+From: Dan Carpenter <dan@pereq.eu>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, Karthik Bhargavan <karthik@pereq.eu>,
+	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
+Subject: Re: [PATCH] KVM: arm64: nv: Re-inject a stored SError after the exit
+ is handled
+Message-ID: <awQesKJZd0gKpLJx@stanley.mountain>
+References: <20261123-double_exception-v1-1-cd82b59a232d@pereq.eu>
+ <sashiko-outbox-229065@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -105,110 +98,137 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20261116091137.94252-5-aneesh.kumar@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <sashiko-outbox-229065@kernel.org>
 
-Hi Aneesh,
+Yep.  These are sort of existing bugs which my patch makes worse...
 
-I'm replying on this patch rather than on the one introducing the API. I
-think it's more obvious here why I think we can make things simpler.
+Claude had previously told me it would review patches to see if they
+expose any new bugs, but now it's saying that promise only extented to
+"crash fixes" and not to "warnings like this".  :P
 
-On Mon, Nov 16, 2026 at 02:41:27PM +0530, Aneesh Kumar K.V (Arm) wrote:
->  static struct page *its_alloc_pages_node(int node, gfp_t gfp,
->  					 unsigned int order)
->  {
-> -	struct page *page;
-> -	int ret = 0;
-> +	struct cc_shared_pages mem;
->  
->  	if (node == NUMA_NO_NODE)
->  		node = numa_mem_id();
->  
-> -	page = alloc_pages_node(node, gfp | gfp_flags_quirk, order);
-> -
-> -	if (!page)
-> -		return NULL;
-> -
-> -	ret = set_memory_decrypted((unsigned long)page_address(page),
-> -				   1 << order);
-> -	/*
-> -	 * If set_memory_decrypted() fails then we don't know what state the
-> -	 * page is in, so we can't free it. Instead we leak it.
-> -	 * set_memory_decrypted() will already have WARNed.
-> -	 */
-> -	if (ret)
-> +	if (alloc_cc_shared_pages_node(node, gfp | gfp_flags_quirk,
-> +				       PAGE_SIZE << order, &mem))
->  		return NULL;
->  
-> -	return page;
-> +	return mem.page;
+Anyway, I will send these fixes.
 
-This part is mostly fine but I do wonder why not make this alloc
-function the same as buddy alloc_pages_node() - return a struct page
-pointer.
+regards,
+dan carpenter
 
->  static void its_free_pages(void *addr, unsigned int order)
->  {
-> -	/*
-> -	 * If the memory cannot be encrypted again then we must leak the pages.
-> -	 * set_memory_encrypted() will already have WARNed.
-> -	 */
-> -	if (set_memory_encrypted((unsigned long)addr, 1 << order))
-> +	struct cc_shared_layout layout;
-> +	struct cc_shared_pages mem;
-> +
-> +	if (WARN_ON(cc_shared_calc_layout(PAGE_SIZE << order, &layout)))
->  		return;
-> -	free_pages((unsigned long)addr, order);
-> +
-> +	mem.page = virt_to_page(addr);
-> +	mem.shared_size = layout.shared_size;
-> +	free_cc_shared_pages(&mem);
->  }
 
-Here it gets weird and I don't see why we can't have just a buddy-like
-interface. The kernel-doc for alloc says that shared_size must be
-retained for the corresponding free but without reading the source code,
-you can't tell that cc_shared_calc_layout() gives you the same
-shared_size populated by alloc. We have a similar pattern in dma-buf but
-using the compound page order.
-
-What's wrong with a simpler API:
-
-struct page *alloc_cc_shared_pages_node(int nid, gfp_t gfp, unsigned int order);
-struct page *alloc_cc_shared_pages(gfp_t gfp, unsigned int order);
-void free_cc_shared_pages(struct page *page, unsigned int order);
-
-Both alloc and free take the original request order and perform the
-round up internally without exposing the details to the caller. Alloc
-shares the whole resulting buddy block and free makes the same block
-private before releasing it. We can document that free takes the
-original requested order and releases the whole allocation. Partial
-frees aren't supported.
-
-We can get rid of layout and mem structures (or at least not as
-part of the API). Of course, this assumes that the shared granule size
-remains constant for a guest's lifetime but I don't think that's a
-problem.
-
-> @@ -278,7 +267,8 @@ static void *itt_alloc_pool(int node, int size)
->  		if (!page)
->  			break;
->  
-> -		gen_pool_add(itt_pool, (unsigned long)page_address(page), PAGE_SIZE, node);
-> +		gen_pool_add(itt_pool, (unsigned long)page_address(page),
-> +			     cc_shared_granule_size(), node);
-
-Here we can introduce:
-
-unsigned int cc_shared_page_order(unsigned int order);
-
-and just use (PAGE_SIZE << cc_shared_page_order(0)) for gen_pool_add().
-
-Was there a caller you had in mind that needs the common allocator to
-share less than the whole buddy block?
-
--- 
-Catalin
+On Mon, Nov 23, 2026 at 10:42:10AM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential
+> issues to consider:
+> - [Medium] KVM: arm64: nv: duplicate SError injection when
+>   NESTED_SERROR_PENDING is set
+> - [Medium] KVM: arm64: nv: premature SError re-injection in
+>   kvm_nested_flush_hwstate()
+> --
+> 
+> commit a6e9a58a0688b0de9bbbb40738acfc3f5921f92e
+> Author: Dan Carpenter <dan@pereq.eu>
+> 
+> KVM: arm64: nv: Re-inject a stored SError after the exit is handled
+> 
+> This commit defers SError re-injection for nested guests from
+> kvm_nested_sync_hwstate() to kvm_nested_flush_hwstate() so that exit
+> handlers can record their exception or PC increment before the SError is
+> re-injected, and updates kvm_arch_vcpu_runnable() to treat a deliverable
+> stored SError as a wakeup condition.
+> 
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index 78d5b18dbd2d6..f063c01c565a0 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -2213,8 +2213,11 @@ void kvm_nested_flush_hwstate(struct kvm_vcpu *vcpu)
+> >  	if (!vcpu_has_nv(vcpu))
+> >  		return;
+> >  
+> > -	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
+> > +	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING))) {
+> > +		/* Commit the exit handler's exception first */
+> > +		__kvm_adjust_pc(vcpu);
+> >  		kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
+> > +	}
+> >  
+> >  	vgic_v3_nested_update_mi(vcpu);
+> >  
+> 
+> [Severity: Medium]
+> Can re-injecting NESTED_SERROR_PENDING here run prematurely when guest
+> entry is subsequently aborted?
+> 
+> In kvm_arch_vcpu_ioctl_run(), kvm_nested_flush_hwstate() runs before
+> checking ret <= 0 or kvm_vcpu_exit_request(), and inside
+> kvm_nested_flush_hwstate() the SError is re-injected before
+> vgic_v3_nested_update_mi() and the KVM_REQ_GUEST_HYP_IRQ_PENDING check:
+> 
+> arch/arm64/kvm/nested.c:kvm_nested_flush_hwstate() {
+> 	...
+> 	vgic_v3_nested_update_mi(vcpu);
+> 
+> 	if (vgic_state_is_nested(vcpu) && kvm_vgic_vcpu_pending_irq(vcpu))
+> 		kvm_make_request(KVM_REQ_GUEST_HYP_IRQ_PENDING, vcpu);
+> }
+> 
+> If L2 has PSTATE.A == 1 (with HCR_EL2.AMO == 0 and HCRX_EL2.TMEA == 0) and
+> NESTED_SERROR_PENDING set while an L1 IRQ or maintenance interrupt is
+> pending, kvm_nested_flush_hwstate() clears NESTED_SERROR_PENDING, sets
+> HCR_EL2_VSE in *vcpu_hcr(vcpu), and posts KVM_REQ_GUEST_HYP_IRQ_PENDING.
+> kvm_vcpu_exit_request() then aborts guest entry without calling
+> kvm_nested_sync_hwstate(), and on the next loop iteration
+> check_nested_vcpu_requests() -> kvm_inject_nested_irq() switches the vCPU
+> to L1 vEL2 with HCR_EL2_VSE still set in vcpu->arch.hcr_el2 even when TGE
+> and AMO are clear.  Similarly, if PSTATE.A == 0 in L2 or if ret <= 0 exits
+> to userspace, pend_serror_exception() pends the SError into L2 state that
+> gets committed by __kvm_adjust_pc() even though L2 was never entered.
+> 
+> > @@ -2231,18 +2234,11 @@ void kvm_nested_sync_hwstate(struct kvm_vcpu *vcpu)
+> >  
+> >  	/*
+> >  	 * We previously decided that an SError was deliverable to the guest.
+> > -	 * Reap the pending state from HCR_EL2 and...
+> > +	 * Reap the pending state from HCR_EL2, and re-inject it from
+> > +	 * kvm_nested_flush_hwstate() once the exit has been handled.
+> >  	 */
+> >  	if (unlikely(__test_and_clear_bit(__ffs(HCR_EL2_VSE), hcr)))
+> >  		vcpu_set_flag(vcpu, NESTED_SERROR_PENDING);
+> > -
+> > -	/*
+> > -	 * Re-attempt SError injection in case the deliverability has changed,
+> > -	 * which is necessary to faithfully emulate WFI the case of a pending
+> > -	 * SError being a wakeup condition.
+> > -	 */
+> > -	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
+> > -		kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
+> >  }
+> 
+> [Severity: Medium]
+> Does leaving NESTED_SERROR_PENDING set across handle_exit() and exits to
+> userspace cause a duplicate SError injection when kvm_inject_serror_esr()
+> is called before the next kvm_nested_flush_hwstate()?
+> 
+> Because kvm_inject_serror_esr() does not clear NESTED_SERROR_PENDING when
+> it delivers an SError via kvm_inject_nested_serror(),
+> pend_serror_exception(), or HCR_EL2_VSE, a KVM_GET_VCPU_EVENTS followed by
+> KVM_SET_VCPU_EVENTS in __kvm_arm_vcpu_set_events() injects and immediately
+> commits the SError via commit_pending_events() while NESTED_SERROR_PENDING
+> remains set:
+> 
+> arch/arm64/kvm/guest.c:__kvm_arm_vcpu_set_events() {
+> 	...
+> 	if (has_esr)
+> 		ret = kvm_inject_serror_esr(vcpu, esr);
+> 	else
+> 		ret = kvm_inject_serror(vcpu);
+> 
+> 	commit_pending_events(vcpu);
+> }
+> 
+> On the subsequent KVM_RUN, kvm_nested_flush_hwstate() sees
+> NESTED_SERROR_PENDING still set and injects a second SError into the
+> guest.  The same double injection happens in-kernel if handle_exit() calls
+> kvm_handle_guest_sea() -> kvm_inject_serror() while NESTED_SERROR_PENDING
+> is set.
+> 
+> -- 
+> Sashiko AI review · https://sashiko.dev/#/patchset/20261123-double_exception-v1-1-cd82b59a232d@pereq.eu?part=1
