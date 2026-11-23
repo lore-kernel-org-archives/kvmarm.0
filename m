@@ -1,70 +1,69 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795440917;
-	b=ot1nWpXjCubuOMHq02x9Et33deZ4xAzwuuaXqbAhl/LYWGzSpc84vWItBXXv3DFZ7KyR
-	 mZeylviWcyr3/bF1R1+bNmokBGIPMJQf9Nx1+GBeBggYpvXNQN1XAcofqMr7VIBl6p5MU
-	 FZziOpSt8ieyVtefejZGKNIfgSgixJ1zAbPugN/KMrYvTtSHRjkc6mmh6SGjiinQhtUvs
-	 ht8VvK3g5YvKwaSX+t+F7CF+KZ6BZz1UVRh5SiDEj3nQAZ//vpubipqGJ0yEXXKFamTZd
-	 PXCNFyCQvoXInbeIctjFg8efxNJfX0MGoyHnsnYdWn/Csg5kZZUPiuzY/9Kkzv4uDEw==
+	t=1795441983;
+	b=vKrL0iM5D9709hIMd86GwMn/kjU2+CL2bvHGSL3ZgHPMCeNnu7WueBnPM+1q67S1CE9S
+	 pCf/7mq0AkoidTqCqjqcMSWJ5zBf6fe7/OlF45FVyq8PajS1TONFhmF9hkals3vrzA2zg
+	 hBGmapje3/HywILsSOFhqxa0FFF1CtZnY//Vid1rZsoluUPlMzer6FdVKf4UVP4SQpoif
+	 GD+4CMtDOEVtYJraqATJTgZX1vQCM4vx0Nrk25L5PqHDgU0TalISStPySDDKA/djAbEfX
+	 saQEJDpHyFjX3G8rcbTX+4wfs+qBrTK4VqNOvd5OVBsEMwRk9ylxgbjQmD07ge6hg3g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795440917;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=PVsLeXRTOahAG2VllZyPWnhqfQeDNFZhs6x5OHNr+L0=;
-	b=TQoqqHinA2pkPFejuT7mw36DhbY3CRIJP7j1fDRUm36PVm88KVkjlar+SqO2zLO2yRyI
-	 3rTJVy4ayZPIcgP8YAAutFH4/KGvelwKedpJ6x1nC1rpJYADFKjCgBSGKv096x+WwG0wC
-	 3LAg8wpK7OHE1rYdDT0M6IgydiiwLvsbB/VpCzm6KrkNK8b9z6Zrj5zeOg+EZnjlMdb4k
-	 3H06KMzT57yQ84NMhv7IjLPz9Kn2LRQRdJgJ6OB34MUAUl5hHoYj1V0dFKnUINpvmVIhW
-	 cebk2d6FB1ZoMcdSpbU7E8Vc2QF5vhx9/safK1g9awBN/yPij8o0d20R0ak5BKjTEiw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795441983;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:In-Reply-To:References:
+	 Date:Message-ID:User-Agent:MIME-Version:Content-Type;
+	bh=w7l6GOVj1ta19VMv5L9sRcj+U6VdIqUJoDJrYzcoSww=;
+	b=rH13m4SBBf4Hn4AuL2mkJJzlL9amwJYnSFbGaRjy0xSXsgfnTWeATYBDwFjdVWsovK6T
+	 5LsGcLwoywgiP/FLF+E81VkRHr1qlc4rsc/BGmFC4NTXHCP6Cb2WnNkHYBg90trl51p4h
+	 9ZOm8q1fcUP4xCwy4j/bosIf0bKjx+66Sio/cdfm2JErtQ81c/RXAthgoDWGdEikphe9r
+	 yO+GaaFwMxe3xRaS3iZXWC1Ynzl9j7ie1rbzODhS9kPkFIau7MAlK4fTuTMC7NLNnwtso
+	 MOuev/TvlDYKig2Fg3OIwGMlCKHFheJT3SMajxiHjQaE7dFjqiREO6n18KBgFsAtLzg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OSMPdru2;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YvgjBJDe;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4AC606A31A;
-	Mon, 23 Nov 2026 13:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C033E606A321;
+	Mon, 23 Nov 2026 13:53:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OSMPdru2
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62EAC1F000C4;
-	Mon, 23 Nov 2026 13:35:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YvgjBJDe
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF0C11F000C6;
+	Mon, 23 Nov 2026 13:52:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795440916;
-	bh=PVsLeXRTOahAG2VllZyPWnhqfQeDNFZhs6x5OHNr+L0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=OSMPdru2FWrEagYOoaXRYsM+Um4FAS8VHNHm/hJ5tSMzeqDEx/H5j+2PSbNaHlAPr
-	 NR3kzA65WNJ2uwfqn/jnwqmmgnK1w5Mem5YySoddV5TCXcE50P6u2+AFVhPRd/EGB4
-	 ctWYjpLbdoro8w50bDxZIQwKz6Jwznmx7cPD3a6qD3/AvcIFQhIDCIVYF27kRbgTLU
-	 7qz66np6YpYCQCSsNqd0Nkm6xJhNBqLmFMvm3Zc77TwlRBJ6YJ8nPcxGo/GILOUVON
-	 yFJQvS10jYNcX9xOQR2+lOCOXn40LMzEwKEdWrKSHRojbhTxxuZMsDsIPcCVBpHT57
-	 7aLStW/OV91PQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xVUCQ-00000001zlA-1AXV;
-	Mon, 23 Nov 2026 13:35:14 +0000
-Date: Mon, 23 Nov 2026 13:35:13 +0000
-Message-ID: <86h5h7zn5a.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Dan Carpenter <dan@pereq.eu>
-Cc: Oliver Upton <oupton@kernel.org>,	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,	Zenghui Yu
- <yuzenghui@huawei.com>,	Catalin Marinas <catalin.marinas@arm.com>,	Will
- Deacon <will@kernel.org>,	Mark Rutland <mark.rutland@arm.com>,	Karthik
- Bhargavan <karthik@pereq.eu>,	=?UTF-8?B?Q2zDqW1lbnQ=?= Blaudeau
- <clement@cryspen.com>,	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,	stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Never invalidate less than a page for a TTL hint
-In-Reply-To: <20261123-inval_range-v1-1-815e15797089@pereq.eu>
-References: <20261123-inval_range-v1-1-815e15797089@pereq.eu>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1795441983;
+	bh=w7l6GOVj1ta19VMv5L9sRcj+U6VdIqUJoDJrYzcoSww=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=YvgjBJDeY6bRVM//Ef/CR3wqhigSAXRBKPMQZnFSl5rRLTYBReyZxGh4KYDN8PZjg
+	 e1+q37zjOWNa/zW6PenUUWn4c+VSxL3VGzz/+YMEB6zdCxuNSRKkYB0fP4i+Q14BwT
+	 C/JymHhoTW1bVfQOv01xOXfAgeEuNJ0kuGBFXXQmTrpRqNPhoqIr3HHlAdhY+r4bUD
+	 O/4WA+RiRgRRCs1i/0nEIMC5nXuVPNWyHrrDqCwNAZDqOsUYPVCgi46EHQtaywgH7d
+	 t/KS4bMveDBrIxMGKCwvWZuMAhNU1gWeMuXMmM73wRDtKsvO63AyJoLgR4ttgh5g7b
+	 E3/6pDDp/TlTQ==
+From: Pratyush Yadav <pratyush@kernel.org>
+To: Tarun Sahu <tarunsahu@google.com>
+Cc: Pasha Tatashin <pasha.tatashin@soleen.com>,  Mike Rapoport
+ <rppt@kernel.org>,  robin.murphy@arm.com,  maz@kernel.org,
+  will@kernel.org,  David Matlack <dmatlack@google.com>,  Alexander Graf
+ <graf@amazon.com>,  seanjc@google.com,  jgg@nvidia.com,
+  loganodell@google.com,  arnd@arndb.de,  dwmw2@infradead.org,
+  baolu.lu@linux.intel.com,  Bjorn Helgaas <bhelgaas@google.com>,
+  oupton@kernel.org,  alex@shazbot.org,  gle.com@google.com,
+  pbonzini@redhat.com,  Andrew Morton <akpm@linux-foundation.org>,
+  kevin.tian@intel.com,  joro@8bytes.org,  kvmarm@lists.linux.dev,
+  linux-pci@vger.kernel.org,  Pratyush Yadav <pratyush@kernel.org>,
+  kexec@lists.infradead.org,  kvm@vger.kernel.org,  iommu@lists.linux.dev,
+  linux-arm-kernel@lists.infradead.org,  skhawaja@google.com,
+  sagis@google.com,  linux-arch@vger.kernel.org,  linux-mm@kvack.org,
+  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 04/19] liveupdate: Reference struct luo_file_set_ser
+ via serialized pointer
+In-Reply-To: <20261110050202.529473-5-tarunsahu@google.com> (Tarun Sahu's
+	message of "Tue, 10 Nov 2026 05:01:47 +0000")
+References: <20261110050202.529473-1-tarunsahu@google.com>
+	<20261110050202.529473-5-tarunsahu@google.com>
+Date: Mon, 23 Nov 2026 13:52:55 +0000
+Message-ID: <2vxzwlq3zmbs.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -73,113 +72,30 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dan@pereq.eu, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, karthik@pereq.eu, clement@cryspen.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Mon, 23 Nov 2026 10:30:16 +0000,
-Dan Carpenter <dan@pereq.eu> wrote:
-> 
-> The compute_tlb_inval_range() function takes the size of a nested TLB
-> invalidation from the TTL hint in the TLBI operand.  A guest hypervisor
-> can give a 4K level-3 hint, which asks for a 4K invalidation.  On a host
-> with 16K or 64K pages that is less than one page.  s2_mmu_unmap_ipa()
-> passes the 4K size to kvm_stage2_unmap_range(), which hits
-> WARN_ON(size & ~PAGE_MASK).
-> 
-> WARNING: arch/arm64/kvm/mmu.c:407 at kvm_stage2_unmap_range+0x38/0x60, CPU#1: ipas2e1_ttl_tes/568
-> Call trace:
->  kvm_stage2_unmap_range (arch/arm64/kvm/mmu.c:410) (P)
->  s2_mmu_unmap_ipa (arch/arm64/kvm/sys_regs.c:4246)
->  kvm_s2_mmu_iterate_by_vmid (arch/arm64/kvm/nested.c:770)
->  handle_ipas2e1is (arch/arm64/kvm/sys_regs.c:4258)
->  perform_access (arch/arm64/kvm/sys_regs.c:4917)
->  kvm_handle_sys_reg (arch/arm64/kvm/sys_regs.c:5455)
->  handle_exit (arch/arm64/kvm/handle_exit.c:466)
->  kvm_arch_vcpu_ioctl_run (arch/arm64/kvm/arm.c:1583)
->  kvm_vcpu_ioctl (virt/kvm/kvm_main.c:4595)
-> 
-> The shadow stage-2 is built from host pages, so invalidating less than
-> a page makes no sense.  Return at least PAGE_SIZE.
-> 
-> Fixes: d1de1576dc21 ("KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Dan Carpenter <dan@pereq.eu>
-> ---
->  arch/arm64/kvm/nested.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 78d5b18dbd2d..e964b122e9d0 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -735,7 +735,7 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
->  	}
->  
->  	WARN_ON(!max_size);
-> -	return max_size;
-> +	return max(max_size, PAGE_SIZE);
->  }
->  
->  /*
-> 
+On Tue, Nov 10 2026, Tarun Sahu wrote:
 
-I'm a bit on the fence about this one.
+> struct luo_session_ser currently embeds struct luo_file_set_ser directly
+> by value. Embedding struct luo_file_set_ser couples the session layout's
+> size and field offsets to struct luo_file_set_ser, preventing either
+> structure from appending fields independently across kexec.
+>
+> Convert struct luo_session_ser to hold a DECLARE_KHOSER_PTR pointer to
+> struct luo_file_set_ser instead of embedding it by value. Reserve space
+> for both structures in each session block-set entry, placing struct
+> luo_file_set_ser immediately after struct luo_session_ser, and bump
+> LUO_ABI_COMPATIBLE from luo-v5 to luo-v6.
+>
+> Signed-off-by: Tarun Sahu <tarunsahu@google.com>
 
-On the surface, this seems the logical thing to do. However, KVM
-imposes strong limitations on the granule sizes that a guest can
-use. Specifically, we don't allow guest S2 page sizes smaller than
-what the host can do, and advertise so in the ID regs.
+Apart from the static asserts,
 
-This means that a guest issued 4kB TLBI IPAS2E1 on a 16kB host is not
-required to take effect at all, since the page size is not advertised
-as supported at S2, as captured by the architecture:
+Reviewed-by: Pratyush Yadav (Google) <pratyush@kernel.org>
 
-<quote>
-If an incorrect value of the TTL field is specified for the entry
-being invalidated by the instruction, then no entries are required by
-the architecture to be invalidated from the TLB.
-</quote>
-
-The trouble is that by the time we realise that the TTL is stupid,
-we're way too deep in the bowels of the invalidation code, and we're
-committed to giving a reasonable answer to this.
-
-So given that the guest is totally buggy, I'd rather treat the TLBI as
-if it didn't have a TTL field at all, as over-invalidation is always
-safe.
-
-This has the advantage of using a size that is correct for the guest:
-a 64kB guest on a 16kB host using a 4kB TTL TLBI would otherwise
-result in a 16kB invalidation, which doesn't make much sense either...
-
-Untested hack follows.
-
-Thanks,
-
-	M.
-
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 78d5b18dbd2d6..36e4e83badf0a 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -714,6 +714,13 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
- 	 */
- 	max_size = __ttl_to_size(ttl);
- 
-+	/*
-+	 * IMPDEF behaviour: treat subpage TTL-annotated TLBI as the largest
-+	 * possible invalidation. Don't try this at home, kids!
-+	 */
-+	if (max_size < PAGE_SIZE)
-+		max_size = 0;
-+
- 	if (!max_size) {
- 		/* Compute the maximum extent of the invalidation */
- 		switch (vtcr_to_tg0_pgsize(kvm, mmu->tlb_vtcr)) {
+[...]
 
 -- 
-Without deviation from the norm, progress is not possible.
+Regards,
+Pratyush Yadav
