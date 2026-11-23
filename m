@@ -1,50 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.73
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.88
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795433683;
-	b=BBwocA/ex1GaMCZgEMH9eK0dqvETeE60RIJlUdFG6Cn7XbQ7eoSt7TDf+GwcuLmsYYAp
-	 DMhApBwJO/GYI/HO3xxKUSXX6CzaVZUZLzXKgpq2MwAaehpwTi2GLRD3TFY8/uklZXWG7
-	 SgXzgqRlM5D+LdYVMHf2OusZKXU9lSpNr7VAHP8GHgizRClzgBCiZNbLVkowQBIMf9wYy
-	 P/c1xPDlsTZ0u9ScMwLE7WujUA3TXr9yk0ZM5XmjiFskoJ26TnTzoAo1SwfyAi2WDDyd7
-	 5M7QPRykgbno7PMzsPsWWuRJc6DhJsJKjU1TBqxoTvG/XgZq6xuYfSJLUeyg9j3f8SA==
+	t=1795433685;
+	b=tgrf5zVIJ+LvKVbCw08GI1gOlwD/CPP5xLR4eUDFPmaHVj3lMVRsZHzda4l2FFQ1+JcJ
+	 6TMjVUaiFN/LKVl96+NhgDWmlXuAXeMxqt9y2O5zwSI5Eag6gtE15axcbXMmW1H9RlkkE
+	 KKTtt4DffP07reCoFSePj6GJ/aHPzIOoSv7+cja2lS8MIK7TU5mWguPnIRhJELkRudTd0
+	 gb6CUNliU1FOY5eonH4YWPniGSZL84uvybjKEH0Cz1vn2ur717xH3iKsS9f3TOq4xbRvD
+	 fE5MT/QBl6rGExYnVns1a7jsoxI7uiEDolVWfDyp8WQh1pyQw24w5/+nGXxNfXLZvhw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795433683;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795433685;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=NPRhYDnwJRvicd4u9ac46NRRTHp7yf2uOQ6I7pysTOs=;
-	b=5Z70e6NqK9MKKrqARbnUp1B5Wk/41GS58ue21ahn6oUJFyk+NotCVYLXSiNBXBXLSD5Z
-	 GdXXb6XzhiIOAl5HBgMb+QXpv9DK2EdLZZ5/GlhjggyU6i7Qz9/7Dl+yi+qlkJhpMkklM
-	 Duh81S0u2jad3PIJTdfMZeQQBU+j/xPx2W3/JU6vlGv1oq3I+qJXmZVD0BNP0SLyHgctb
-	 pA3TG4PT/kM2XyAJKk3kKHkJBcAqXcmL4HH2yNDEERsLRKZ1SeHQhSkPDUAVdHsNPnGPV
-	 P5/8znAdzA9pja0rt/tf0BMCKHzHr8ltyMJ4KpOwNLqrlbljfDjHV3JRJhyrsCReVyg==
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=UppeewSJQTI9wML/iAiukB2NfsE5bh7Xk8VoIJRzzKE=;
+	b=XYKCMkta+GBsxA9QqwU9grJLKmH6P07ElOKbFYq8VIQbufWnziZQnlm6AUNH9FY0gBgs
+	 TkOd4Trdo8RjEa+fxeoNpdR+KgF3h5wEX4ibqSyknJksfwQu93hiYCYfe5BjTDkaPgY9R
+	 mLmdcq7daYXnU4365AhIEurRvFKW5b1BQwUkm5N2MTLDSL9IDm2u39Kyo9UakWfjNaLA4
+	 56ZqRU0eu9O6JDxUOxOzkbyq4UbXglXwjdq/pZKFtpDFH8AAzUMBZni/NsrJVnzmR6OHf
+	 aXoaA4wX4oGr4ttxczj8+s18bJYbY3/5oMEZWg8lLk3tDbDdXSfalveKQwCsGFTUUKQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=LJyZfoTK;
-	arc=none smtp.remote-ip=91.218.175.73
-Received: from mta0.migadu.com (out-73.mta0.migadu.com [91.218.175.73])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=G0TQwbQf;
+	arc=none smtp.remote-ip=91.218.175.88
+Received: from mta0.migadu.com (out-88.mta0.migadu.com [91.218.175.88])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55814606A32E
-	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 11:34:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 55814606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42986606A696
+	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 11:34:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 42986606A696
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=LJyZfoTK
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=G0TQwbQf
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=sjV6qrYMC8GhJztUOTln5L8ygixllt0tnTT6CrNeYyI=;
+DKIM-Signature: a=rsa-sha256; bh=kJVYvwnmwcWNzEw2JdWH14aPDZC8p2gGMQyighOKNqY=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795433680; v=1; x=1796038480;
- b=LJyZfoTK8ZtIYq9wmTcSMfhlUK4V/QQiyUq0/16fublnXDwgzY+bHufptb+40LP4Btx/jvBA
- tgXKmtXeFKVh5OcpvJu9iiFbyoBSjybXUlU/ZuYeQdOrleefE2eqzdiLKQDG/oSAAlKgTUANJKM
- GQzMMepdx6XCOdQtir/HYZbE=
+ t=1795433683; v=1; x=1796038483;
+ b=G0TQwbQf7Kj4y/R6ox6nny9M8jPCzE187Ty8ReY69/nju2wzoC+y5I9ya0vYj9QW/3FWlWyH
+ G25nR7EQEz3etHUljY+sBKLfq+jmR6sCb2TE89hKrsEC2encTA8VdM4IZNCEMihAEQlDswljmJj
+ inhMt+6tpk4fOfwl+SEyyLPs=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id b141b18848b98b72;
-	Mon, 23 Nov 2026 11:34:40 +0000
-X-Mizu-Trace-ID: b141b18848b98b72
+Received: by smtp.migadu.com with ESMTPS id 9a34595c63725e53;
+	Mon, 23 Nov 2026 11:34:43 +0000
+X-Mizu-Trace-ID: 9a34595c63725e53
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Paolo Bonzini <pbonzini@redhat.com>,
@@ -68,10 +69,12 @@ Cc: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v3 0/3] KVM: Bound KVM_PRE_FAULT_MEMORY by the vCPU's dirty ring
-Date: Mon, 23 Nov 2026 11:34:32 +0000
-Message-ID: <20261123113435.1170711-1-fuad.tabba@linux.dev>
+Subject: [PATCH v3 2/3] KVM: Warn userspace against ioctls while an exit is pending
+Date: Mon, 23 Nov 2026 11:34:34 +0000
+Message-ID: <20261123113435.1170711-3-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261123113435.1170711-1-fuad.tabba@linux.dev>
+References: <20261123113435.1170711-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -83,60 +86,41 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi folks,
+KVM_PRE_FAULT_MEMORY sets run->exit_reason to KVM_EXIT_DIRTY_RING_FULL
+when it stops on a full dirty ring. If an MMIO exit is pending at that
+point, the next KVM_RUN on arm64 and riscv doesn't complete it. Rather
+than document that case alone, which could suggest that other ioctls
+are safe, warn against invoking any ioctl other than KVM_RUN before a
+pending exit is completed.
 
-Changes since v2 [1]:
-  - Added patch 2, which warns in api.rst against calling ioctls other
-    than KVM_RUN while an exit is pending. (Sean)
-  - Mentioned riscv as well as arm64 in patch 1's exit_reason
-    paragraph. (Lorenzo)
-  - Collected Lorenzo's Acked-by on patch 3. (thanks!)
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ Documentation/virt/kvm/api.rst | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-KVM_PRE_FAULT_MEMORY never checks the vCPU's dirty ring, so one call
-over a large enough range of populated, dirty-logged pages overflows
-it. The first patch stops the loop at the soft limit, as KVM_RUN does.
-The second warns userspace against calling ioctls other than
-KVM_RUN while an exit is pending. The third adds the case to
-pre_fault_memory_test.
-
-Pre-faulting isn't the only ioctl that can push past the ring's
-reserve. On x86, KVM_SET_MSRS does too when it writes the wall clock or
-the Hyper-V hypercall page. A guest can also push past the reserve
-within one exit, for example through the arm64 ITS. What those paths
-should do when the ring fills is an open question for the dirty ring
-API, which I don't think belongs in this series.
-
-I didn't include the kvm_dirty_ring_check_request() rewrite that Sean
-sketched on v1, since I think it can lose a request. It tests the
-request first and clears it afterwards. If the vCPU is scheduled out in
-between, loongarch sets the PV preempted flag in guest memory and x86
-updates a Xen guest's runstate area, either of which pushes an entry.
-When that push makes the ring soft full, the request it makes is then
-cleared, and the vCPU runs with the ring soft full until its next push.
-Clearing first and re-setting, as the code does now, doesn't have that
-window.
-
-Based on Linux 7.4-rc2 (7475ea8b58616; also applies to kvm-x86/next
-cbe54fc3462b3 with git am -3).
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20261117074428.7544-1-fuad.tabba@linux.dev/
-
-Fuad Tabba (3):
-  KVM: Stop KVM_PRE_FAULT_MEMORY when the vCPU's dirty ring is full
-  KVM: Warn userspace against ioctls while an exit is pending
-  KVM: selftests: Test KVM_PRE_FAULT_MEMORY against a full dirty ring
-
- Documentation/virt/kvm/api.rst                |  20 ++--
- include/linux/kvm_dirty_ring.h                |   5 +
- .../selftests/kvm/pre_fault_memory_test.c     | 102 ++++++++++++++++++
- virt/kvm/kvm_main.c                           |   5 +
- 4 files changed, 126 insertions(+), 6 deletions(-)
-
-
-base-commit: 7475ea8b58616b33c04afb976cf0fbaad9dd63fb
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 89eb6be9bc6e3..980ef0cdc1c91 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6974,10 +6974,13 @@ to the byte array.
+ 
+       The pending state of the operation is not preserved in state which is
+       visible to userspace, thus userspace should ensure that the operation is
+-      completed before performing a live migration.  Userspace can re-enter the
+-      guest with an unmasked signal pending or with the immediate_exit field set
+-      to complete pending operations without allowing any further instructions
+-      to be executed.
++      completed before performing a live migration.  In general, userspace should
++      exercise extreme caution when invoking ioctls other than KVM_RUN prior to
++      completing the original operation.
++
++      Userspace can re-enter the guest with an unmasked signal pending or with
++      the immediate_exit field set to complete pending operations without
++      allowing any further instructions to be executed.
+ 
+ ::
+ 
 -- 
 2.47.3
 
