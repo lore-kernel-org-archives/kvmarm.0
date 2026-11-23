@@ -1,62 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.195
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795462288;
-	b=4rNOf+RVjV618WhP9qPFZ2J2LVAG3AbQkL5CaGrdfkiH5VX8IWLW/W3B/0mqTEHab4uv
-	 AVQsZ2pknx8lKywqB5TBBPtL9iucoe52gCeg9ZKCjfKh552pRvYkbqJAtBX0GKkVQ9HNs
-	 cgWG7DGQQV6nzLGgNhbPVw5breKoPd60UaseX/diowcnaH9w8guEaLIAZOH+svAxEho/k
-	 ntbnFzawsGfb4zFKhOwqMPAX32BQecOkz+gFoTxhvuYg2hJHZdYorJ9EpZZg85TvCncQb
-	 or1AtqBrziKLiwUCG7c4FSPHdOTsGP4W9R36yVNpJWQj04DNgbIfYjPjkBNEfd5Nbqw==
+	t=1795462497;
+	b=bKL/NKdoH80Z1wRzBZtubXP4M0jtJIjNSZH0A+4muv5IGSmvJu4xtjo5kWeD+ZFQZ2Kz
+	 4Wy6B7wNA6Y8+QW1Hs/xhKIQmMFF6o4HcOYw4dIsAnawMY6TW2/H8N30q/QYTvWhnYkk6
+	 p8ylAr/bGON9eKUXxr4nxLXjFIXrBAxOsXioQuZ2wHoo2alQyco4zwACuKo7Q6LmDUFtV
+	 Lrh6qOK+16RyEFsZLRPZCZv0K3GgYF8Nwla7xKhHhPcOMHq8ojm6VmyBgbyr6lQnBuXkA
+	 KjbHkBjwEzk0DPMFpwMbnZUMpXAlJXtTLH7mo7sdewtPY6SZ6w5JIXsEiejdR7Guj1A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795462288;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=hIyBw/Rnf4XDdCcPvUaoHh+oCwvS6/u0QmuD2Ig3thk=;
-	b=g1xuXJcFCbnTs7Lv6gaZWVLjPp1S9e7ursl5IC5btr12Dqj8wtHEou3o/yWIuX1P/xCs
-	 4f56aQ6pxVWEtdrU4z4PvdShwg5m7OIRXMbp+yTT87hdHmP8VldX0grE3kVIbbs4x1gn3
-	 TB0kZbfV46r2hC/UlmStH7zTh3I07h5QhTVIuNCuG97inqGqkXZEkfMCJgPs1ohD0zyMa
-	 FO3NevxYBXj0QO7qgSpx9tjPTCg6ABKjhYCjNFQyrFR1rRmrUB/WM7VjZNER8Pjnd+bhl
-	 sYzFq4nAmYg66tt8Hpeng0YPfJT60XAaK3GhdMmi0sROs8neiQU3Fxuo5Lk7HXTGoEA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795462497;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=P9smyWWFNbqZ0JC5hQlWxI90ybr781jHhc3XD7suVuE=;
+	b=gL1KVd+ZQl8QhTVrZQlKA1h61ZKnTXEm88IXvacaLUWZwJ4pIbH9RJiDxHh/SgkLTm5s
+	 ENYgCyvk6dmYzvZcvpFTxXHARYD4NvQNxi/zcGY6Z+CtkxgMnHuSuI3xJ1GRQe4W931h9
+	 MAnJs8XA6bfVYe2C4LuYxmR36Gjhb8RIhwHc8bKld7mQi5hXvficmQqu6vouNpBc9W7zc
+	 sVFOpUYYz94Cq0Fd5KpIZqcQ0TLxidAFkm24TJjgSLUUAwxzv3HeSqnR3ymKglSSA62bN
+	 eyaOZ4PBOZOPvlEOeuYcqf5jLPG0Bx09I5zmofTFhlCLz7QhQoaFGJbGtwzwOagNUQw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=mjYZ4LiX;
-	arc=none smtp.remote-ip=95.215.58.195
-Received: from mta1.migadu.com (out-195.mta1.migadu.com [95.215.58.195])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ONrNRncj;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC080606A31A
-	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 19:31:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AC080606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE23606A31A;
+	Mon, 23 Nov 2026 19:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=mjYZ4LiX
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=kKf0+6VXw5GQNljtgXjHRstGkHmQFT+6ySSk8HNbVuw=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795462285; v=1; x=1796067085;
- b=mjYZ4LiXQpoQf1CymdJq8ut/L3GFyRejc8B6Rp5VSXvtx5/NBIF6O4p+fTRl5jSfhREWuEXq
- z08MjJlP/9I/tPC6rYGOFw0TMhPwfB6kFX5T9ptNHp8pP6eZjQdrY5X1k2ncDmcuvCkJ1ba40h1
- ZNPVVk9Z0A7nUalsU2eUpMJI=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 1655705257098672;
-	Mon, 23 Nov 2026 19:31:25 +0000
-X-Mizu-Trace-ID: 1655705257098672
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5be58ad9600so16134e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 11:31:21 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErHweOFfEpc8Lcl/ONixoioinxQBkOc3hmnLNAMeCpii3reOkPlIk9crr1xnC4RuQmqXYCpqc2k=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+nsoEo1WHVKBCLxguP5q2HjvrsBVRLK3o8oa0zUE23O6EeFJIa
-	gTO6Dnbc3mNcD0mkDkGzX/H73molYBDXZTrbZ/w0nxr+yCEWC+UNBp28HpFkdc+OlHkN4zRI9hg
-	7ZpAqd7d7gSJAxKLCjsbAHWv9Pu2MwHdGCtMEYoYH
-X-Received: by 2002:a05:6512:6c3:b0:5c1:6063:cd75 with SMTP id
- 2adb3069b0e04-5c1c8052873mr300301e87.0.1795462280355; Mon, 23 Nov 2026
- 11:31:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ONrNRncj
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 457E61F000C0;
+	Mon, 23 Nov 2026 19:34:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795462496;
+	bh=P9smyWWFNbqZ0JC5hQlWxI90ybr781jHhc3XD7suVuE=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=ONrNRncjUgabik9vUUm2LrPo2AuAwo9+/QszLkCuVKHeEir3TXKVm7GdxTutH4Im7
+	 iejkMb0B5CaMEgpcb0H5gKTI7nC1SyvdO3ro4hWtXEs5whiKQ21HL9WaVmaShvglNA
+	 7eVTMde8N9mitr7QwZxfEuZYh8+utqfkCj23ThUWTsri2mgTxEOEhsBfvWJ1j8OhvB
+	 6yii5aGEMXqGoPXz02y2PQLvU2SPCiRbB/hub9vvRAcZxzu53kFO9gCnc0Mh55YFIF
+	 LHaexEv9+NFHIlS211LfY7tDE+L4//6p9f6X7qpLumVX9JGn0Ptx9eUp+wp/zTea4K
+	 X+q4eXzxaaX7Q==
+Message-ID: <sashiko-outbox-229945@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 1/3] KVM: arm64: Add enum support to idreg sanitisation
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Cc: "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20261123192457.8700-2-maz@kernel.org>
+References: <20261123192457.8700-1-maz@kernel.org>
+ <20261123192457.8700-2-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 23 Nov 2026 19:34:55 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,273 +59,66 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <20261117174403.58762-1-vdonnefort@google.com> <20261117174403.58762-9-vdonnefort@google.com>
-In-Reply-To: <20261117174403.58762-9-vdonnefort@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 23 Nov 2026 19:30:44 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTy5fjJcFAYfxYeG2aAAuwbSwXrkzK+3tiVNag-wNmiKCw@mail.gmail.com>
-X-Gm-Features: Aa3M54omcjaQ9NPsG0-ifI_vW3LHFs3kfGStDJpu6bzStGYmSDLTwYfW8RlpE7Y
-Message-ID: <CA+EHjTy5fjJcFAYfxYeG2aAAuwbSwXrkzK+3tiVNag-wNmiKCw@mail.gmail.com>
-Subject: Re: [PATCH v4 08/23] KVM: arm64: Add a range to __pkvm_host_donate_guest()
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
-	qperret@google.com, weilin.chang@arm.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hi Vincent,
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Low] KVM: arm64: oversized value in field_prep() in
+  compute_idreg_field_deps()
+--
 
-On Tue, 17 Nov 2026 17:43:47 +0000, Vincent Donnefort
-<vdonnefort@google.com> wrote:
-[...]
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index f7d249d35f50..ed82cbe973ad 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -1452,22 +1452,30 @@ static int __guest_check_pgtable_memcache(struct pkvm_hyp_vcpu *vcpu)
->          return 0;
->  }
->
+commit db63f3732a88cac7f7573382f03761fa97deb813
+Author: Marc Zyngier <maz@kernel.org>
 
-Could you update the comment above __guest_check_pgtable_memcache()? It
-says only share installs a block, and donate does too now.
+KVM: arm64: Add enum support to idreg sanitisation
 
-Cheers,
-/fuad
+This commit extends the ID register dependency framework to evaluate nested
+ordered enum feature descriptors and compute the corresponding RES0 and RES1
+masks for ID register fields.
 
-On Tue, 17 Nov 2026 at 17:44, Vincent Donnefort <vdonnefort@google.com> wrote:
->
-> In preparation for supporting stage-2 huge mappings for protected VMs,
-> add a nr_pages argument to the __pkvm_host_donate_guest() hypercall.
-> This range supports only two values: 1 or PMD_SIZE / PAGE_SIZE (that is
-> 512 on a 4K-pages system).
->
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> ---
->  arch/arm64/include/asm/kvm_hcall.h            |  2 +-
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  4 +-
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 48 +++++++++++--------
->  arch/arm64/kvm/pkvm.c                         |  2 +-
->  5 files changed, 33 insertions(+), 25 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_hcall.h b/arch/arm64/include/asm/kvm_hcall.h
-> index 64d18b7f2392..c47ee2653110 100644
-> --- a/arch/arm64/include/asm/kvm_hcall.h
-> +++ b/arch/arm64/include/asm/kvm_hcall.h
-> @@ -221,7 +221,7 @@ DECLARE_KVM_HOST_HCALL(int, __pkvm_host_share_hyp,
->  DECLARE_KVM_HOST_HCALL(int, __pkvm_host_unshare_hyp,
->         u64, pfn)
->  DECLARE_KVM_HOST_HCALL(int, __pkvm_host_donate_guest,
-> -       u64, pfn, u64, gfn)
-> +       u64, pfn, u64, gfn, u64, nr_pages)
->  DECLARE_KVM_HOST_HCALL(int, __pkvm_host_share_guest,
->         u64, pfn, u64, gfn, u64, nr_pages, u64, prot)
->  DECLARE_KVM_HOST_HCALL(int, __pkvm_host_unshare_guest,
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index ec0bf9dff899..b04cedaf4ec6 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -39,7 +39,7 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
->  int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
->  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
->  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
-> -int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu);
-> +int __pkvm_host_donate_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu);
->  int __pkvm_vcpu_in_poison_fault(struct pkvm_hyp_vcpu *hyp_vcpu);
->  int __pkvm_host_force_reclaim_page_guest(phys_addr_t phys);
->  int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 853dad542597..4f420718ca6a 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -965,7 +965,7 @@ static int pkvm_refill_memcache(struct pkvm_hyp_vcpu *hyp_vcpu)
->  }
->
->  DEFINE_KVM_HOST_HCALL(int, __pkvm_host_donate_guest,
-> -       u64, pfn, u64, gfn)
-> +       u64, pfn, u64, gfn, u64, nr_pages)
->  {
->         struct pkvm_hyp_vcpu *hyp_vcpu;
->         int ret;
-> @@ -978,7 +978,7 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_host_donate_guest,
->         if (ret)
->                 return ret;
->
-> -       return __pkvm_host_donate_guest(pfn, gfn, hyp_vcpu);
-> +       return __pkvm_host_donate_guest(pfn, gfn, nr_pages, hyp_vcpu);
->  }
->
->  DEFINE_KVM_HOST_HCALL(int, __pkvm_host_share_guest,
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index f7d249d35f50..ed82cbe973ad 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -1452,22 +1452,30 @@ static int __guest_check_pgtable_memcache(struct pkvm_hyp_vcpu *vcpu)
->         return 0;
->  }
->
-> -int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu)
-> +int __pkvm_host_donate_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu)
->  {
->         struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
->         u64 phys = hyp_pfn_to_phys(pfn);
->         u64 ipa = hyp_pfn_to_phys(gfn);
-> +       u64 size;
->         u64 meta;
->         int ret;
->
-> +       if (!pfn_range_is_valid(pfn, nr_pages))
-> +               return -EINVAL;
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index 6f668148ccc11..9763d021a5ecd 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+
+[ ... ]
+
+> @@ -1557,6 +1571,27 @@ static const struct reg_feat_map_desc *idreg_feat_=
+maps[] =3D {
+>  	&id_aa64mmfr3_el1_desc,
+>  };
+> =20
+> +static struct resx compute_idreg_field_deps(struct kvm *kvm,
+> +					    const struct reg_bits_to_feat_map *map)
+> +{
+> +	const struct reg_bits_to_feat_map *tmp;
+> +	struct resx resx;
 > +
-> +       ret = __guest_check_transition_size(phys, ipa, nr_pages, &size);
-> +       if (ret)
-> +               return ret;
+> +	/*
+> +	 * Assume the enum values are ordered in reverse order of
+> +	 * capability (from most to least capable). A NULL callback
+> +	 * value indicates the ultimate fallback (not implemented).
+> +	 */
+> +	for (tmp =3D map->idreg_field_deps; tmp->match; tmp++)
+> +		if (tmp->match(kvm))
+> +			break;
 > +
->         host_lock_component();
->         guest_lock_component(vm);
->
-> -       ret = __host_check_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_OWNED);
-> +       ret = __host_check_page_state_range(phys, size, PKVM_PAGE_OWNED);
->         if (ret)
->                 goto unlock;
->
-> -       ret = __guest_check_page_state_range(vm, ipa, PAGE_SIZE, PKVM_NOPAGE);
-> +       ret = __guest_check_page_state_range(vm, ipa, size, PKVM_NOPAGE);
->         if (ret)
->                 goto unlock;
->
-> @@ -1476,9 +1484,9 @@ int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu)
->                 goto unlock;
->
->         meta = host_stage2_encode_gfn_meta(vm, gfn);
-> -       WARN_ON(host_stage2_set_owner_metadata_locked(phys, PAGE_SIZE,
-> +       WARN_ON(host_stage2_set_owner_metadata_locked(phys, size,
->                                                       PKVM_ID_GUEST, meta));
-> -       WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
-> +       WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, size, phys,
->                                        pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_OWNED),
->                                        &vcpu->vcpu.arch.stage2_mc, 0));
->
-> @@ -1820,7 +1828,7 @@ int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pgtable_nr
->         assert_transition_res(-EPERM,   hyp_pin_shared_mem, virt, virt + size);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
->         assert_transition_res(-ENOENT,  __pkvm_host_unshare_guest, gfn, 1, vm);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, 1, vcpu);
->
->         selftest_state.host = PKVM_PAGE_OWNED;
->         selftest_state.hyp = PKVM_NOPAGE;
-> @@ -1840,7 +1848,7 @@ int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pgtable_nr
->         assert_transition_res(-EPERM,   __pkvm_hyp_donate_host, pfn, 1);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
->         assert_transition_res(-ENOENT,  __pkvm_host_unshare_guest, gfn, 1, vm);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, 1, vcpu);
->
->         assert_transition_res(0,        hyp_pin_shared_mem, virt, virt + size);
->         assert_transition_res(0,        hyp_pin_shared_mem, virt, virt + size);
-> @@ -1853,7 +1861,7 @@ int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pgtable_nr
->         assert_transition_res(-EPERM,   __pkvm_hyp_donate_host, pfn, 1);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
->         assert_transition_res(-ENOENT,  __pkvm_host_unshare_guest, gfn, 1, vm);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, 1, vcpu);
->
->         hyp_unpin_shared_mem(virt, virt + size);
->         assert_page_state();
-> @@ -1873,7 +1881,7 @@ int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pgtable_nr
->         assert_transition_res(-EPERM,   __pkvm_hyp_donate_host, pfn, 1);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
->         assert_transition_res(-ENOENT,  __pkvm_host_unshare_guest, gfn, 1, vm);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, 1, vcpu);
->         assert_transition_res(-EPERM,   hyp_pin_shared_mem, virt, virt + size);
->
->         selftest_state.host = PKVM_PAGE_OWNED;
-> @@ -1890,7 +1898,7 @@ int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pgtable_nr
->         assert_transition_res(-EPERM,   __pkvm_host_share_hyp, pfn, 1);
->         assert_transition_res(-EPERM,   __pkvm_host_unshare_hyp, pfn, 1);
->         assert_transition_res(-EPERM,   __pkvm_hyp_donate_host, pfn, 1);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, 1, vcpu);
->         assert_transition_res(-EPERM,   hyp_pin_shared_mem, virt, virt + size);
->
->         selftest_state.guest[1] = PKVM_PAGE_SHARED_BORROWED;
-> @@ -1906,9 +1914,9 @@ int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pgtable_nr
->
->         selftest_state.host = PKVM_NOPAGE;
->         selftest_state.guest[0] = PKVM_PAGE_OWNED;
-> -       assert_transition_res(0,        __pkvm_host_donate_guest, pfn, gfn, vcpu);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, vcpu);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn + 1, vcpu);
-> +       assert_transition_res(0,        __pkvm_host_donate_guest, pfn, gfn, 1, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, 1, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn + 1, 1, vcpu);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn + 1, 1, vcpu, prot);
->         assert_transition_res(-EPERM,   __pkvm_host_share_ffa, pfn, 1);
-> @@ -1921,8 +1929,8 @@ int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pgtable_nr
->         selftest_state.guest[0] = PKVM_PAGE_SHARED_OWNED;
->         assert_transition_res(0,        __pkvm_guest_share_host, vcpu, gfn);
->         assert_transition_res(-EPERM,   __pkvm_guest_share_host, vcpu, gfn);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, vcpu);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn + 1, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, 1, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn + 1, 1, vcpu);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn + 1, 1, vcpu, prot);
->         assert_transition_res(-EPERM,   __pkvm_host_share_ffa, pfn, 1);
-> @@ -1935,8 +1943,8 @@ int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pgtable_nr
->         selftest_state.guest[0] = PKVM_PAGE_OWNED;
->         assert_transition_res(0,        __pkvm_guest_unshare_host, vcpu, gfn);
->         assert_transition_res(-EPERM,   __pkvm_guest_unshare_host, vcpu, gfn);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, vcpu);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn + 1, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, 1, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn + 1, 1, vcpu);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn + 1, 1, vcpu, prot);
->         assert_transition_res(-EPERM,   __pkvm_host_share_ffa, pfn, 1);
-> @@ -1948,19 +1956,19 @@ int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pgtable_nr
->         selftest_state.host = PKVM_PAGE_OWNED;
->         selftest_state.guest[0] = PKVM_POISON;
->         assert_transition_res(0,        __pkvm_host_force_reclaim_page_guest, phys);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, 1, vcpu);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
->         assert_transition_res(-EHWPOISON, __pkvm_guest_share_host, vcpu, gfn);
->         assert_transition_res(-EHWPOISON, __pkvm_guest_unshare_host, vcpu, gfn);
->
->         selftest_state.host = PKVM_NOPAGE;
->         selftest_state.guest[1] = PKVM_PAGE_OWNED;
-> -       assert_transition_res(0,        __pkvm_host_donate_guest, pfn, gfn + 1, vcpu);
-> +       assert_transition_res(0,        __pkvm_host_donate_guest, pfn, gfn + 1, 1, vcpu);
->
->         selftest_state.host = PKVM_PAGE_OWNED;
->         selftest_state.guest[1] = PKVM_NOPAGE;
->         assert_transition_res(0,        __pkvm_host_reclaim_page_guest, gfn + 1, vm);
-> -       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, vcpu);
-> +       assert_transition_res(-EPERM,   __pkvm_host_donate_guest, pfn, gfn, 1, vcpu);
->         assert_transition_res(-EPERM,   __pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
->
->         selftest_state.host = PKVM_NOPAGE;
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 29e7a51a1c03..d1acdca0254f 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
-> @@ -594,7 +594,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
->                         return ret ? -EFAULT : -EAGAIN;
->                 }
->
-> -               ret = kvm_call_hyp_nvhe(__pkvm_host_donate_guest, pfn, gfn);
-> +               ret = kvm_call_hyp_nvhe(__pkvm_host_donate_guest, pfn, gfn, 1);
->         } else {
->                 if (WARN_ON_ONCE(size != PAGE_SIZE && size != PMD_SIZE))
->                         return -EINVAL;
-> --
-> 2.56.1.708.g77570a6a1d-goog
->
+> +	resx.res0 =3D field_prep(map->bits, ~(tmp->bits));
+> +	resx.res1 =3D field_prep(map->bits, tmp->bits);
+> +
+> +	return resx;
+> +}
+
+[Severity: Low]
+Can passing ~(tmp->bits) to field_prep() trigger a compile-time BUILD_BUG_ON
+("field_prep: value too large for the field") if the compiler constant-folds
+map->bits and tmp->bits?
+
+tmp->bits is a 64-bit unsigned value holding an unshifted field value, so
+~(tmp->bits) always has upper bits set outside the field width, which
+violates __BF_FIELD_CHECK_MASK() in __FIELD_PREP().  Computing resx.res1
+first and deriving resx.res0 as map->bits & ~resx.res1 avoids passing an
+out-of-range value to field_prep().
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123192457.8700=
+-1-maz@kernel.org?part=3D1
