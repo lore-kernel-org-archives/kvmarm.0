@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795446614;
-	b=n1Hes4ceyseuYF+ezp/ssH9o9Dz1qh32be7mevoiskJ7IKiRvuX7vzWdG1zuT16uZYaO
-	 qDivn7MH47JGwn4uuIIbVCrAZ4KbZvyAAyWRm62InAQIW6G5eQw0UVBritmKwDsGgISUG
-	 JxFPqxVaSYUpSPVsL41bD4MT/7H00HCljuspIDPZ/f+wrtjk9yH+PunL3m4LKsAGhcPyQ
-	 YCDkCO1j8DV9mddZCYyl3T3/4K3Lin+fZr9bxDtnxbgo7H6h4pLtkM+0GpBcwg6pixtX7
-	 jnz139p4tOrTWC4k5QFC2Bh/Kx31QRFxT88W8erGrKn3vWg4tsCEWstaVmclEvnZweA==
+	t=1795446622;
+	b=5lyvtrbkfW1Zy1DmkTCd9qcxGH8ZxZTCGziiwZv2r7kowsPg5ZXALGqg5dZn2BXUPNaT
+	 dWs7WXiamoNkNM8dtR6vREMo0hTuj354WvUOxXr/vjS83tnZv6tVIkR0typoc9AmoQ8Wx
+	 upNCmfNg22U0ozd7BUykGsj/kEhibP/9NCN3Tc8gW0ppWyiiCj7Z8u9IKkeCQlQ2SdURc
+	 LgaJaecA2vbjx5LXlGiY+r8bQI8TsYL5OWLmc97FjRp/gI6uRQC8xGQTs4KYPHToFEFpu
+	 2HUf9+Ms2LuXdv4czjT4PFo+i9qcN1mLODxCjKFL+9fjJyKKLOCfhu1WnIvjQSDvKzQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795446614;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795446622;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=pcj3iR5Q/uD/43toBqFlh9vTlYdxRie3u4SrhRP2Apo=;
-	b=NwVsfVC+wI1kdPUUHwY83q1qFhhGzGJJGe4xpaeUZDZ1Ph9DNoqO+ZMW/A5JyYUuY9fu
-	 Gu9RHuDR6zVH3eOMmq7ii6L7YW85DriiKZaEt7JZlOBfyczZZos27hTIuDUGdp1LQAPSG
-	 kgKouB1BONIhlw6mXTRUkvQX0BX78znIv90BBnfWDWz4Li/a9Na1yVECRuc3AqPbO6X+l
-	 u5yrDZ/5XliHZq6t1i0uJ+rT/49c3vATqQ2v3qbLpYfZHL/SYa1qgqacrqYl1lgYPgFWY
-	 OqYfPclVwz54fnCWtlgYsHOH/duULF4oNxGsHrKTjGFj7bEAYBYL8+v3cIE0l8uaIoQ==
+	bh=IQiXWzWKyvjJNCEJcNajLSK7Gsk4vnOC+isyTFIFLsY=;
+	b=IMZEft0HdfCkhbu2Tgte+sOnh/ukMoY1eyxKmQewxHdTk/YO5HEfXL0XnLAwAoFXWloU
+	 EXlxRQDi0VHt26FS6Rw8JD7/JshMMFjl4JD8Q4tA3M1fBQt3bdpVxy+5RzLnvbIIe7uKd
+	 dAZTBCZm+EQUcXzCIdyJy19Inr1pVcVjf4QN2luZgrKE46BHb4vQOvmBoy7MZxLO3TdrZ
+	 8DTkmQN4xEN+yrXsovT/fT3YwRHZgGkBoWTgFomVId0VO1X+c9GywlSAG4miHhQyiFyN8
+	 cbQjAz1V5xAC44cOupmO4dl5id+RyrV4uwq424U1lhLYD/OROYL/y33C5aOEGSCAKFw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=L7r0aR5U;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=mA9ZvOFW;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E74606A31F
-	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 15:10:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D3E74606A31F
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9EDF606A32D
+	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 15:10:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A9EDF606A32D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=L7r0aR5U
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=mA9ZvOFW
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 537A61476;
-	Mon, 23 Nov 2026 07:10:10 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3F93019F6;
+	Mon, 23 Nov 2026 07:10:18 -0800 (PST)
 Received: from entos-yitian-01.Arm.com (unknown [10.168.196.233])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 0B9023F632;
-	Mon, 23 Nov 2026 07:10:05 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id EA2633F632;
+	Mon, 23 Nov 2026 07:10:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795446613; bh=aufnXj7ZWmuYwG8s29o0HdRWSyaK4nqqahpsQ6DgXPk=;
+	t=1795446621; bh=U9cuwkZdZShqPIkeMhEmNQyq0ckxOTBqrasBSAUj27Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=L7r0aR5Uj5elzPjTCDs45bPPlL/3ny6m03q4Luh2c0NkaC0TWYD8Gh7XGWo6A54TU
-	 qX1izGVgksuJH4npvA/byai8Vy4vJisGgeMA5m/ztGHJN4vFvnZGMAR0/kMpkbWli/
-	 KG1vW1NbUDFxynqIVCNiPhTD3cAt8ZFaLGQDGvHw=
+	b=mA9ZvOFWCwrhB53yIHpXKQ+Km7EUzZZD11mk8j1dTe8RTfFJ2FGLJ38ehZNIs1Hub
+	 BUc8+Xnyx9VO6eTqR4Ty9kciJ70hSxoGSAdG3luDZJNjwZmeSV+8PJuOO/lQe31VV4
+	 7MBic+e/FhUA8yiH+g2Utd503JArUtlAeNKUx3EM=
 From: Jia He <justin.he@arm.com>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
@@ -63,9 +63,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Jia He <justin.he@arm.com>
-Subject: [PATCH 1/3] KVM: arm64: Don't load hardware vCPU state before first run
-Date: Mon, 23 Nov 2026 15:09:15 +0000
-Message-Id: <20261123150917.2679600-2-justin.he@arm.com>
+Subject: [PATCH 2/3] KVM: arm64: nv: Don't request or attempt L1 VNCR mapping without vncr_tlb
+Date: Mon, 23 Nov 2026 15:09:16 +0000
+Message-Id: <20261123150917.2679600-3-justin.he@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261123150917.2679600-1-justin.he@arm.com>
 References: <20261123150917.2679600-1-justin.he@arm.com>
@@ -80,119 +80,45 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-KVM_PRE_FAULT_MEMORY calls vcpu_load() as soon as KVM_ARM_VCPU_INIT has
-completed. On arm64, however, kvm->arch.sysreg_masks, the trap
-configuration, vncr_tlb and nested vGIC state are only set up on the
-first KVM_RUN in kvm_arch_vcpu_run_pid_change().
+vcpu->arch.vncr_tlb is only allocated when ID_AA64MMFR4_EL1.NV_frac
+advertises FEAT_NV2. When NV_frac is cleared to 0 (or E2H0 is selected),
+vncr_tlb is NULL for the lifetime of the vCPU.
 
-Running the full vcpu_load() path before then reads unsanitised guest
-sysregs and touches uninitialised nested state: get_s2_mmu_nested()
-populates nested_mmus[] from raw VTTBR_EL2/VTCR_EL2/HCR_EL2 values, FGT
-and HCRX_EL2 are written before kvm_calculate_traps() has run, and
-kvm_vgic_load() can enter vgic_v3_load_nested() early. In particular, if
-userspace creates an EL2 vCPU with ID_AA64MMFR4_EL1.NV_frac cleared to 0
-(so vncr_tlb is never allocated), sets HCR_EL2.NV=1 and an EL1 PSTATE,
-and calls KVM_PRE_FAULT_MEMORY, kvm_vcpu_load_hw_mmu() queues
-KVM_REQ_MAP_L1_VNCR_EL2. The next KVM_RUN then dereferences a NULL
-vncr_tlb in kvm_map_l1_vncr() with preemption disabled and kvm->mmu_lock
-held for read:
+Don't set KVM_REQ_MAP_L1_VNCR_EL2 in kvm_vcpu_load_hw_mmu() when
+vncr_tlb is NULL. The only other place that sets this request is
+kvm_translate_vncr(), which only runs on a FEAT_NV2 VNCR abort. Warn and
+return early in kvm_map_l1_vncr() if vt is NULL before disabling
+preemption and taking kvm->mmu_lock.
 
-  [   73.636014] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000078
-  [   73.801972] pc : kvm_map_l1_vncr+0x48/0x2d0
-  [   73.884820] Call trace:
-  [   73.887253]  kvm_map_l1_vncr+0x48/0x2d0 (P)
-  [   73.891422]  check_nested_vcpu_requests+0xb8/0x168
-  [   73.896200]  check_vcpu_requests+0x2a0/0x428
-  [   73.900458]  kvm_arch_vcpu_ioctl_run+0x2d8/0x6d8
-  [   73.905062]  kvm_vcpu_ioctl+0x388/0xaf0
-
-KVM_PRE_FAULT_MEMORY still needs generic vcpu_load() to set
-kvm_running_vcpu for dirty-ring tracking in mark_page_dirty_in_slot(),
-but kvm_arch_vcpu_pre_fault_memory() only walks and populates
-&kvm->arch.mmu and does not use any hardware vCPU state. Skip the arch
-vcpu_load()/vcpu_put() callbacks until vcpu_has_run_once() is true. In
-KVM_RUN, vcpu->pid is set under vcpu->mutex right after
-kvm_arch_vcpu_run_pid_change() succeeds and before
-kvm_arch_vcpu_ioctl_run() calls vcpu_load().
-
-Since kvm_running_vcpu can now be set without VHE state on the CPU, use
-host_ctxt->__hyp_running_vcpu in VHE enter_vmid_context() (matching
-nVHE) and check vcpu_has_run_once() in vgic_maintenance_handler().
-
-Fixes: 34cfa9b3af17 ("KVM: arm64: Implement KVM_PRE_FAULT_MEMORY")
 Signed-off-by: Jia He <justin.he@arm.com>
 ---
- arch/arm64/kvm/arm.c            | 17 +++++++++++++++--
- arch/arm64/kvm/hyp/vhe/tlb.c    |  3 ++-
- arch/arm64/kvm/vgic/vgic-init.c |  2 +-
- 3 files changed, 18 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/nested.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 157bf4b81202..ef626fd13d8e 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -811,6 +811,16 @@ static void pkvm_vcpu_load(struct kvm_vcpu *vcpu)
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	vcpu->cpu = cpu;
-+
-+	/*
-+	 * KVM_PRE_FAULT_MEMORY calls vcpu_load() before the first KVM_RUN has
-+	 * finalised the VM and vCPU state in kvm_arch_vcpu_run_pid_change().
-+	 * Pre-faulting only populates the canonical stage-2 and needs no
-+	 * hardware vCPU state on the CPU.
-+	 */
-+	if (unlikely(!vcpu_has_run_once(vcpu)))
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 4d83281a7a28..2f52c128f3a7 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -979,7 +979,8 @@ void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
+ 				vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
+ 		}
+ 
+-		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_NV)
++		if (vcpu->arch.vncr_tlb &&
++		    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_NV))
+ 			kvm_make_request(KVM_REQ_MAP_L1_VNCR_EL2, vcpu);
+ 	}
+ }
+@@ -1761,6 +1762,9 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
+ 	struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
+ 	pgprot_t prot;
+ 
++	if (WARN_ON_ONCE(!vt))
 +		return;
 +
- 	vcpu->arch.vcpu_ops->vcpu_load(vcpu);
+ 	guard(preempt)();
+ 	guard(read_lock)(&vcpu->kvm->mmu_lock);
  
- 	if (!cpumask_test_cpu(cpu, vcpu->kvm->arch.supported_cpus))
-@@ -862,8 +872,11 @@ static void pkvm_vcpu_put(struct kvm_vcpu *vcpu)
- 
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.vcpu_ops->vcpu_put(vcpu);
--	vcpu_clear_on_unsupported_cpu(vcpu);
-+	if (likely(vcpu_has_run_once(vcpu))) {
-+		vcpu->arch.vcpu_ops->vcpu_put(vcpu);
-+		vcpu_clear_on_unsupported_cpu(vcpu);
-+	}
-+
- 	vcpu->cpu = -1;
- }
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 33ac9a8c954e..98df0bb0a05c 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -20,11 +20,12 @@ struct tlb_inv_context {
- static void enter_vmid_context(struct kvm_s2_mmu *mmu,
- 			       struct tlb_inv_context *cxt)
- {
--	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-+	struct kvm_vcpu *vcpu;
- 	u64 val;
- 
- 	local_irq_save(cxt->flags);
- 
-+	vcpu = host_data_ptr(host_ctxt)->__hyp_running_vcpu;
- 	if (vcpu && mmu != vcpu->arch.hw_mmu)
- 		cxt->mmu = vcpu->arch.hw_mmu;
- 	else
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index c9991e24cb6b..cd413069b16e 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -825,7 +825,7 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
- 	 * Of course, NV throws a wrench in this plan, and needs
- 	 * something special.
- 	 */
--	if (vcpu && vgic_state_is_nested(vcpu))
-+	if (vcpu && vcpu_has_run_once(vcpu) && vgic_state_is_nested(vcpu))
- 		vgic_v3_handle_nested_maint_irq(vcpu);
- 
- 	return IRQ_HANDLED;
 -- 
 2.34.1
 
