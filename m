@@ -1,56 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.166
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795462497;
-	b=bKL/NKdoH80Z1wRzBZtubXP4M0jtJIjNSZH0A+4muv5IGSmvJu4xtjo5kWeD+ZFQZ2Kz
-	 4Wy6B7wNA6Y8+QW1Hs/xhKIQmMFF6o4HcOYw4dIsAnawMY6TW2/H8N30q/QYTvWhnYkk6
-	 p8ylAr/bGON9eKUXxr4nxLXjFIXrBAxOsXioQuZ2wHoo2alQyco4zwACuKo7Q6LmDUFtV
-	 Lrh6qOK+16RyEFsZLRPZCZv0K3GgYF8Nwla7xKhHhPcOMHq8ojm6VmyBgbyr6lQnBuXkA
-	 KjbHkBjwEzk0DPMFpwMbnZUMpXAlJXtTLH7mo7sdewtPY6SZ6w5JIXsEiejdR7Guj1A==
+	t=1795463268;
+	b=wJEUDml8QHGi1pcxJqzk1hII0zDxlrI9re33SWNaqyDjDINrF48gRePqLyYS3qvmiX9O
+	 cUjT2kd7zKhFbmW7U27KGuvCZCSKhbm8SAW5gmrt+2vAWbg+PreNUy+VQX1ao6PqeOe+K
+	 MNaFViZETCfoQXQjFUbtvSnYLe7p0ReJx7Q9f7DZa14M/cAaSg8HH4MfPDEvF5S047Hiy
+	 CwMH832YoMvbRNSxpdq3+BrXxE7pdO0hM9nwnuzp1xIReHuktpcG1miMRDpsF4kxWArI6
+	 oGZLVhfAOd4JVUa0igKAhD519SvGHj96Ig8eet7ViUPoAzt4KZ6g8ZnF9FwvUChtPrg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795462497;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=P9smyWWFNbqZ0JC5hQlWxI90ybr781jHhc3XD7suVuE=;
-	b=gL1KVd+ZQl8QhTVrZQlKA1h61ZKnTXEm88IXvacaLUWZwJ4pIbH9RJiDxHh/SgkLTm5s
-	 ENYgCyvk6dmYzvZcvpFTxXHARYD4NvQNxi/zcGY6Z+CtkxgMnHuSuI3xJ1GRQe4W931h9
-	 MAnJs8XA6bfVYe2C4LuYxmR36Gjhb8RIhwHc8bKld7mQi5hXvficmQqu6vouNpBc9W7zc
-	 sVFOpUYYz94Cq0Fd5KpIZqcQ0TLxidAFkm24TJjgSLUUAwxzv3HeSqnR3ymKglSSA62bN
-	 eyaOZ4PBOZOPvlEOeuYcqf5jLPG0Bx09I5zmofTFhlCLz7QhQoaFGJbGtwzwOagNUQw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795463268;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=IgLGsvO6I1cVesMXGOLiV/+5WDdxgMcaxBy6FOWw03c=;
+	b=Ur1Wl/86uBr9avAHwiTm5FB4xmTFke7H/zVRG6diBLEP5bvKKk3L/rl9kMswB10BEiZa
+	 1R6LBKoldzjEFphbiKaqJGj91PAtlk0RAxSiIAv1frtZPzSHydEXvlkGWC1eWeU7nR6cD
+	 QnFrZ78Y2kC7l4CYKHJqIvO52B4wK0Bw4YQBaeZMzApAdXQhFkQSFFfnw5Ue4nyNiY+oZ
+	 XXXtb7E1Af51hyjETH2PpMWO+ltIo2KEDg+os9XXWD+T3D1YkqJa9MiM92YnD1PooRy/g
+	 8PiRjBLmY/h82+aP50Sk60baTGjYkPOuQ163d6xqUAG5PFIPdSywFSXJj2kNocdlBEQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ONrNRncj;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=lA2E68WD;
+	arc=none smtp.remote-ip=91.218.175.166
+Received: from mta0.migadu.com (out-166.mta0.migadu.com [91.218.175.166])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE23606A31A;
-	Mon, 23 Nov 2026 19:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F284606A31F
+	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 19:47:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1F284606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ONrNRncj
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 457E61F000C0;
-	Mon, 23 Nov 2026 19:34:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795462496;
-	bh=P9smyWWFNbqZ0JC5hQlWxI90ybr781jHhc3XD7suVuE=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=ONrNRncjUgabik9vUUm2LrPo2AuAwo9+/QszLkCuVKHeEir3TXKVm7GdxTutH4Im7
-	 iejkMb0B5CaMEgpcb0H5gKTI7nC1SyvdO3ro4hWtXEs5whiKQ21HL9WaVmaShvglNA
-	 7eVTMde8N9mitr7QwZxfEuZYh8+utqfkCj23ThUWTsri2mgTxEOEhsBfvWJ1j8OhvB
-	 6yii5aGEMXqGoPXz02y2PQLvU2SPCiRbB/hub9vvRAcZxzu53kFO9gCnc0Mh55YFIF
-	 LHaexEv9+NFHIlS211LfY7tDE+L4//6p9f6X7qpLumVX9JGn0Ptx9eUp+wp/zTea4K
-	 X+q4eXzxaaX7Q==
-Message-ID: <sashiko-outbox-229945@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 1/3] KVM: arm64: Add enum support to idreg sanitisation
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Cc: "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20261123192457.8700-2-maz@kernel.org>
-References: <20261123192457.8700-1-maz@kernel.org>
- <20261123192457.8700-2-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Nov 2026 19:34:55 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=lA2E68WD
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=IgLGsvO6I1cVesMXGOLiV/+5WDdxgMcaxBy6FOWw03c=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795463264; v=1; x=1796068064;
+ b=lA2E68WD0WkftNbJ4nxgKaxfCY1G5+C4xwpXNjo6LI4u/syjbk8Qs7DNWP20j/HSexvjmy6l
+ uoAg154xs25ylLIhW5GKTTKukSyGfNfSpF05/XHkD5HB+n08eQG9WmueYvgG1+6tAxq2w1cZs8h
+ vY8I63aJQ52Fd6A8uHLflH1k=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 6740a640e4fe41c5;
+	Mon, 23 Nov 2026 19:47:44 +0000
+X-Mizu-Trace-ID: 6740a640e4fe41c5
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5c14bc5a743so15857e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 11:47:44 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErEwuorbsMuGNzwraXRn4FkrBsEE8l13/QxFsShUfj252CcHvmGSW1LAjpVX/JrBSYtFHKc3CzY=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/+R+RCU5HutveecixJydO8E24kCqOC4Xnkzg8XSNp9V6tkaod3
+	gWjMiw1qJ7IAH4IVfQE2bP9GbBC1aqG1G0mPCD0VZYwFyh8UgT2MW21bUsS1OJ5T2bc5M7iJFe5
+	UL3bIsjTEsLKENDfForZy+zXiS2iSnbdYdyC5aTxE
+X-Received: by 2002:a05:6512:2342:b0:5c1:56f6:2f50 with SMTP id
+ 2adb3069b0e04-5c21234bb6bmr259897e87.1.1795463263390; Mon, 23 Nov 2026
+ 11:47:43 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,66 +65,34 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+References: <20261117174403.58762-1-vdonnefort@google.com> <20261117174403.58762-12-vdonnefort@google.com>
+In-Reply-To: <20261117174403.58762-12-vdonnefort@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 23 Nov 2026 19:47:06 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTzXp-id_CFECB+X-F7GZ9etswCVknWbZzC=euZk=1psSg@mail.gmail.com>
+X-Gm-Features: Aa3M54rgmBRXFm63EaKcGRVndPx-0D9msphFQcyS8e9jJT3_VFzFGgPwCV7sANA
+Message-ID: <CA+EHjTzXp-id_CFECB+X-F7GZ9etswCVknWbZzC=euZk=1psSg@mail.gmail.com>
+Subject: Re: [PATCH v4 11/23] KVM: arm64: Add a range to __pkvm_guest_share_host()
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
+	qperret@google.com, weilin.chang@arm.com
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Low] KVM: arm64: oversized value in field_prep() in
-  compute_idreg_field_deps()
---
+Hi Vincent,
 
-commit db63f3732a88cac7f7573382f03761fa97deb813
-Author: Marc Zyngier <maz@kernel.org>
+On Tue, 17 Nov 2026 17:43:50 +0000, Vincent Donnefort
+<vdonnefort@google.com> wrote:
+> In preparation for supporting stage-2 huge mappings for protected VMs,
+> add a nr_pages argument to the __pkvm_guest_share_host() hypercall. This
+> range supports only two values: 1 or PMD_SIZE / PAGE_SIZE (that is 512
+> on a 4K-pages system).
 
-KVM: arm64: Add enum support to idreg sanitisation
+__pkvm_guest_share_host() is a function, not a hypercall. Also, the
+MEM_SHARE hypercall still passes one page.
 
-This commit extends the ID register dependency framework to evaluate nested
-ordered enum feature descriptors and compute the corresponding RES0 and RES1
-masks for ID register fields.
-
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index 6f668148ccc11..9763d021a5ecd 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-
-[ ... ]
-
-> @@ -1557,6 +1571,27 @@ static const struct reg_feat_map_desc *idreg_feat_=
-maps[] =3D {
->  	&id_aa64mmfr3_el1_desc,
->  };
-> =20
-> +static struct resx compute_idreg_field_deps(struct kvm *kvm,
-> +					    const struct reg_bits_to_feat_map *map)
-> +{
-> +	const struct reg_bits_to_feat_map *tmp;
-> +	struct resx resx;
-> +
-> +	/*
-> +	 * Assume the enum values are ordered in reverse order of
-> +	 * capability (from most to least capable). A NULL callback
-> +	 * value indicates the ultimate fallback (not implemented).
-> +	 */
-> +	for (tmp =3D map->idreg_field_deps; tmp->match; tmp++)
-> +		if (tmp->match(kvm))
-> +			break;
-> +
-> +	resx.res0 =3D field_prep(map->bits, ~(tmp->bits));
-> +	resx.res1 =3D field_prep(map->bits, tmp->bits);
-> +
-> +	return resx;
-> +}
-
-[Severity: Low]
-Can passing ~(tmp->bits) to field_prep() trigger a compile-time BUILD_BUG_ON
-("field_prep: value too large for the field") if the compiler constant-folds
-map->bits and tmp->bits?
-
-tmp->bits is a 64-bit unsigned value holding an unshifted field value, so
-~(tmp->bits) always has upper bits set outside the field width, which
-violates __BF_FIELD_CHECK_MASK() in __FIELD_PREP().  Computing resx.res1
-first and deriving resx.res0 as map->bits & ~resx.res1 avoids passing an
-out-of-range value to field_prep().
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123192457.8700=
--1-maz@kernel.org?part=3D1
+Cheers,
+/fuad
