@@ -1,94 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795432118;
-	b=f5iIUr/LWuIAWGgjfuctbRkPd+tWIUAiBqls9tUZZzv0AtiAkp9aVgn+INrrVzCdOBsb
-	 tUHdo3j+GKqYz7IYFMWfgOnnV0tPGqE0KWaZUoIe2DQiokJQFobX5rDCtudgGJYA5Jj/D
-	 qyzSZeVg4Yi7IwyQ16/tFVFLm/cTnYMp3EW/pe2uiv7h7wztO2xodaYNSgTCoLyt5WXmt
-	 u4MXCwtVhhgNSWbmuwNSupUwbbd8MQpSsM4LYqvefCx46yjmEnmB9MfMyWicn6YVuiLWR
-	 ABq3xzQsRZ7SxQtCg9TImZ641SCaMhPngqlPKnFmiMRmeflZfiTRxPTyiU538bqK3qA==
+	t=1795432367;
+	b=qhXQXqgmpXW85RU5uaTv3q8/REMgAPpPh5ppXNXvcwWsnGKoEHi98P86xuuMKwT0arxc
+	 4ckJTqDhuFykqZDyKfm3xCLZt1j/4JxgQ/FiOLDlOqSsvrnj3naSnjKSABHSX4koZfHlq
+	 mrLt1HHpiWsaJQks0rDHv3octVvyGRqzjTvcnyh7b8bkgB4Z4bNSzztNpn2Z1PWDR6DIX
+	 s4iWZC5Wo1oCglsouOrrrxvudh9UzlkjSy6fM7E06p6vv7xLB5g33bLz17f5h0/PnFOgP
+	 of6WsrFLEXWQ6mxd72p3XQm5b68CwDhnVIutWErYXmcE0J3XEaYhtu3ySv0DG6TraJQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795432118;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
-	bh=2ahVaClWdiwyy5fxyONnLYFCAROTD31eA1TLqeeKJiU=;
-	b=5mzoCsh0a9JIatAAAAFBgHh3wDaGaINjnqc7xpIUfL+K2wdBgTMpErc+yTRZcek3ELH9
-	 U8ahe1ilnggQn9BiGpdsgE/nFAVrGEa6IlNPAWAvhta3xDUoBnBvf23oPtQIJrQ6YHvqu
-	 v2abzohy+V5SvEClLAhmwU19NqyZAdQW9VrGNw6loE4uRCnsMoqB8wIcjw7fkkmblwkbC
-	 cn8V3vdNrY8/PNVpsTOdnUoueDHNGcLu0BeSx6aDSvSME/L77ihN9VgJcqxBXs7yfesgA
-	 m8bk6SuflTP1d1H6JfCvu8nIF6uqfw54+bmvL1nRVwCX4np0oTuef6QG28k7DXVtVIQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795432367;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=qrX5Yr120rUTLIH3qjzb7/7MgZS9LyjgbpraPB20evs=;
+	b=HeDm873GCsMR4I5lahEjrNNrAFqNip4sc0ZyK/qZvEbZ0kl0SRa1jXg/yKK3YsH72X98
+	 lN0dhcLtxp2Iw3p9NA4HjfC8kkq8SQ/D7xewIOD1m5cjMckOAzLdmT1hC5ePmc4Nk0t2y
+	 8hkmR9+SlDVBaO3sj4ioumIh20DWTgqHoA3wkAbiQivbrb12x6tO0W1X4Ck1raLFBCefM
+	 eICFyXbzweQCquZQhR1QachyYZZYxLz6jz0oB5yvRaSW0/4Zsv1jJcJ+RRma16xECExc3
+	 1bpMMftjKgjuimF5QJNFLJQsv8nLjXa3fFvdblQ/nqcbOwoP2Q3lca0WFVXN4jvxyNQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=pereq.eu;
-	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=bt2VSFp9;
-	arc=none smtp.remote-ip=209.85.221.42
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FXCeMz+e;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420D8606A32C
-	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 11:08:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 420D8606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8091B606A31A;
+	Mon, 23 Nov 2026 11:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=bt2VSFp9
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-490f38e9688so2172092f8f.0
-        for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 03:08:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1795432116; x=1796036916; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=2ahVaClWdiwyy5fxyONnLYFCAROTD31eA1TLqeeKJiU=;
-        b=bt2VSFp9CIIAltQoi/VreeqHhrjZCe3/unTtCON4zB+A0oZFMGKySEjraE6MUGQN3r
-         m4ILlqbuLaSFqoTdq9ydkf4Py/apERKnFMM/F7WrnH7AhRcEdz6PSVSdiAiufobJ7J1v
-         rFLG1epRyRUkYfSD+Mtqc/Q3BSOesqzC27BSQB6IUS0c2S+Pl+66MtW5RyohXnCA50cc
-         i+ciYSdn+UiMNdFey/9xSHlpjeffIZU2QqCLK704Xf3Z72LwySNEVwY3zT6yO3r4hbg7
-         WAZ3kQVBT4fPV+och1t2W1rFpqG0xKvKvm1T31c9CX1/wUmmzFgur7omWb8fjNb3M82Y
-         sWlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795432116; x=1796036916;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=2ahVaClWdiwyy5fxyONnLYFCAROTD31eA1TLqeeKJiU=;
-        b=KcQpXvoMqjhIp9Xh7B0g7U13hljtvuXtXb6VkfHkizCx6WJGrnESXumMZQa+lsBKzT
-         SJV4Y5XF/0SncL2HWiYy5Lr/sO93CX6xhNi11Y0un61ZrkfHCDwus48pdrNyoEoIacA6
-         ZunKHaeWkApmId67UO3yDWMJhPolX0PGWkDD42ulnLXN4KNIltsgHmlUaK0Dqp+Gcgji
-         I2uTn8GBa4UpUVtMQdQgftph2plo1eqGfjIcexn2n7wdSTnOKeisxP490I8ZcHI7vysQ
-         opmbwa31eKd+8FTWuKfgzKTNKHB2+nYx+BQOGp8JpI9PpXqaDu9+/PcRwUogO0AFDfnd
-         ilOA==
-X-Gm-Message-State: APuU4Z/WZvHdI8XSz7DuOnqrNFEwoQ4zUmH7c9ilTuu1tuueckqXXW6i
-	kpJAlwAFiWvYRmair+SLCDzqu4jV85s0pbuGbrVB7+EuZE7IueOOhe47mjSK/y0aqbg=
-X-Gm-Gg: AZFdTZfbrsuJ8X5PGcbxc42cd+6+9cTAH57AXSANPWoV0NvRFlW8L7neICt6WXtlgmW
-	aY21RFPck2vBcIOrqOfzxUOk+jazWM10zVtfROgGeqw3dZVhru0uIMzhWKyIZ2pUgiSpU3oVcwy
-	AKTP6/WJ7dqn8w4waeA9HaMjRw/UoNrkq2JkXxGqQmy6nAwKFplzQd8wIb5q/unUSPoyFZbS1Qg
-	xZDMTsOahPNVG+ZrPqtrRxQPjgNdeZuRwrY0l3jxo4rXMjLI/RjXbrSHywEpvOTuz8Ub5EDfPGE
-	osEy8EPmmt+SBtnctSfGPrBFkLJRANgF8YDTb4lzn9cBGskrvuURokElpxBacb+5IITmiCxmfCq
-	BuSh+wOOD71LtoZ0J2GjG+MFKL+4Wzf32nfgXirqqtxopjt6XMViWsuLjKp17CSWEUUaZ0oca/B
-	CbI6aMlpxOXy7FRxxJUnZzVbXFmbbHZvlhR5cgOtz4EZunWUXiKRHN9yXeflTkctsrgobjcVefK
-	JI1g+0vj1Z22LW6mTljyS13aY2JS0dnoagffCz19cJK3QTkc8cnEHtgVvBAPnAaIh++nknAeUV1
-	TWvnAikWcoQdX79Qe0buxPqtpPVDnlQuQggO+IX3
-X-Received: by 2002:a05:6000:40ce:b0:488:8347:a110 with SMTP id ffacd0b85a97d-4abafd02fa0mr23222776f8f.7.1795432116203;
-        Mon, 23 Nov 2026 03:08:36 -0800 (PST)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4b34e9c3ffesm5162435f8f.19.2026.11.23.03.08.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 03:08:35 -0800 (PST)
-Date: Mon, 23 Nov 2026 14:08:32 +0300
-From: Dan Carpenter <dan@pereq.eu>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Karthik Bhargavan <karthik@pereq.eu>,
-	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Re-inject a stored SError after the exit
- is handled
-Message-ID: <awQesKJZd0gKpLJx@stanley.mountain>
-References: <20261123-double_exception-v1-1-cd82b59a232d@pereq.eu>
- <sashiko-outbox-229065@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FXCeMz+e
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1C221F00A19;
+	Mon, 23 Nov 2026 11:12:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795432367;
+	bh=qrX5Yr120rUTLIH3qjzb7/7MgZS9LyjgbpraPB20evs=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=FXCeMz+eZQMM2docDa31NKFyzTxyqZVzLaTc3GTul11qsB+2BCebdpLJyTBKaL6KX
+	 HXtE1nXl77aMs+LOELK8Rj1dAn1vjBle7iQtxdP+NF912rGD82uRNWqFWd4F36OwE3
+	 i6kVNHIyZKH+vSxhavncDRDLJBtYKnp+AHrddG8OwLhEov4BIN3hitDCggAMHXU5B6
+	 5WaK5ZzDKK1vdPPxrBEr1Q/p37kPXzEbc029eXTvHfwpIyjX8dgGxHPFEUYhr1V8ls
+	 hqPM7olb/fRZaoEtU4hbeb/J5Mis+Q84lGlSSgiiFgjb4lOAcZ03W5EchFdSnlW9ZK
+	 nAdtLXLM7iayQ==
+Message-ID: <sashiko-outbox-229102@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v4 07/11] KVM: arm64: CCA: Add Realm RTT mapping and
+ invalidation helpers
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steven Price" <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261123104233.95710-8-steven.price@arm.com>
+References: <20261123104233.95710-1-steven.price@arm.com>
+ <20261123104233.95710-8-steven.price@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 23 Nov 2026 11:12:46 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -97,138 +60,167 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <sashiko-outbox-229065@kernel.org>
 
-Yep.  These are sort of existing bugs which my patch makes worse...
+Thank you for your contribution! Sashiko AI review found 3 potential
+issues to consider:
+- [Medium] KVM: arm64: cca: direct-reclaim allocation in
+  realm_unmap_cache_topup()
+- [Medium] KVM: arm64: cca: stale err_level used after
+  realm_unmap_cache_topup() failure
+- [Low] KVM: arm64: cca: possible RTT creation for unmapped entry in
+  realm_unmap_*()
+--
 
-Claude had previously told me it would review patches to see if they
-expose any new bugs, but now it's saying that promise only extented to
-"crash fixes" and not to "warnings like this".  :P
+commit 4c7e030072ac67c12f0f2603fad3d39821c47426
+Author: Steven Price <steven.price@arm.com>
 
-Anyway, I will send these fixes.
+KVM: arm64: CCA: Add Realm RTT mapping and invalidation helpers
 
-regards,
-dan carpenter
+This commit adds RMI Realm Translation Table creation, folding, and stage-2
+unmapping helpers for CCA Realms, including filtered range unmapping for
+shared and private memory.
 
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index 435174ac3d87f..b34f5320b50b6 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
 
-On Mon, Nov 23, 2026 at 10:42:10AM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential
-> issues to consider:
-> - [Medium] KVM: arm64: nv: duplicate SError injection when
->   NESTED_SERROR_PENDING is set
-> - [Medium] KVM: arm64: nv: premature SError re-injection in
->   kvm_nested_flush_hwstate()
-> --
-> 
-> commit a6e9a58a0688b0de9bbbb40738acfc3f5921f92e
-> Author: Dan Carpenter <dan@pereq.eu>
-> 
-> KVM: arm64: nv: Re-inject a stored SError after the exit is handled
-> 
-> This commit defers SError re-injection for nested guests from
-> kvm_nested_sync_hwstate() to kvm_nested_flush_hwstate() so that exit
-> handlers can record their exception or PC increment before the SError is
-> re-injected, and updates kvm_arch_vcpu_runnable() to treat a deliverable
-> stored SError as a wakeup condition.
-> 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 78d5b18dbd2d6..f063c01c565a0 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -2213,8 +2213,11 @@ void kvm_nested_flush_hwstate(struct kvm_vcpu *vcpu)
-> >  	if (!vcpu_has_nv(vcpu))
-> >  		return;
-> >  
-> > -	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
-> > +	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING))) {
-> > +		/* Commit the exit handler's exception first */
-> > +		__kvm_adjust_pc(vcpu);
-> >  		kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
-> > +	}
-> >  
-> >  	vgic_v3_nested_update_mi(vcpu);
-> >  
-> 
-> [Severity: Medium]
-> Can re-injecting NESTED_SERROR_PENDING here run prematurely when guest
-> entry is subsequently aborted?
-> 
-> In kvm_arch_vcpu_ioctl_run(), kvm_nested_flush_hwstate() runs before
-> checking ret <= 0 or kvm_vcpu_exit_request(), and inside
-> kvm_nested_flush_hwstate() the SError is re-injected before
-> vgic_v3_nested_update_mi() and the KVM_REQ_GUEST_HYP_IRQ_PENDING check:
-> 
-> arch/arm64/kvm/nested.c:kvm_nested_flush_hwstate() {
-> 	...
-> 	vgic_v3_nested_update_mi(vcpu);
-> 
-> 	if (vgic_state_is_nested(vcpu) && kvm_vgic_vcpu_pending_irq(vcpu))
-> 		kvm_make_request(KVM_REQ_GUEST_HYP_IRQ_PENDING, vcpu);
-> }
-> 
-> If L2 has PSTATE.A == 1 (with HCR_EL2.AMO == 0 and HCRX_EL2.TMEA == 0) and
-> NESTED_SERROR_PENDING set while an L1 IRQ or maintenance interrupt is
-> pending, kvm_nested_flush_hwstate() clears NESTED_SERROR_PENDING, sets
-> HCR_EL2_VSE in *vcpu_hcr(vcpu), and posts KVM_REQ_GUEST_HYP_IRQ_PENDING.
-> kvm_vcpu_exit_request() then aborts guest entry without calling
-> kvm_nested_sync_hwstate(), and on the next loop iteration
-> check_nested_vcpu_requests() -> kvm_inject_nested_irq() switches the vCPU
-> to L1 vEL2 with HCR_EL2_VSE still set in vcpu->arch.hcr_el2 even when TGE
-> and AMO are clear.  Similarly, if PSTATE.A == 0 in L2 or if ret <= 0 exits
-> to userspace, pend_serror_exception() pends the SError into L2 state that
-> gets committed by __kvm_adjust_pc() even though L2 was never entered.
-> 
-> > @@ -2231,18 +2234,11 @@ void kvm_nested_sync_hwstate(struct kvm_vcpu *vcpu)
-> >  
-> >  	/*
-> >  	 * We previously decided that an SError was deliverable to the guest.
-> > -	 * Reap the pending state from HCR_EL2 and...
-> > +	 * Reap the pending state from HCR_EL2, and re-inject it from
-> > +	 * kvm_nested_flush_hwstate() once the exit has been handled.
-> >  	 */
-> >  	if (unlikely(__test_and_clear_bit(__ffs(HCR_EL2_VSE), hcr)))
-> >  		vcpu_set_flag(vcpu, NESTED_SERROR_PENDING);
-> > -
-> > -	/*
-> > -	 * Re-attempt SError injection in case the deliverability has changed,
-> > -	 * which is necessary to faithfully emulate WFI the case of a pending
-> > -	 * SError being a wakeup condition.
-> > -	 */
-> > -	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
-> > -		kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
-> >  }
-> 
-> [Severity: Medium]
-> Does leaving NESTED_SERROR_PENDING set across handle_exit() and exits to
-> userspace cause a duplicate SError injection when kvm_inject_serror_esr()
-> is called before the next kvm_nested_flush_hwstate()?
-> 
-> Because kvm_inject_serror_esr() does not clear NESTED_SERROR_PENDING when
-> it delivers an SError via kvm_inject_nested_serror(),
-> pend_serror_exception(), or HCR_EL2_VSE, a KVM_GET_VCPU_EVENTS followed by
-> KVM_SET_VCPU_EVENTS in __kvm_arm_vcpu_set_events() injects and immediately
-> commits the SError via commit_pending_events() while NESTED_SERROR_PENDING
-> remains set:
-> 
-> arch/arm64/kvm/guest.c:__kvm_arm_vcpu_set_events() {
-> 	...
-> 	if (has_esr)
-> 		ret = kvm_inject_serror_esr(vcpu, esr);
-> 	else
-> 		ret = kvm_inject_serror(vcpu);
-> 
-> 	commit_pending_events(vcpu);
-> }
-> 
-> On the subsequent KVM_RUN, kvm_nested_flush_hwstate() sees
-> NESTED_SERROR_PENDING still set and injects a second SError into the
-> guest.  The same double injection happens in-kernel if handle_exit() calls
-> kvm_handle_guest_sea() -> kvm_inject_serror() while NESTED_SERROR_PENDING
-> is set.
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20261123-double_exception-v1-1-cd82b59a232d@pereq.eu?part=1
+[ ... ]
+
+> @@ -172,6 +391,208 @@ void kvm_realm_unmap_stage2_all(struct kvm *kvm)
+>  	realm->stage2_unmapped =3D true;
+>  }
+> =20
+> +static bool realm_unmap_cache_topup(struct kvm *kvm,
+> +				    struct kvm_mmu_memory_cache *mc, int needed)
+> +{
+> +	int ret;
+> +
+> +	if (!mc || kvm_mmu_memory_cache_nr_free_objects(mc) >=3D needed)
+> +		return false;
+> +
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
+> +	write_unlock(&kvm->mmu_lock);
+> +	ret =3D __kvm_mmu_topup_memory_cache(mc, KVM_PGTABLE_LAST_LEVEL, needed=
+);
+> +	write_lock(&kvm->mmu_lock);
+> +
+> +	return !ret;
+> +}
+
+[Severity: Medium]
+When __kvm_mmu_topup_memory_cache() fails, does returning false cause
+realm_unmap_shared_range() and realm_unmap_private_range() to pass a stale
+err_level to realm_create_rtt_levels()?
+
+Because kvm->mmu_lock was dropped and re-acquired, another thread can fold
+the RTT at err_level before the lock is retaken.  The callers only retry
+from addr when realm_unmap_cache_topup() returns true; on failure they fall
+through to realm_create_rtt_levels(realm, addr, err_level, level, mc).
+alloc_rtt() can still succeed from a partially topped-up cache or via
+alloc_delegated_granule()'s GFP_ATOMIC fallback (which sets __GFP_HIGH and
+force-charges memcg), causing realm_rtt_create() at err_level + 1 to fail
+with RMI_ERROR_RTT at an ancestor level < err_level.  That triggers the
+WARN() in realm_create_rtt_levels() and returns -ENXIO, hitting
+WARN_ON(ret !=3D -ENOMEM) in realm_unmap_shared_range() or KVM_BUG_ON(1, kv=
+m)
+in realm_unmap_private_range().
+
+> +static void realm_unmap_shared_range(struct kvm *kvm,
+> +				     unsigned long start,
+> +				     unsigned long end,
+> +				     bool may_block,
+> +				     struct kvm_mmu_memory_cache *mc)
+> +{
+> +	struct realm *realm =3D &kvm->arch.realm;
+> +	unsigned long rd =3D realm->rd_phys;
+> +	unsigned long next_addr, addr;
+> +	unsigned long shared_bit =3D BIT(realm->ia_bits - 1);
+> +
+> +	if (start >=3D end)
+> +		return;
+> +
+> +	/*
+> +	 * Callers may pass either an IPA range or its shared alias. Add the
+> +	 * shared bit only for the former. Use addition so an exclusive end at
+> +	 * shared_bit advances to the end of the IPA space.
+> +	 */
+> +	if (start < shared_bit) {
+> +		start +=3D shared_bit;
+> +		end +=3D shared_bit;
+> +	}
+> +
+> +	for (addr =3D start; addr < end; addr =3D next_addr) {
+> +		long ret;
+> +
+> +		ret =3D rmi_rtt_unprot_unmap(rd, addr, end, RMI_ADDR_TYPE_NONE,
+> +					   0, &next_addr, NULL, NULL);
+> +		if (WARN_ON(ret < 0))
+> +			return;
+> +
+> +		switch (RMI_RESULT_STATUS(ret)) {
+> +		case RMI_SUCCESS:
+> +			break;
+> +		case RMI_ERROR_RTT: {
+> +			int err_level =3D RMI_RESULT_DATA_LEVEL(ret);
+> +			int level =3D find_map_level(realm, addr, end);
+> +
+> +			if (WARN_ON(err_level < realm->start_level ||
+> +				    err_level > KVM_PGTABLE_LAST_LEVEL))
+> +				return;
+> +
+> +			if (err_level >=3D level) {
+> +				/* Nothing present, so skip */
+> +				next_addr =3D ALIGN(addr + 1,
+> +						  kvm_granule_size(err_level));
+> +				break;
+> +			}
+
+[Severity: Low]
+This question rests on an RMM architectural detail that could not be
+confirmed from the kernel source: can SMC_RMI_RTT_UNPROT_UNMAP or
+SMC_RMI_RTT_DATA_UNMAP return RMI_ERROR_RTT with err_level < level when the
+RTT walk stops at an unassigned ancestor entry (where neither a child RTT
+nor a block mapping is present at err_level), rather than advancing
+next_addr and returning RMI_SUCCESS?
+
+If so, when unmapping a sub-block range (such as a single page, where
+find_map_level() returns KVM_PGTABLE_LAST_LEVEL) across an unmapped ancestor
+entry, both realm_unmap_shared_range() and realm_unmap_private_range() only
+skip when err_level >=3D level.  For err_level < level, they treat the entry
+as a block mapping to split, allocating and delegating intermediate RTTs via
+realm_create_rtt_levels() only to fold them back at the end of the function,
+and if that allocation fails in realm_unmap_private_range() (for example
+under GFP_ATOMIC when may_block is false), it hits KVM_BUG_ON(1, kvm) even
+though nothing was mapped.
+
+[ ... ]
+
+> +void kvm_realm_unmap_range_filter(struct kvm *kvm, unsigned long start,
+> +				  unsigned long size, bool may_block,
+> +				  enum kvm_gfn_range_filter attr_filter)
+> +{
+> +	/*
+> +	 * MMU notifier callbacks cannot take slots_lock, which protects the
+> +	 * eager split cache. Use a cache owned by this invalidation instead.
+> +	 */
+> +	struct kvm_mmu_memory_cache cache =3D { .gfp_zero =3D __GFP_ZERO };
+
+[Severity: Medium]
+Can topping up this cache from an MMU notifier callback enter direct reclaim
+and trigger a lockdep splat on __mmu_notifier_invalidate_range_start_map?
+
+When mmu_notifier_invalidate_range_start() invokes
+kvm_mmu_notifier_invalidate_range_start() -> ... ->
+kvm_realm_unmap_range_filter() with may_block set, it holds
+__mmu_notifier_invalidate_range_start_map.  Because cache.gfp_custom is left
+at 0, realm_unmap_cache_topup() -> __kvm_mmu_topup_memory_cache() allocates
+with GFP_KERNEL_ACCOUNT (__GFP_DIRECT_RECLAIM | __GFP_FS), which enters
+fs_reclaim_acquire() and acquires __mmu_notifier_invalidate_range_start_map
+recursively (and risks reclaim recursion deadlock under memory pressure).
+Setting cache.gfp_custom to GFP_NOWAIT | __GFP_ACCOUNT avoids direct reclaim
+in the notifier path.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123104233.9571=
+0-1-steven.price@arm.com?part=3D7
