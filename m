@@ -1,71 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795430113;
-	b=SnagUT/6jnlDd1WoEbsw0rqAPFqSqopjqrG5XKuaIJCRA2poIDbvo9P6m393IYDek2KO
-	 2MdGXT2DweqNNdw0H1WzuezHGU1nJWeT3eKylcfkNPNPd/BZedv9kZ/CnutN6vWJd/y/O
-	 RuEUNGpjYpYkJPZvzMCwHEnpPcCnQZIJ7PzpJz5far204mtt1CV7prGPch0ok33XvlJ+Q
-	 Kf2f0Vbc6TFGhMr4i+9+mUz5wuq8CX3m92x2zF4zVR3oOvHjp8Dp8k0L0F4kEnIJv3qul
-	 i5eja1BWDKvV+/y6oGlm9VouGp/0KmxFp1MQeXQgTDG65RNVtC9CBfGjpflYrQQPdqQ==
+	t=1795430531;
+	b=VRSPLRUkJQ59gC8Ny591vHyw7oaNobJVCNdjQgvpPBperwgU1BYvLPad7UPNW8+XAcRN
+	 ZZVdjf2X9WMUyYpsPGuzmAg15pjs+VgyBxF9rG7+5kbhYiTJVfq7KS39ddHHNGthd3FKK
+	 EN3b3S1d0YO2IWv7dYPDln2P69fFeYx94cdFxbFOjHgiTgTkOk77e7knuII1+5Tq3Ph37
+	 JX9S5dnEOHqZihmhMj+Gp0HVfh6ImlzppVEu1eTF/evPpJ8Mj6x7geGMk8cJrCHRjRkPH
+	 B8BASp9YlRHvx3Zw7UK3qot1kVqBcVbKdd7kv61UBBdc0mpmZp3hwE43EGSRTyR9SAQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795430113;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=JNegrRp/NUexDN4FEoZ14wbn4iQ1tVQRQNeyZoOBH0s=;
-	b=fGISI47ziHKTnXqQJPAC+LQn15zLTUYAHt94EC0hqdmkhR21yJ6i4gNxCDdkbEuU2Rus
-	 R6KoT5ICT9R+q3DfmAhIZ/8okQ+i2iPg+9n2muo7S2nAvKxk0nJnZk1UQgaqfXjrOQE0H
-	 y3NSy900R1BWzcoubDl5YklzE7YDNcVpPKMiRxXzV+v97vAmNqnkL0y14fBB0GtbSfioz
-	 nWBY35ATiCSPR2U6TDE6R4mSO6uMH/+0EDI5snpqj+wtcqXcvXiE0+4qGoI4bIFG4sUdT
-	 nOfF21gCIXgRqFI0Msrc1sMm+BWk2Q3wlHNoIzyZkDYQ3SkNjkX19khQdJZnYiOQKQQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795430531;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=hnKOtRCqIvyy1sSy8VyZw9gGdPtPJkPBXPX0Mg8ue+4=;
+	b=YJWqLtae6aSHRHl5xFq5EeTyr2QdKdCb7cYJiOZn/jreIWVbEFt0MN1Xk0+FUxMzTu/G
+	 KSyF93f0Telyzukvg9JbnVS/A1QAzuwM2Ahykpf7vM1/se8QIp9p5aPh9u2ZNRbdO6+Jc
+	 Ym93MERIJ2D9MKdZQ3Dklx+3OHTWyznw+W24If+sXB9NQKCHnHhwL/AQ/zUZpsMZFUrcc
+	 Nbfba6fhow8XpD4dg5gm6KNjCf+dseLO0KcDxgSOMRs82N5X4Q/mlUfVnZKKnWovA1Zq1
+	 2E0ztwst07Vx8G0C2KXdbXYBF93P8QYdC+ZVtivGDgGrlPmfHh90AMcpyZYVywc8h/Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=SYrvy0AS;
-	arc=none smtp.remote-ip=91.218.175.176
-Received: from mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dnD6Z5pj;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66171606A31A
-	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 10:35:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 66171606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AC0606A31A
+	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 10:42:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=SYrvy0AS
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=e7GMFbIO7ODomw2VAv04MqAxjpRjG/NYtGRnw2lyuKg=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795430106; v=1; x=1796034906;
- b=SYrvy0ASAPN+lXMAw9H6wJ54CZ9CpGKQvuFNzNEBiyy94HfcboOjPeUUBGE67SRgF17ViSPq
- Lg/k6p9ZIQ+tNriw09l49gWMUDVi0buVYKbmYhsLjFEz1o/tN8/nCu6N/eaSgue8k5ZgmUBBza/
- 6w2V2c6SV+Jr+4B7qflrlSdg=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 1b19a606ff982d8d;
-	Mon, 23 Nov 2026 10:35:06 +0000
-X-Mizu-Trace-ID: 1b19a606ff982d8d
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Gavin Shan <gshan@redhat.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 0/2] KVM: arm64: Fix stage-2 THP mapping on hosts with 2-level page tables
-Date: Mon, 23 Nov 2026 10:35:03 +0000
-Message-ID: <20261123103505.1006067-1-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dnD6Z5pj
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30FC21F000D1;
+	Mon, 23 Nov 2026 10:42:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795430531;
+	bh=hnKOtRCqIvyy1sSy8VyZw9gGdPtPJkPBXPX0Mg8ue+4=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=dnD6Z5pjdV3QzFjdylzKo/67IxiRbnnkAx2dtz7K49u/C5NaM0h3SDJca9Ad+r/qB
+	 I7aYWtbK2gIIHtr9obI7kVt7we38h3YcQ63tUrKy7me074CguvrABZnuc4J8PUJWAt
+	 6wUNXrzOOZ8j9nUNBNKvnjTKxnfI0RHTtaCIj7UgRG0WcWblcobuXw5O0qKqdv0aWl
+	 zOTnhtCBuNAbehlryM93MnIQpDaBin6UnaWRaRK12YuMH+60gHQPaKH9TMlZs1GV/2
+	 P0RboLoCDjXGCO8Pmi0HRGWfllNjf4PDK0htVwimbnQwVt6MQQVME9520A/GhTdVp1
+	 tPPTL1bo1OlqA==
+Message-ID: <sashiko-outbox-229065@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] KVM: arm64: nv: Re-inject a stored SError after the
+ exit is handled
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Dan Carpenter" <dan@pereq.eu>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20261123-double_exception-v1-1-cd82b59a232d@pereq.eu>
+References: <20261123-double_exception-v1-1-cd82b59a232d@pereq.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 23 Nov 2026 10:42:10 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -74,43 +60,125 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Hi folks,
+Thank you for your contribution! Sashiko AI review found 2 potential
+issues to consider:
+- [Medium] KVM: arm64: nv: duplicate SError injection when
+  NESTED_SERROR_PENDING is set
+- [Medium] KVM: arm64: nv: premature SError re-injection in
+  kvm_nested_flush_hwstate()
+--
 
-A fix for how KVM maps a THP at stage-2 on a host with 2-level page
-tables (64K pages with a 42-bit VA, or 16K pages with a 36-bit VA).
-There, KVM also maps the host memory that follows a THP into the guest
-if the guest's first access to the THP isn't to its first page.
+commit a6e9a58a0688b0de9bbbb40738acfc3f5921f92e
+Author: Dan Carpenter <dan@pereq.eu>
 
-transparent_hugepage_adjust() is meant to round the faulting pfn down to
-the start of the THP, but its mask is a no-op when the PMD level is
-folded, and has been since THP support was added. Before 6f745f1bb5bf2
-("KVM: arm64: Convert user_mem_abort() to generic page-table API"), KVM
-mapped only the THP anyway, which is why the Fixes: tag is on that
-commit. Kernels before f583a53c2b8a ("KVM: arm64: Make fault_ipa
-immutable") round the IPA with PMD_MASK, so only the pfn line of the fix
-applies there.
+KVM: arm64: nv: Re-inject a stored SError after the exit is handled
 
-Tested on QEMU with a 64K, 42-bit VA host kernel, where the new
-selftest scenario fails without the fix and passes with it.
+This commit defers SError re-injection for nested guests from
+kvm_nested_sync_hwstate() to kvm_nested_flush_hwstate() so that exit
+handlers can record their exception or PC increment before the SError is
+re-injected, and updates kvm_arch_vcpu_runnable() to treat a deliverable
+stored SError as a wakeup condition.
 
-Based on Linux 7.4-rc3 (aebb727447640).
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 78d5b18dbd2d6..f063c01c565a0 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -2213,8 +2213,11 @@ void kvm_nested_flush_hwstate(struct kvm_vcpu *vcp=
+u)
+>  	if (!vcpu_has_nv(vcpu))
+>  		return;
+> =20
+> -	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
+> +	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING))) {
+> +		/* Commit the exit handler's exception first */
+> +		__kvm_adjust_pc(vcpu);
+>  		kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
+> +	}
+> =20
+>  	vgic_v3_nested_update_mi(vcpu);
+> =20
 
-Cheers,
-/fuad
+[Severity: Medium]
+Can re-injecting NESTED_SERROR_PENDING here run prematurely when guest
+entry is subsequently aborted?
 
-Fuad Tabba (2):
-  KVM: arm64: Fix THP block mapping when the PMD level is folded
-  KVM: arm64: selftests: Test a THP whose first fault is on a tail page
+In kvm_arch_vcpu_ioctl_run(), kvm_nested_flush_hwstate() runs before
+checking ret <=3D 0 or kvm_vcpu_exit_request(), and inside
+kvm_nested_flush_hwstate() the SError is re-injected before
+vgic_v3_nested_update_mi() and the KVM_REQ_GUEST_HYP_IRQ_PENDING check:
 
- arch/arm64/kvm/mmu.c                          |  4 +-
- .../kvm/arm64/stage2_block_transitions.c      | 56 ++++++++++++++++++-
- 2 files changed, 55 insertions(+), 5 deletions(-)
+arch/arm64/kvm/nested.c:kvm_nested_flush_hwstate() {
+	...
+	vgic_v3_nested_update_mi(vcpu);
 
+	if (vgic_state_is_nested(vcpu) && kvm_vgic_vcpu_pending_irq(vcpu))
+		kvm_make_request(KVM_REQ_GUEST_HYP_IRQ_PENDING, vcpu);
+}
 
-base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
--- 
-2.47.3
+If L2 has PSTATE.A =3D=3D 1 (with HCR_EL2.AMO =3D=3D 0 and HCRX_EL2.TMEA =
+=3D=3D 0) and
+NESTED_SERROR_PENDING set while an L1 IRQ or maintenance interrupt is
+pending, kvm_nested_flush_hwstate() clears NESTED_SERROR_PENDING, sets
+HCR_EL2_VSE in *vcpu_hcr(vcpu), and posts KVM_REQ_GUEST_HYP_IRQ_PENDING.
+kvm_vcpu_exit_request() then aborts guest entry without calling
+kvm_nested_sync_hwstate(), and on the next loop iteration
+check_nested_vcpu_requests() -> kvm_inject_nested_irq() switches the vCPU
+to L1 vEL2 with HCR_EL2_VSE still set in vcpu->arch.hcr_el2 even when TGE
+and AMO are clear.  Similarly, if PSTATE.A =3D=3D 0 in L2 or if ret <=3D 0 =
+exits
+to userspace, pend_serror_exception() pends the SError into L2 state that
+gets committed by __kvm_adjust_pc() even though L2 was never entered.
 
+> @@ -2231,18 +2234,11 @@ void kvm_nested_sync_hwstate(struct kvm_vcpu *vcp=
+u)
+> =20
+>  	/*
+>  	 * We previously decided that an SError was deliverable to the guest.
+> -	 * Reap the pending state from HCR_EL2 and...
+> +	 * Reap the pending state from HCR_EL2, and re-inject it from
+> +	 * kvm_nested_flush_hwstate() once the exit has been handled.
+>  	 */
+>  	if (unlikely(__test_and_clear_bit(__ffs(HCR_EL2_VSE), hcr)))
+>  		vcpu_set_flag(vcpu, NESTED_SERROR_PENDING);
+> -
+> -	/*
+> -	 * Re-attempt SError injection in case the deliverability has changed,
+> -	 * which is necessary to faithfully emulate WFI the case of a pending
+> -	 * SError being a wakeup condition.
+> -	 */
+> -	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
+> -		kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
+>  }
+
+[Severity: Medium]
+Does leaving NESTED_SERROR_PENDING set across handle_exit() and exits to
+userspace cause a duplicate SError injection when kvm_inject_serror_esr()
+is called before the next kvm_nested_flush_hwstate()?
+
+Because kvm_inject_serror_esr() does not clear NESTED_SERROR_PENDING when
+it delivers an SError via kvm_inject_nested_serror(),
+pend_serror_exception(), or HCR_EL2_VSE, a KVM_GET_VCPU_EVENTS followed by
+KVM_SET_VCPU_EVENTS in __kvm_arm_vcpu_set_events() injects and immediately
+commits the SError via commit_pending_events() while NESTED_SERROR_PENDING
+remains set:
+
+arch/arm64/kvm/guest.c:__kvm_arm_vcpu_set_events() {
+	...
+	if (has_esr)
+		ret =3D kvm_inject_serror_esr(vcpu, esr);
+	else
+		ret =3D kvm_inject_serror(vcpu);
+
+	commit_pending_events(vcpu);
+}
+
+On the subsequent KVM_RUN, kvm_nested_flush_hwstate() sees
+NESTED_SERROR_PENDING still set and injects a second SError into the
+guest.  The same double injection happens in-kernel if handle_exit() calls
+kvm_handle_guest_sea() -> kvm_inject_serror() while NESTED_SERROR_PENDING
+is set.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123-double_exc=
+eption-v1-1-cd82b59a232d@pereq.eu?part=3D1
