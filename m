@@ -1,51 +1,50 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.84
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.176
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795430114;
-	b=PZq4jVPGkd5jx6LhdgyXMcdbI/JpBbhH2meWaWrzTeHaofhgWyzVB2pi5lhYKmsNS22B
-	 gYtCcECok+ZWitCP12ib6ghd8dRPxRsQluhM5LF85sHCIrx6qbVdJGyk+A6CQ4N3kemFd
-	 74QUsbtAiT2B3AdreoUHaHaFYMiCrWzHb9g8vm5F5frphy8/MYJCbkn0962tXUIGNYDrO
-	 Z/S/yAsU+vcjAe2tMrgo7/EQjo4VT3dIamZFgq8B7aVC3SwhihlFN+3erdRezlBmBjNdD
-	 anozvDzZ82TF8M2uKly2Vtwz79u1MgsQl0LIjLKZnM5zeLnnQbL4dNSLfGBW1/rj2Qg==
+	t=1795430113;
+	b=SnagUT/6jnlDd1WoEbsw0rqAPFqSqopjqrG5XKuaIJCRA2poIDbvo9P6m393IYDek2KO
+	 2MdGXT2DweqNNdw0H1WzuezHGU1nJWeT3eKylcfkNPNPd/BZedv9kZ/CnutN6vWJd/y/O
+	 RuEUNGpjYpYkJPZvzMCwHEnpPcCnQZIJ7PzpJz5far204mtt1CV7prGPch0ok33XvlJ+Q
+	 Kf2f0Vbc6TFGhMr4i+9+mUz5wuq8CX3m92x2zF4zVR3oOvHjp8Dp8k0L0F4kEnIJv3qul
+	 i5eja1BWDKvV+/y6oGlm9VouGp/0KmxFp1MQeXQgTDG65RNVtC9CBfGjpflYrQQPdqQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795430114;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795430113;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=lWio/ZaYW+Ez8es1JnqyfDCIZ2Tx6iwXiB9k3U+N5Zs=;
-	b=gooZTZAKGG9CgrNUco1BJuaP6fczSKjpvyXA3PAE2/cDMOOYqnpqkulBbf62ZJc5nlu7
-	 3VMQTuotzK/wQcsFg+ys5Iryqc5i1DDGKJiH0i6CWwDhFNx0JimcbTLN1iErgTwx4bFYH
-	 70yg/vXgfjkRxgmL7g2pYFobZ2ZYZVr658i1ZAkMTRRde3qUJQT+K+MX3NjFtEjz+/LtQ
-	 Bt6QjLP/bJ162CFMSRxTludjWrBtiL/LRjZK5m37fwVMkdu7oMZ1SJchJFqHO7N2qvLR1
-	 Eg6+4d1KF8UaZWnVwmntBmrLl1KBjzC92aIshlIN38M5lAolftyvvzLclWoZNuqfXCA==
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=JNegrRp/NUexDN4FEoZ14wbn4iQ1tVQRQNeyZoOBH0s=;
+	b=fGISI47ziHKTnXqQJPAC+LQn15zLTUYAHt94EC0hqdmkhR21yJ6i4gNxCDdkbEuU2Rus
+	 R6KoT5ICT9R+q3DfmAhIZ/8okQ+i2iPg+9n2muo7S2nAvKxk0nJnZk1UQgaqfXjrOQE0H
+	 y3NSy900R1BWzcoubDl5YklzE7YDNcVpPKMiRxXzV+v97vAmNqnkL0y14fBB0GtbSfioz
+	 nWBY35ATiCSPR2U6TDE6R4mSO6uMH/+0EDI5snpqj+wtcqXcvXiE0+4qGoI4bIFG4sUdT
+	 nOfF21gCIXgRqFI0Msrc1sMm+BWk2Q3wlHNoIzyZkDYQ3SkNjkX19khQdJZnYiOQKQQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=FZmSMvmV;
-	arc=none smtp.remote-ip=95.215.58.84
-Received: from mta1.migadu.com (out-84.mta1.migadu.com [95.215.58.84])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=SYrvy0AS;
+	arc=none smtp.remote-ip=91.218.175.176
+Received: from mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC34C606A33F
-	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 10:35:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EC34C606A33F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66171606A31A
+	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 10:35:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 66171606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=FZmSMvmV
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=SYrvy0AS
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=IDG8FN6cGRh+zZL5h3B/Xnl0MXwN5GMGINSU+pdwgF8=;
+DKIM-Signature: a=rsa-sha256; bh=e7GMFbIO7ODomw2VAv04MqAxjpRjG/NYtGRnw2lyuKg=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795430111; v=1; x=1796034911;
- b=FZmSMvmVeeH6UEw2Wp+Ddu8t5rKXzxQ0iHUHyd0CGSdPqH7QtxGHoh2fDMpyL0SCI0dGU1Id
- 7MU50K3LTxtoMYhcqRrE86K0QQh2TeiAeo22DvldbJAFA3fhmmARZUJnJfirLu20Xq5wRJLjxbf
- ZAkfKzsfQFytxLLkVEfv1wPo=
+ t=1795430106; v=1; x=1796034906;
+ b=SYrvy0ASAPN+lXMAw9H6wJ54CZ9CpGKQvuFNzNEBiyy94HfcboOjPeUUBGE67SRgF17ViSPq
+ Lg/k6p9ZIQ+tNriw09l49gWMUDVi0buVYKbmYhsLjFEz1o/tN8/nCu6N/eaSgue8k5ZgmUBBza/
+ 6w2V2c6SV+Jr+4B7qflrlSdg=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 82def4b9cf94a7df;
-	Mon, 23 Nov 2026 10:35:10 +0000
-X-Mizu-Trace-ID: 82def4b9cf94a7df
+Received: by smtp.migadu.com with ESMTPS id 1b19a606ff982d8d;
+	Mon, 23 Nov 2026 10:35:06 +0000
+X-Mizu-Trace-ID: 1b19a606ff982d8d
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -63,12 +62,10 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 2/2] KVM: arm64: selftests: Test a THP whose first fault is on a tail page
-Date: Mon, 23 Nov 2026 10:35:05 +0000
-Message-ID: <20261123103505.1006067-3-fuad.tabba@linux.dev>
+Subject: [PATCH 0/2] KVM: arm64: Fix stage-2 THP mapping on hosts with 2-level page tables
+Date: Mon, 23 Nov 2026 10:35:03 +0000
+Message-ID: <20261123103505.1006067-1-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261123103505.1006067-1-fuad.tabba@linux.dev>
-References: <20261123103505.1006067-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -80,111 +77,40 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On a host whose PMD level is folded, KVM mapped host memory past a THP
-when the guest first touched the THP at a page other than its first.
+Hi folks,
 
-Add a scenario for that case. The guest writes to the second host page
-of a memslot backed by one THP, then reads the first address past the
-memslot. The test checks that the write landed in that page, and that
-the read exits to userspace as MMIO. On a host whose PMD level isn't
-folded, the scenario passes with or without the fix. It doesn't use
-hugetlb pages, so it runs before the probe that skips the rest of the
-test when they aren't reserved.
+A fix for how KVM maps a THP at stage-2 on a host with 2-level page
+tables (64K pages with a 42-bit VA, or 16K pages with a 36-bit VA).
+There, KVM also maps the host memory that follows a THP into the guest
+if the guest's first access to the THP isn't to its first page.
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
+transparent_hugepage_adjust() is meant to round the faulting pfn down to
+the start of the THP, but its mask is a no-op when the PMD level is
+folded, and has been since THP support was added. Before 6f745f1bb5bf2
+("KVM: arm64: Convert user_mem_abort() to generic page-table API"), KVM
+mapped only the THP anyway, which is why the Fixes: tag is on that
+commit. Kernels before f583a53c2b8a ("KVM: arm64: Make fault_ipa
+immutable") round the IPA with PMD_MASK, so only the pfn line of the fix
+applies there.
+
+Tested on QEMU with a 64K, 42-bit VA host kernel, where the new
+selftest scenario fails without the fix and passes with it.
+
+Based on Linux 7.4-rc3 (aebb727447640).
+
+Cheers,
+/fuad
+
+Fuad Tabba (2):
+  KVM: arm64: Fix THP block mapping when the PMD level is folded
+  KVM: arm64: selftests: Test a THP whose first fault is on a tail page
+
+ arch/arm64/kvm/mmu.c                          |  4 +-
  .../kvm/arm64/stage2_block_transitions.c      | 56 ++++++++++++++++++-
- 1 file changed, 53 insertions(+), 3 deletions(-)
+ 2 files changed, 55 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/arm64/stage2_block_transitions.c b/tools/testing/selftests/kvm/arm64/stage2_block_transitions.c
-index 5fd47f4ada1f3..000e8ec7ce8cc 100644
---- a/tools/testing/selftests/kvm/arm64/stage2_block_transitions.c
-+++ b/tools/testing/selftests/kvm/arm64/stage2_block_transitions.c
-@@ -3,10 +3,10 @@
-  * Copyright (c) 2026 Google LLC
-  * Author: Fuad Tabba <fuad.tabba@linux.dev>
-  *
-- * stage2_block_transitions - Exercise stage-2 block/page granularity changes
-- * that dirty logging forces at fault time, and assert the guest completes.
-+ * stage2_block_transitions - Exercise stage-2 block/page granularity at fault
-+ * time: the changes dirty logging forces, and how far a THP block reaches.
-  *
-- * Both scenarios need the fault handler to allocate at fault time (a fresh
-+ * Scenarios 1 and 2 need the fault handler to allocate at fault time (a fresh
-  * mapping and/or page-table pages while holding mmu_lock), so a fault path
-  * that fails to stage that memory manifests as a KVM_RUN error or, worse, a
-  * host crash. The asserted property is host-agnostic: the guest runs the
-@@ -27,6 +27,11 @@
-  *   fault that must split the block into pages during logging, draining
-  *   page-table pages. Skipped on CTR_EL0.DIC hardware, where mappings are
-  *   made executable eagerly and the execute fault never occurs.
-+ *
-+ * Scenario 3 - THP whose first fault is on a tail page:
-+ *   The guest writes to the second host page of a memslot backed by one
-+ *   THP, then reads the first address past it. If KVM mapped the THP and
-+ *   nothing past it, the write lands in the memslot and the read exits as MMIO.
-  */
- #include <linux/bitfield.h>
- #include <linux/bitmap.h>
-@@ -198,6 +203,49 @@ static void test_exec_split_drain(void)
- 	kvm_vm_free(vm);
- }
- 
-+static void thp_guest_code(u64 touch_gva, u64 past_gva)
-+{
-+	WRITE_ONCE(*(u64 *)touch_gva, 0x1);
-+	READ_ONCE(*(u64 *)past_gva);
-+	GUEST_DONE();
-+}
-+
-+static void test_thp_tail_first_touch(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	size_t npages;
-+	u64 thp_size;
-+	u64 gpa;
-+
-+	if (!thp_configured()) {
-+		ksft_print_msg("SKIP THP tail first touch: THP not configured\n");
-+		return;
-+	}
-+	thp_size = get_trans_hugepagesz();
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, thp_guest_code);
-+	npages = thp_size / vm->page_size;
-+
-+	gpa = (vm_compute_max_gfn(vm) * vm->page_size) - 2 * thp_size;
-+	gpa = align_down(gpa, thp_size);
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_THP, gpa, DATA_SLOT, npages, 0);
-+	virt_pg_map(vm, TEST_GVA + getpagesize(), gpa + getpagesize());
-+	virt_pg_map(vm, TEST_GVA + thp_size, gpa + thp_size);
-+	vcpu_args_set(vcpu, 2, TEST_GVA + getpagesize(), TEST_GVA + thp_size);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT(get_ucall(vcpu, &uc) != UCALL_DONE,
-+		    "Read past the memslot completed without an exit");
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_MMIO);
-+	TEST_ASSERT_EQ(vcpu->run->mmio.phys_addr, gpa + thp_size);
-+	TEST_ASSERT_EQ(*(u64 *)addr_gpa2hva(vm, gpa + getpagesize()), 0x1);
-+
-+	kvm_vm_free(vm);
-+}
-+
- /*
-  * The explicit-size hugetlb backing hard-fails region creation if the pages
-  * are not already reserved, so probe here and skip rather than abort. The
-@@ -216,6 +264,8 @@ static void require_hugepages(size_t bytes)
- 
- int main(void)
- {
-+	test_thp_tail_first_touch();
-+
- 	require_hugepages(NR_BLOCKS * BLOCK_SIZE);
- 
- 	test_block_collapse();
+
+base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
 -- 
 2.47.3
 
