@@ -1,81 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795455412;
-	b=FDrofl5PgYoqvIVG0CoRsyF4BVnIdATtApuY1iNK8lT7Ly6yb6HqdoqZ9Z/nGM7HhkLN
-	 dq93OloMwzrEB/tLC4Bd+mIlbCEnnr3dYWs9G1sYeG0QcEikXrSG265WXRb/KJB/s+ZkS
-	 cK74hbkHrMyL/mh/tVwI8K6Kh7uKJHSID3Lu5kjhgReMsevPM6VJcI/hNKiHxLS6TrJR/
-	 yfr8vZd7k0X5Norh7hJFDuR8taWB5xNMVLX16fyBOaTXqDy7i4AJHHwu9Mqp+zJAeNtM7
-	 4+Cio72XGbC+YRlTmGFW2EtxSKpSNZQIsPd1pDOYE/H0ssxioaRX1sz1C4ftwfe5Z4g==
+	t=1795456255;
+	b=iMEj5Vwoa3f5ky4lr6rkqicnjW5WI/4kyTMvc7YJHKzhUjjtRTL85btZpJZvtzIPsNnW
+	 x72VBgm3lFXT1vOo0cz3VwcSFinuREbaFXJhfO84FrtJv4OB3wKltO4zsAv6i24cG1/sg
+	 e5ekrG2B30t8Nh48v3OtG4lFZjdPA0tC4OncS6mL+o5xmdRXh2WomaehChvlIiftqHJkN
+	 OzIMIe7PqeD8wOdA92bEkpkNC3iP653pwBmSUXIbYWUnr+mBxCsOCekLLmcD4/0MdXtGm
+	 OwzUrztUbB5Kk4v0uD/NsUVxwuERMKxPETxU9k3ePIPzbVw/RgfXWjQ+lIKljDzUxMA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795455412;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=worv+Y03ljvU23jf61f6lVoQSFBcO1gUtcVibu/cXn8=;
-	b=M1OiJMCl7VPytwK4e39stqbQccj5h+MbVqmOul899qoDqz/vtaC8XSdl34yVyi1yu+Ax
-	 rkAHTHj7dIsvL81SKmdT8GfDpXz07kOspZRL3B5pt6UqH1JRLand2yCZc20MAPIFtMRSt
-	 Sj8zZAXahjfiiZpDGFPMVwK2BfMiEmJzZEi85j/73txY9ksXjY25B0mGhYTVSFklQCLHD
-	 rOkC6echM6XFU4hOzFaciHOQEpTpzNjg3bRNNsYAOeiBI5spi53xrxSHTl1Bb3kG8Qj8S
-	 lV1N47DJn53egfNM86UY5riqfoT82lTjOIxt3WOcf5Ii/7UuWv+rDXzLikBB6rutaxA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795456255;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=BmdihYOxirTm+1eTZLfQO693ehUdXJrj7zcBiNWtsTU=;
+	b=EI63RUyGy9TUVrDVSmQG04oVxXV9eQa/apzL6GLlMUutVogwyYZQIJZvPAoTne489k5Q
+	 Jfsy67/6Q6Vg+DCLOB8mlT36pCx4ePiJWLnDuKbIyc48o0kmE5DuBeK/MquHGbG1wjhKp
+	 ewHP0j7Ate5HmtjS++EXUwyQl6hijFYmBd0rP1LWxhLjwl6y+JAdLNJRQdPScAd72S/89
+	 36pzyyDSpPm0L4lfQkykQVrQnoVcUdFaJ36xGc2ysVKujAhWT2bla938ETBicE53z6aN0
+	 nPLDCFzQcVEMxaoMEeR35OY7AvN86qhaqhEfFxpVEiNyYKvnTGBXGfi79tiucOcj+XA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SJk8boVo;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nSRmqnb+;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED096606A69E;
-	Mon, 23 Nov 2026 17:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54937606A32E;
+	Mon, 23 Nov 2026 17:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SJk8boVo
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59F671F000C0;
-	Mon, 23 Nov 2026 17:36:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nSRmqnb+
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 654B31F000E1;
+	Mon, 23 Nov 2026 17:50:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795455411;
-	bh=worv+Y03ljvU23jf61f6lVoQSFBcO1gUtcVibu/cXn8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=SJk8boVobebpbSdbYgq+ftbo1Hu42e9YjaF2dfLHBZ1M7fH90f13dklbfXyjek4KM
-	 +yXJYaFac1o47GUKLAKEwIfPpHNwhem1lMn4A7/2Mzi6YofnonARX+s6yIeIYUJWNF
-	 N3lJm6rLkZ534B1Xu3KSZHUmH4ud8cAOv3R+qjkR8VKlLQQCNWbE3qA0z7GBzQI3Y1
-	 955gnreLohaj+uevvYp4aNE+VDxjSpvxYmRISbfcvM2FqEtYHy04ITMqnGrrGxkQza
-	 pwIlD9bEFTsy4xcXXzPJevZPQSvLns/RP3AmZTZKrSYk8sGmeMMalYsRfE9MbZh3Fm
-	 C7wSD1bRpQTMg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xVXyC-000000027Gl-3QWM;
-	Mon, 23 Nov 2026 17:36:48 +0000
-Date: Mon, 23 Nov 2026 17:36:48 +0000
-Message-ID: <86cxrvzbyn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jia He <justin.he@arm.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 2/3] KVM: arm64: nv: Don't request or attempt L1 VNCR mapping without vncr_tlb
-In-Reply-To: <20261123150917.2679600-3-justin.he@arm.com>
+	s=k20260515; t=1795456254;
+	bh=BmdihYOxirTm+1eTZLfQO693ehUdXJrj7zcBiNWtsTU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=nSRmqnb+fUbrWxvbElJY6njf1lvjAVkusLXLFpjaFxEgQ+kYXgZgf4ZMN68xKQ+YZ
+	 ZDuOeDeOvEWuXxAdz4qv+/1uDMRZHkpDyX1hQ1mnfoWDZcWUddJmIEI6qTPdBUTbDg
+	 awoNG1kWDag7/uPxC53z6rUsK6vHnGFypQu7hk2+cVKf5+sypF3nTrEcss5aYpXMw+
+	 xoDcJp5Jg6FpDbcSSK1DeP6iO6/SlQUJfg6gEnYBS9hlbKJYlzvCxsOFMRDYGV3Chi
+	 5TT1OusQZKg4Q+PiFJOYRjcC7vso4DnCTC4vreS0mgIU0gaaEptbrENdnfFZRF2lxm
+	 Et+USmiUgrwyw==
+Date: Mon, 23 Nov 2026 17:50:46 +0000
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Jia He <justin.he@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Shuah Khan <shuah@kernel.org>, Sascha Bischoff <Sascha.Bischoff@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: arm64: Don't load hardware vCPU state before
+ first run
+Message-ID: <awR4AzA5xeyNmz7i@gremlin>
 References: <20261123150917.2679600-1-justin.he@arm.com>
-	<20261123150917.2679600-3-justin.he@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20261123150917.2679600-2-justin.he@arm.com>
+ <86eccbzcqh.wl-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -84,68 +65,94 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: justin.he@arm.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86eccbzcqh.wl-maz@kernel.org>
 
-On Mon, 23 Nov 2026 15:09:16 +0000,
-Jia He <justin.he@arm.com> wrote:
-> 
-> vcpu->arch.vncr_tlb is only allocated when ID_AA64MMFR4_EL1.NV_frac
-> advertises FEAT_NV2. When NV_frac is cleared to 0 (or E2H0 is selected),
-> vncr_tlb is NULL for the lifetime of the vCPU.
-> 
-> Don't set KVM_REQ_MAP_L1_VNCR_EL2 in kvm_vcpu_load_hw_mmu() when
-> vncr_tlb is NULL. The only other place that sets this request is
-> kvm_translate_vncr(), which only runs on a FEAT_NV2 VNCR abort. Warn and
-> return early in kvm_map_l1_vncr() if vt is NULL before disabling
-> preemption and taking kvm->mmu_lock.
-> 
-> Signed-off-by: Jia He <justin.he@arm.com>
-> ---
->  arch/arm64/kvm/nested.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 4d83281a7a28..2f52c128f3a7 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -979,7 +979,8 @@ void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
->  				vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
->  		}
->  
-> -		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_NV)
-> +		if (vcpu->arch.vncr_tlb &&
-> +		    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_NV))
->  			kvm_make_request(KVM_REQ_MAP_L1_VNCR_EL2, vcpu);
+On Mon, Nov 23, 2026 at 05:20:06PM +0000, Marc Zyngier wrote:
+> [+ Lorenzo]
+>
+> Hey Jia,
+>
+> On Mon, 23 Nov 2026 15:09:15 +0000,
+> Jia He <justin.he@arm.com> wrote:
+> >
+> > KVM_PRE_FAULT_MEMORY calls vcpu_load() as soon as KVM_ARM_VCPU_INIT has
+> > completed. On arm64, however, kvm->arch.sysreg_masks, the trap
+> > configuration, vncr_tlb and nested vGIC state are only set up on the
+> > first KVM_RUN in kvm_arch_vcpu_run_pid_change().
+>
+> I think I'm going to queue a patch disabling prefaulting immediately,
+> and then we can fix this crap.
 
-How do we even get here? Now that you have short-circuited the vcpu
-state loading, I can't see how this code is reachable before we've
-actually initialised the relevant state.
+Ack, will prioritise looking through Jia's series.
 
-What am I missing?
+>
+> >
+> > Running the full vcpu_load() path before then reads unsanitised guest
+> > sysregs and touches uninitialised nested state: get_s2_mmu_nested()
+> > populates nested_mmus[] from raw VTTBR_EL2/VTCR_EL2/HCR_EL2 values, FGT
+> > and HCRX_EL2 are written before kvm_calculate_traps() has run, and
+> > kvm_vgic_load() can enter vgic_v3_load_nested() early. In particular, if
+> > userspace creates an EL2 vCPU with ID_AA64MMFR4_EL1.NV_frac cleared to 0
+> > (so vncr_tlb is never allocated), sets HCR_EL2.NV=1 and an EL1 PSTATE,
+> > and calls KVM_PRE_FAULT_MEMORY, kvm_vcpu_load_hw_mmu() queues
+> > KVM_REQ_MAP_L1_VNCR_EL2. The next KVM_RUN then dereferences a NULL
+> > vncr_tlb in kvm_map_l1_vncr() with preemption disabled and kvm->mmu_lock
+> > held for read:
+> >
+> >   [   73.636014] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000078
+> >   [   73.801972] pc : kvm_map_l1_vncr+0x48/0x2d0
+> >   [   73.884820] Call trace:
+> >   [   73.887253]  kvm_map_l1_vncr+0x48/0x2d0 (P)
+> >   [   73.891422]  check_nested_vcpu_requests+0xb8/0x168
+> >   [   73.896200]  check_vcpu_requests+0x2a0/0x428
+> >   [   73.900458]  kvm_arch_vcpu_ioctl_run+0x2d8/0x6d8
+> >   [   73.905062]  kvm_vcpu_ioctl+0x388/0xaf0
+> >
+> > KVM_PRE_FAULT_MEMORY still needs generic vcpu_load() to set
+> > kvm_running_vcpu for dirty-ring tracking in mark_page_dirty_in_slot(),
+> > but kvm_arch_vcpu_pre_fault_memory() only walks and populates
+> > &kvm->arch.mmu and does not use any hardware vCPU state. Skip the arch
+> > vcpu_load()/vcpu_put() callbacks until vcpu_has_run_once() is true. In
+> > KVM_RUN, vcpu->pid is set under vcpu->mutex right after
+> > kvm_arch_vcpu_run_pid_change() succeeds and before
+> > kvm_arch_vcpu_ioctl_run() calls vcpu_load().
+> >
+> > Since kvm_running_vcpu can now be set without VHE state on the CPU, use
+> > host_ctxt->__hyp_running_vcpu in VHE enter_vmid_context() (matching
+> > nVHE)
+>
+> Can you clarify under which circumstances we end-up on the TLB
+> invalidation path? Simply faulting things in should not result in
+> invalidation. Unless we end-up with MMU notifiers firing?
 
->  	}
->  }
-> @@ -1761,6 +1762,9 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
->  	struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
->  	pgprot_t prot;
->  
-> +	if (WARN_ON_ONCE(!vt))
-> +		return;
-> +
+Yeah I think the issue is that an enter_vmid_context() /
+exit_vmid_context() pair flushing some other MMU could end up writing
+the vCPU's (canonical) hw_mmu into VTTBR_EL2/VTCR_EL2 on exit, even
+though it was never loaded in the first place.
 
-I don't think we want this. Either the code is rock solid, and the
-warning pointless, or we have terrible problems, and I really want to
-see the kernel exploding, specially given that NV is still an
-experimental feature.
+But that would just get overwritten when next loaded anyway?
 
-Thanks,
+So I think it's probably the right change but makes no difference in
+practice ATM?
 
-	M.
+>
+> > and check vcpu_has_run_once() in vgic_maintenance_handler().
+>
+> I have similar questions here. It isn't obvious how you end-up getting
+> a VGIC MI if you don't run and don't load the state on the CPU.
 
--- 
-Without deviation from the norm, progress is not possible.
+Yeah I don't think there is a way? Maybe this is just defensive?
+
+>
+> Thanks,
+>
+> 	M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+
+--
+Cheers, Lorenzo
