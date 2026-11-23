@@ -1,57 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795432367;
-	b=qhXQXqgmpXW85RU5uaTv3q8/REMgAPpPh5ppXNXvcwWsnGKoEHi98P86xuuMKwT0arxc
-	 4ckJTqDhuFykqZDyKfm3xCLZt1j/4JxgQ/FiOLDlOqSsvrnj3naSnjKSABHSX4koZfHlq
-	 mrLt1HHpiWsaJQks0rDHv3octVvyGRqzjTvcnyh7b8bkgB4Z4bNSzztNpn2Z1PWDR6DIX
-	 s4iWZC5Wo1oCglsouOrrrxvudh9UzlkjSy6fM7E06p6vv7xLB5g33bLz17f5h0/PnFOgP
-	 of6WsrFLEXWQ6mxd72p3XQm5b68CwDhnVIutWErYXmcE0J3XEaYhtu3ySv0DG6TraJQ==
+	t=1795432408;
+	b=m8afByOVQ9z8hHeASEM78R92OBP1wCHRFiJK987rKicAKEgUCCYNqD46wk7k1fXl2Wnf
+	 6+ygK+5RPJKItNrwxNKiGHEaqT4ZWX4FVpgPvBh/cDni4M9Ugg0QtDKKZqDHYomMDR1+3
+	 PQkcybxo/wRM1ZAFTmWV+bjg5HVh1jw4PnR1tweBAbyq+4YxKNkroZcV6J143Gi3BBhrc
+	 LJeR25jtZhiI3KdDw2DTHTR/korLAsQv4QAFKyJ4NThvIfDleheSjvm/cxpwaBDVeBohF
+	 /ggR106sMegXmbNmnKqtDaZakGzGIN8DNkuQiihgszv3DXaolmLS7F0Gf3dL9qUa5SQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795432367;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=qrX5Yr120rUTLIH3qjzb7/7MgZS9LyjgbpraPB20evs=;
-	b=HeDm873GCsMR4I5lahEjrNNrAFqNip4sc0ZyK/qZvEbZ0kl0SRa1jXg/yKK3YsH72X98
-	 lN0dhcLtxp2Iw3p9NA4HjfC8kkq8SQ/D7xewIOD1m5cjMckOAzLdmT1hC5ePmc4Nk0t2y
-	 8hkmR9+SlDVBaO3sj4ioumIh20DWTgqHoA3wkAbiQivbrb12x6tO0W1X4Ck1raLFBCefM
-	 eICFyXbzweQCquZQhR1QachyYZZYxLz6jz0oB5yvRaSW0/4Zsv1jJcJ+RRma16xECExc3
-	 1bpMMftjKgjuimF5QJNFLJQsv8nLjXa3fFvdblQ/nqcbOwoP2Q3lca0WFVXN4jvxyNQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795432408;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=pdNtJPN+YZ4rri0c8RqM9UiYr5D4vUVV+Oim0b+KOQQ=;
+	b=kX9KH+0LS/FQL0+t1CKKOeVX33fnGMXfWnqeEpcMuvczA6F6OGB0dIBRNmAUSYB3+sMb
+	 C8Nqmbpa8bvo428H2Rj/09y0M/DfAVPvXwsLmeKvSZnLRMMaggpzeZVDAjHY119ktm5Gn
+	 BjNVBhYx1s9/oJUsHB0mjKD/rMw5iXT1ef2WFJqZiCBNWgMDx5kzQKzLp2P+5eT9pnwaC
+	 R0NjRFJ0k8Ln5xy+GurBtvbcPQZt/fC+pvCUL8sYcwzYccuKtyDlOwmkP2omcXVqz2pfJ
+	 e9/JpZR787t8b3l6b4cwBylXPYk9dkEExG60am1h7O5q29MJ6XyhY3FTf6nit8ZA8lA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FXCeMz+e;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8091B606A31A;
-	Mon, 23 Nov 2026 11:12:47 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=m9Q7jtT3;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE39E606A332;
+	Mon, 23 Nov 2026 11:13:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EE39E606A332
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FXCeMz+e
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1C221F00A19;
-	Mon, 23 Nov 2026 11:12:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795432367;
-	bh=qrX5Yr120rUTLIH3qjzb7/7MgZS9LyjgbpraPB20evs=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=FXCeMz+eZQMM2docDa31NKFyzTxyqZVzLaTc3GTul11qsB+2BCebdpLJyTBKaL6KX
-	 HXtE1nXl77aMs+LOELK8Rj1dAn1vjBle7iQtxdP+NF912rGD82uRNWqFWd4F36OwE3
-	 i6kVNHIyZKH+vSxhavncDRDLJBtYKnp+AHrddG8OwLhEov4BIN3hitDCggAMHXU5B6
-	 5WaK5ZzDKK1vdPPxrBEr1Q/p37kPXzEbc029eXTvHfwpIyjX8dgGxHPFEUYhr1V8ls
-	 hqPM7olb/fRZaoEtU4hbeb/J5Mis+Q84lGlSSgiiFgjb4lOAcZ03W5EchFdSnlW9ZK
-	 nAdtLXLM7iayQ==
-Message-ID: <sashiko-outbox-229102@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 07/11] KVM: arm64: CCA: Add Realm RTT mapping and
- invalidation helpers
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steven Price" <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261123104233.95710-8-steven.price@arm.com>
-References: <20261123104233.95710-1-steven.price@arm.com>
- <20261123104233.95710-8-steven.price@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Nov 2026 11:12:46 +0000
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=m9Q7jtT3
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06927143D;
+	Mon, 23 Nov 2026 03:13:24 -0800 (PST)
+Received: from [10.0.129.12] (Suzukis-MBP.cambridge.arm.com [10.0.129.12])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6DCA73F882;
+	Mon, 23 Nov 2026 03:13:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795432406; bh=oNhrJvzngQdGUdvtf3HwuE2CWgPaaoD7obsB30AVFiY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=m9Q7jtT3qHQi3dYcCrefTbgfBfUUxdNLEeSayLg5rbIkTXoB/x4VvOFF+eg0uhNh2
+	 T/4lQSmqKOLk+XDumy7kWWFZul9JkoADuqxsEvtsVmmda8EtepGJuohYsvZf+bq7uV
+	 Nl/sd5PnvA+c6orhoSiVc+M4ML8dN8BWTlgNNhto=
+Message-ID: <3a3c5681-ff1e-47b6-b942-2d5ce64a8d6d@arm.com>
+Date: Mon, 23 Nov 2026 11:13:22 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,167 +52,100 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 01/11] KVM: arm64: guest_memfd: Check mmap support when
+ preparing memslot
+Content-Language: en-GB
+To: Sean Christopherson <seanjc@google.com>
+Cc: Steven Price <steven.price@arm.com>, Fuad Tabba <tabba@google.com>,
+ Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Kohei Enju <enju.kohei@fujitsu.com>
+References: <20261116164358.142785-1-steven.price@arm.com>
+ <20261116164358.142785-2-steven.price@arm.com>
+ <CA+EHjTy5xBmavNWSYPjqU9qXtssV3ZHzsUr1s_4bVOt1GnDLVg@mail.gmail.com>
+ <6bb490cd-ebbe-41d7-adf3-d6eaf0e53478@arm.com>
+ <b1ef7241-54b0-4a17-83b6-0008e722f2f6@arm.com>
+ <8a095a42-662a-416d-a5d7-79e10161201c@arm.com>
+ <cc27e6a8-6bfa-4c82-92a7-33175baf6803@arm.com>
+ <120ad525-efa5-4129-9d97-fa6fa5db747f@arm.com>
+ <av8No1rvJLXwciId@seanjc-mac.roam.internal>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <av8No1rvJLXwciId@seanjc-mac.roam.internal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 3 potential
-issues to consider:
-- [Medium] KVM: arm64: cca: direct-reclaim allocation in
-  realm_unmap_cache_topup()
-- [Medium] KVM: arm64: cca: stale err_level used after
-  realm_unmap_cache_topup() failure
-- [Low] KVM: arm64: cca: possible RTT creation for unmapped entry in
-  realm_unmap_*()
---
+On 19/11/2026 14:54, Sean Christopherson wrote:
+> On Thu, Nov 19, 2026, Suzuki K Poulose wrote:
+>> I see, thanks Steven. For context:
+>>
+>> Arm64 currently (without inplace conversion support) only allows GMEM
+>> with MMAP flags only and relies on kvm_slot_gmem_only() to detect that
+>> the GMEM has MMAP flag. But, when we enable inplace conversion,
+>> we can't reliably reject the slots by kvm_slot_gmem_only(), because
+>> all GMEM slots are marked GMEM only with inplace conversion.
+>>
+>> Also, from the API Documentation,
+>>
+>> "When the KVM MMU performs a PFN lookup to service a guest fault, the fault
+>> will always be consumed from guest_memfd, regardless of whether it is a shared
+>> or a private fault (unless in-place conversion is disabled and the backing
+>> guest_memfd does not have the GUEST_MEMFD_FLAG_MMAP flag set)."
+>>
 
-commit 4c7e030072ac67c12f0f2603fad3d39821c47426
-Author: Steven Price <steven.price@arm.com>
 
-KVM: arm64: CCA: Add Realm RTT mapping and invalidation helpers
+>> So, in effect, with in-place conversion enabled a KVM_CREATE_GUEST_MEMFD
+>> without GUEST_MEMFD_FLAG_MMAP is an error
+> 
+> It's only an error if (a) the userspace address in the memslot points at the
+> gmem fd and 
 
-This commit adds RMI Realm Translation Table creation, folding, and stage-2
-unmapping helpers for CCA Realms, including filtered range unmapping for
-shared and private memory.
+I don't understand this part. With inplace conversion, we mark the slot
+as GMEM_ONLY and always resolve shared faults from the gmem (on arm64
+as described by the API). So, isn't it a usage error from the VMM if it
+plans to use GUEST_MEMFD_FLAG_MMAP=false with inplace conversion ?
 
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 435174ac3d87f..b34f5320b50b6 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
+In other words, do you mean to say, passing a non-gmem fd userspace
+address is fine with GUEST_MEMFD_FLAG_MMAP=false ? But the API
+documentation and the GMEM_ONLY flags contradict the usage.
 
-[ ... ]
+Now, should we reject that in KVM or not is the secondary question.
 
-> @@ -172,6 +391,208 @@ void kvm_realm_unmap_stage2_all(struct kvm *kvm)
->  	realm->stage2_unmapped =3D true;
->  }
-> =20
-> +static bool realm_unmap_cache_topup(struct kvm *kvm,
-> +				    struct kvm_mmu_memory_cache *mc, int needed)
-> +{
-> +	int ret;
-> +
-> +	if (!mc || kvm_mmu_memory_cache_nr_free_objects(mc) >=3D needed)
-> +		return false;
-> +
-> +	lockdep_assert_held_write(&kvm->mmu_lock);
-> +	write_unlock(&kvm->mmu_lock);
-> +	ret =3D __kvm_mmu_topup_memory_cache(mc, KVM_PGTABLE_LAST_LEVEL, needed=
-);
-> +	write_lock(&kvm->mmu_lock);
-> +
-> +	return !ret;
-> +}
 
-[Severity: Medium]
-When __kvm_mmu_topup_memory_cache() fails, does returning false cause
-realm_unmap_shared_range() and realm_unmap_private_range() to pass a stale
-err_level to realm_create_rtt_levels()?
+(b) something in KVM tries to actually GUP the memslot using the
+> userspace virtual address.
 
-Because kvm->mmu_lock was dropped and re-acquired, another thread can fold
-the RTT at err_level before the lock is retaken.  The callers only retry
-from addr when realm_unmap_cache_topup() returns true; on failure they fall
-through to realm_create_rtt_levels(realm, addr, err_level, level, mc).
-alloc_rtt() can still succeed from a partially topped-up cache or via
-alloc_delegated_granule()'s GFP_ATOMIC fallback (which sets __GFP_HIGH and
-force-charges memcg), causing realm_rtt_create() at err_level + 1 to fail
-with RMI_ERROR_RTT at an ancestor level < err_level.  That triggers the
-WARN() in realm_create_rtt_levels() and returns -ENXIO, hitting
-WARN_ON(ret !=3D -ENOMEM) in realm_unmap_shared_range() or KVM_BUG_ON(1, kv=
-m)
-in realm_unmap_private_range().
+Agreed
 
-> +static void realm_unmap_shared_range(struct kvm *kvm,
-> +				     unsigned long start,
-> +				     unsigned long end,
-> +				     bool may_block,
-> +				     struct kvm_mmu_memory_cache *mc)
-> +{
-> +	struct realm *realm =3D &kvm->arch.realm;
-> +	unsigned long rd =3D realm->rd_phys;
-> +	unsigned long next_addr, addr;
-> +	unsigned long shared_bit =3D BIT(realm->ia_bits - 1);
-> +
-> +	if (start >=3D end)
-> +		return;
-> +
-> +	/*
-> +	 * Callers may pass either an IPA range or its shared alias. Add the
-> +	 * shared bit only for the former. Use addition so an exclusive end at
-> +	 * shared_bit advances to the end of the IPA space.
-> +	 */
-> +	if (start < shared_bit) {
-> +		start +=3D shared_bit;
-> +		end +=3D shared_bit;
-> +	}
-> +
-> +	for (addr =3D start; addr < end; addr =3D next_addr) {
-> +		long ret;
-> +
-> +		ret =3D rmi_rtt_unprot_unmap(rd, addr, end, RMI_ADDR_TYPE_NONE,
-> +					   0, &next_addr, NULL, NULL);
-> +		if (WARN_ON(ret < 0))
-> +			return;
-> +
-> +		switch (RMI_RESULT_STATUS(ret)) {
-> +		case RMI_SUCCESS:
-> +			break;
-> +		case RMI_ERROR_RTT: {
-> +			int err_level =3D RMI_RESULT_DATA_LEVEL(ret);
-> +			int level =3D find_map_level(realm, addr, end);
-> +
-> +			if (WARN_ON(err_level < realm->start_level ||
-> +				    err_level > KVM_PGTABLE_LAST_LEVEL))
-> +				return;
-> +
-> +			if (err_level >=3D level) {
-> +				/* Nothing present, so skip */
-> +				next_addr =3D ALIGN(addr + 1,
-> +						  kvm_granule_size(err_level));
-> +				break;
-> +			}
 
-[Severity: Low]
-This question rests on an RMM architectural detail that could not be
-confirmed from the kernel source: can SMC_RMI_RTT_UNPROT_UNMAP or
-SMC_RMI_RTT_DATA_UNMAP return RMI_ERROR_RTT with err_level < level when the
-RTT walk stops at an unassigned ancestor entry (where neither a child RTT
-nor a block mapping is present at err_level), rather than advancing
-next_addr and returning RMI_SUCCESS?
+Suzuki
 
-If so, when unmapping a sub-block range (such as a single page, where
-find_map_level() returns KVM_PGTABLE_LAST_LEVEL) across an unmapped ancestor
-entry, both realm_unmap_shared_range() and realm_unmap_private_range() only
-skip when err_level >=3D level.  For err_level < level, they treat the entry
-as a block mapping to split, allocating and delegating intermediate RTTs via
-realm_create_rtt_levels() only to fold them back at the end of the function,
-and if that allocation fails in realm_unmap_private_range() (for example
-under GFP_ATOMIC when may_block is false), it hits KVM_BUG_ON(1, kvm) even
-though nothing was mapped.
 
-[ ... ]
+> 
+>> and thats what this patch is trying to fix in arm64 KVM. The question is:
+>>
+>> 1) Should this be fixed ? How does TDX/SNP support older VMMs with
+>> inplace conversion ? What was the conclusion on this breakage ?
+> 
+> There is no "breakage".  If userspace doesn't point the userspace address at a
+> valid VMA, that userspace's problem.  The only thing the early check would do is
+> prevent weird use cases that may or may not be valid (and for which KVM doesn't
+> care), and error out earlier if KVM guesses right and userspace really did goof.
+> 
+>> 2) If it should be, then shouldn't it be done in kvm_gmem_create() ?
+> 
+> No.  As above, I don't see any reason to have the check at all.
 
-> +void kvm_realm_unmap_range_filter(struct kvm *kvm, unsigned long start,
-> +				  unsigned long size, bool may_block,
-> +				  enum kvm_gfn_range_filter attr_filter)
-> +{
-> +	/*
-> +	 * MMU notifier callbacks cannot take slots_lock, which protects the
-> +	 * eager split cache. Use a cache owned by this invalidation instead.
-> +	 */
-> +	struct kvm_mmu_memory_cache cache =3D { .gfp_zero =3D __GFP_ZERO };
-
-[Severity: Medium]
-Can topping up this cache from an MMU notifier callback enter direct reclaim
-and trigger a lockdep splat on __mmu_notifier_invalidate_range_start_map?
-
-When mmu_notifier_invalidate_range_start() invokes
-kvm_mmu_notifier_invalidate_range_start() -> ... ->
-kvm_realm_unmap_range_filter() with may_block set, it holds
-__mmu_notifier_invalidate_range_start_map.  Because cache.gfp_custom is left
-at 0, realm_unmap_cache_topup() -> __kvm_mmu_topup_memory_cache() allocates
-with GFP_KERNEL_ACCOUNT (__GFP_DIRECT_RECLAIM | __GFP_FS), which enters
-fs_reclaim_acquire() and acquires __mmu_notifier_invalidate_range_start_map
-recursively (and risks reclaim recursion deadlock under memory pressure).
-Setting cache.gfp_custom to GFP_NOWAIT | __GFP_ACCOUNT avoids direct reclaim
-in the notifier path.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123104233.9571=
-0-1-steven.price@arm.com?part=3D7
