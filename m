@@ -1,69 +1,145 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.219.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795445804;
-	b=uynXIVkH2LrMM99yrd1JBJO4q7IMthuv162HaC1cW+2pX74krIm2MtNDiXkFcsBPf5jG
-	 lYc9BLE9UcP+RugAyAYZ9hnU3TZooQUhNFiPcTuVf6p1NTXCOrKsDencuJfKPqRY4xyuS
-	 wpQHpAiNbkOn8fWjuPvjt66dNCPmBVxgUByWN/PVvo+AktjuHlgdNQSqnGjKKAyt6gXht
-	 WJ3pWqLgzr/bI3/Zn15PP2RSoa+f//p4KGnhaXkAbQn0b+ISbfrrRC80PRhJ46eY0neZD
-	 g4u4K8Kgin1k5G09yllmhrLDocr8W4kcavbeIrzB+F9iS8hKCHkgT0BGrioP4gh3i4g==
+	t=1795446045;
+	b=RgSiCwUbA/3kz/9qEx2xw6z46c6xgDV3BtsRt057D2hM3AZ38MKenuYGj/5+2u3XkF/c
+	 +jaB296A194YU5EZTo8y4eazmpQKgx6AzdyA4kO8eNe/nk99tkR1iqeP+9kzfjAtdoY1Z
+	 du6zxJWQDTAjgSGxCCSVxNv7QgEg8quPY42UquMrhbWcCqJegHY3kHxDYUwiMlBBbfHe4
+	 VQRRh3e5Xa+udPvdwWbGSDEJe7xUQqbOCyuh4AlObyurOABtHgXcjldvNYkWfLKCmZRGN
+	 cspfqkjOX1gHBC1O1DUo2PP2ToSNqx6ZGBwOeaDeR/BpKqpGy2dqaWEKc/Mt0ddhwLg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795445804;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:In-Reply-To:References:
-	 Date:Message-ID:User-Agent:MIME-Version:Content-Type;
-	bh=JOZamLNrX3zI1FIx1Zgz/K1EJ0SMnsfMEV0ESniCNAw=;
-	b=JTcgIoVrTvCqme3RZd4Wo8s5t/TLMKNC7fL9WTYbmjfbNcepPbt0hxLdodSzAP3/8vnF
-	 KytdIXTxfPVnJfzdnrIf7MmQf+xbr6ctGnhL6VrCYhkS+0G35ehpHBnt1LA8izkA06L05
-	 P7SNQg9nNEl4jZKrBXLC8udc8PJuucwnsHGyBmlgCKQ8+L6VB+ZwQfSZuTF2lyvdA0pEV
-	 ho5WjKzUA1dZgy4u6LQF/LX82pIISFhqZC8rni0FpYUU+cfZPhdVPtoCDx6zMynkFBNAl
-	 nqCBqhKQRCYFil1Hw+9TnRShGtuNTv5mWheW6vshdzc/+v6TUWeguP5QYehRXC3hbiA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795446045;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=8YXzoVkoKKTn5S6189qRHpEA8zSaXUAPSQ685ax1F0I=;
+	b=kB2S/bnSdQXfVAg8IxSymEBN2OHzPSfc7C1usqCxMWcFEowbQdpvgGMqhy4EPqeZQi0Q
+	 RoyJJDHA/Rd/SFLBKSv1S2PlKgcqW/5JIF0m7F07uASdRlgCOjx/+EFICzWO/vpjQa0Nr
+	 SWaUg/AlR/9Q0vhnrjXL35XH0gmvZn83Fbv6uMqimoy58ZCqU94PrETu0ooXOzjC2qmnM
+	 waRI8awV/nJ42RvPu7D/zD36F6+uSaPxyzjsv0Fdbs5sH1TJidU4lDp++nhxjeyvsdP40
+	 9wmXnnUsRq9sYC3SB07b6jbmNWuWwbTFyN7H7dD7/Sqj9BNwCUGB5AJDR5QSvY2qrnA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YqWv2qyj;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=none header.from=ziepe.ca;
+	spf=pass smtp.mailfrom=ziepe.ca;
+	dkim=pass header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b="Js/hN7BF";
+	arc=none smtp.remote-ip=209.85.219.41
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC17606A338;
-	Mon, 23 Nov 2026 14:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF11606A6A5
+	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 15:00:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3FF11606A6A5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YqWv2qyj
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD6091F000EF;
-	Mon, 23 Nov 2026 14:56:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795445804;
-	bh=JOZamLNrX3zI1FIx1Zgz/K1EJ0SMnsfMEV0ESniCNAw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=YqWv2qyjcmNEHZr5ibzz7SsD3Sv0fNqsfzxZTHwNk4UHOxkfmYvkT6oOT0BiMl7wm
-	 /QbzGWI73gNRm2cAqHQpSotGxxCtw2NN85IosI9IXgAw7CnM4SiMCTJxlOfOHqBd0P
-	 FEVIPm6SNuG4PHCNJdCGS4Lo+fIqw6FXLYityRX4nJq+Edu0X2+p0co49qeNLhMcX4
-	 4OSNEgIfA8AqfmtMS3MDIjbFejZ5juflZnGcXMH2BSqpTZgLqpO3I3jOvmof6eNqwo
-	 ntivX1iXJkxlIdDiq+2av3GWxI+Ez9VQvgXdD7vO5JJlmMftHUsStroK2tk4HW/kkV
-	 mIcWQfwg6fLNg==
-From: Pratyush Yadav <pratyush@kernel.org>
-To: Tarun Sahu <tarunsahu@google.com>
-Cc: Pasha Tatashin <pasha.tatashin@soleen.com>,  Mike Rapoport
- <rppt@kernel.org>,  robin.murphy@arm.com,  maz@kernel.org,
-  will@kernel.org,  David Matlack <dmatlack@google.com>,  Alexander Graf
- <graf@amazon.com>,  seanjc@google.com,  jgg@nvidia.com,
-  loganodell@google.com,  arnd@arndb.de,  dwmw2@infradead.org,
-  baolu.lu@linux.intel.com,  Bjorn Helgaas <bhelgaas@google.com>,
-  oupton@kernel.org,  alex@shazbot.org,  gle.com@google.com,
-  pbonzini@redhat.com,  Andrew Morton <akpm@linux-foundation.org>,
-  kevin.tian@intel.com,  joro@8bytes.org,  kvmarm@lists.linux.dev,
-  linux-pci@vger.kernel.org,  Pratyush Yadav <pratyush@kernel.org>,
-  kexec@lists.infradead.org,  kvm@vger.kernel.org,  iommu@lists.linux.dev,
-  linux-arm-kernel@lists.infradead.org,  skhawaja@google.com,
-  sagis@google.com,  linux-arch@vger.kernel.org,  linux-mm@kvack.org,
-  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 05/19] kho: Add feature header for fine-grained ABI
- compatibility
-In-Reply-To: <20261110050202.529473-6-tarunsahu@google.com> (Tarun Sahu's
-	message of "Tue, 10 Nov 2026 05:01:48 +0000")
-References: <20261110050202.529473-1-tarunsahu@google.com>
-	<20261110050202.529473-6-tarunsahu@google.com>
-Date: Mon, 23 Nov 2026 14:56:36 +0000
-Message-ID: <2vxzse0rzjdn.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=Js/hN7BF
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-9215934a14cso8603846d6.0
+        for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 07:00:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1795446044; x=1796050844; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=8YXzoVkoKKTn5S6189qRHpEA8zSaXUAPSQ685ax1F0I=;
+        b=Js/hN7BFiz+V59LU3g3qClRYtgCYYRyqOBkW49G+CeYW1aEcatOFKpUqNmDa6nwoLO
+         EEbZijW6BaZXx7xFQ+7bBLUFNphUSNLLEct5ENjAr5bCyRwBr03momZfim1ZfRs7R6og
+         IuK9n0r/YinKfN0nFoXlYdgmv3JMxrqeV/+rOki5A6zQ16unhdz3qvXlQtHAnyXaCKAw
+         m15ayg/ihxXKoYaonVGoEZTjRJMfkV25c4wJHR9yhGd4A7pVyaHJkb/UtBalcU5uuOxE
+         BqeYptVjjfg+ensmZldQmRMXh2aVA2slv7fdKgNyHhoTrDbMjjhC7R6NhJfv1zKy/aIf
+         S95A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795446044; x=1796050844;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=8YXzoVkoKKTn5S6189qRHpEA8zSaXUAPSQ685ax1F0I=;
+        b=Mz4xIiuwCxyhfUZycuB/v0QjbtfX3kk6KK7L+Sg9xBiLby/0E1EufLexzi1SxjTrlM
+         RN1gJJSSZMV9D79rNtsCO0NNf9efnbd4uYnPx/Vh7H7fXLjt4Czvn2OvCSYlK2X0QlTK
+         n94wieYzN+WBBB5D0kxDs2tTXsVsaHQK4PV1VwJASIjBjvjnrcopNJTs//KnafqkI/Cf
+         Ct3/2eT1NP8BFfw5jLDDmcBdvEBVCPXGp3hPvAGOcHy9/Csx28po5qBmeUoia6g3lNrE
+         MEmXxr6NhCZ34LQxKjI8p6BgwCxDVe+h5cKNfCMaVtrmtLgnySeFNaNkJgI/DKGv6poH
+         vaiA==
+X-Forwarded-Encrypted: i=1; AL+hErHcY4nkIdM/RYvBNm5FGJbeSPG3G8jDouI7L/Itm2kszkOBpLQPBpwsduKbxXEmSCOGG97WOic=@lists.linux.dev
+X-Gm-Message-State: APuU4Z9r6tin2Ry5ZUOFCxQ6Fm2MGSVrRDqC5HSHaYLC/7v/0+z7Gxm1
+	KJsK3af39zD8xVxUbdyYjjkXRfe++sv4C5R+4gCrHoY7GQusrNorUEl7ZUsnH3br4dM=
+X-Gm-Gg: AZFdTZeMmej77vqyIJJZR46YF8F6aZSfkRPNtaNZ70GrhmxOyJIqvza/pXB1uKbs5Sx
+	tEEUCCJHLzNEy+/7zPqWTt9WqPWyvFtAfzkN8TIcfh3nuIW1YOktfyQqwFim2A3cqb544g0eWbC
+	2zrxLWhQhYDKlwXLkddYmUssJwa5154e1uUaR01Yu1NfyO4vBJ4IWBJUbA4J1zlDuciXh2BORug
+	i/EGHI9DIH2edlRdd7m2fPECf9rU2cCNtwdI11SN7/FSO7ppd2Ury9bP5WEzr2O6GPf0nv6CEbD
+	/hwgGel1BWONuhOTmp1nN+gGRgfyc2/Z/nf2jsEt0u+sssj6Ci/2Pq2FO/68/zu9sI3e+qa9QSP
+	I0UIo29nNt6ygHmUW3PcuSsadXUUAlGMHDCivhHGa6Vhh5rix4MQRcV4BV1OFYn26lZoqsB/eth
+	tRGr5tlQEmpRLI9rOnrQ2ZJsokUGG7hYm79lPm2bVszAGwdO+1gZnHe6p0tp6crzwVil3qAciyr
+	NXvS2wfht4OjOr00PUKpFjdalntVjzgcGSgbg+Mx2Hg32OFY0T9ULgyGvbLH8z8Bmutqk62ya9y
+	hhvyco/zuqIer7vKV28MN0YpuPfZJKaeoQrk5XjaGPMD9Vm7iTM/AyjcSVhbXP4FJ3G771A0yax
+	dwHI=
+X-Received: by 2002:a05:6214:4891:b0:921:27c2:3f89 with SMTP id 6a1803df08f44-92134a3715dmr207386236d6.17.1795446043629;
+        Mon, 23 Nov 2026 07:00:43 -0800 (PST)
+Received: from ziepe.ca (stjhnbsu6iw-159-2-142-59.dhcp-dynamic.fibreop.nb.bellaliant.net. [159.2.142.59])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-92134a16754sm107600476d6.39.2026.11.23.07.00.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Nov 2026 07:00:42 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1xVVX7-00000000rK9-14j4;
+	Mon, 23 Nov 2026 11:00:41 -0400
+Date: Mon, 23 Nov 2026 11:00:41 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	linux-coco@lists.linux.dev,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
+	Brian Starkey <Brian.Starkey@arm.com>,
+	John Stultz <jstultz@google.com>,
+	Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
+	"T.J. Mercier" <tjmercier@google.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <chleroy@kernel.org>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Shrikanth Hegde <sshegde@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	linaro-mm-sig@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev
+Subject: Re: [PATCH v10 04/13] irqchip/gic-v3-its: Allocate shared tables
+ using CoCo shared memory allocator
+Message-ID: <20261123150041.GB179082@ziepe.ca>
+References: <20261116091137.94252-1-aneesh.kumar@kernel.org>
+ <20261116091137.94252-5-aneesh.kumar@kernel.org>
+ <awQd81MwZqi55gf8@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -73,121 +149,75 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <awQd81MwZqi55gf8@arm.com>
 
-On Tue, Nov 10 2026, Tarun Sahu wrote:
+On Mon, Nov 23, 2026 at 11:05:23AM +0000, Catalin Marinas wrote:
+> > -	/*
+> > -	 * If set_memory_decrypted() fails then we don't know what state the
+> > -	 * page is in, so we can't free it. Instead we leak it.
+> > -	 * set_memory_decrypted() will already have WARNed.
+> > -	 */
+> > -	if (ret)
+> > +	if (alloc_cc_shared_pages_node(node, gfp | gfp_flags_quirk,
+> > +				       PAGE_SIZE << order, &mem))
+> >  		return NULL;
+> >  
+> > -	return page;
+> > +	return mem.page;
+> 
+> This part is mostly fine but I do wonder why not make this alloc
+> function the same as buddy alloc_pages_node() - return a struct page
+> pointer.
 
-> Serialized structures in KHO and Live Update Orchestrator currently rely
-> on whole-structure compatibility strings or monolithic version fields to
-> validate handed-over state across kexec. Any change to a serialized
-> structure, even an optional additive field, requires bumping the
-> compatibility string or version number and breaks live update between
-> adjacent kernels.
->
-> Introduce a generic feature header (struct kho_ser_hdr) for serialized
-> binary structures in include/linux/kho/abi/feature.h. Each subsystem
-> groups the fields of its serialized structure under feature indices,
-> starting with index 0 for base fields. When a subsystem adds a new
-> capability, it appends new fields to the end of its payload structure
-> under a new feature index. Retired fields are kept in place so existing
-> field offsets never shift; if the type or format of a field needs to
-> change, the existing field and feature are kept intact until retired and
-> a new feature index with an appended field of the new type is added.
-> Only when a change requires a complete break in the serialized layout or
-> semantics that feature flags cannot handle, a new handler or format can
-> be introduced with an incremented version number.
->
-> Each feature belongs to either a required feature space or an optional
-> feature space. Both spaces are numbered independently starting from 0.
-> In the serialized header, required features occupy the first nr_required
-> bits, followed immediately by nr_optional bits for optional features:
->
->   struct kho_ser_hdr {
->           __u32 size;
->           __u16 nr_required;
->           __u16 nr_optional;
->           __aligned_u64 flags[];
->   };
->
-> A set bit indicates that the feature is present in the payload. The
-> truth table for deserialization:
->
->   Source bit       Target            Action
->   Not set          -                 Accept: feature absent
->   Optional set     unknown or known  Accept: ignore or use the data
->   Required set     known             Accept: use the feature data
->   Required set     unknown           Reject: -EOPNOTSUPP
->
-> During deserialization, the target kernel only validates required
-> features: if the source set any required feature bit at or beyond the
-> known required feature count of the target kernel, validation fails with
-> -EOPNOTSUPP. Optional features are never rejected; the target kernel
-> simply checks whether known optional features are present before reading
-> their data.
+I'd argue we shouldn't even be returning struct page here, do many
+places even use the struct page? What for?
 
-I've been thinking more about this recently, and I don't think we need
-to differentiate between optional and required flags. I think all we
-need is "feature flags".
+Exposing struct page to places that just want a kernel addr means they
+have to call page_address and we are back to the highmem weirdness.
 
-Let me explain this by taking my KHO map patches [0] as the example, since
-they got me thinking about this in the first place.
+> >  static void its_free_pages(void *addr, unsigned int order)
+> >  {
+> > -	/*
+> > -	 * If the memory cannot be encrypted again then we must leak the pages.
+> > -	 * set_memory_encrypted() will already have WARNed.
+> > -	 */
+> > -	if (set_memory_encrypted((unsigned long)addr, 1 << order))
+> > +	struct cc_shared_layout layout;
+> > +	struct cc_shared_pages mem;
+> > +
+> > +	if (WARN_ON(cc_shared_calc_layout(PAGE_SIZE << order, &layout)))
+> >  		return;
+> > -	free_pages((unsigned long)addr, order);
+> > +
+> > +	mem.page = virt_to_page(addr);
+> > +	mem.shared_size = layout.shared_size;
+> > +	free_cc_shared_pages(&mem);
+> >  }
+> 
+> Here it gets weird and I don't see why we can't have just a buddy-like
+> interface. The kernel-doc for alloc says that shared_size must be
+> retained for the corresponding free but without reading the source code,
+> you can't tell that cc_shared_calc_layout() gives you the same
+> shared_size populated by alloc. We have a similar pattern in dma-buf but
+> using the compound page order.
 
-I sent out RFC v1 with no multi-entry support and static depth. During
-the review, we figured out that we should support multi-index entries
-and dynamic depth. Both of them need breaking ABI changes. If you use
-these features, a kernel that doesn't understand them will break.
+This makes sense, we should not be passing size to a free function,
+make a compount page/high order folio instead if the API is going to
+be struct page based.
 
-Now let's say for argument's sake that we merged my RFC v1 as-is, and
-later down the line realized that we needed multi-index and dynamic
-depth. They are backwards incompatible ABI changes, and so need required
-flags called say KHO_MAP_F_MULTI_INDEX and KHO_MAP_F_DYN_DEPTH.
+> We can get rid of layout and mem structures (or at least not as
+> part of the API). Of course, this assumes that the shared granule size
+> remains constant for a guest's lifetime but I don't think that's a
+> problem.
 
-If memfd_luo does not know what features the incoming kernel supports,
-it can't really ever use these flags. Because it can not guarantee at
-all that the live update would succeed. So without information of what
-the incoming kernel supports, you can only ever add optional flags.
+It should be encoded in the struct page meta data, as the order.
 
-From the conversations we've had at LPC and in the bi-weeklies (and also
-[1]), we want to supply a specification for all the features the
-incoming kernel understands via a uAPI.
+> Was there a caller you had in mind that needs the common allocator to
+> share less than the whole buddy block?
 
-Once memfd_luo knows whether the incoming kernel supports
-KHO_MAP_F_MULTI_INDEX or KHO_MAP_F_DYN_DEPTH, it can choose to use them,
-or go with the less efficient single-slot entries. It makes that
-decision when writing out the serialization structures at runtime based
-on the spec provided. Backwards compatibility is kept by looking at what
-the incoming kernel supports, and only using what it can understand.
+If we want this it definitely needs to be a void * based API not
+struct page one though..
 
-When we have all this available, I don't see the point in
-differentiating between optional and required features at the ABI level.
-At the ABI level, all that matters is what the incoming kernel
-understands. If the incoming kernel does not understand a specific
-field, the outgoing kernel should just not use it. There's no point.
-Best case, it gets ignored.
-
-The semantics of required or optional then become "can I describe this
-object with the capabilities I can use?". If the answer is yes,
-serialization succeeds, if the answer is no, serialization fails. So
-with this, KHO_MAP_F_MULTI_INDEX or KHO_MAP_F_DYN_DEPTH are indeed
-optional. All memfds can be described without these, they just will be
-less efficient.
-
-The only thing that the optional flag buys us is to add backwards ABI
-compatible changes _until_ we add the ability to export the
-specification of the incoming kernel. Since that should be coming in the
-near future, I don't think the churn of optional flags is worth it.
-
-So in short, here's my proposal: we only do "feature flags". The
-serializer should know what the incoming side understands, and it should
-only use the features that are understood. It should simply not use
-anything else. If it can't describe an object with the flags available
-to use, serialization fails.
-
-[0] https://lore.kernel.org/kexec/20261116134013.1636689-1-pratyush@kernel.org/
-[1] https://lore.kernel.org/kexec/CA+CK2bCnS8wcVDbOymBGeJB6pDUkknOpF22EynbwSV=D5=J4ow@mail.gmail.com/
-
-[...]
-
--- 
-Regards,
-Pratyush Yadav
+Jason
