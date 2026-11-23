@@ -1,96 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795461920;
-	b=dG48OIL52s4oBlb9i5N4aHrBmMiF+kKAlfWZlto/Fmieia1LsBAsmmSmJ0qiiI+mOO3X
-	 ctNJO7bINhGa0yGQMVR3stabipxGRei0m9A8qi53MTfxW1ZUK9l1K5iODNvc0OnL/hqaI
-	 iVXR9iu1FZcSpgKIdFtrjbZbAfHWc0/u4cb4uTtCf9kP6uX+YwvZzbrEU/sPopD9JiCZ0
-	 CaBC6RNkdqM1Uj8pZ4SpesmF/nZ0y5Dv6+iVVwl77hU4dpiUBWzkGNP5qqy6eEvAGeFGs
-	 qWex+9sGEC722IRdWbbARC6xhPCutsbICXksUovEjrkzZ8nvJfzAMYI0HwhPCUL6c2w==
+	t=1795461923;
+	b=VwC/J+0uJGu+RGrHMlgFDswl98fa86ANeLhLWct+KG8QyX8dCplCJ5mSd57xKulCA2oN
+	 q/RymKMvncnwDYRqKyUrp0+ZlhaHAlnhrWe2CVauR53XHpdhLA6bRCghR3jeBsmX7Ny2s
+	 6YK7DbIgcTO4fwREGawk3wQiBTnNi5KzyTQJOiP0lgvelBZ3B8BePy8SvNlfXCuD/w7dl
+	 8ZJTL0zbQaEQwis5nYPgl2/9HT9FFiwL6436n9RLWSM8I/1wM1QcMtdrPjxe84OW/LnDU
+	 ryQwVsVa79autLDlNQxMcy5rDTMBCg53fXRZv5CD8hXHHZ8h3sQ6oywbfn0eW4Iul/w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795461920;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=Ivc+yZF1e+YkHBH2XdPHCIshByex18b++1Ftez3VniI=;
-	b=C2LILcypnPszC/sq1KHHtLlwlLluR1xmihZxctDrH2kX0fvl/ejhjgpX7iMFEOMGcPN3
-	 8D2h2Aq/qaOMJr/s4T0GBR0IvSwgodcR4VhOXIP9zRGJ/mXxKhf/+08FKr4t6HOKWPjFD
-	 BysosnTif88itVJA1t71AcaPzlB2nTW1kT9sNBfxGoYwVCLRtpBpzNOrKxueTZpsaeifl
-	 eWcmn+NdxLfydSX703ExhmKrxC0lKOoe8+n+z8Cd/5KVkwRI2k0r5rUrBeQMbq+wIDBMY
-	 rNdHwqfxx3/L93SWL4UlmYMgYtGLGdPIJdwgxgcb3IDYRgwirATnzeSWkfdfUOZLS1A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795461923;
+	h=Received:DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:
+	 X-SA-Exim-Mail-From:X-SA-Exim-Scanned;
+	bh=BFhYmS3lF+XBG7GlA3KpWFp5tO2SjJoboEtR4nWrvcs=;
+	b=LOm5nlrzI3HkfrssZRTan4bjBIhn4G71ch5jpq485u/nr70OyImTaxXGKhCkfJRA3XE0
+	 qP29+y2jmvjAp5PWs++zWHGKYu8X4AYGGSZsFHXE9QuBR0nLiHSH+HZFxXr+T3Uj85h6T
+	 z4nWhS4MLxVC3cl31JJp+ZTK/OUkekGQLS5DKeSGzeOpfNyM5dy4Nn4eW7XJJTN+/B15l
+	 f+z2y1C7ARfMUcLhBGm5kNUNDMzWuHRq0esCVrVq1QZjqZfHxcHCI0zNVm3uEBZcS6thG
+	 NhlDq2c36UkZNbIZpu3gUwzBY6tK0NvUIzua3Hwb1CRb3XfN3PWBP41oBkCkFCgKKXg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=pereq.eu;
-	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=KeqImWCM;
-	arc=none smtp.remote-ip=209.85.128.42
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=L5YgBkR+;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BAC606A321
-	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 19:25:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D6BAC606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1AB606A31A;
+	Mon, 23 Nov 2026 19:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=KeqImWCM
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a210470b49so36215915e9.2
-        for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 11:25:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1795461913; x=1796066713; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Ivc+yZF1e+YkHBH2XdPHCIshByex18b++1Ftez3VniI=;
-        b=KeqImWCM/9fSw5XXICwDpLbofnwB+fY/ixW+0HlvCU0UbcBWLhvt5wuraUn6Klqfm4
-         zJiQZT1HRx20enWhohckf+PMObD5YAy1XyBX9XD9gP9KTFK4HcOYeVQHxML42b/gKfRb
-         9uHGHK8d8D4DDjU7umpgGEGdGBXzJG7i8aLAAni9ZFFnwaxTcwihAv8ipruQF4hq7zY5
-         DC+31DN5CmpxwNW5YBb+YhDqFAlkBLRcYArob40vFjvdG4qGFvwWFHtneFCe223m6VD8
-         raHQQTwJ7aSUk7I7h35s4DjGG0gjO6bAtKJ/QEnFy1AcZl6nXPqEaKfhnGkBFvgYH+jT
-         fMSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795461913; x=1796066713;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Ivc+yZF1e+YkHBH2XdPHCIshByex18b++1Ftez3VniI=;
-        b=RUtnrppv6xzhHMZtwl3VT87lpLvveOdB6NL1PJ7ark8ePxV1Md6YWIUUFTqDLmq6xO
-         GtVEM5tO20FN+il7SrLu9Vu86BYwHzQ6POdmI2pjU1UC3J09gQ1NmvSsFj89huZ+oLA7
-         UR2kqTykohjcmkNhxekg54xmqudb7og09DtRi9lTpLVF9RuRpWnO7kMZFgDFPtkkrInb
-         fAIEFPaef6a2reBvb4jHXAhW18nx7JUdFH/Slk6WZ6bjue67ZyrLqi4D3qWkY95cBy/t
-         2EooxYvx3LOHc9qqrGfT+oNo2P8j1rZV4+d98qfKpiRIQxfBfTnVD6JaMPN9+TfM0s7V
-         w7fA==
-X-Gm-Message-State: APuU4Z+g8qV0IXejitMqhdvBbWhbtQflzR0vOD3wEWTr8yRJ+gKtuit8
-	qSDKQC0aOR+P2CesZ+otiROAQzzW4IcI8J7G2Fmpjb+YXD1E9su8RzWg8RxiX3r8F38=
-X-Gm-Gg: AZFdTZciPooda+MRbJ5ajRh6b9aGqMy4tTV1PTyGRLQvC38NjQWhFZcEhkwAOxSFRYC
-	VCqmDTHDym75LAFW3W7SashK28KYUmIBj4pmYcsYzfE2DtuY2MBSukH5QG3Q9V29JMKOQk5oWnr
-	6cObDPyDHBAsQviZo9ryqPzUX7kwT2OfAz61qG0nEn9wmjT6nnqP3yQ2Rx1qVc6OONzPfqYjYP7
-	7945pklaVo5vWA3ZSD5Rvv1NafoLXuqUkunNGCgEblGdRUuZEZy+zQGPKic3OOc0R6ydxDyN1rS
-	dx4RUgBizxYZLO1Jy6+VNO0fJF99OHLjCMh7USwsY6s5RmRBAzH8+d8Z4d4pNaj76f81OJYb/ty
-	xaAZE/22P6K5fhDakcP1S/NE/S+YjtVkPpOcmVTVM7Lj5bse/Qkn1Q0IXp5CS5R1sWedRfdx91X
-	4+kGWFuqWiFL+b1dPR73wFrpYkiMVam5w/craTLxbWiyLf9Y9C7cucLA3Na8ZOxcrCKYmG8wXRj
-	B3hbMru8yurDFHZkCBGmSJ4lvPQmMpzwJ8jlxJc9hU3CZqavei/qBX5Cr+KvHj8yhb1hkDnq1nY
-	5Dv+9f9pjy1YmTEmHj0=
-X-Received: by 2002:a05:600c:670b:b0:4a6:30c3:1114 with SMTP id 5b1f17b1804b1-4bb88922df3mr240330235e9.12.1795461912931;
-        Mon, 23 Nov 2026 11:25:12 -0800 (PST)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb884911e3sm442986305e9.6.2026.11.23.11.25.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 11:25:12 -0800 (PST)
-Date: Mon, 23 Nov 2026 22:25:09 +0300
-From: Dan Carpenter <dan@pereq.eu>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Steffen Eiden <seiden@linux.ibm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=L5YgBkR+
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7294C1F000E0;
+	Mon, 23 Nov 2026 19:25:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795461923;
+	bh=BFhYmS3lF+XBG7GlA3KpWFp5tO2SjJoboEtR4nWrvcs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=L5YgBkR+VrmeyzgAZ3he/DIjkd0SE8JFs6tCuHUcfQ4nGLfMqmzRs+JwPfl2Qa6dU
+	 cA2+9MoIbNqRjOJOxOwHCG/0E2kZhUNZ7ehLJ4yu7b7thA1evlipDM7J6XlyTPxKyU
+	 kkTQxwv6VwQc1G7QEK2AEejh0qJUEmaCX36RTM/y9sJOlXLyW89CXrVJQEDhUB9gpF
+	 klKyO2YmOyXlrGWMt/tZiPuYU9O7ofEFQlCqwU8Bd7qBvBIpT2OCdpzRrVXZwxlxFF
+	 42l8F641voaBYdq3gG8yhtRWIIbaYTs20mGJc6vRcuQ4F6QOQetaR1OjZbhJOL0yHl
+	 7K+mY46wnrbOQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=localhost.localdomain)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xVZfF-00000002A6V-2yEk;
+	Mon, 23 Nov 2026 19:25:21 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>, stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Upgrade sub-page TTL hint to maximum size
-Message-ID: <awSTFVxQQuz1tbk4@stanley.mountain>
-References: <20261123182312.4842-1-maz@kernel.org>
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: [PATCH 3/3] KVM: arm64: Drop open-coded GIC idreg sanitisation
+Date: Mon, 23 Nov 2026 19:24:57 +0000
+Message-ID: <20261123192457.8700-4-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261123192457.8700-1-maz@kernel.org>
+References: <20261123192457.8700-1-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -100,45 +72,140 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261123182312.4842-1-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Nov 23, 2026 at 06:23:12PM +0000, Marc Zyngier wrote:
-> Should a guest be slightly foolish and submit a S2 TLBI with a TTL hint
-> that describe a base granule size smaller than the host's page size,
-> we take the resulting size at face value and feed it to the S2 unmapping
-> code. Which legitimately screams about something not being page-aligned.
-> 
-> The architecture allows us to drop the TLBI on the floor, as we don't
-> support a S2 granule size smaller than the host's page size. But it turns
-> out that doing so is proving pretty hard (we call compute_tlb_inval_range
-> from a number of places, none of which is amenable to an early out).
-> 
-> Instead, detect the annoying case, and pretend that we don't have a TTL
-> hint at all, leaving the size upgrade mechanism to take place and use
-> the largest possible size for the guest's S2 granule size.
-> 
-> This will still allow nonsensical stuff to get through, such as a 4kB
-> level 2 (aka 2MB) from a guest with a 64kB S2 base granule size running
-> on a 16kB page size host, but that's not worse than doing nothing, and
-> the host code won't get shouty.
-> 
-> Reported-by: Dan Carpenter <dan@pereq.eu>
-> Link: https://lore.kernel.org/r/20261123-inval_range-v1-1-815e15797089@pereq.eu
-> Fixes: d1de1576dc21 ("KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
-> ---
-> 
-> Notes:
->     Reposting this as a first class patch, as I'd like to plug that one
->     as early as possible (and Dan has plenty of other patches in flight...)
+Now that we have a generic mechanism to sanitise the GIC idregs,
+drop the open-coded version and replace it with a call to the
+new code.
 
-Tested-by: Dan Carpenter <dan@pereq.eu>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/sys_regs.c       | 45 ---------------------------------
+ arch/arm64/kvm/vgic/vgic-init.c | 31 +----------------------
+ include/kvm/arm_vgic.h          |  1 -
+ 3 files changed, 1 insertion(+), 76 deletions(-)
 
-Although obviously zero is handled on the next line so there wasn't
-much call for testing, but I still did do the testing.
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 0687b78cd7c2b..d145541420b3a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -5874,51 +5874,6 @@ static int kvm_vm_finalize_sys_regs(struct kvm *kvm)
+ 
+ 	kvm_idregs_enforce_dependencies(kvm);
+ 
+-	/*
+-	 * This hacks into the ID registers, so only perform it when the
+-	 * first vcpu runs, or the kvm_set_vm_id_reg() helper will scream.
+-	 */
+-	if (!irqchip_in_kernel(kvm)) {
+-		u64 val;
+-
+-		val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
+-		kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1, val);
+-		val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1) & ~ID_AA64PFR2_EL1_GCIE;
+-		kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1, val);
+-		val = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
+-		kvm_set_vm_id_reg(kvm, SYS_ID_PFR1_EL1, val);
+-	} else {
+-		/*
+-		 * Certain userspace software - QEMU - samples the system
+-		 * register state without creating an irqchip, then blindly
+-		 * restores the state prior to running the final guest. This
+-		 * means that it restores the virtualization & emulation
+-		 * capabilities of the host system, rather than something that
+-		 * reflects the final guest state. Moreover, it checks that the
+-		 * state was "correctly" restored (i.e., verbatim), bailing if
+-		 * it isn't, so masking off invalid state isn't an option.
+-		 *
+-		 * On GICv5 hardware that supports FEAT_GCIE_LEGACY we can run
+-		 * both GICv3- and GICv5-based guests. Therefore, we initially
+-		 * present both ID_AA64PFR0.GIC and ID_AA64PFR2.GCIE as IMP to
+-		 * reflect that userspace can create EITHER a vGICv3 or a
+-		 * vGICv5. This is an architecturally invalid combination, of
+-		 * course. Once an in-kernel GIC is created, the sysreg state is
+-		 * updated to reflect the actual, valid configuration.
+-		 *
+-		 * Setting both the GIC and GCIE features to IMP unsurprisingly
+-		 * results in guests falling over, and hence we need to fix up
+-		 * this mess in KVM. Before running for the first time we yet
+-		 * again ensure that the GIC and GCIE fields accurately reflect
+-		 * the actual hardware the guest should see.
+-		 *
+-		 * This hack allows legacy QEMU-based GICv3 guests to run
+-		 * unmodified on compatible GICv5 hosts, and avoids the inverse
+-		 * problem for GICv5-based guests in the future.
+-		 */
+-		kvm_vgic_finalize_idregs(kvm);
+-	}
+-
+ 	set_bit(KVM_ARCH_FLAG_ID_REGS_FINAL, &kvm->arch.flags);
+ 
+ 	return 0;
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index c9991e24cb6b7..b6236146602d8 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -180,7 +180,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+ 	 * We've now created the GIC. Update the system register state
+ 	 * to accurately reflect what we've created.
+ 	 */
+-	kvm_vgic_finalize_idregs(kvm);
++	kvm_idregs_enforce_dependencies(kvm);
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		ret = vgic_allocate_private_irqs_locked(vcpu, type);
+@@ -770,35 +770,6 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+ 	return ret;
+ }
+ 
+-void kvm_vgic_finalize_idregs(struct kvm *kvm)
+-{
+-	u32 type = kvm->arch.vgic.vgic_model;
+-	u64 aa64pfr0, aa64pfr2, pfr1;
+-
+-	aa64pfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
+-	aa64pfr2 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1) & ~ID_AA64PFR2_EL1_GCIE;
+-	pfr1 = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
+-
+-	switch (type) {
+-	case KVM_DEV_TYPE_ARM_VGIC_V2:
+-		break;
+-	case KVM_DEV_TYPE_ARM_VGIC_V3:
+-		aa64pfr0 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
+-		if (kvm_supports_32bit_el0())
+-			pfr1 |= SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
+-		break;
+-	case KVM_DEV_TYPE_ARM_VGIC_V5:
+-		aa64pfr2 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
+-		break;
+-	default:
+-		WARN_ONCE(1, "Unknown VGIC type!!!\n");
+-	}
+-
+-	kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1, aa64pfr0);
+-	kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1, aa64pfr2);
+-	kvm_set_vm_id_reg(kvm, SYS_ID_PFR1_EL1, pfr1);
+-}
+-
+ /* GENERIC PROBE */
+ 
+ void kvm_vgic_cpu_up(void)
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 4b2c41917b77c..956c68f75e7c0 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -689,7 +689,6 @@ int kvm_vgic_create(struct kvm *kvm, u32 type);
+ void kvm_vgic_destroy(struct kvm *kvm);
+ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu);
+ int kvm_vgic_map_resources(struct kvm *kvm);
+-void kvm_vgic_finalize_idregs(struct kvm *kvm);
+ int kvm_vgic_hyp_init(void);
+ void kvm_vgic_init_cpu_hardware(void);
+ 
+-- 
+2.47.3
 
-regards,
-dan carpenter
