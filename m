@@ -1,81 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.216
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795433684;
-	b=3oOx+kBR0b3K+ADrErTSCXpsvtl2wM6BDllLTn1iLJgBPNYZ91eXIHS4oqyzx/0Q0Ljm
-	 /OKu5+2n5ueV9J8hTZDmuhQG2v/Y5rmVUg/C+p3EVP6tVhs28XxmJGkH7cW76t2h/Apxl
-	 88tfnWyWOEnHboE2Um36zalUB+73cGxjw1TJVTK+g154ClF/fy+FafXdWYa+Pw69rajk6
-	 7A5qSC+kfqIs1sjxpHfo/Aq92fQKQ/r4L6vCTF432bVa4dszMkzvvonxzc+bUKRiFdjSS
-	 M8H3EsSQMUzuX9ntRDlNKm6PuaDdbIKSfIyQ0VIoeTDT+Q/2MGuBjDeB2NnGxinAkDg==
+	t=1795433709;
+	b=XaWva1EgXPJDFUZxUu5RlsF5WauqWM2e5h27I3PzWAE6GdanUjrl9VTafx1JiKvI19Mb
+	 udStMHokkrcVwuPt6YHaUCcveAU7G8gZm9taO9/9xvFgoTUOsfgfDuLeCohBFj4+1RI8c
+	 ojyRbGOZUJM6lTiS4GUAXXvx122GzlwGOwC4bgKmn1I6Gosm4JSVSF07JAieEch81vHd2
+	 PNj2lvBF5VvXvaJbhi/Xbot1vPWQWrknHQyU9cQa0Vf/kot5GzOrmJDj27C8lrFKyXDTV
+	 8nXcyt4Br1BU8Vu5Z+8ZPTFeo7wI44eAl2amBM09EMMRwGiC3JNBIP06RXew4hQ56cA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795433684;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=fmxcbhG1chT0b9F6QCQYXCbAO+nUWqbQ4u1W0a/I5sc=;
-	b=K2l7VMUcBqTE97gURrbN0nMeMgswywtEnK3uULqnirmxddrlQ0ZlJCMidPd14Db0q/Qb
-	 Xg5R9/bI7KdQDW0OYhiXupREFwW1of56R8lU/O/ePxvR9OEK9HQlrG6BZlROHxlLf9HX6
-	 UK0ujTm2awknCqurBSmgpEGGtIT7ft8Mnqltsh3obK82l4TDun85fVtz2JajU/sEVKif4
-	 dzautkwROEHWpU65ZK+Duhi/3KxdKEQ3sNKCuLEO92WE+hXK5PJoRjb4i/aIuKvZbYi2p
-	 ixeoEClPw4H0ikOR2Umzx1VMHIQNaJAfYjFNfrT7D5qTUiVhWVTlJ9Bd52B6IpYwd0Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795433709;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=bFQeSIonQoNAJlvVjuvJ7vB2WO8yi3wgzbUUjHoVyjo=;
+	b=P58AQgFDbjGBHKTt5kOddeQ7MelZBl59fnuO4hLELnkLutSFJd8H80yz34bDGL7whx2M
+	 TaozvWQ7PE1DWC4sy6dJ7887z++wtrl0pzCGga64eW2uQNaxwBiUWUaeWRlCMocCrbMos
+	 oBIrY5t+wT1u3ceo/UMwE9O9RviRgQOabWDMihXeIEhWjXWgUb9KknLFoA7YcqceuhqW9
+	 1vAU3KxHygch5Znzi401HZF5gBWTXx3KuYBMD4192WvmTkkOuTRxpIVvbDQTegSfz3gj0
+	 h/23Bjjr/QjsXuNhGJYKaHC/Xo/rI10F+CNDR/hkjOZp7SbKr0PhVvalIvDYcg8wnJQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=EJMipN2q;
-	arc=none smtp.remote-ip=95.215.58.216
-Received: from mta1.migadu.com (out-216.mta1.migadu.com [95.215.58.216])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8842F606A686
-	for <kvmarm@lists.linux.dev>; Mon, 23 Nov 2026 11:34:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8842F606A686
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=uVOvnrOT;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13DA606A31E;
+	Mon, 23 Nov 2026 11:35:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B13DA606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=EJMipN2q
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=GFdOLbAuUR9hfwY/LXg7YohW2tjrVa6l2cMuco/EPYU=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795433681; v=1; x=1796038481;
- b=EJMipN2qWlyGuNiXFej4NzeZIFFlv//5wKRgeR75WdOZ8XYgAGUZb1I4M+3TukEc/GAAojt2
- KV0ItrVp7sDbIoRuljsxgyun/twxcfpPvGanlG0q9/UmUOa/8gCtCzFYWPXwyymIybXSSt0ilyl
- kZFz4VWJEgsATXViJ9pTm4Bc=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 1ec6cd2606eb83c4;
-	Mon, 23 Nov 2026 11:34:41 +0000
-X-Mizu-Trace-ID: 1ec6cd2606eb83c4
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atish.patra@linux.dev>,
-	kvm-riscv@lists.infradead.org,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v3 1/3] KVM: Stop KVM_PRE_FAULT_MEMORY when the vCPU's dirty ring is full
-Date: Mon, 23 Nov 2026 11:34:33 +0000
-Message-ID: <20261123113435.1170711-2-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261123113435.1170711-1-fuad.tabba@linux.dev>
-References: <20261123113435.1170711-1-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=uVOvnrOT
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EE5BB143D;
+	Mon, 23 Nov 2026 03:35:04 -0800 (PST)
+Received: from [10.0.129.12] (Suzukis-MBP.cambridge.arm.com [10.0.129.12])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 80E383F9AB;
+	Mon, 23 Nov 2026 03:35:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795433707; bh=z2UjvLOic3835pBC+7T3rWMtMHbQw/5uf0dNP5+l1zY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=uVOvnrOTwpVLMcG+Dlh+WlY7FSjZJK+7KsCxa4yQPWdBcAsUxKfmHFNlhpfRP2QKw
+	 04JoSaUxntF0XyMj2D/TDk44iVt+iM0RY5dNlmXWk9T66VIIvSB9igiX2YEyN7au3r
+	 BqwK97UJttJ9K3rBNG3rmC7kiFx4hn+AfGk1vJG8=
+Message-ID: <882a401c-c701-4770-bb7b-970d8869ae61@arm.com>
+Date: Mon, 23 Nov 2026 11:35:03 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -85,114 +53,277 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 05/11] KVM: arm64: CCA: Add basic infrastructure for
+ creating a realm
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Kohei Enju <enju.kohei@fujitsu.com>
+References: <20261123104233.95710-1-steven.price@arm.com>
+ <20261123104233.95710-6-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20261123104233.95710-6-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Pre-faulting can map a dirty-logged page writable, which pushes it to
-the vCPU's dirty ring. KVM_RUN exits with KVM_EXIT_DIRTY_RING_FULL
-before the ring overflows, but the pre-fault loop never checks it, so
-one call can push more entries than the ring has free, which trips the
-WARN in kvm_dirty_ring_push() and overwrites entries userspace hasn't
-harvested. On x86:
+On 23/11/2026 10:42, Steven Price wrote:
+> Introduce the skeleton functions for creating and destroying a realm.
+> The requested IPA size is checked against both the KVM and RMM limits.
+> 
+> The actual work of constructing the realm will be added in future
+> patches.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> 
+> ---
+> Changes since v3:
+> - Use the preceding destruction dispatch instead of a temporary
+>    Realm-specific check in kvm_stage2_destroy().
+> 
+> Changes since v2:
+> - Move ARM_RMM_RMI selection and rmi.o build registration here.
+>    Store the RD physical address from the outset and free SRO state
+>    on Realm teardown errors.
+> 
+> Changes since v1:
+> - Cap the Realm IPA size at the smaller KVM and RMM limit, and record
+>    the selected IPA size when initializing Realm state.
+> ---
+>   arch/arm64/include/asm/kvm_rmi.h | 23 ++++++++++++
+>   arch/arm64/kvm/Kconfig           |  1 +
+>   arch/arm64/kvm/Makefile          |  2 +-
+>   arch/arm64/kvm/arm.c             |  9 +++++
+>   arch/arm64/kvm/mmu.c             |  7 +++-
+>   arch/arm64/kvm/rmi.c             | 63 ++++++++++++++++++++++++++++++++
+>   6 files changed, 103 insertions(+), 2 deletions(-)
+>   create mode 100644 arch/arm64/kvm/rmi.c
+> 
+> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+> index 67f16793b4d0..4ac1af622872 100644
+> --- a/arch/arm64/include/asm/kvm_rmi.h
+> +++ b/arch/arm64/include/asm/kvm_rmi.h
+> @@ -6,6 +6,9 @@
+>   #ifndef __ASM_KVM_RMI_H
+>   #define __ASM_KVM_RMI_H
+>   
+> +#include <linux/arm-smccc-rmi.h>
+> +#include <linux/kvm.h>
+> +
+>   /**
+>    * enum realm_state - State of a Realm
+>    *
+> @@ -50,10 +53,30 @@ enum realm_state {
+>   /**
+>    * struct realm - Additional per VM data for a Realm
+>    *
+> + * @rd_phys: Physical address of the RMM-managed Realm Descriptor (RD) granule
+> + * @sro: Preallocated SRO state context for Realm MMU operations
+>    * @state: The lifetime state machine for the realm
+> + * @ia_bits: Number of valid Input Address bits in the IPA
+> + * @start_level: Starting level of the Realm Translation Table
+>    */
+>   struct realm {
+> +	phys_addr_t rd_phys;
+> +	/*
+> +	 * Reused by RTT map/unmap SRO commands. Those commands are only
+> +	 * issued from Realm stage-2 map/unmap paths while kvm->mmu_lock is
+> +	 * held for write, including Realm fault handling where
+> +	 * kvm_fault_lock() takes the write side, so concurrent use is
+> +	 * serialized.
+> +	 */
+> +	struct rmi_sro_state *sro;
+>   	enum realm_state state;
+> +	unsigned int ia_bits;
+> +	int start_level;
+>   };
+>   
+> +u32 kvm_rmm_ipa_limit(void);
+> +
+> +int kvm_init_realm(struct kvm *kvm);
+> +void kvm_destroy_realm(struct kvm *kvm);
+> +
+>   #endif /* __ASM_KVM_RMI_H */
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index cecea0820e52..d067063a3686 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -34,6 +34,7 @@ menuconfig KVM
+>   	select GUEST_PERF_EVENTS if PERF_EVENTS
+>   	select KVM_GUEST_MEMFD
+>   	select KVM_GENERIC_PRE_FAULT_MEMORY
+> +	select ARM_RMM_RMI
+>   	help
+>   	  Support hosting virtualized guest machines.
+>   
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 7aaeeb84e788..66a719ab5b6b 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -16,7 +16,7 @@ CFLAGS_handle_exit.o += -Wno-override-init
+>   kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>   	 inject_fault.o va_layout.o handle_exit.o config.o \
+>   	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
+> -	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
+> +	 vgic-sys-reg-v3.o fpsimd.o pkvm.o rmi.o \
+>   	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
+>   	 vgic/vgic.o vgic/vgic-init.o \
+>   	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index d79e5451923d..7c22d9474a38 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -300,6 +300,13 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   
+>   	bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
+>   
+> +	/* Initialise the realm bits after the generic bits are enabled */
+> +	if (kvm_vm_is_realm(kvm)) {
+> +		ret = kvm_init_realm(kvm);
+> +		if (ret)
+> +			goto err_uninit_mmu;
+> +	}
+> +
+>   	return 0;
+>   
+>   err_uninit_mmu:
+> @@ -364,6 +371,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>   
+>   	kvm_destroy_nested(kvm);
+>   	kvm_arm_teardown_hypercalls(kvm);
+> +	if (kvm_vm_is_realm(kvm))
+> +		kvm_destroy_realm(kvm);
+>   }
+>   
+>   static bool kvm_has_full_ptr_auth(void)
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index fab915ddeaab..84b02699f103 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -981,10 +981,14 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+>   
+>   static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+>   {
+> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>   	u32 kvm_ipa_limit = get_kvm_ipa_limit();
+>   	u64 mmfr0, mmfr1;
+>   	u32 phys_shift;
+>   
+> +	if (kvm_vm_is_realm(kvm))
+> +		kvm_ipa_limit = min(kvm_ipa_limit, kvm_rmm_ipa_limit());
+> +
+>   	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
+>   	if (is_protected_kvm_enabled()) {
+>   		phys_shift = kvm_ipa_limit;
+> @@ -1097,6 +1101,8 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>   		return -EINVAL;
+>   	}
+>   
+> +	mmu->arch = &kvm->arch;
+> +
+>   	err = kvm_init_ipa_range(mmu, type);
+>   	if (err)
+>   		return err;
+> @@ -1105,7 +1111,6 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>   	if (!pgt)
+>   		return -ENOMEM;
+>   
+> -	mmu->arch = &kvm->arch;
+>   	err = KVM_PGT_FN(kvm_pgtable_stage2_init)(pgt, mmu, &kvm_s2_mm_ops);
+>   	if (err)
+>   		goto out_free_pgtable;
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> new file mode 100644
+> index 000000000000..fafca2439c46
+> --- /dev/null
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -0,0 +1,63 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2023-2026 ARM Ltd.
+> + */
+> +
+> +#include <linux/arm-rmi-cmds.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_mmu.h>
+> +#include <asm/kvm_pgtable.h>
+> +#include <asm/virt.h>
+> +
+> +u32 kvm_rmm_ipa_limit(void)
+> +{
+> +	return u64_get_bits(rmi_feat_reg(0), RMI_FEATURE_REGISTER_0_S2SZ);
+> +}
+> +
+> +void kvm_destroy_realm(struct kvm *kvm)
+> +{
+> +	struct realm *realm = &kvm->arch.realm;
+> +	size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
+> +
+> +	if (!kvm_realm_is_created(kvm))
+> +		goto out_free_sro;
+> +
+> +	kvm_set_realm_state(kvm, REALM_STATE_DYING);
+> +
+> +	if (realm->rd_phys) {
 
-  WARNING: arch/x86/kvm/../../../virt/kvm/dirty_ring.c:225 at kvm_dirty_ring_push+0x7a/0xd0
-  Call Trace:
-   make_spte+0x2cc/0x450
-   kvm_tdp_mmu_map+0x5e1/0x7f0
-   kvm_tdp_page_fault+0x12c/0x1b0
-   kvm_mmu_do_page_fault+0x181/0x250
-   kvm_arch_vcpu_pre_fault_memory+0x136/0x1d0
-   kvm_vcpu_pre_fault_memory+0xcf/0x180
-   kvm_vcpu_ioctl+0x455/0x770
+Do we expect this to be otherwise ? Or do we get called twice
+on this function ?
 
-Stop the loop once the ring is soft full, with the check KVM_RUN makes
-before entering the guest. Return the pages already processed, or
--ENOSPC when there aren't any, since a retry can't succeed until
-userspace harvests and resets the ring. s390 has the ioctl but no ring,
-so give kvm_dirty_ring_check_request() a stub.
+> +		phys_addr_t rd_phys = realm->rd_phys;
+> +
+> +		if (WARN_ON(rmi_realm_terminate(rd_phys, realm->sro)))
+> +			goto out_free_sro;
+> +
+> +		if (WARN_ON(rmi_realm_destroy(rd_phys, realm->sro)))
+> +			goto out_free_sro;
+> +		rmi_free_delegated_page(rd_phys);
+> +		realm->rd_phys = 0;
+> +	}
+> +
+> +	if (WARN_ON(rmi_undelegate_range(kvm->arch.mmu.pgd_phys,
+> +					 pgd_size)))
+> +		goto out_free_sro;
 
-The check also sets run->exit_reason to KVM_EXIT_DIRTY_RING_FULL. On
-arm64, KVM_RUN completes a pending MMIO exit only if exit_reason is
-still KVM_EXIT_MMIO, and on riscv KVM_RUN does the same for its MMIO,
-SBI and CSR exits. If a pre-fault stops on a full ring while such an
-exit is pending, the next KVM_RUN doesn't complete it and the guest
-repeats the instruction that caused the exit. Userspace can avoid that
-by completing the exit with KVM_RUN before pre-faulting.
+In the integration branch, we undelegate the Stage2 root RTTs, if the
+Realm create fails. Is there a particular reason why we may have the
+delegated S2 RTTs with realm->rd_phys = 0 ?
 
-Fixes: bc1a5cd002116 ("KVM: Add KVM_PRE_FAULT_MEMORY vcpu ioctl to pre-populate guest memory")
-Cc: stable@vger.kernel.org
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- Documentation/virt/kvm/api.rst | 9 +++++++--
- include/linux/kvm_dirty_ring.h | 5 +++++
- virt/kvm/kvm_main.c            | 5 +++++
- 3 files changed, 17 insertions(+), 2 deletions(-)
+Suzuki
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index e95c9cda085d9..89eb6be9bc6e3 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6544,6 +6544,7 @@ Errors:
-   ENOENT     The specified `gpa` is outside defined memslots.
-   ENOEXEC    The vCPU has not been initialised (arm64).
-   EINTR      An unmasked signal is pending and no page was processed.
-+  ENOSPC     The vCPU's dirty ring is full and no page was processed.
-   EFAULT     The parameter address was invalid.
-   EHWPOISON  A poisoned host page was encountered.
-   EOPNOTSUPP Mapping memory for a GPA is unsupported by the
-@@ -6588,7 +6589,9 @@ case, the ioctl can be called in parallel.
- 
- When the ioctl returns, the input values are updated to point to the
- remaining range.  If `size` > 0 on return, the caller can just issue
--the ioctl again with the same `struct kvm_map_memory` argument.
-+the ioctl again with the same `struct kvm_pre_fault_memory` argument.
-+If that fails with ENOSPC, the vCPU's dirty ring has to be harvested
-+and reset first.
- 
- On x86, shadow page tables cannot support this ioctl because they
- are indexed by virtual address or nested guest physical address.
-@@ -8957,7 +8960,9 @@ Therefore, the ioctl must be called *before* reading the content of
- the dirty pages.
- 
- The dirty ring can get full.  When it happens, the KVM_RUN of the
--vcpu will return with exit reason KVM_EXIT_DIRTY_RING_FULL.
-+vcpu will return with exit reason KVM_EXIT_DIRTY_RING_FULL, and
-+KVM_PRE_FAULT_MEMORY on the vcpu will process no more pages until the
-+ring has been harvested and reset.
- 
- The dirty ring interface has a major difference comparing to the
- KVM_GET_DIRTY_LOG interface in that, when reading the dirty ring from
-diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
-index eb10d87adf7d5..729615ae0cf4d 100644
---- a/include/linux/kvm_dirty_ring.h
-+++ b/include/linux/kvm_dirty_ring.h
-@@ -60,6 +60,11 @@ static inline void kvm_dirty_ring_push(struct kvm_vcpu *vcpu,
- {
- }
- 
-+static inline bool kvm_dirty_ring_check_request(struct kvm_vcpu *vcpu)
-+{
-+	return false;
-+}
-+
- static inline struct page *kvm_dirty_ring_get_page(struct kvm_dirty_ring *ring,
- 						   u32 offset)
- {
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index cf4cb586f1407..ac8b94a386e4a 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4461,6 +4461,11 @@ static int kvm_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
- 			break;
- 		}
- 
-+		if (kvm_dirty_ring_check_request(vcpu)) {
-+			r = -ENOSPC;
-+			break;
-+		}
-+
- 		r = kvm_arch_vcpu_pre_fault_memory(vcpu, range);
- 		if (WARN_ON_ONCE(r == 0 || r == -EIO))
- 			break;
--- 
-2.47.3
+
+> +
+> +	kvm_set_realm_state(kvm, REALM_STATE_DEAD);
+> +
+> +out_free_sro:
+> +	kfree(realm->sro);
+> +	realm->sro = NULL;
+> +}
+> +
+> +int kvm_init_realm(struct kvm *kvm)
+> +{
+> +	struct realm *realm = &kvm->arch.realm;
+> +
+> +	realm->ia_bits = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
+> +	realm->start_level = 4 - VTCR_EL2_LVLS(kvm->arch.mmu.vtcr);
+> +	realm->sro = kmalloc_obj(*realm->sro);
+> +	if (!realm->sro)
+> +		return -ENOMEM;
+> +
+> +	return 0;
+> +}
 
