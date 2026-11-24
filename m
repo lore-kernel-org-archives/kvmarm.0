@@ -1,104 +1,107 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.171
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795560617;
-	b=BNibjCotbMoeVDeWVxJGMT4Ol5DeCvTLhSH68cswHJ6nF3FlU0/WDHkcpK8J8dOtAsP0
-	 DZY+tCyEpXFjYfuRo0sdZrKPMURdiFIZqwy5pH9MGZkwZkJfj/C+svBfpY/ibV0IYYGFf
-	 E9dhOuFezBeQPDR2zyu8h3q33iAks53RfWzS3g9CA6TAylvl6MJ9N9RZaQoO12nNDi/iy
-	 aGJ+pByoNgTViV+H+1CE3EwAKo52ZIS6UNV1BWonCKzn5V+UboSNke9eQqGFwBlypqh5y
-	 /noyzjjXt2LHOfPwv0oWPiHWn5Wf2qAibr0Aubqd+yMEOFTwyUwnKskVP5P3KPoAA2g==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795560617;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.47
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795563022;
+	b=zN1Mz1YRugk7kMcRrmt14w0MH05XU71UDkvWpsYTE7Al8kOpLWN/5ujkkZfh3xuXhg5/
+	 aQW77fCDs1I19mPz0nB717b1LyBGWkNCv31muT2JkW0EqKP24k8Q5bYdruflBc1s9EbzU
+	 05ozXhNSoOz8WOq2dcp+bcVMCeVcLkKcD/o1M7nRWpcZNlz6ImmeWYm9u3Q436QfSIH4t
+	 TjyIGXIxk5O5sq68Aa7sMmkGdFgml/spAcZJyIz/i4uKvSvRQIFAE6olK9EI3w/dhjXVf
+	 APWC4AjLOzNuHJ2I+BRhSyPF26cFid0ESQLf2jmfy4yTPozZ4njs/wT5r9Zb8qMgP8A==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795563022;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=sVZKaVNqfINKaLZaT1Y8yFr4I/GfwQE92cCdjha8+PA=;
-	b=pK8doQZpDJoEINBn3WxgCnEZmZRzqxXE1IhPKkbCBKllswtq3wfMXdYnxeUYYuV0jWdK
-	 gDMOA4EqIJkynT2ONPijy4VI8OOF6Tzp58Sszj6sMdxyuw1T33gP+xTHQOoXC0qTf0sOS
-	 gw5pWhfRYcJEsEQnNiiGInOv9K4AzEqFh2yUtDVCDJMTj7F0x72MwfM43mxqDeEc3ZW4S
-	 WaZaFSwjrRRD84Yl2Vmu8J/8DiAR88E0sDw6OLFhsjKmBU8JH5IMh6K69npGTKPPrciIl
-	 b4qj3vh07+bdv/Te/KSsBwoYD916LlWhYMMm3lpV7rmxZDqhHZdHZTH4gSf0f+YLtAA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=aashishsharma.net;
-	spf=pass smtp.mailfrom=aashishsharma.net;
-	dkim=pass header.d=aashishsharma.net header.i=@aashishsharma.net header.a=rsa-sha256 header.s=google header.b=NhAS41Xn;
-	arc=none smtp.remote-ip=74.125.82.171
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+	 From:In-Reply-To:References:MIME-Version:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=tmoluJRxJ9HN+1c8Y5zGpOvMcLNPpYDSuvXeIRfQoGU=;
+	b=JP/QcDNxh8hNC64/XG71cH88/vmesM6rONpD/75yfCER/3HUPYdcVxZpZ1K6Y25rxxnn
+	 pKFHG70QF2DRTKajS48Obw6qCPyve6dlfxG2NpEsWUitVb5voxPCJ8ilJ5bzccDO1jk8E
+	 8mI53m3WI2rpkWtvCYIVNsNwuh0nD+LJD59pakHfWnCNKg4mgsjykVpJYfzVY7CZi6AMH
+	 D7XD+3/znX8dMmCrI4hu8U2/3cCbMZidCk9QN7qwkNryOqAGkFTXwAhTghSqLSoNhqxlg
+	 0QgIOqxhHw08QeK8t9F1isjO8CF3jYAxu5cM4zzMgwVLFga3lckhJnk5sd11hdZE+CA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BGVTQYwM;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.47
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F68A606A680
-	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:50:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7F68A606A680
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aashishsharma.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aashishsharma.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DCC606A329
+	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 23:30:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 44DCC606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aashishsharma.net header.i=@aashishsharma.net header.a=rsa-sha256 header.s=google header.b=NhAS41Xn
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-33bf40b0c8bso10879101eec.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 14:50:16 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BGVTQYwM
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-9212dac247aso53469796d6.1
+        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 15:30:22 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795563021; cv=none;
+        d=google.com; s=arc-20260327;
+        b=SKRM1YCKf23UAZ9DaVvvsfiumkqdXoPhCpgNxzn8rSYTrKvtDrv1m0OUhGF3Ojhosi
+         eQvHdoeXVUmlrV4H7HmsQYCBuvM7UtnAoPc1aCzDsY8i336EMNipmX3fROpNuffRCpuF
+         IFGVbCYPUREi16QLiiSl41ZR6CXPQJXHuofVCrDf1kJ3rj/8yfyLb8tOBhPl/VL8Y6wf
+         OGRIfvxd/IcpA749cjI+3dUudR0fpoc1sL1TkNlRn/NubhPakH/orXG7ZkjMmpZ8y/Kj
+         s7dCWrr0rvAr+qs8Po8m/V0oA8/YZiy8Cs36zVif8zZhkkURqv9Jonrb5daum9lGSIGW
+         RFww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date
+         :mime-version:references:in-reply-to:from:dkim-signature;
+        bh=tmoluJRxJ9HN+1c8Y5zGpOvMcLNPpYDSuvXeIRfQoGU=;
+        fh=qMaYGtMmE4/CyY1sp3muIxelC81p9qCp36LMisaFRUI=;
+        b=jJDr1fMovGOk9mry3zb3CJFsfiO66wHwg3fCgZpK2w2VUdSfYocKEW4/xyhi639alX
+         C+XJIOoK+EvMh9g9yb023QG7dtrfa9FpabPMD3hTooMwNWyN9W0WN6vwWrQA6qsgJblX
+         qvzo/KeUg1nnwn7AT1G12B/TGqJaDqjdsZNr1Uv1hbtN2FiL+azwBS+d/GWj6STN3ITi
+         mwn8a80sJsXmhR74/gvB8n59S9JCpj2aKbN6EQ54xk1qIlQbNNKpGz2j1O7lm8hYmD6s
+         ZUx2C7csoIRnKEBuxQbUOIZqjXEsjWI3Y3Cf7n323VUbiriE22SfMdMuMibOpoPL7XsD
+         sPug==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=aashishsharma.net; s=google; t=1795560615; x=1796165415; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=sVZKaVNqfINKaLZaT1Y8yFr4I/GfwQE92cCdjha8+PA=;
-        b=NhAS41XnpJYM7yWuPOmESMyubGudyb52MV5nJExlBFDyOpSofjKjl83ku2dUkBgW9e
-         3Wf4nkNNacRbnzaDrSTXZv52uqA69BaFo8HGnzlx7EIZfPGXobOFiI+ffhDWBNasEKXW
-         lAsm0ySOYlamreqYdFqhDij7FDXWVT0+feqk6GlihRHB5PiwyR7MbuZwsozMEkl6/4rk
-         34NMyCyq/nvXCjFuLXJerp5uUgTfc4tmWJyRsQo3749ASx4nuNTskHEPcS44ImLykneB
-         06sYyuMzTRdTvvmGI+MiS+o699vJBIzL8X7CnC6+qrh5xumTsUPNWyMV3reIigdtt998
-         /gRg==
+        d=google.com; s=20260707; t=1795563021; x=1796167821; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:mime-version:references:in-reply-to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=tmoluJRxJ9HN+1c8Y5zGpOvMcLNPpYDSuvXeIRfQoGU=;
+        b=BGVTQYwMjSGbsaeH8oXvrneOEFc5q2NguhQrm7SzHggbHh5BmXZcQNjGw/PW+hs44K
+         tf0IUOkVOJpe3gv7sXEtb+VR+GOpK17obd0w3pVUKm91fQOne67F6Cif2mv5vDOiG+9Q
+         HMOPeHrk2YUUVES1jnsD6OcJwdVI00cnpDDTcLEJhQFhKjJNoKB1GUbmUDzFAvBmrKSs
+         hqLif+LsjKG1ay//t6biQs3IVMx+vsCHmtEItRHdtNWgcKZ68XREdDUADL8uuN/oFnfE
+         tH5lEM82AsqvqiqOTIYnOM/mJato7/d+h2CpDzuOCuyN6+vKl1Fq9xs54CG6/vkZhxxm
+         S/Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795560615; x=1796165415;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=sVZKaVNqfINKaLZaT1Y8yFr4I/GfwQE92cCdjha8+PA=;
-        b=kTV3aeO/LxsMvm2gRTbvcWaS8ELTCFdt2+lzOU1NN2vDEFE0ytz6V44YAGlTXwzPSF
-         ocwkpZop/Wmp3AgujNyhswFSSQE6nbef2V0hXgFa6tIb4v/MGmkf39SX3ZWM9Qf019pT
-         UNLyo5jRTSQgSL3gSHiKb0IJJAGfzggC9UzJVIKh9KcI8gD3yLP5/o6wBQm8n23PI4Xb
-         wSLjJEik6lzAD/jCNVlnXAd3im1S+x4eNoortO9y6b8DTb+jY8seoCJcirtc6yz7H4gd
-         1Fp8DmAuttXr35sGD9JVdPInmfGhaVw6buFZC8l292qG6lKRhdSJMTYPdOEwyuyEHZX6
-         deEQ==
-X-Forwarded-Encrypted: i=1; AL+hErGihmYO8y6Ik6d0oiW/Xdi0OsdEpHHctZ2PTNpdYOFbacwh0LrdxjpTrEzDeiO0aeiFXZUuiHQ=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8j7pMgSMp0jte4rqpnAdeXXLhycAJvIOxi7G6HDSSaSwh9aSZ0
-	f3P6do7YzG3ZiP+NK/XEdx5ro3ISyIj02ee4mudnVCpGiKKoikrhwGKNH7AM20fXbkM=
-X-Gm-Gg: AZFdTZd9nnKIJZbZOt9Ljhs/FC2azFYlZ7rUxnu4Po3bJQhl8rsnuHPX2L4MNikFAyF
-	FWG7pezdCBgwZ+r3GjBWh2fA6A7xFJcmybQlh5NnKMMegdbqRdxuTn1LLBuv1kfblbvOeFWLTlp
-	8jxb/oBrBSqGzfw6VMVesWloLTOF/aRwS8KkaMZhCq8iX+AQYwmPNQrsnFtjAerbLBgWOmdAEXN
-	Izs5Zo/FYq46GSe5G8FgZyjbBrTgxkm+H7IOoIPdEHcxnYyPGbw5J4Pjp4WOLIwXa5oilN8rq6Z
-	l5MLYJOuDsCMUSYmOY3qcBNpLT6chKHhrMNQpWUB3xdvgdj9/OrVe75DLkyPS7PnYfLg7fFQJpy
-	0lQkWzqUn2Gl/r97TueXCVbcokPnY6zkTAyJd2zhYqwquR+l2Cj0EZZdQ1cXJ+aJAzRwirFad3f
-	NCDr0j9wooAdC6zN3vgE5nNHMem2rnTJ4/YOgwy+0jKUWbZwgAgM3U5c5pDnO+XmyeMSnCjzFaA
-	c2mq9qWeQ+mCPyc7espy2hXvghzkoMd9UkU9+fP21ouz3F2H781Xduy5gQ5DkYaKjIwt/nS/ztt
-	c8m1Ugv++kb8fQwKIx9cQ4PeagUJ+lJxdGl7hzbYYkuq+dPeww2Jt+rvQBO2G7LYeWkHrAI5CwB
-	uoFbBF7LrDZDDMqMdSvh71tThNBBZPWQQxQM5Tns=
-X-Received: by 2002:a05:7301:4284:b0:382:1aea:c21d with SMTP id 5a478bee46e88-3857191bcf7mr17176831eec.41.1795560615370;
-        Tue, 24 Nov 2026 14:50:15 -0800 (PST)
-Received: from shraash.sjc.corp.google.com ([2a00:79e0:2ebe:8:be5d:9202:acae:6527])
-        by smtp.googlemail.com with ESMTPSA id 5a478bee46e88-38566cd46c5sm58294406eec.11.2026.11.24.14.50.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 14:50:14 -0800 (PST)
-From: Aashish Sharma <aashish@aashishsharma.net>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Aashish Sharma <aashish@aashishsharma.net>,
-	stable@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Do not free split_page_cache in kvm_arch_flush_shadow_all()
-Date: Tue, 24 Nov 2026 14:49:59 -0800
-Message-ID: <20261124224959.685002-1-aashish@aashishsharma.net>
-X-Mailer: git-send-email 2.56.1.831.g720f3f5937-goog
+        d=1e100.net; s=20260707; t=1795563021; x=1796167821;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:mime-version:references:in-reply-to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=tmoluJRxJ9HN+1c8Y5zGpOvMcLNPpYDSuvXeIRfQoGU=;
+        b=xk5Z7bYgzonXAhyqrxUq/D7D3qoVYcaeuZdaUoEDNm/hDRWEH451Z0zhSo8DvNHkYE
+         iLfSih0hwvphMlHLMLnL2InxB8odrEb/vtC3Og8uzRVoF7Z35J7oJgV4HDYpk3T992Rb
+         e9z6guTAxjtFPHJg2VrCx9Y9dFHUAepGlS2y2FI0Yejy4rxkVZsqi1bHlvcT3Nmb+WY2
+         3k3rV++8Ojhf4Qap6BU/ZgewE7ZrWOEExt+GeAUcsr/g1VUD0oTzXGq740JxbEXULBhI
+         Bcynt0u5FJ/WGjoqB36/hyvgus0duzCNjlDBqFNJqo511GqpKRDwRYAmatNO6lIheszu
+         eZqw==
+X-Forwarded-Encrypted: i=1; AL+hErFm0loyXcu5BT7PoTFFsguNzCJs7ieg1v314VWsvaNyfzSsxtyulS+tDddYi4Hh4TWxzzzrNxQ=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/3xzWlhec/AmFru/BwCJMA2fBiW/+BPOYD1XzRfS0UorsATOoW
+	031HiH6N7MfEvvTEMt//QeY7Y7s3BDSPZO6/Bm0CEkriL/g6XBmhp4NtDrNmWXD18ENYiXdzOda
+	k98ujUJvcFxZKaqiVA+dYHqMg1CKzLAmmJKqEB67i
+X-Gm-Gg: AZFdTZcBu5ur8oky6qaP1hKk0qowK/mTUHtEurd3EreURJXf89+7i3NyZzteHkgOkap
+	2aBoCL2YvdmGebsGDkA0cOgQKTisUbzE015P3YzMJKsyqVpM75s4Xd8pHE8I2QQoYdIunMWEHQx
+	Fg3EQzhe9zyxFlvyRdNo3jMsILZlTzzePhRYnZPc0SbXIYYOoonkAEmmIV595pvdozcWrjSyWoL
+	uELJfB3O59friwbv8mzyn7pllWmSlUVbiq67+J5Z7FZ8zKgqAw9VBoWpvvdSDSn9gpMTeR03+AU
+	rEfqHFvX+CP7euKmqNoMEK0bL5+dHHP1MYj1jmcl86aywk5spfrEHsbn4v327opgwBoOp3GGDXZ
+	oucKaP+GrdX6KoHcpthq0DlaBvq/KQx1xYuHFGZNkBbjAZEDIyZYJdGpIN65X81m8iaXL27vJDY
+	fhSu+ZgicmjeX5HGRy2hRQgwc=
+X-Received: by 2002:a0c:f412:0:b0:921:541:246b with SMTP id
+ 6a1803df08f44-92134a9123cmr301795036d6.38.1795563020302; Tue, 24 Nov 2026
+ 15:30:20 -0800 (PST)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 24 Nov 2026 15:30:19 -0800
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <sashiko-outbox-229096@kernel.org>
+References: <20261123104233.95710-1-steven.price@arm.com> <20261123104233.95710-2-steven.price@arm.com>
+ <sashiko-outbox-229096@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -108,45 +111,119 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Date: Tue, 24 Nov 2026 15:30:19 -0800
+X-Gm-Features: Aa3M54o433xbzGFqcKUYR3R8okBny6foO_6QsBRN_-OVy4JGrTMEGT43jesbap4
+Message-ID: <CAEvNRgGU+z609edF+Mw8xQ0NDUDKn9jjxJjJWTyUqJ0N2BGEHQ@mail.gmail.com>
+Subject: Re: [PATCH v4 01/11] KVM: arm64: guest_memfd: Check mmap support when
+ preparing memslot
+To: sashiko-reviews@lists.linux.dev, Steven Price <steven.price@arm.com>, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-kvm_arch_flush_shadow_all() is called from the MMU notifier ->release()
-callback, which can run concurrently from __mmu_notifier_release() and
-mmu_notifier_unregister(), as well as concurrently with VM ioctls
-accessing split_page_cache under kvm->slots_lock. Calling
-kvm_uninit_stage2_mmu() there invokes kvm_mmu_free_memory_cache()
-without locking, which is not thread-safe and can double-free
-split_page_cache.
+sashiko-bot@kernel.org writes:
 
-Call kvm_free_stage2_pgd(&kvm->arch.mmu) directly instead.
-kvm_arch_destroy_vm() already calls kvm_uninit_stage2_mmu() once after
-mmu_notifier_unregister() completes and all VM references are gone
-(see commit a3ca3bfd01b7 ("KVM: arm64: Destroy stage-2 page-table in
-kvm_arch_destroy_vm()")).
+> Thank you for your contribution! Sashiko AI review found 1 potential
+> issue to consider:
+> - [Medium] KVM: arm64: kvm_arch_prepare_memory_region() rejects non-mmap
+>   guest_memfd
+> --
+>
+> commit a0665f8dc612d05686ef019cc8462841573fe88c
+> Author: Steven Price <steven.price@arm.com>
+>
+> KVM: arm64: guest_memfd: Check mmap support when preparing memslot
+>
+> This commit introduces kvm_gmem_slot_supports_mmap() and uses it in
+> kvm_arch_prepare_memory_region() to require that all guest_memfd-backed
+> memslots on arm64 come from files created with GUEST_MEMFD_FLAG_MMAP.
+>
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 1db10d8d6db73..2825fccd2a197 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -2839,10 +2839,10 @@ int kvm_arch_prepare_memory_region(struct kvm *k=
+vm,
+>>  		return -EFAULT;
+>>
+>>  	/*
+>> -	 * Only support guest_memfd backed memslots with mappable memory, sinc=
+e
+>> -	 * there aren't any CoCo VMs that support only private memory on arm64=
+.
+>> +	 * All VMs need mappable guest_memfd memory, as the memslot's HVA may =
+be
+>> +	 * used to access shared memory even if guest faults use guest_memfd.
+>>  	 */
+>> -	if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
+>> +	if (kvm_slot_has_gmem(new) && !kvm_gmem_slot_supports_mmap(new))
+>>  		return -EINVAL;
+>>
+>>  	/* guest_memfd is incompatible with MTE. */
+>
+> [Severity: Medium]
+> As reported by Suzuki K Poulose on v2 [1], should
+> kvm_arch_prepare_memory_region() drop this guest_memfd check altogether
+> rather than rejecting memslots backed by a guest_memfd created without
+> GUEST_MEMFD_FLAG_MMAP?
+>
+> Both gmem_abort() and realm_gmem_abort() fault in guest_memfd pages via
+> kvm_gmem_get_pfn() without using new->userspace_addr, and
+> kvm_arch_prepare_memory_region() does not verify that new->userspace_addr
+> maps the guest_memfd or any valid VMA.  Requiring GUEST_MEMFD_FLAG_MMAP
+> here fails KVM_SET_USER_MEMORY_REGION2 with -EINVAL for VMs (such as
+> Realms) that bind private-only guest_memfd instances without allowing hos=
+t
+> userspace mmap, and on v3 the guest_memfd maintainer noted that this chec=
+k
+> is unnecessary and should be removed rather than exposing
+> kvm_gmem_slot_supports_mmap().
+>
 
-Fixes: e7bf7a490c68 ("KVM: arm64: Split huge pages when dirty logging is enabled")
-Cc: <stable@vger.kernel.org> # 6.6.x: a3ca3bfd01b7: KVM: arm64: Destroy stage-2 page-table in kvm_arch_destroy_vm()
-Cc: <stable@vger.kernel.org> # 6.6.x
-Signed-off-by: Aashish Sharma <aashish@aashishsharma.net>
----
- arch/arm64/kvm/nested.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I agree with Sashiko here. I traced the history of this check:
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 4d83281a7a28..2440ad9fed87 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1472,7 +1472,7 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
- 		if (!WARN_ON(atomic_read(&mmu->refcnt)))
- 			kvm_free_stage2_pgd(mmu);
- 	}
--	kvm_uninit_stage2_mmu(kvm);
-+	kvm_free_stage2_pgd(&kvm->arch.mmu);
- }
- 
- /*
+    if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
+        return -EINVAL;
 
-base-commit: b6a9fa34ce4187cb69d3c588a4bbffc31ce5db8f
--- 
-2.56.1.831.g720f3f5937-goog
+In [1], Arm64 guest_memfd enablement, !kvm_memslot_is_gmem_only(new)
+meant "this guest_memfd does not support mmap()". Arm64 had no CoCo
+private-memory VMs yet, so guest_memfd was only usable for shared memory
+where the host VMM needed mmap() to access guest RAM. Rejecting
+non-mappable guest_memfd slots prevented unusable private-only memslots.
 
+In [2], pKVM support was added. The v1 of [2], [3], says pKVM uses
+anonymous memory. pKVM doesn't really specifically use gmem, so there's
+actually no change, this check doesn't really affect pKVM.
+
+Conversions [4] made stage 2 faults (mostly on x86), always get memory
+from gmem. On arm, as long as it is a gmem memslot, it already always
+got memory from gmem.
+
+Now that ARM CCA supports private memory, we should drop this check
+completely, I think David noted that right when it was added [5], and
+that's what Sean means too [6].
+
+If userspace sets up gmem with a memslot and doesn't set up mmap,
+userspace probably won't be able to set up a running ARM CCA VM, but
+that's userspace's bug imo.
+
+Imo even back in [1] perhaps the check didn't need to be added, it's
+just a userspace bug to try and set up a memslot with gmem that can't
+really be used.
+
+[1] https://lore.kernel.org/all/20250729225455.670324-21-seanjc@google.com/
+[2] https://lore.kernel.org/all/20260330144841.26181-1-will@kernel.org/
+[3] https://lore.kernel.org/all/20260105154939.11041-1-will@kernel.org/
+[4] https://lore.kernel.org/all/20260910-gmem-inplace-conversion-v13-12-dd6=
+fbf94f4e1@google.com/
+[5] https://lore.kernel.org/all/2195c01b-3a17-46c5-a013-66922e8509bd@redhat=
+.com/
+[6] https://lore.kernel.org/all/av8No1rvJLXwciId@seanjc-mac.roam.internal/
+
+> [1] https://lore.kernel.org/r/26a29420-8d27-4069-bbd5-28692c9e8542@arm.co=
+m
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123104233.95=
+710-1-steven.price@arm.com?part=3D1
