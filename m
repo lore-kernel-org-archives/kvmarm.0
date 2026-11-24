@@ -1,72 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.228
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795517415;
-	b=wEXRi3WXLLF8KcuFFDLLcZ27FT/z8sJmGETqSxcFHjvpD8kXhukaKsHC4n0hESamRmWZ
-	 W3T/4vR9d7XU+W/4j5QRoGcQJkRrYvHifUKYTbmzTKFKrFzHkiA4rwstlntZ+IVs0xcut
-	 PeiSO3jaBAP8tGoh2NyeHvRGNYjAcjzYkvpkFhyc5t8vLHmgqWDrA3nhviO2/7E7PB93D
-	 uUnEtEQG4Mrq+LmRJNCBzIc4wQdjNkP5pQBBSwZnkZOncJrnRkiV8SJ1+3mhp111Gs7pg
-	 NsU9t3VVqnEWmP1qY7iSTonLlURED4+hV4ow9KUnm76MPZ6XNoZUejh5I1F3XbG53eg==
+	t=1795518141;
+	b=hyuo55OJf6Gn9mLnYZAyNR0GER1pwUu2gokEHOAPRguMxG38RjFJSmuAOQEYRg0QsPG2
+	 4eoPyQW8Wa4DApTtTFDxCkriqGUsEkpma2MJ/TRVok100hsX+OYKhoVu3MvtBZ/gqmSOq
+	 pY4IxaBr6k9eqobPflDPmMlpNgLu/ncRCk0insSYbNCk6G7Q6iTVQrQ9gcaL5m1g/pfu6
+	 t1PYvYgCY02q93bTPga8squ1EExrMWBydlxVuJ7elkSIeOA+NVsssKOG/GEVCI9X3YsRd
+	 dClySKm/KDAsUUb9LXwP6ax67tpKha6cZys8TxBUrGOcS9WJrm24CEiebaDQAdE3afw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795517415;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=d1InUdNvrxxB04G5bxXtj4JDVBuTsOLfVQpVUmwkbqM=;
-	b=KBOu1xgpknz+GMcgitTqVcDPqbwqPENkr7bac/HG4ySmfAMKAyFFmT0LPmoIxDAktKj6
-	 PKIhNpSzXt4P7Zz++uCUDO/qaitiJsqLbbK1PxEiHlMb/k7uFWEooztZSHASiKZY6YGHA
-	 WsqAqGfNfRQWjq5LBqeSIpukb4WYArWlqDGvOxauzXPpUnz8VV+6QgLMzYbCFbSqTiFn9
-	 ytVJYJB+MTg+vbTBq+p2RXQAYk1TJUpYOO9qkcSMSfXXHhXTUdV4hgIuIGq7dKIlV7XL9
-	 v7+h3lqTTASVu/Hn3lewl1l9aExm5+LETEgooU6zWfCtWnbVgb2kxcosB8MK+1gGKQg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795518141;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=KAvHK6j0hREgOFUkVu/pGTkn7fy5PDfJjXV7BZ0L4ak=;
+	b=mKL23MNniBY3kLVMz2dRYdPBnYPmAzietPRrQnSVhwNXVEVyhVeK2UEVrBsoNdHzTuQJ
+	 PR6rcYILczhdbBnJZIyOazjYOAVxYxaPPpxP/t9L/raU50m6DMNFHEmcnSf9E3h/+Kizv
+	 8Een3GHGvIHBkh9NC94Q/mlngNz6/2gcCdQ5eCE5OTejhi3HgHRMRa84n1BKVvK1HvhLJ
+	 FWqVa+HxPEWYwqDVhro/duNGjFWfLitMDNhyiIKpQRyPYIr36ioE+uJ16jM7SJwDaFUEh
+	 6OLw1sfjUxBlItsfK9hB44H5Xy5y+rfTHj40ppWBIxPuQBLcelHFlzIoPRYjq+XlPbA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XM02+DLz;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=mHAjw4tY;
+	arc=none smtp.remote-ip=95.215.58.228
+Received: from mta1.migadu.com (out-228.mta1.migadu.com [95.215.58.228])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FBA606A322;
-	Tue, 24 Nov 2026 10:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBDB606A326
+	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 11:02:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BFBDB606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XM02+DLz
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 784E31F000C0;
-	Tue, 24 Nov 2026 10:50:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795517414;
-	bh=d1InUdNvrxxB04G5bxXtj4JDVBuTsOLfVQpVUmwkbqM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=XM02+DLzzE4PhFkSToQX7gQrNAky1EYIzU20SU9GIlmoRJjLrx5wEUx63VzSxL1/v
-	 UjVhkTvTFjO75C06GyrybkRR2uMJm8JGAzRCPDZKVy8vaXE981I5yHaQLJilz6DoG9
-	 pYRGSsv0wYct22PwdBhgRm1+tFx/+QS25DHoBOtYf9GkBUJMxJ2ylfJLqPU/TNVEOk
-	 +LY7DpEfCnd6hd+IxhfawETl0j7mRbJFF3GaYwsIOep7nGdCD67ZA1VgJdyHM3eqU9
-	 B3YxGQADb5LGbNJD2p03wiS+cpMJzLSmtCwti9nfEiB3Ns/jhIcArFP2NE0ktmifWL
-	 2I1UJH6xwjR+g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xVo6G-00000002Wua-0c5I;
-	Tue, 24 Nov 2026 10:50:12 +0000
-Date: Tue, 24 Nov 2026 10:50:11 +0000
-Message-ID: <86a4myzeos.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Steffen Eiden <seiden@linux.ibm.com>,
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=mHAjw4tY
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=YQOhx28BDze68y36zy90w+D/2RW09RYxRy95T7kvqVE=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795518138; v=1; x=1796122938;
+ b=mHAjw4tYzSAbLJMfkcEYcq0YIf63aj6uOu6qCOkBwPC9lFDTox4JZQHX+hqk/29Qy48Ta4AE
+ 0zsD0hoswVQYR/4upBbAsovAW+PpPOlVCjGJs5pNJR8Mh18Y0wTATB4fnlphyx7P24tdcpzC7BG
+ 8UvW+9cJhuO/KG1gieRzi5LY=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id e2ce8471a6143467;
+	Tue, 24 Nov 2026 11:02:18 +0000
+X-Mizu-Trace-ID: e2ce8471a6143467
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Cc: Oliver Upton <oupton@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: Drop open-coded GIC idreg sanitisation
-In-Reply-To: <CA+EHjTynhBzhjrFzd514Sycib=1rmh7JqYp0xSPVBvurk6Sm-A@mail.gmail.com>
-References: <20261123192457.8700-1-maz@kernel.org>
-	<20261123192457.8700-4-maz@kernel.org>
-	<CA+EHjTynhBzhjrFzd514Sycib=1rmh7JqYp0xSPVBvurk6Sm-A@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Peter Collingbourne <peter@pcc.me.uk>,
+	Cornelia Huck <cohuck@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Set PG_mte_tagged before copying MTE tags from userspace
+Date: Tue, 24 Nov 2026 11:02:13 +0000
+Message-ID: <20261124110213.587871-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -75,76 +76,118 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue, 24 Nov 2026 09:38:00 +0000,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> Hi Marc,
-> 
-> On Mon, 23 Nov 2026 19:24:57 +0000, Marc Zyngier <maz@kernel.org> wrote:
-> [...]
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> [...]
-> > @@ -5874,51 +5874,6 @@ static int kvm_vm_finalize_sys_regs(struct kvm *kvm)
-> [...]
-> > -                 * On GICv5 hardware that supports FEAT_GCIE_LEGACY we can run
-> > -                 * both GICv3- and GICv5-based guests. Therefore, we initially
-> > -                 * present both ID_AA64PFR0.GIC and ID_AA64PFR2.GCIE as IMP to
-> > -                 * reflect that userspace can create EITHER a vGICv3 or a
-> > -                 * vGICv5. This is an architecturally invalid combination, of
-> > -                 * course. Once an in-kernel GIC is created, the sysreg state is
-> > -                 * updated to reflect the actual, valid configuration.
-> 
-> nit: This comment is the only place that explains why, on a
-> FEAT_GCIE_LEGACY host, a VM's ID registers can show both GIC and GCIE
-> as IMP before the VM first runs. sanitise_id_aa64pfr0_el1() and
-> sanitise_id_aa64pfr2_el1() still set both at reset. Is it worth having
-> a short version of it next to the tables patch 2 adds?
+KVM_ARM_MTE_COPY_TAGS takes PG_mte_lock on a page's first tagging, and
+sets PG_mte_tagged only after copying the tags in from userspace.
+However, that copy faults on the same page if the VMM passes a PROT_MTE
+mapping of the page as the tags buffer. The fault then spins forever in
+mte_sync_tags(), waiting for PG_mte_tagged to be set.
 
-I don't think that's the correct place. If anything, such comment
-should be in the reset code, not in the sanitisation code, which
-actually generates the architecturally compliant view.
+Call sanitise_mte_tags() before the copy, so that PG_mte_tagged is
+already set if the copy faults. The ioctl calls it holding a reference
+on the page rather than kvm->mmu_lock, and either keeps the page from
+being freed. A racing vCPU fault or __set_ptes() then finds the page
+tagged and doesn't touch its tags. The guest and the VMM can read
+cleared tags from the page until the copy finishes.
 
-> 
-> [...]
-> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> [...]
-> > @@ -180,7 +180,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
-> >           * We've now created the GIC. Update the system register state
-> >           * to accurately reflect what we've created.
-> >           */
-> > -        kvm_vgic_finalize_idregs(kvm);
-> > +        kvm_idregs_enforce_dependencies(kvm);
-> 
-> This now also applies the S1P[IO]E dependencies when the vGIC is
-> created, at a point where userspace can still write the ID registers.
-> Was that intended? If this clears S1PIE or S1POE, the first KVM_RUN
-> doesn't restore it, so the final ID_AA64MMFR3_EL1 can change with the
-> order in which userspace writes the ID registers and creates the vGIC.
-> If that's the intent, should it say so in the commit message?
+Fixes: d77e59a8fccde ("arm64: mte: Lock a page for MTE tag initialisation")
+Reported-by: Catalin Marinas <catalin.marinas@arm.com>
+Closes: https://lore.kernel.org/all/auPCV6VdMEz4uZkK@arm.com/
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
 
-The commit message has no influence on the behaviour of the kernel.
-However, I want to know whether this change is an acceptable behaviour
-or not *from an ABI perspective*. We have several options:
+Notes:
+    Based on kvmarm/fixes (012e4bc01e339), which has the MTE fixes this
+    patch depends on.
+    
+    I didn't go with Catalin's suggestion of a copy_from_user() into a
+    local buffer, since there's no helper that writes tags held in the
+    ioctl's one-tag-per-byte format from a kernel buffer to a page.
 
-(1) delay all idreg enforcement to the same (late) point
+ arch/arm64/include/asm/kvm_mmu.h |  1 +
+ arch/arm64/kvm/guest.c           | 18 ++++--------------
+ arch/arm64/kvm/mmu.c             |  7 +++----
+ 3 files changed, 8 insertions(+), 18 deletions(-)
 
-(2) keep things as currently done, meaning that the GIC fields are
-    special and sanitised at a different time
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 32392abf2e21c..d0f66426f139f 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -196,6 +196,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 
+ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
+ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
++void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn, unsigned long size);
+ 
+ phys_addr_t kvm_mmu_get_httbr(void);
+ phys_addr_t kvm_get_idmap_vector(void);
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index b7d36c2abfdf9..82911d1287611 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -24,6 +24,7 @@
+ #include <asm/fpsimd.h>
+ #include <asm/kvm.h>
+ #include <asm/kvm_emulate.h>
++#include <asm/kvm_mmu.h>
+ #include <asm/kvm_nested.h>
+ #include <asm/sigcontext.h>
+ 
+@@ -1057,27 +1058,16 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 			kvm_release_page_clean(page);
+ 		} else {
+ 			/*
+-			 * Only locking to serialise with a concurrent
+-			 * __set_ptes() in the VMM but still overriding the
+-			 * tags. A hugetlb folio is marked tagged as a whole,
+-			 * so its first tagging clears every page.
++			 * The user copy can fault on this page, and that fault
++			 * spins until PG_mte_tagged is set, so set it first.
+ 			 */
+-			if (folio_test_hugetlb(folio)) {
+-				if (folio_try_hugetlb_mte_tagging(folio))
+-					mte_clear_folio_tags(folio);
+-			} else {
+-				try_page_mte_tagging(page);
+-			}
++			sanitise_mte_tags(kvm, page_to_pfn(page), PAGE_SIZE);
+ 			num_tags = mte_copy_tags_from_user(maddr, tags,
+ 							MTE_GRANULES_PER_PAGE);
+ 
+ 			/* uaccess failed, don't leave stale tags */
+ 			if (num_tags != MTE_GRANULES_PER_PAGE)
+ 				mte_clear_page_tags(maddr);
+-			if (folio_test_hugetlb(folio))
+-				folio_set_hugetlb_mte_tagged(folio);
+-			else
+-				set_page_mte_tagged(page);
+ 
+ 			kvm_release_page_dirty(page);
+ 		}
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index a0d4981ebb998..9365d83a646d7 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1598,11 +1598,10 @@ static int get_vma_page_shift(struct vm_area_struct *vma)
+  * able to see the page's tags and therefore they must be initialised first. If
+  * PG_mte_tagged is set, tags have already been initialised.
+  *
+- * Must be called with kvm->mmu_lock held to ensure the memory remains mapped
+- * while the tags are zeroed.
++ * The caller must hold kvm->mmu_lock or a reference on the page, so that the
++ * page isn't freed while the tags are zeroed.
+  */
+-static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+-			      unsigned long size)
++void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn, unsigned long size)
+ {
+ 	unsigned long i, nr_pages = size >> PAGE_SHIFT;
+ 	struct page *page = pfn_to_page(pfn);
 
-(3) say that idregs can change at any point if you change the
-    configuration of the system, such as creating a GIC
-
-I'd be tempted to go with either (1) or (3). (2) feels like a total
-bodge.
-
-	M.
-
+base-commit: 012e4bc01e339a65dc7c59181b5efb33b171d12c
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.3
+
