@@ -1,75 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.197
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795558579;
-	b=lCPQrfIH5WB4DYShjLuaBJ0rB/6r7Jg5QlN0e+lM9RgtXHb+RwEJX7347BxPDONMwbKQ
-	 PlPGc2BHM8T8gQitHMeE1NkOwZiaULzOswreh27W8kY0O0dirHEMcmNRNSUmonSiCz5oi
-	 E+sAPvstOmTIEfsr/Egql93+YkDKWu6/01EtwfMOUAPuhRl+VhLXTXhVO0nw7sI9i5YaG
-	 tItsolPo8vLCMcUHVOemF8ZEqg6q78PCb86wE36WdXT2S+5tzI5MCInmZjk2LX+EnTgnR
-	 dIobBknAfSi1C7XVspi6M/ycfNCh1aOjrceg2N9wngXyJsQiW8gD5Ct2cZpD/c7Oa+Q==
+	t=1795559352;
+	b=N4R4o5tYuogawXPecl+DPczqZzOLo81k3liXhtKowgQxde9uuXWCtVi/8W12YEkymDsZ
+	 ktax/Hr1tpwyUbfA0Z8IpCzaMdIKDmHXygy4ewofbAQfVdEUfiUA9sZxEUu/EQYzMuMEd
+	 OgawgbDfegBqAK8u38dkh7nOUf9xK6XE5KIRLGs6lS8Uo3Sh8GO1XoYS8wCRPdSmu12hF
+	 9Uf7j29kPoTbSIIv4NZB0XHlln/sPtwuFn5uQ/36MFWu7VY8HAFh9UUKlW9hzB52QqUIl
+	 RehsGIB1WGXD0G2NNBPPxjEF0vNaJP+DwdAUQVjLMiSjYWms2cSJiTJf4VFcIE0XTDA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795558579;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
-	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
-	 Content-Type;
-	bh=oIkNeebV3bBNTky3/G9aQsRRQo/i+uLeVgZIMqhznFQ=;
-	b=G65BROWbzD11Fu3DPd9XlgSESdyKI1xmB/Us0GExI0zQizBBr9VqK4EwzczocxtOQNZc
-	 JlDh2c2r7Ukia1BqYxurqeHv9xI7rveXzpZ5rQDg006CSD4ZFP6bEr/d1K26UDj84CvJi
-	 MTzfE2E7tNnbgYo6ejmPOBR1OrYF6/hoQUiMQlfMJ1oVApGuuUh7mttk+Z3qFejm1gWXA
-	 EUn/dgapE1sBwLgT0DewB35r36VwI31OEsX8tea0V2IdRCh0k+9KBrHeWjgPF4f6lJSbZ
-	 pJ/0XVGrgbSWfHUV8igw5HEqjamlZwFivg5SF+wZDlVSFB0hs1zX4kELZZHPhbtlbSQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795559352;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=WkLgW+c6Vs03pawnWwBT2nJkyF8m6BmAQ32Lw7TCuco=;
+	b=NEWZJ7pLAeWsh7b2o9rYVIcEbUeMKFnqaDG99rV4lgcqCVbbMAsH6cg0ALbxzBgbbbCc
+	 GLFoGfyMF5BmmitvNeU/6TB3+SqTsC/XXEmy3tN9VGcpuHSXOOKOpndiIfrM/arkJ5mGf
+	 4btxqZ4BzRCQ0EUNxCQhdF2EuY0VeD5ThFu272tp+SNv8Slnyl9dXpcaOE5Ip7r5+oGoE
+	 dPWubAlx3aBEmhqV04TdX5D20ivBZ86cNWHZo3haalgY9ROPx8QeqMf6+qWLWyB4TKCz8
+	 laXB0hxd+cMmCMfTyjqfYuTUUchw2IowwetVOhcahcMse5tF85R9BysS29vmmjE3m3g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=fEUiioa6;
-	arc=none smtp.remote-ip=209.85.167.197
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=o2vpPnrm;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DB6606A326
-	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E4DB6606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDC5606A31E;
+	Tue, 24 Nov 2026 22:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=fEUiioa6
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-4cbf700ddccso3754313b6e.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 14:16:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795558578; x=1796163378; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=oIkNeebV3bBNTky3/G9aQsRRQo/i+uLeVgZIMqhznFQ=;
-        b=fEUiioa6HMwZg8X+RpcD1qE32b8z5wesLGDNfSSMfzcrv3GURIlRff2IZLu53Jc5l/
-         GMsbCYbBVB4d/fBCrYFmYW3gb+YRTp1qlI6RA7T9RFRYES5rPGAjADQXR5TP+z24lF01
-         u3wHo2TeWoT/MwGYfEFXzCKKpGCjEyyznm0onW7BnjX0l+WDENm9imgUuANb2uqMQQ1m
-         hNTAkYaDdY+Dv7fVWrHVurDibbIMXZnU2+gMf82HmvIUfuRqtj/Ghk91NXbdwwAyfAGq
-         ohUSdAB7mSuHuY0uFOAO5sjiKIRVOYW8hzXEX659zJlhq2Tdwj5FCgSpbIgfMsdZ3sj6
-         0XNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795558578; x=1796163378;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=oIkNeebV3bBNTky3/G9aQsRRQo/i+uLeVgZIMqhznFQ=;
-        b=RUvNcuiWK6h3dD033/1thk6A1Mcsh+DJngI5VavuKrB4MYIw71TKV6u+YnWRWDHh/m
-         zD1xZjfqALl+LBSHDh3V3Ot//bo9SPy4iRrxQVBgZ0TGOV7nw5gZWflEX6Rv0RsFpf7G
-         nKz8nKLwIja9CyJNRKNNWtsniJ91YZTrxah9k2gXIKS+fTHjW7KSRFgard40RZCtcSUB
-         uM6qN31rqNKa1ey7TPAowGOJlCTpEhk8R6KXjI3Ki1of8mfIqAy+VGz8eSULTW3K5all
-         zdwgHpuSYwLPUOYRCZbArLmhuO5Y4uL2K5lk6E1HZ+DYKD5nn44/ncHNDIF2Undb6jDI
-         pzQw==
-X-Forwarded-Encrypted: i=1; AL+hErECZIlSVgEyCnVcK3eS6+qKKgNIp9O21klUlMG/mWnb4csyhn7i+JqRR4ZQOvKfnvdTERxcq8c=@lists.linux.dev
-X-Gm-Message-State: APuU4Z87prEMLjqNnEjUsv3/5SICkiTOw7qdiIqve56gJgAIVZ4dowbI
-	CmNKLrOzzoupTKvO10hVvxWkboVwbvWBxpFOWA3odBWS3r5Cc+TxAQop7G8abLLvj2zYrXbST8R
-	N6K5GirIMZchUv6SXGdpMLCsFbQ==
-X-Received: from jaaq28.prod.google.com ([2002:a05:6638:c01c:b0:61d:1a3b:cb30])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:180e:b0:572:61c7:bee2 with SMTP id 5614622812f47-57a06a1a79bmr18783520b6e.1.1795558577535;
- Tue, 24 Nov 2026 14:16:17 -0800 (PST)
-Date: Tue, 24 Nov 2026 22:16:16 +0000
-In-Reply-To: <87a4my7yhg.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=o2vpPnrm
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02D111F000C4;
+	Tue, 24 Nov 2026 22:29:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795559351;
+	bh=WkLgW+c6Vs03pawnWwBT2nJkyF8m6BmAQ32Lw7TCuco=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=o2vpPnrmCxtOS8P4HVMlKGd/mwISEMkCQRNhDBmEksIcnnp4Ig8q/vKSsvXIk1N92
+	 gq2c8oMJW97kGIf8vTTNEC55YbRTgmE7EsPpgpY71ZmAA5mN8Im31aoxF+g+0Xa31D
+	 ZMUIEhm/KJpYM3iJNv1PGvI3m00mxPUsr0hb4bqC1xgPIj9rETcK42HhQD3QgK15JB
+	 l5WF86ZE2CQA6vbKe/1b5JS5s+x8Mx4l0NjHrFs1PJxyJPr0D6K5RAacpwY8hJvI/X
+	 XD/wFKxYwcO9mEch31+86IlVIegcSheoZKzm0XYpj+SApYC3/dKZp+64j9frnHmoq2
+	 UTnxdnXBiZKLw==
+Date: Tue, 24 Nov 2026 14:29:09 -0800
+From: Oliver Upton <oupton@kernel.org>
+To: Nathan Chen <nathanc@nvidia.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Marc Zyngier <maz@kernel.org>, Tom Matthias <tmatthias@nvidia.com>,
+	Shameer Kolothum Thodi <skolothumtho@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Julian Miller <julianmiller@nvidia.com>
+Subject: Re: [RFC PATCH 0/6] KVM: arm64: nv: Grow the shadow S2 MMU pool on
+ demand
+Message-ID: <awYPtXVeY1NYeTla@kernel.org>
+References: <20261124211218.2751086-1-nathanc@nvidia.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -78,59 +66,50 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-Mime-Version: 1.0
-References: <20261123232647.3733149-1-coltonlewis@google.com>
- <20261123232647.3733149-2-coltonlewis@google.com> <867bi2z87n.wl-maz@kernel.org>
- <20261124202215.3731849-1-coltonlewis@google.com> <87a4my7yhg.wl-maz@kernel.org>
-X-Mailer: git-send-email 2.56.1.831.g720f3f5937-goog
-Message-ID: <20261124221616.4155034-1-coltonlewis@google.com>
-Subject: Re: [PATCH v2 1/2] KVM: arm64: nv: Discard undersized TTL hints in compute_tlb_inval_range()
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
-	Dan Carpenter <dan@pereq.eu>, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261124211218.2751086-1-nathanc@nvidia.com>
 
-On Tue, 24 Nov 2026 20:42:19 +0000, Marc Zyngier <maz@kernel.org> wrote:
-> On Tue, 24 Nov 2026 20:22:15 +0000,
-> Colton Lewis <coltonlewis@google.com> wrote:
-> > [1] only catches TTL hints smaller than host PAGE_SIZE. It does not
-> > catch a hint that is >= PAGE_SIZE but smaller than the mapped block,
-> > such as a 4kB L3 hint on a 2MB block on a 4kB host.
->
-> Why do you think this makes *any* difference? The hint passed by the
-> guest is utter bollocks, and the best thing would be to not invalidate
-> anything. It's just too invasive to do elegantly.
+Hi Nathan,
 
-Architecturally [1] is fine for the TLB, and before guest_s2_mappings
-landed in v7.4-rc1 clearing the block was harmless. The problem with [1]
-is a host memory leak in kvm_pgtable_stage2_unmap_tracked():
+On Tue, Nov 24, 2026 at 01:12:12PM -0800, Nathan Chen wrote:
+> A nested-capable VM gets 2 shadow stage-2 MMUs per vcpu. Once the guest
+> hypervisor runs more nested VMs than that, nearly every nested context
+> switch recycles a live MMU and spikes host CPU usage.
+> 
+> This series lets KVM grow the shadow MMU pool on demand when the pool
+> is too small, up to a host-wide VMID budget. It also parks grown MMUs
+> on a guest TLBI ALLE1 and when a guest range invalidation leaves them
+> empty, in order to return unused capacity.
 
-1. L2 faults in a 2MB block. kvm_s2_fault_map() installs a 2MB block PTE
-   and kvm_record_guest_s2_mapping() inserts a 2MB
-   struct kvm_guest_s2_mapping into both interval trees.
-2. L1 runs TLBI IPAS2E1IS with a 4kB L3 TTL hint (4kB == PAGE_SIZE, so
-   [1] returns 4kB).
-3. kvm_pgtable_stage2_unmap(..., SZ_4K) clears the entire 2MB block PTE.
-4. kvm_remove_guest_s2_mappings(..., SZ_4K) skips removing the 2MB entry
-   because a 4kB range does not enclose it.
-5. L2 touches the address again, faults because the PTE was cleared, and
-   allocates another 2MB tracking entry.
+Thanks for taking a look at the problem. There's no argument that we
+need to do something, the existing MMU allocation policy was good enough
+for doing nested development and would get replaced eventually.
 
-Looping steps 2-5 lets an L1 guest leak one struct kvm_guest_s2_mapping
-per iteration until a larger unmap or VM teardown (I measured 832kB of
-slab_unreclaimable growth over 8192 iterations) and turns later TLBIs on
-that range into linear walks under write_lock(&kvm->mmu_lock). Patch 2
-avoids exact duplicates for the same (nested, canonical) pair, but
-remapping the nested IPA to different canonical IPAs still leaves each
-stale entry behind.
+With that said, I feel rather strongly that we should not invest further
+in the MMU array because it is quite inflexible. On top of that we need
+an actual eviction policy that selects cold MMUs as victims instead of
+the current round robin approach. I don't think you need to do anything
+special on the invalidation side with a good eviction policy.
 
-If you prefer not to touch compute_tlb_inval_range() beyond [1], another
-option is keeping [1] as-is and dropping the cleared tracking entry in
-kvm_remove_guest_s2_mappings() when a partial overlap leaves no valid
-mapping beneath it (zero cost on valid hints).
+I think this is what we need:
+
+ - A VM-wide hashtable for storing stage-2 MMUs, keyed off of
+   {VTCR_EL2, VTTBR_EL2, HCR_EL2.VM} to align with how we handle TLB
+   match at stage-2. The hashtable can be dimensioned based on a
+   configurable VM limit for shadow stage-2 MMUs.
+
+ - A state tracking mechanism for victim selection. An LRU list seems
+   like a reasonable starting point.
+
+ - RCU replacement of the evicted MMU. I need to think about it a bit
+   more but you should be able to reuse the PGD in the new MMU context
+   as well since we know that no vCPU holds a reference on the victim.
+   That ought to be the goal anyway.
+
+That should allow us to dynamically allocate MMUs while also improving
+upon the current behavior for constrained MMU allocations.
+
+Thanks,
+Oliver
