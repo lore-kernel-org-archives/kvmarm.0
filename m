@@ -1,146 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795525676;
-	b=i61ds7Wqu8N2YXIMEiPWAW27/OnFB4chuenUUH5jXTulkyVvZGRT/l0V27ryRgHK2hpq
-	 wlKO4RMUWgHKZTkWZPxcy5/vSx/eRcq+95GSdoXXajrYEq4WWFXDnF0vfe7UtNh2CGvX2
-	 HDAxGSGH8tkGRpsypakVeD8ax6MJOzIR0hpmg6oZQRc7fEwxizb0BlhqMYOznJnB7fHPG
-	 I6QLUFjcCCsD2BXuj9ZqTlsyzhcEGc40zOU6MJMXq8GoBuorb4wGUTbCe/oNkU2kRLS45
-	 4u5thU06XqNC4IiXb9a7L9lkOn3yk5N8QVGbD9ZFqE/lEP8/EOMeYzef55FY7qCXX4Q==
+	t=1795525807;
+	b=yYsSTAkPnjG7ZxRaJqoprsEpC2FxwuuCYepL8wLCcsaXkh1I0bxMBWzWpO4jiKMSs+OV
+	 6FBqsPXWVezPYK/BL9PcHqmTFPWC9aU6nDij7O5vRh4Q9kgUqyh98QxtyPFXMgx2/2osR
+	 HYeGtQ9BsP7Y5IvyTmMtNVe9byYyzuh36YapxVqg0NoQgZe8WglR+CIuzXIqrYGk+BEXL
+	 raZxhmRuSOikEUeILuVxiotgXhZy5Zbz1d+P934PuMWcGKUMaoK88O3riZ4rhMuUyd9Nx
+	 VU4GTSvslLGPSU90AoYEFDr/wDaaL+idfhAMeOaNolbxRtR97zZ8z3788ESdHbK63Ig==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795525676;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
-	 In-Reply-To;
-	bh=2Jqv6h2U/zwufJIWy6q7C5BzrR7eGEBWyzupif8ezko=;
-	b=q3PwVCKZooEZGXEWA+6yjmTeT89oCY/ZneVqq3+OUvYMlzEAyjZ1c4zx8qeO4eokHINO
-	 wD7ppHZntK6BIcPJLx92Gs/MN4JSMEdvY2ULrzGXmCTkzHaThtKN2V9wRxTc1gYzv/KQg
-	 rc9gMpG5vqBVPvaHnesPHdtl5KPdNgca25Ky/crUSeWlIq8ZZy30ZQciBzJj7SgyTtQ/W
-	 UIgkc+Pos+R6iljsUvJSHtA7Ii1PD3Z5t9HM8pBfkS87kHHaGHpQeQQO1gW+uReeNIhzI
-	 4cl4WZUGRWMAc16oo+jCcg4Fb7U6cfzS5E8wcdm4lxyf0wKuPan/hi1U4oXOSYR0BPg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795525807;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=Z3NWK5cLOijzuItkhwXkwNPbHwJin1fTuYBbbki6ORI=;
+	b=PAU9V0fWjy2Mqq5P5VPW+TpCOhtqSKZHuXDYcXAjLauRaDDUljVqnUXphDTFP33hagA0
+	 5fIT3PAo3mmCKCVORnM6agWtKUenhO3O6yHT4hAZ+tzgcRcAYcKE5bGwsP+BQtyNZUBY9
+	 CJ/a2DfMolvx3hlhTNDhLoSdk8eC1fH3+POF53rNkZBNuEWtr5Qi5kPrxDhFpt22p0pwF
+	 rkpd8v4nSm1Ow3mKre3pJdREdceWy1xs8ykC7lgXxjGfF4Ilk9MCWL2j/Pe7Iel/jkry+
+	 4omZCsmj2v4vVLFKkPXL47+iKZSLA9gAjeA28U/a/VYeUZhAeDIN3qMXfDx9gcYW5QQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=ziepe.ca;
-	spf=pass smtp.mailfrom=ziepe.ca;
-	dkim=pass header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=CJZp6cV7;
-	arc=none smtp.remote-ip=209.85.222.177
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X0QNvToG;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A11606A322
-	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 13:07:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 44A11606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3976606A31E;
+	Tue, 24 Nov 2026 13:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=CJZp6cV7
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-9496473b511so535204985a.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 05:07:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1795525675; x=1796130475; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=2Jqv6h2U/zwufJIWy6q7C5BzrR7eGEBWyzupif8ezko=;
-        b=CJZp6cV77fzkUCXvgeGyc7n9vOvZov1aNWjYfoQB8lqfjpe7VVz2pKyasHC0M9bSo3
-         qvoro/45R0bYQRTdO2OhOwP8IqZDTveCj+W0rKGqVuCBz/BgVUCJlNyD58G1GcYb3njP
-         MhERoQBSZF9WEeWN1BrNcXyxnT9a2V9qA6Tztu/pOhGSXK2qaxtPyM7+o3gi7IQ5m8Vl
-         zl9+/Rui9jQl3P++qkZI/CGbAH51e/eughhaB/kN3C/3tgk7TbjbUX+50M64WuaFgcYP
-         wX9YibH8TLZgk0DjcQxRjLhIWJBK9Dfla9PQfVx96fqCzu0PbTcLTtuv2r94I2lv8Uf7
-         UBLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795525675; x=1796130475;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=2Jqv6h2U/zwufJIWy6q7C5BzrR7eGEBWyzupif8ezko=;
-        b=S0rLRx6CUpBY5FpWbnLnLCsS3B7B9OAot2NoRqnzFFPFUrzha5hFfWcyh43W0ik9ci
-         IUL1U72Y39SDMkSSCdeoi/Fu66W8tD13j4AuUo9/yJm6uU9gXJFSlrogwkzOs2tniNrp
-         siGnMGocaKu5gqDELsQ8Z0LgY8eaZ+TCLwjQzVwbzYpjpBLMpNY1i8Hg7Rv6nAhk1qKq
-         tI+IuNoPVPpYFF2wo3zMKmsA/R+JPecN+DSEtGLcOfoCCgFYphvmZKFIbmqAqDvn+pBR
-         4osbLUK1SLB+3XpWEwmyx9NHywFIsMZ9EvWfj9W5YfseLrP3ONcXpAVMEdjqzN0jfq7E
-         kJSQ==
-X-Forwarded-Encrypted: i=1; AL+hErFaHQt1XW0JJj5MS+gkiMHx2gc20vOmV8/bPLCd9KabWBmSxx7M1OA0C0phrGvKikQ1X8i0s0I=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+nI2kWO5dErztWtXsTzU5iejx14SqLlDi63OetYOvWnyI25mPe
-	WREWtum1b2L2mou+W99sA3HNECmhX6/iYXb9lkpqx6ZtLcdulm61NFHAM5CeaQnfLsY=
-X-Gm-Gg: AZFdTZeGlE0kj/4RlYaegFvK6s1RD0gECRUQpRlHqiVCmqI4tr+EhLGOcFmH03+Ic79
-	FMvQMM+vVZ1bNpm6WlZCIHSMOO4gtoDqFqAIdN3zJyNwUhP1dU97oC0uXlsvSA8jQOCjR3FIFGN
-	Jd5roPEZmgpj6S1z5BibFdiy42jVRYMaIn6OGQdL5GTjoba9ibtKm9TFF9WeouWs+2zsWy4s+tW
-	GXREMMatqVDnIv5urwCbpjOfdh8abYFc0BInBqz2Et44/Hqji9az6ZJhQKkvlA+ZxO2ws5N6lfM
-	sc068gLBlefVWr8EVpVLkNkg7TxP67Zmm2poc6hw6B8w1WrfVueADXkBjeLgbySrlOAsveVLAP5
-	iPc4UbKIvzPEdh5tf8wOOOFvHx7BJo57RU0BT46iwUIG8dFSNuBwO1+ddgWEp73x4UIGtei3SDA
-	k0Ic/8bdpevMM3FUzM9giFVXkjMYFLc1F3LOJ/EPHEc9BuIA9vnlXBN/tiJ3zXrLQb/XFHxRBoQ
-	tQYAqec60I2G89Tlr2tqZ90Ymijn53Tw3WQ/BxYmYVIvXOvM4JBIE8/9feocCXfRiPw037b+Ro3
-	RAokCw==
-X-Received: by 2002:a05:620a:2705:b0:949:8ee5:6faa with SMTP id af79cd13be357-949ba818db4mr2224332285a.4.1795525675010;
-        Tue, 24 Nov 2026 05:07:55 -0800 (PST)
-Received: from ziepe.ca ([142.177.118.84])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-949bb4219c4sm1034879485a.41.2026.11.24.05.07.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 05:07:54 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1xVqFV-00000000OKe-3ac5;
-	Tue, 24 Nov 2026 09:07:53 -0400
-Date: Tue, 24 Nov 2026 09:07:53 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
-	linux-coco@lists.linux.dev,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X0QNvToG
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0D851F000C0;
+	Tue, 24 Nov 2026 13:10:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795525807;
+	bh=Z3NWK5cLOijzuItkhwXkwNPbHwJin1fTuYBbbki6ORI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=X0QNvToGXtckZFbW+UoARbViFoCfBnXhVDDwI1XkbcWrUksYFrngLCyTtTIWGQpsk
+	 0BQnnXr6ZkOsAVYrbETr1rus/d1lTaP5rV+4gAwivLWSscyewP5X2zeBtjJWtjJkCo
+	 FEDWLwCynU6pD7wQDBtu2QsYMNcuhvEdFh2IoosoP1mG9SqZUTiyH7ceumcWZVEpCI
+	 7reSYgJq/P13bLyt9pTNx356QSA2Hjw60m3NJgdg3425aNSw7qRTpifjo0d0GJszaz
+	 dDyvlyeq62OUngXQI0oG2S80VBVIFeVItu6x3L+iG3u//4Od2x1r6JxbVsNIOZjKZO
+	 mmqLk4B5CutYA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xVqHc-00000002aNR-3azu;
+	Tue, 24 Nov 2026 13:10:04 +0000
+Date: Tue, 24 Nov 2026 13:10:04 +0000
+Message-ID: <867bi2z87n.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-	Brian Starkey <Brian.Starkey@arm.com>,
-	John Stultz <jstultz@google.com>,
-	Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
-	"T.J. Mercier" <tjmercier@google.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	linaro-mm-sig@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH v10 04/13] irqchip/gic-v3-its: Allocate shared tables
- using CoCo shared memory allocator
-Message-ID: <20261124130753.GD9566@ziepe.ca>
-References: <20261116091137.94252-1-aneesh.kumar@kernel.org>
- <20261116091137.94252-5-aneesh.kumar@kernel.org>
- <awQd81MwZqi55gf8@arm.com>
- <20261123150041.GB179082@ziepe.ca>
- <awSGBdS1AiFhJzZV@arm.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Dan Carpenter <dan@pereq.eu>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: arm64: nv: Discard undersized TTL hints in compute_tlb_inval_range()
+In-Reply-To: <20261123232647.3733149-2-coltonlewis@google.com>
+References: <20261123232647.3733149-1-coltonlewis@google.com>
+	<20261123232647.3733149-2-coltonlewis@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -149,35 +81,42 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <awSGBdS1AiFhJzZV@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, fuad.tabba@linux.dev, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, weilin.chang@arm.com, dan@pereq.eu, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Nov 23, 2026 at 06:29:25PM +0000, Catalin Marinas wrote:
-
-> > Exposing struct page to places that just want a kernel addr means they
-> > have to call page_address and we are back to the highmem weirdness.
+On Mon, 23 Nov 2026 23:26:46 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> dma-buf system heap needs struct page for scatterlist, so we need the
-> virt_to_page() conversion if we return a VA.
-
-Yeah, but if that is a one off I'd give it is own API..
-
-> > > Was there a caller you had in mind that needs the common allocator to
-> > > share less than the whole buddy block?
-> > 
-> > If we want this it definitely needs to be a void * based API not
-> > struct page one though..
+> When an L1 guest issues TLBI IPAS2E1 with a non-zero TTL hint,
+> compute_tlb_inval_range() takes it at face value. If the hinted size is
+> smaller than the actual mapping (for example, a 4kB L3 hint on a 2MB
+> block), kvm_pgtable_stage2_unmap() clears the entire block while
+> kvm_remove_guest_s2_mappings() leaves its stale tracking entry behind in
+> guest_s2_mappings. On 16kB or 64kB hosts, a 4kB hint also triggers
+> WARN_ON(size & ~PAGE_MASK) in kvm_stage2_unmap_range().
 > 
-> For whole-block sharing, either a VA or a folio works for me. If the
-> allocator takes an order, the requested size and the sharing granule are
-> both powers of two. Rounding up to the granule already gives a valid
-> buddy block size, so there’s no need for a separate shared_size.
+> A TTL hint smaller than PAGE_SIZE or the mapped entry is wrong. Check
+> it against PAGE_SIZE, the shadow stage-2 leaf size, and the guest block
+> size encoded in KVM_NV_GUEST_MAP_SZ. If it is too small, ignore the hint
+> and fall through to the unhinted invalidation path.
+> 
+> When falling back to the maximum mapping extent with stage-2 disabled,
+> size it from PAGE_SIZE rather than VTCR_EL2.TG0 so 1:1 shadow blocks are
+> still covered.
+> 
+> Fixes: d1de1576dc21 ("KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations")
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 
-But you still will need the allocator to use the struct page metadata
-for its own tracking information, so it shouldn't be exposed to the
-caller..
+What's the advantage doing all this dance over the patch proposed at
+[1]?
 
-Jason
+	M.
+
+[1] https://lore.kernel.org/all/20261123182312.4842-1-maz@kernel.org/
+
+-- 
+Without deviation from the norm, progress is not possible.
