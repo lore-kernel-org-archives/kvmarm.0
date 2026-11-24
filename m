@@ -1,11 +1,11 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.201.19
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
 	t=1795554751;
-	b=X44AS8RVyLK2faByDdNxBR+3Kmg+u5SyYYxseavltulpUhPpNHz5ErBVtS653vqOzf2C
-	 bReu7erSInrWJEe02Bx0UN8CvsoJf90IFSUonunmHpxwIFQDtk9bSDRMD2go3rYRS0exC
-	 48etFGg7871Gy3MiAdrTw7EkotqBHZxVQnD81ws2tpWrxuF0i8iL5onBaLKjQy09FGBUp
-	 hOjiQFyAm51FCrDa0oxK65gHM8ZjsOyEMi5d1cwOHC6gmmcF5xmuqydGX6nat3yd6NBm6
-	 8Hy/8xuxJx/8Tm6lmI4b25l/uNkD5uJwxoPJzlMVAbbf0/HoNNvoiggIAoB0xmFMqhQ==
+	b=XV0M4VWYzzJVoBlRIdsSZzML8SC2/aMwggQ0Tw4ZAZxw0+QG3Kis0k5cNo5uu8qGKXQa
+	 0WSHOXruMd9IFlqRaUf7uTWEpi+43ZdJyd3MTh2Q3njvwqXzYN0cGWbW1ncOJsFaswbtG
+	 w5+SFpBoUpzre3xmcPGGeOpbv0Me13tZxJyNT3+1RpKqwsY1oJMQKSzfV3grQaqetoSua
+	 BFKC9KAl1eHIs6GbPioRfBimY5Qde/ff3J3YqOWwdrdyiyIGeqlDMDRRJmSxzaQKoDeMp
+	 BlZr0IPPTfDrRcftVV+90pG3AfqQKiZ8Bct4Eto7HDx4/5QCRP54WVHlhxTWfDpgDMA==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795554751;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
@@ -24,54 +24,54 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=3QDeZ2E6JVSmOjpVLTizsdvzMIuExQwZ3bWcUhyvNFY=;
-	b=XE2+jItMaLO8Ou1toocjsdWmHxbIGg338tTeiSbca8TNNOGqv5zgj+PPgFS3NnWHxe9g
-	 Txv4JYKOXjwvG+84gbbDdlT+hkoolzWQhut/a+zxKnpzpfIDndj9J3CylcxIyvXYtVBzE
-	 iqbM4pzTV1jn92vkfcsLvVtrkj3ss31uKXZoHU842aPTh3GuixSK5/Yi1c9Yk9yienaaB
-	 ZEU1D8a0a6ahigdjbI3mky9o02CNtnrvP5cWBHquvc1WkaB0kSWtGSQUvrTnE8h80ugN7
-	 BqbhVvs9/CrJtW93rJzoTom/3DV4CCSfyxCsVRvby3OBPYvkiMU+ovJ/VUO9zXe3WqA==
+	bh=nPQxHVd8Hd9LuG2BowK9hjiuzm6n8cntZXe8OTIfcyM=;
+	b=G7csYcb3/pFPrqRWXY54l8O4FyTjgHjJmydDAcg1phLboRwc7CHwo8y2bktSmu6CG4P5
+	 yFiQYLtDZqfpYtWG4z807l6fC03FfPUMVJ6yiRBewB+HgTx6Bu3sT00bb1q2OjnnPwsn2
+	 cI9MYn1zH+khQTj6X1WDy1tmswsHaJiymrYlO9MAEipe7mb9TQdQrqPXmCSreVJfPpsqq
+	 dGulldYJnXA4CiCCIISDE6VfqH2Bdy+3rPNMzHug3tckoW/QJRcRaHoMSGwwim2CLvKxX
+	 fokDXDzB4MaPef++0XSz3T0db9gAp6fTl3Ll0ddeF2mT+jpNszrVpmlfaqraPj4cGVQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=nvidia.com;
 	spf=fail smtp.mailfrom=nvidia.com;
-	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=KWYoeD4i;
+	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=TftbQ80E;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.201.19
 Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013019.outbound.protection.outlook.com [40.93.201.19])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D588606A687
-	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 21:12:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8D588606A687
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E34606A32D
+	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 21:12:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 48E34606A32D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=KWYoeD4i
+	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=TftbQ80E
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NIdija6vEA8UO9mGRHtZG7pUsn611lun5Qhn1wh6YL5ki6kOXP+5JU+IR9oTQdvsKDCz6AzKm8+HKw2kkQrmUDyIQFP4o1MZ4H7ALGxTZ883wOaUM0EVBjpCoaIWgCsXg9befEK0MD4DkfxQf2H4MKp7hVdUIdlajI0/erT1x6Db551D79mqC3Zke4wAxaRy8HuwN2/79WWAv6ipUC7hmwqkowawbqzHunBkRSbyKf9KuboiSRel4Bvn6hhVW/Mwg3NSg5Vow7TvEuyxiBRoZxlG6s2Tpxt1u6+2cwRXOHiP91qSsCeNQHbvD7tYSoPtpmQHUNQ06pqzOAQ2sxvaEg==
+ b=Ww87Potlw7TnIpBmMR1AW8uQkcVR32ejoiwFOcS9yh+QHK8sdJnAHn0GlnInFqYU0WOlaIdAhzJQigS43RguN10dUDnhNBIo7/VmhgmaWVW/kjMx256T5kFthPfvLiU6zcG21iMyxeSDl9j7n9vvMnKkIuOqPSnJxoKDE4eENXqxkvDO+He3DdpVeTf9wpIPy0Y1V1TgHGomzjbZJW8TbPU6YPrw5QbjF9Ew1mi00/VNZzQoGWRruTB+RvUU1SijR5ZyaQLmnFbpp46lPFoNeptg/sOHaNdPP5QEdUY4Eak7AVXTCluunK9KLnwpaYTFGQZohj/Du+YWe+R1YRB8LQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3QDeZ2E6JVSmOjpVLTizsdvzMIuExQwZ3bWcUhyvNFY=;
- b=vTJP53PLUVn1rJY7MpkIJeacjnzOh6UU9FMCEwH42Y/NJFfSadL/Lise/XcyriCDh2TM8yOAtwXd3Mgo3Dh7+GulD6mXojeYmWqCA8jbgjeAsO/3uiFkfue9nlda/NrItiklDKidhzl2+4v81Gl4m9snXjZ7EpEzMYiCrh8XuouMM1KddW5IOBNqLL5lXtPjB5pWl2ojdU3+Wq12/JAx8sFiJXyH3W41IU92dobP9V7GCTOdIeL7McFQ428jLHqYJl9cLTlMjf7NY2EhHulF3lKTWqD/ebmhMoa6SYtONQehCY0RxhO5S1pPzzEz7ssEGp4d9ZwaEqBJAYf+yhsLpQ==
+ bh=nPQxHVd8Hd9LuG2BowK9hjiuzm6n8cntZXe8OTIfcyM=;
+ b=QrbTE0Goa9hQJC6fiZW8ZAfCveAqJlxRySphm5nJnn/qYiFazcUjOWfUyxUVxadcOHMqliTrcJx2py0hMPoXeefM4Yak/XYL9M8EasX2/3kYc/0o6w0Sy2l+YPlpauput64OtyM0qYJ+xOlPFpVwTO0eB0Z/WUD6X04AaaTzn1pdDkD5Iy4C43/PImoDJvJEksNxTMNb7Ld3RQAdLhBnA9Qh5OLx94Q52r6WwuY74eCl15hrp8VMni1J/jLM13xWWsIonIWdhbhzxO5vP2Nt+Y0gayVm6vh07VnldnvKUrBsaeDaJ5NZ70ROiQfKflljBNRqPUHotoE7GEIEvr21MA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3QDeZ2E6JVSmOjpVLTizsdvzMIuExQwZ3bWcUhyvNFY=;
- b=KWYoeD4id3aGTpy/zY46nHVah0P8rve+y9ka2Aa8TDXLU2M0IvzqlO51xstgFYRasxGIhDolkZClWxXEqFL8my9Fv0pOOqT4uQI7jsSIPt3hRc7Jx/VOOQvyi8wbCO8iPeCFDCEtnM0ihLCC0aDdbk08j/fVk+xAglPMS0zAE+P87f8fb7snphOnsrr7JqmrF7b/xCeldNOO6WKjCEuBtEmO3TnNowDsKZvrbMPTt5XOAkoR08ejwB9wLuAuDawPElYv3qA9VWlrTkEM2H1X5agjhGTDkne7cTtekYNG3yfumnIFxV8CbIAJ76udVM9NcIBFhFkCEJ2mYN7pesLW+A==
+ bh=nPQxHVd8Hd9LuG2BowK9hjiuzm6n8cntZXe8OTIfcyM=;
+ b=TftbQ80ET6NFUrdSCrrwWc5rABOk4MwlP9M+vDx4ZWKtGoimrLx8GHXME5/8OAkJJyxBuELb1EkGdbdW81zrWDbtY9pzZt5pscbREqXXIpJvPstApmIfXXcOR2R4mTfVPx4KAu+HgmqS/VQxMlvynzOVlaqcmbqWhFPGf5RCpvlZrTlD3tMgBsiysqdHivp74VYjTXB7LPEGvxVxAIQU2TXhz3eoQAMjPtHae3JqAZa1aDIQDj+5ajEgWsU7mMsbwrhm6CT89HSdbQ5pP3+4XJpMDyjsZWgLdyl33x6xhOT3CzIdKgGSUMp/OUcrlKn4E0sOHEfX819C6oHs8qECcw==
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from DM4PR12MB5390.namprd12.prod.outlook.com (2603:10b6:5:389::15)
  by LV9PR12MB9784.namprd12.prod.outlook.com (2603:10b6:408:2ed::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.639.13; Tue, 24 Nov
- 2026 21:12:27 +0000
+ 2026 21:12:29 +0000
 Received: from DM4PR12MB5390.namprd12.prod.outlook.com
  ([fe80::2815:c27e:a0a:2720]) by DM4PR12MB5390.namprd12.prod.outlook.com
  ([fe80::2815:c27e:a0a:2720%3]) with mapi id 15.21.0662.001; Tue, 24 Nov 2026
- 21:12:27 +0000
+ 21:12:28 +0000
 From: Nathan Chen <nathanc@nvidia.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -90,16 +90,16 @@ Cc: Mark Rutland <mark.rutland@arm.com>,
 	Shameer Kolothum Thodi <skolothumtho@nvidia.com>,
 	Jason Gunthorpe <jgg@nvidia.com>,
 	Julian Miller <julianmiller@nvidia.com>
-Subject: [RFC PATCH 4/6] KVM: arm64: nv: Grow the shadow S2 MMU pool on demand
-Date: Tue, 24 Nov 2026 13:12:16 -0800
-Message-ID: <20261124211218.2751086-5-nathanc@nvidia.com>
+Subject: [RFC PATCH 5/6] KVM: arm64: nv: Park grown MMUs on ALLE1 and reactivate them on demand
+Date: Tue, 24 Nov 2026 13:12:17 -0800
+Message-ID: <20261124211218.2751086-6-nathanc@nvidia.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261124211218.2751086-1-nathanc@nvidia.com>
 References: <20261124211218.2751086-1-nathanc@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: MW4PR02CA0007.namprd02.prod.outlook.com
- (2603:10b6:303:16d::33) To DM4PR12MB5390.namprd12.prod.outlook.com
+X-ClientProxiedBy: MW4PR02CA0019.namprd02.prod.outlook.com
+ (2603:10b6:303:16d::23) To DM4PR12MB5390.namprd12.prod.outlook.com
  (2603:10b6:5:389::15)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -112,384 +112,307 @@ Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DM4PR12MB5390:EE_|LV9PR12MB9784:EE_
-X-MS-Office365-Filtering-Correlation-Id: ea3b35aa-af62-419d-64c8-08df4a6fa457
+X-MS-Office365-Filtering-Correlation-Id: 7d665eff-5b7f-4098-3190-08df4a6fa56f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|23010399003|1800799024|261028144727099003|261022113327099003|10067099003|11063799006|5023799004|56012099006|261021121427099003|261022115727099003|261022105027099003|261021133027099003|261026140227099003|261021130227099003|261022075727099003|261021123027099003|261009223027099003|261026135527099003|261102123227099003|261026130827099003|261021135927099003|261026121527099003|18002099003|22082099003|6133799003;
+	BCL:0;ARA:13230040|366016|376014|7416014|23010399003|1800799024|261028144727099003|10067099003|11063799006|56012099006|261021121427099003|261022105027099003|261026140227099003|261021123027099003|261009223027099003|261102123227099003|261026121527099003|18002099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	YP3sXyhZj6DHO2IWf41YHYV3RSMb7BIw5KdeJm6lHkpXw5yDGl2R7Pz14SyFQIe/MoQrvRIXiQELmx/Z43TIUO9KiblwiH/XizFumEBEqaSAiJJ0Z0KAqwD12j8WVS830cbGXM2ItJqGjFjwOWHzYOLPW0MiTl/8BqtzPVafS9A9jVx9ARJhugkIY/t5r08PC1MDQesDTDMigE++uj/UCDRpyCksrriL1zphRm7+ob5rxcH2fuBIxHdfXGixWI/ES3h2/IvUWln9Zh4/JG7dGudZlzaX2skCBG7ywhNvGJ7wUQVGUrpP7R5EHTxDALNI0h3FiUsz24Zh4/QsyCyCFPM6o4wVnC7c2PPbgmJ6eH/9rtmNOBOZCZ2M8wn2llCAO+IDoeAbnpxWx2GzQA027OOgRiomuGZZKbnDHL3GLIM77zwgQrnFMtBwKeeaBdKPtzac4zHYGo3J+eTRQAgYBdGiQJjoTiZRgxl6c5z1aGLwZLx6ZDIoc4dvdQYDTHJEx70Ti/1eXYXyUCe0tEk1p9c7WmxRSVISSNWmAzqYndWOfd6AFgjNyexhglKBfQ2zl24OOhSOjzfEY3thGRaTJwnN8w/KqpTON7jzyYsMp/J/yL7MLlL1qA8Y9CuYviHU9FjMWEShUG1zYr/qkV9krBCJJEOWAeN3fYWhebZ8hc0=
+	S4br2rxnR3AEfudkRtHFYWOxfEly/beuALRG4qY1AoSupqEtuRgPWgBLmj+qtW+U+mCmxN3PtBR/asDRlGRPjPlpyrrn5NI1jEyDdHmQomxEVAEJFHPYcNB77GgXd5FgY15IoOrmlJgHE+axE2HEqfMWk2k4EzqbUptpHutaMGDkkoC0HQyA6055FXDcmhy3Lbnay0qKdyp7BtE4o1Pv/Nu7kiFho3cVo8/HytUgmv6TjyEsYbH9DSorl3GwuZMiawl5UVYmWkTp0pNakNRA25YCj6VQshxxZ9HXiWeonNeZBEAFMzggx855zV+ca1V3cyjjqp8b8nV8f4R8d3WhrVG1ur2XC2RhPBHDnajdD6mm6bWgdX66NfUPTU1aN9Wf7cI1kqdtvxQbHEDKrxnBkJ5VNK5SYnnM5SbRHaW6Szyc7dhQ8FFp6qVZJOYL1hIaaNdYihu9IeAT4ikQSHStaBRAoBD9l1Lfkv5nStCRdaN+p/HQtBO6P7as1gYHdwxCI6CcCZXBTGXt2VHFqXDAMmVBRoYB36EQ1hKmV6pSmY3dCybsVtZ0Q/WcfGVu2FoLQ8Z8b8pvdlzij7GrRPUX96aJWT/X9ssNjdfN0I9u+iggsvtrHR8wmL1xZs3+3hMC1kQFFNtYbt73WNpKCwU1SADBe72UL2/XvsHtfra4PRg=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5390.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(23010399003)(1800799024)(261028144727099003)(261022113327099003)(10067099003)(11063799006)(5023799004)(56012099006)(261021121427099003)(261022115727099003)(261022105027099003)(261021133027099003)(261026140227099003)(261021130227099003)(261022075727099003)(261021123027099003)(261009223027099003)(261026135527099003)(261102123227099003)(261026130827099003)(261021135927099003)(261026121527099003)(18002099003)(22082099003)(6133799003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5390.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(23010399003)(1800799024)(261028144727099003)(10067099003)(11063799006)(56012099006)(261021121427099003)(261022105027099003)(261026140227099003)(261021123027099003)(261009223027099003)(261102123227099003)(261026121527099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?jdVh1p8Vfpc3KpOSwnx9UC30Tbv7aVNC/DqvTCiUf+ILoSyboJazt3d52cMX?=
- =?us-ascii?Q?XwCRBLNem17WXmz2sMtdbScCWbs12uEeXZ7sFdgj4XrTutmEsZw3q1b+sv/P?=
- =?us-ascii?Q?9RkWxm3aF9Z1wdhEFOS4g+Ln6A+L9KydcnxRd+TeppBWfNiiX+3eM/lAN0g3?=
- =?us-ascii?Q?X/ud/+hg+X7cRdiOZRIBFCXzMYzM30GCSmxDa50ZXWAj2yBtMHVGIg2T6gGJ?=
- =?us-ascii?Q?Wj4F1GQZ/H0wpKQxTIuRSuv6VFOjYHxgt/trX3hrXGxTzbTdlAdT7jvJ8ok8?=
- =?us-ascii?Q?4KZxwcY02E2EuSB2RBFgpQH0UaOoyIKre3R6IB0i0Hy0f83biSbDs+u2kXAa?=
- =?us-ascii?Q?v5eU/yOcE/xW0+csCjqeiIqvZ20cblwkpbCx9wShAyfY9Ai8lhSV9aa9xP3m?=
- =?us-ascii?Q?k9WBAV2BUf631x9pm0Bu6vMLbJb0kQbCo7qbmC2/3AFk272ZP8fLJm2e91hR?=
- =?us-ascii?Q?PVkfThx+xn3Eb7RJ7qZLgvVVSyS7a/BK2o1av3c38FXLb9zHbXrXAr0+3Ewk?=
- =?us-ascii?Q?5+D1wxMK7IcC+q+8QMIuFs3MhdwTDzidx2iaJgT4X9IVqhzMwn5rXdZj9STj?=
- =?us-ascii?Q?ewbn7A9j1FM0vU8nQTgSK7gAZcQI83o3r5FDOPoVF79Y4KuPdZiJBMp5nMNh?=
- =?us-ascii?Q?q7LPM52GS1wW/FiYiS567pSWFdO2gptVG4fp34+q4iITga6ECwSIt8bVEWog?=
- =?us-ascii?Q?dDkUVrR6w7PzjqUMn4g3UEDP8ljA/hUNePIDYzCt4eP75ofg/Emcwnq43qNm?=
- =?us-ascii?Q?P7dyf4B4aSn0S6YqX3kcHu+qUyBHuGo1QeCaKHYd5EkK6xhlESC/DoDiKd4F?=
- =?us-ascii?Q?hLOotmU0nxRzA6HQww/H6lDUBdCVblbC/VMeLFdugpj16ydafrk3YXiN+L8z?=
- =?us-ascii?Q?pvbNBhQQCCtKT/5z2WLZMukPnjhdXrccurOfE6jKq+xo+SZfFjMj8oqIyj45?=
- =?us-ascii?Q?HRtXTSxV/fqYO737iJyaWuLxxt9PsR68b0d5stscSqF7PbYnfAEArM5F4ErP?=
- =?us-ascii?Q?sh5PtjrGiYNMs7LjAv2ghFdyRZ70X+nw+9aGQaouPoiDwmlrBHnJ8BMs33kN?=
- =?us-ascii?Q?sc0QV81aW1lB1yi9Z7bPxwll/77pQoC0B0CRsd7sdbL/aESHPrhLjR3oUuRl?=
- =?us-ascii?Q?Oj6jq5YTqAZrvA4gppEkcyzE9j4lff8x/O6v2/+JL8hvR/fd3Wwxm53iU+sI?=
- =?us-ascii?Q?adRJNZxIDrQ7hV/T0tkQ6z53aYAG3Pgf+E5gsTSlZsWBBLHU1TuMmrncM/KE?=
- =?us-ascii?Q?fQSiWfTHMKLe46b6R2n7uay+QaWlDGe4L9HRjgVjcIsij9PMg4z8jss+tUJS?=
- =?us-ascii?Q?Hmq1CgWzlQNyPbDi9Uy4BPmcWT28c6ptX2za2mPkGO9uv+mja8B1ERSyLx45?=
- =?us-ascii?Q?6BC4dc2FlCOIbmSr3WjQ/ufDZ1ujh7533eqatfnrTefmwFgr0wyadLZTEkRM?=
- =?us-ascii?Q?XJaGPGfFLvZbtWAO7YNkbQFRYBElgLDU8ijclKqqhfJYlnuPNHaEaOTKLx4N?=
- =?us-ascii?Q?GCAfTZBZNjF1QXfpPduPjcixxQAqAQ34/RNpdDtjVeSnTcT+R+ZacB4V+GlT?=
- =?us-ascii?Q?dhVqvldiOfbT8kRKLsjp02zWybdz/S86KffWhrODzmJMbAkTpGhhtvdy9c7B?=
- =?us-ascii?Q?B2q1VAV3iPl4bBQWmrEeH2Vc4dwles5R3z+1ADUXPsXD9+eLPUkMOKo77que?=
- =?us-ascii?Q?4WQNFmogJC2yI1w8ihh32Fbr0wiQVqg1rmAEXj2uIkRCKptaMy8Dsat7B6r9?=
- =?us-ascii?Q?JhRUy/wu1w=3D=3D?=
+	=?us-ascii?Q?N/11zJ8BBmZfsbyUre6pDqdEJQzUvLWtKCA/jLedx+YnkNt18B76LbiP6bwR?=
+ =?us-ascii?Q?ivlLW7kgXTQPmA8KBlVzCGyFoNZ1Sd7Sctj9qcsFCe4KXyRC9YEaRDd2ai7C?=
+ =?us-ascii?Q?oOewVjbDJ0mt4kUMYXPhgXL3udcPL9a5Ohwm8TGi9KuSduXFKsRLzJlNH+rE?=
+ =?us-ascii?Q?WDtEHT5Z9GdBXXH+3gxJB7qKneVj8KryE79fEsewqMa6+uXNimRY/E3JPOEB?=
+ =?us-ascii?Q?7HtzbQHaJl1CLFvxNnsrL8VL//9E471n8Oiibyq17mDNfPaUFu/+Y0YeYSt3?=
+ =?us-ascii?Q?XAxznO1SS+Xn6+qPubLBCi157mX/rVzpQak87zQ3zKP5iAknY3Puuk/S2KUv?=
+ =?us-ascii?Q?RJnki92L+sWGfpVOiuauYNQS9wpfkSkb83I5QM2PlJ1RAeUb3e+QesqFBnWj?=
+ =?us-ascii?Q?V2D1QBso7DsHY1yQSdJnR2QrnZSthOMzf8Vcf+ADhlz05HUCZX4s8Zc6A0Ax?=
+ =?us-ascii?Q?OPvb9o1dpmN9JotmR+d7xhYEkuA9cKFUA2d+3TcRVjNI8NSpvHHUuoYNnJrM?=
+ =?us-ascii?Q?NyRyAQ0wJoesYJAg14Z7MnTO7zw7vAuCFrkcF3B7/b+0DirJ2ubqcRWbxHdM?=
+ =?us-ascii?Q?oMnkZbgo1aHN4NFulG0LmdB5XU8iePfac5qPktumxdF53SXFlIOSRnowGbor?=
+ =?us-ascii?Q?ygY2l50Od6EhnGAwkmUpZtlguqXSCWLBqiu+WP/PKXvXXPgaCrVgsCawR6su?=
+ =?us-ascii?Q?3V0i/tl92/MNWDr/2odmmOfFQK9XXELrofnX0dml8Co2+CeB4FW1In1N00uJ?=
+ =?us-ascii?Q?HDbFV83QkSv7eQNnoS6T5mY+IpMt2jAC5u2qjQw/2xuL0VHm3IRkkYu+9yzL?=
+ =?us-ascii?Q?mazBrmqj237pJrlLSbDtLcTuRHl2zL+NMMGpjFtVdZy71jdoW6/Zh6Wa/WKr?=
+ =?us-ascii?Q?VSBUaEqy81VEgZIilXTG8iKWOrXEGknv3qh3BwOe7Wi0Dm/RtY5mN1R7EtmV?=
+ =?us-ascii?Q?lKxC2+UoScSo2xGZ/PGe08chPKSEaS6Em4PGXzAzbSAvgMa4dEoR0FTRi6iV?=
+ =?us-ascii?Q?C9I4aZhIbLU+nIU1dV83o6XYXYs0KXwchzqwYWfSj94cIogQ/7S9CQ6YTQAR?=
+ =?us-ascii?Q?iUZwxVsWOD0y77z8qeh579lKC878qijkFzNWxXezJH5d6SwsHu78YfgEfs9O?=
+ =?us-ascii?Q?NkWiz6L2iGrXUrlWboYc1UliZTP2H30YgTJ3RbAT6F8lTPBlegOLd2EevBq5?=
+ =?us-ascii?Q?qD6XD+joXzlknayyKubzDh4UBnqa/OyTHVl58ro6xts5/jvL39+4+9WQR0W6?=
+ =?us-ascii?Q?GqE0ezrmJc91kiFO/MNwIJIxm9xp/S28KIH0oE9+myFjyecJtfsW0acbJ7d8?=
+ =?us-ascii?Q?cp4dW+QVRx3HH7Sl7M3fos9Leq8Gq0OFW+QfGbGuGafc0/rwiYuNbo2tEDnO?=
+ =?us-ascii?Q?J2FOiltJLVTu0yfkoIyggaio5i7g1yM9GCQw6zNFSE2U4L9AUDfNcXFBk0Rp?=
+ =?us-ascii?Q?SiIjsGANlaCDYUSlcYguOo3bCubRpi7QxZNcTS9bI551jdhVSyrJU9gHJxsj?=
+ =?us-ascii?Q?lufRDN35C2BUVaj66oqbwdSkxPCRRF/hA4bey3HK2wz7vYTNB/2sgJRnBjtg?=
+ =?us-ascii?Q?g9F979NdASe2UKIzGvB4eqEy3/xwrUKPdP60X81bsS+YvI29lSqRRbvzyCcK?=
+ =?us-ascii?Q?shzfr1OvlFvuSNL/xFcfhYMkt9q6ugo59Q8M1W48hC7Ta/Xx2tS9JUb+amK4?=
+ =?us-ascii?Q?4KAPoRMMQO7xuKXt+6EtkoGeZJ3mMYs873AKNcU6fcJIAvYT3iB8LoKMhlGZ?=
+ =?us-ascii?Q?GrNbnggWBA=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea3b35aa-af62-419d-64c8-08df4a6fa457
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d665eff-5b7f-4098-3190-08df4a6fa56f
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5390.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2026 21:12:27.1342
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2026 21:12:28.8565
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oDoOOMYusr32MUf7SuIJOsB15JOVF2BUdIW8sRUK+i/88TxCx2iEtORV1eXlLT94C1gpx5uFr4B4OIg/VQtJlg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: XewKu2g4qj/pWFw6qLcTTgWJN31rbu67WQmxCXqNFYBygvC47/8a/3owSKMwByNQRseky5VynYqXUJZp93SYOA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV9PR12MB9784
 
-A nested-capable VM gets online_vcpus * S2_MMU_PER_VCPU shadow stage-2
-MMUs, with S2_MMU_PER_VCPU currently hardcoded to 2. When the guest
-hypervisor runs more than that number of concurrent nested VMs,
-get_s2_mmu_nested() recycles live MMUs on nearly every nested context
-switch, tearing down and rebuilding shadow stage-2 tables and issuing
-VMID TLB invalidations each time. This causes a sharp spike in host CPU
-usage.
+Grown shadow S2 MMUs only return to the host budget when their VM is
+destroyed, so a guest hypervisor that once ran many nested VMs keeps
+holding the budget after they are gone.
 
-Keep S2_MMU_PER_VCPU as the initial allocation, and grow the VM's pool
-when the guest's working set outgrows it. To keep growth from exhausting
-the VMID space, grown MMUs are counted across all VMs on the host and
-limited to half of what kvm_arm_vmid_nr_usable() returns.
-
-If an allocation fails, growth stops for good, so that a VM at its
-memory limit doesn't retry on every recycle.
-
-The nested_mmus pointer table is reallocated when full. Only the table
-moves, not the MMUs, so cached hw_mmu pointers stay valid.
+Park the grown MMUs that are unreferenced and still empty after a guest
+TLBI ALLE1, returning them to the budget. A later grow reactivates
+parked MMUs before allocating new ones.
 
 Signed-off-by: Nathan Chen <nathanc@nvidia.com>
 ---
- arch/arm64/include/asm/kvm_host.h |   8 +-
- arch/arm64/kvm/nested.c           | 153 +++++++++++++++++++++++++++---
- 2 files changed, 148 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/kvm_host.h   |  13 +++-
+ arch/arm64/include/asm/kvm_nested.h |   1 +
+ arch/arm64/kvm/nested.c             | 113 +++++++++++++++++++++++++---
+ arch/arm64/kvm/sys_regs.c           |   1 +
+ 4 files changed, 118 insertions(+), 10 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 6ae86bc96600..9307b86285a5 100644
+index 9307b86285a5..c0b9cd60dbe6 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -62,6 +62,7 @@
- #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
- #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
- #define KVM_REQ_RELOAD_GICv5		KVM_ARCH_REQ(12)
-+#define KVM_REQ_NESTED_S2_GROW		KVM_ARCH_REQ(13)
+@@ -329,6 +329,15 @@ struct kvm_s2_mmu {
+ 	/* Used since the victim search last went past it, under mmu_lock */
+ 	bool	accessed;
  
- /* Bit indices for kvm_arch::flags */
- enum {
-@@ -434,12 +435,17 @@ struct kvm_arch {
++	/*
++	 * Added by growing the pool, and returned to the host budget by
++	 * parking it (invalid and unmapped) once unused. A parked MMU is
++	 * never picked by the victim search until a grow reactivates it.
++	 * Both under mmu_lock.
++	 */
++	bool	grown;
++	bool	parked;
++
  	/*
- 	 * Stage 2 paging state for VMs with nested S2 using a virtual
- 	 * VMID. The MMUs are allocated in blocks tracked on
--	 * nested_mmu_blocks.
-+	 * nested_mmu_blocks, and the pool grows on demand.
- 	 */
- 	struct kvm_s2_mmu **nested_mmus;
+ 	 *  0: Nobody is currently using this, check vttbr for validity
+ 	 * >0: Somebody is actively using this.
+@@ -441,8 +450,10 @@ struct kvm_arch {
  	size_t nested_mmus_size;
-+	size_t nested_mmus_capacity;
+ 	size_t nested_mmus_capacity;
  	struct list_head nested_mmu_blocks;
-+	/* Grown MMUs, counted in the host budget, under mmu_lock */
-+	unsigned int nested_mmus_grown;
+-	/* Grown MMUs, counted in the host budget, under mmu_lock */
++	/* Grown MMUs not parked, counted in the host budget, under mmu_lock */
+ 	unsigned int nested_mmus_grown;
++	/* Parked MMUs, under mmu_lock */
++	unsigned int nested_mmus_parked;
  	int nested_mmus_next;
-+	bool nested_mmus_grow;
-+	bool nested_mmus_no_grow;
+ 	bool nested_mmus_grow;
+ 	bool nested_mmus_no_grow;
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 0f899addafa8..952853ab245a 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -174,6 +174,7 @@ extern void kvm_nested_s2_wp(struct kvm *kvm);
+ extern void kvm_nested_unmap_cipa_range(struct kvm *kvm, gpa_t cipa,
+ 					size_t unmap_size, bool may_block);
+ extern void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block);
++extern void kvm_nested_s2_shrink(struct kvm *kvm);
+ extern void kvm_nested_s2_flush(struct kvm *kvm);
  
- 	/*
- 	 * Serializes guest s2 tracking trees access when the mmu_lock
+ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val);
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 44dc6780fe6f..d530a37716be 100644
+index d530a37716be..9251f3fd4840 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -39,14 +39,58 @@ struct vncr_tlb {
+@@ -96,6 +96,55 @@ struct nested_s2_mmu_block {
+ 	struct kvm_s2_mmu	mmus[];
  };
  
- /*
-- * Ratio of live shadow S2 MMU per vcpu. This is a trade-off between
-- * memory usage and potential number of different sets of S2 PTs in
-- * the guests. Running out of S2 MMUs only affects performance (we
-- * will invalidate them more often).
-+ * Initial ratio of shadow S2 MMU per vcpu. When a vcpu has to recycle an
-+ * MMU that is still in concurrent use, the VM's pool, which all its vcpus
-+ * share, grows by one MMU per vcpu within the host-wide budget below.
-+ * The pool then follows the number of different sets of S2 PTs the guest
-+ * uses at the same time.
-  */
- #define S2_MMU_PER_VCPU		2
- #define S2_MMU_PER_VM		(KVM_MAX_VCPUS * S2_MMU_PER_VCPU)
- 
-+/* The MMU index is kept in the low bits of a tracked nested IPA */
-+#define S2_MMU_MAX_PER_VM	SZ_4K
++static int s2_mmu_nonempty_walker(const struct kvm_pgtable_visit_ctx *ctx,
++				  enum kvm_pgtable_walk_flags visit)
++{
++	return ctx->old ? -EEXIST : 0;
++}
++
++/* Only looks at the stage-2 root unless it finds an entry in use */
++static bool kvm_s2_mmu_empty(struct kvm_s2_mmu *mmu)
++{
++	struct kvm_pgtable_walker walker = {
++		.cb	= s2_mmu_nonempty_walker,
++		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_PRE,
++	};
++
++	return !kvm_pgtable_walk(mmu->pgt, 0, kvm_phys_size(mmu), &walker);
++}
 +
 +/*
-+ * Each shadow S2 MMU that runs takes a host VMID, and VMIDs are shared
-+ * by all VMs on the host. Running out of them causes a rollover, which
-+ * invalidates the TLBs for every VM. MMUs added beyond the initial
-+ * S2_MMU_PER_VCPU are therefore counted host-wide and limited to half
-+ * of the VMIDs the allocator can hand out. Hosts with 8-bit VMIDs don't
-+ * have enough to spare, so they never grow.
++ * Park @mmu if it is grown, unreferenced and empty, returning it to the
++ * budget. It is invalidated, so no lookup can hand it out, and skipped
++ * by the victim search. It keeps its slot, its struct and its stage-2
++ * root until the VM is destroyed, so walkers of the table that drop
++ * mmu_lock never see it go away. Parking always leaves S2_MMU_PER_VCPU
++ * unparked MMUs per vcpu, so the victim search always has a candidate.
 + */
-+static atomic_t nested_s2_mmus_grown;
-+
-+static int nested_s2_mmus_budget(void)
++static bool kvm_nested_s2_park(struct kvm *kvm, struct kvm_s2_mmu *mmu)
 +{
-+	if (kvm_arm_vmid_bits <= 8)
-+		return 0;
++	unsigned int keep = atomic_read(&kvm->online_vcpus) * S2_MMU_PER_VCPU;
 +
-+	return kvm_arm_vmid_nr_usable() / 2;
++	lockdep_assert_held_write(&kvm->mmu_lock);
++
++	if (kvm->arch.nested_mmus_size - kvm->arch.nested_mmus_parked <= keep)
++		return false;
++
++	if (!mmu->grown || mmu->parked || atomic_read(&mmu->refcnt) ||
++	    !mmu->pgt || !kvm_s2_mmu_empty(mmu))
++		return false;
++
++	if (kvm_s2_mmu_valid(mmu))
++		kvm_init_nested_s2_mmu(mmu);
++	mmu->parked = true;
++	mmu->pending_unmap = false;
++
++	kvm->arch.nested_mmus_grown--;
++	kvm->arch.nested_mmus_parked++;
++	atomic_dec(&nested_s2_mmus_grown);
++	return true;
 +}
 +
-+/* Lockless hint, checked on recycle before asking for a grow */
-+static bool nested_s2_mmus_budget_left(void)
-+{
-+	return atomic_read(&nested_s2_mmus_grown) < nested_s2_mmus_budget();
-+}
-+
-+/* Take up to @nr MMUs from the budget, returning how many were taken */
-+static int nested_s2_mmus_budget_take(int nr)
-+{
-+	int budget = nested_s2_mmus_budget();
-+	int old = atomic_read(&nested_s2_mmus_grown);
-+	int take;
-+
-+	do {
-+		take = min(nr, budget - old);
-+		if (take <= 0)
-+			return 0;
-+	} while (!atomic_try_cmpxchg(&nested_s2_mmus_grown, &old, old + take));
-+
-+	return take;
-+}
-+
- struct nested_s2_mmu_block {
- 	struct list_head	list;
- 	struct kvm_s2_mmu	mmus[];
-@@ -55,10 +99,12 @@ struct nested_s2_mmu_block {
  int kvm_init_nested(struct kvm *kvm)
  {
  	INIT_LIST_HEAD(&kvm->arch.nested_mmu_blocks);
-+	kvm->arch.nested_mmus_capacity = S2_MMU_PER_VM;
- 	kvm->arch.nested_mmus = kvmalloc_objs(struct kvm_s2_mmu *,
--					      S2_MMU_PER_VM,
-+					      kvm->arch.nested_mmus_capacity,
- 					      GFP_KERNEL_ACCOUNT);
- 	kvm->arch.nested_mmus_size = 0;
-+	kvm->arch.nested_mmus_no_grow = !nested_s2_mmus_budget();
- 	atomic_set(&kvm->arch.vncr_tlb_count, 0);
- 	spin_lock_init(&kvm->arch.guest_s2_tracking_lock);
+@@ -167,6 +216,7 @@ static int kvm_nested_add_s2_mmus(struct kvm *kvm, int nr, bool grow)
+ 			goto out_free;
  
-@@ -72,6 +118,8 @@ void kvm_destroy_nested(struct kvm *kvm)
- 	list_for_each_entry_safe(blk, tmp, &kvm->arch.nested_mmu_blocks, list)
- 		kvfree(blk);
- 
-+	atomic_sub(kvm->arch.nested_mmus_grown, &nested_s2_mmus_grown);
-+	kvm->arch.nested_mmus_grown = 0;
- 	kvm->arch.nested_mmus_size = 0;
- 	kvfree(kvm->arch.nested_mmus);
- }
-@@ -91,16 +139,25 @@ static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- 	return kvm_init_stage2_mmu(kvm, mmu, kvm_get_pa_bits(kvm));
- }
- 
--/* Add a block of @nr shadow S2 MMUs to the pool */
--static int kvm_nested_add_s2_mmus(struct kvm *kvm, int nr)
-+/*
-+ * Add a block of @nr shadow S2 MMUs to the pool, reallocating the
-+ * pointer table if it is full. Only the table moves, never the MMUs, so
-+ * cached hw_mmu pointers stay valid. Runtime walkers of the table hold
-+ * mmu_lock, and kvm_arch_flush_shadow_all() only runs once no vcpu can
-+ * enter the guest, so it can't race with a grow.
-+ */
-+static int kvm_nested_add_s2_mmus(struct kvm *kvm, int nr, bool grow)
- {
-+	gfp_t gfp = GFP_KERNEL_ACCOUNT | (grow ? __GFP_NORETRY : 0);
- 	size_t size = kvm->arch.nested_mmus_size;
-+	size_t cap = kvm->arch.nested_mmus_capacity;
-+	struct kvm_s2_mmu **table = NULL;
- 	struct nested_s2_mmu_block *blk;
- 	int i, ret = 0;
- 
- 	lockdep_assert_held(&kvm->arch.config_lock);
- 
--	blk = kvzalloc_flex(*blk, mmus, nr, GFP_KERNEL_ACCOUNT);
-+	blk = kvzalloc_flex(*blk, mmus, nr, gfp);
- 	if (!blk)
- 		return -ENOMEM;
- 
-@@ -112,14 +169,36 @@ static int kvm_nested_add_s2_mmus(struct kvm *kvm, int nr)
  		blk->mmus[i].s2_mmu_idx = size + i;
++		blk->mmus[i].grown = grow;
  	}
  
-+	if (size + nr > cap) {
-+		cap = max(cap * 2, size + nr);
-+		table = kvmalloc_objs(struct kvm_s2_mmu *, cap, gfp);
-+		if (!table) {
-+			ret = -ENOMEM;
-+			goto out_free;
-+		}
-+	}
-+
- 	scoped_guard(write_lock, &kvm->mmu_lock) {
-+		if (table) {
-+			memcpy(table, kvm->arch.nested_mmus,
-+			       size_mul(size, sizeof(*table)));
-+			swap(kvm->arch.nested_mmus, table);
-+			kvm->arch.nested_mmus_capacity = cap;
-+		}
-+
- 		for (i = 0; i < nr; i++)
- 			kvm->arch.nested_mmus[size + i] = &blk->mmus[i];
+ 	if (size + nr > cap) {
+@@ -216,14 +266,15 @@ static int kvm_nested_add_s2_mmus(struct kvm *kvm, int nr, bool grow)
+ /*
+  * A vcpu had to recycle a shadow S2 MMU in concurrent use. The request
+  * is per vcpu, but the pool belongs to the VM: grow it by one MMU per
+- * vcpu, within the budget and S2_MMU_MAX_PER_VM. If the budget is used
+- * up, the pool keeps recycling until another VM's destruction returns
++ * vcpu, within the budget and S2_MMU_MAX_PER_VM, reactivating parked
++ * MMUs before allocating new ones. If the budget is used up, the pool
++ * keeps recycling until parking or another VM's destruction returns
+  * some. Stop growing for good if an allocation fails, so that a VM at
+  * its memory limit doesn't retry on every recycle.
+  */
+ static void kvm_nested_s2_grow(struct kvm *kvm)
+ {
+-	int nr, add;
++	int nr, add = 0, reactivated = 0, first = -1;
  
- 		kvm->arch.nested_mmus_size = size + nr;
-+		if (grow)
-+			kvm->arch.nested_mmus_grown += nr;
-+
-+		/* Hand out the new, unused MMUs before recycling live ones */
-+		kvm->arch.nested_mmus_next = size;
+ 	guard(mutex)(&kvm->arch.config_lock);
+ 
+@@ -238,15 +289,57 @@ static void kvm_nested_s2_grow(struct kvm *kvm)
+ 		return;
  	}
  
- 	list_add(&blk->list, &kvm->arch.nested_mmu_blocks);
-+	kvfree(table);
- 
- 	for (i = 0; i < nr; i++)
- 		kvm_nested_s2_ptdump_create_debugfs(&blk->mmus[i], size + i);
-@@ -134,6 +213,42 @@ static int kvm_nested_add_s2_mmus(struct kvm *kvm, int nr)
- 	return ret;
- }
- 
-+/*
-+ * A vcpu had to recycle a shadow S2 MMU in concurrent use. The request
-+ * is per vcpu, but the pool belongs to the VM: grow it by one MMU per
-+ * vcpu, within the budget and S2_MMU_MAX_PER_VM. If the budget is used
-+ * up, the pool keeps recycling until another VM's destruction returns
-+ * some. Stop growing for good if an allocation fails, so that a VM at
-+ * its memory limit doesn't retry on every recycle.
-+ */
-+static void kvm_nested_s2_grow(struct kvm *kvm)
-+{
-+	int nr, add;
+-	add = min_t(int, nr, S2_MMU_MAX_PER_VM - kvm->arch.nested_mmus_size);
++	scoped_guard(write_lock, &kvm->mmu_lock) {
++		for (int i = 0; i < kvm->arch.nested_mmus_size; i++) {
++			struct kvm_s2_mmu *mmu = kvm->arch.nested_mmus[i];
 +
-+	guard(mutex)(&kvm->arch.config_lock);
++			if (reactivated == nr)
++				break;
++			if (!mmu->parked)
++				continue;
 +
-+	/* Other vcpus may have asked too, before a grow or a failure */
-+	if (!READ_ONCE(kvm->arch.nested_mmus_grow) ||
-+	    READ_ONCE(kvm->arch.nested_mmus_no_grow))
-+		return;
++			mmu->parked = false;
++			reactivated++;
++			if (first < 0)
++				first = i;
++		}
 +
-+	nr = nested_s2_mmus_budget_take(atomic_read(&kvm->online_vcpus));
-+	if (!nr) {
-+		WRITE_ONCE(kvm->arch.nested_mmus_grow, false);
-+		return;
++		if (reactivated) {
++			kvm->arch.nested_mmus_grown += reactivated;
++			kvm->arch.nested_mmus_parked -= reactivated;
++			kvm->arch.nested_mmus_next = first;
++		}
++
++		add = min_t(int, nr - reactivated,
++			    S2_MMU_MAX_PER_VM - kvm->arch.nested_mmus_size);
 +	}
 +
-+	add = min_t(int, nr, S2_MMU_MAX_PER_VM - kvm->arch.nested_mmus_size);
-+	if (add && kvm_nested_add_s2_mmus(kvm, add, true)) {
-+		WRITE_ONCE(kvm->arch.nested_mmus_no_grow, true);
-+		add = 0;
-+	}
-+	WRITE_ONCE(kvm->arch.nested_mmus_grow, false);
-+
-+	if (nr - add)
-+		atomic_sub(nr - add, &nested_s2_mmus_grown);
+ 	if (add && kvm_nested_add_s2_mmus(kvm, add, true)) {
+ 		WRITE_ONCE(kvm->arch.nested_mmus_no_grow, true);
+ 		add = 0;
+ 	}
+ 	WRITE_ONCE(kvm->arch.nested_mmus_grow, false);
+ 
+-	if (nr - add)
+-		atomic_sub(nr - add, &nested_s2_mmus_grown);
++	if (nr - reactivated - add)
++		atomic_sub(nr - reactivated - add, &nested_s2_mmus_grown);
 +}
 +
++/*
++ * The guest hypervisor invalidated all of its stage-2 TLBs, and the
++ * caller has just unmapped every shadow S2 MMU. Any MMU of a torn down
++ * nested VM is now empty and unreferenced, but so may be those of live
++ * nested VMs that aren't running right now. Park every grown MMU that
++ * is unreferenced and still empty. Parking doesn't unmap or invalidate
++ * TLBs again, as every removal of its mappings was followed by a TLB
++ * invalidation. An MMU that was refilled since the caller's unmap is in
++ * use, and is left alone.
++ */
++void kvm_nested_s2_shrink(struct kvm *kvm)
++{
++	lockdep_assert_held_write(&kvm->mmu_lock);
++
++	for (int i = 0; i < kvm->arch.nested_mmus_size; i++)
++		kvm_nested_s2_park(kvm, kvm->arch.nested_mmus[i]);
+ }
+ 
  int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
-@@ -155,7 +270,7 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 	num_mmus = atomic_read(&kvm->online_vcpus) * S2_MMU_PER_VCPU;
- 
- 	if (num_mmus > kvm->arch.nested_mmus_size) {
--		int ret = kvm_nested_add_s2_mmus(kvm, S2_MMU_PER_VCPU);
-+		int ret = kvm_nested_add_s2_mmus(kvm, S2_MMU_PER_VCPU, false);
- 
- 		if (ret) {
- 			free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
-@@ -842,6 +957,7 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_s2_mmu *s2_mmu;
-+	bool in_use = true;
- 	int i, victim = -1;
- 
- 	lockdep_assert_held_write(&vcpu->kvm->mmu_lock);
-@@ -859,8 +975,8 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
- 	 * hasn't been used since the search last went past it (such as
+@@ -976,7 +1069,8 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
  	 * one left behind by a torn down guest), is recycled straight
  	 * away. Other free MMUs lose their accessed bit and get a second
--	 * chance. If every free MMU was used since the last pass, the
--	 * first one found is recycled.
-+	 * chance. If every free MMU was used since the last pass, they
-+	 * are all in concurrent use and the pool is too small.
+ 	 * chance. If every free MMU was used since the last pass, they
+-	 * are all in concurrent use and the pool is too small.
++	 * are all in concurrent use and the pool is too small. Parked
++	 * MMUs are skipped until a grow reactivates them.
  	 */
  	for (i = kvm->arch.nested_mmus_next;
  	     i < (kvm->arch.nested_mmus_size + kvm->arch.nested_mmus_next);
-@@ -873,6 +989,7 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+@@ -984,7 +1078,7 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+ 		struct kvm_s2_mmu *mmu;
+ 
+ 		mmu = kvm->arch.nested_mmus[i % kvm->arch.nested_mmus_size];
+-		if (atomic_read(&mmu->refcnt))
++		if (atomic_read(&mmu->refcnt) || mmu->parked)
+ 			continue;
  
  		if (!kvm_s2_mmu_valid(mmu) || !mmu->accessed) {
- 			victim = i;
-+			in_use = false;
- 			break;
- 		}
+@@ -1010,7 +1104,8 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
  
-@@ -891,6 +1008,14 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
- 	if (kvm_s2_mmu_valid(s2_mmu))
- 		s2_mmu->pending_unmap = true;
+ 	/* Every free MMU is in concurrent use: the pool is too small */
+ 	if (in_use && !READ_ONCE(kvm->arch.nested_mmus_no_grow) &&
+-	    kvm->arch.nested_mmus_size < S2_MMU_MAX_PER_VM &&
++	    (kvm->arch.nested_mmus_size < S2_MMU_MAX_PER_VM ||
++	     kvm->arch.nested_mmus_parked) &&
+ 	    nested_s2_mmus_budget_left()) {
+ 		WRITE_ONCE(kvm->arch.nested_mmus_grow, true);
+ 		kvm_make_request(KVM_REQ_NESTED_S2_GROW, vcpu);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c7d91138a6d4..df81adf96259 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4047,6 +4047,7 @@ static bool handle_alle1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	 * corresponding VMIDs.
+ 	 */
+ 	kvm_nested_s2_unmap(vcpu->kvm, true);
++	kvm_nested_s2_shrink(vcpu->kvm);
  
-+	/* Every free MMU is in concurrent use: the pool is too small */
-+	if (in_use && !READ_ONCE(kvm->arch.nested_mmus_no_grow) &&
-+	    kvm->arch.nested_mmus_size < S2_MMU_MAX_PER_VM &&
-+	    nested_s2_mmus_budget_left()) {
-+		WRITE_ONCE(kvm->arch.nested_mmus_grow, true);
-+		kvm_make_request(KVM_REQ_NESTED_S2_GROW, vcpu);
-+	}
-+
- 	/*
- 	 * The virtual VMID (modulo CnP) will be used as a key when matching
- 	 * an existing kvm_s2_mmu.
-@@ -924,7 +1049,8 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
- static void tag_s2_mapping_mmu(struct kvm_guest_s2_mapping *mapping,
- 			       struct kvm_s2_mmu *mmu)
- {
--	BUILD_BUG_ON(S2_MMU_PER_VM > SZ_4K);
-+	BUILD_BUG_ON(S2_MMU_PER_VM > S2_MMU_MAX_PER_VM);
-+	BUILD_BUG_ON(S2_MMU_MAX_PER_VM - 1 > S2_MMU_IDX_MASK);
- 	mapping->nested.start &= ~S2_MMU_IDX_MASK;
- 	mapping->nested.start |= mmu->s2_mmu_idx;
- }
-@@ -2210,6 +2336,9 @@ void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
- 		write_unlock(&vcpu->kvm->mmu_lock);
- 	}
- 
-+	if (kvm_check_request(KVM_REQ_NESTED_S2_GROW, vcpu))
-+		kvm_nested_s2_grow(vcpu->kvm);
-+
- 	if (kvm_check_request(KVM_REQ_MAP_L1_VNCR_EL2, vcpu))
- 		kvm_map_l1_vncr(vcpu);
+ 	write_unlock(&vcpu->kvm->mmu_lock);
  
 -- 
 2.43.0
