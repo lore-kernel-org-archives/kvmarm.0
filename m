@@ -1,144 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795527984;
-	b=cGsmsPJUaSBa7HzYIY9YhNgSlK51HhdVxH4WbEw6t0mukniqP3J8MDKWAKppYtFHJStK
-	 85p1HTdLx5AoPS+5yUQqzTye00+tMmYVMJIHX5uTPA7+glIWvEZ51RmOsWfmf2lNzSRgU
-	 5DMhJA7MqORJ1AB4lUmUzh/NIEHoAMQbnGjmmOJ+LuEFnBfM3vDEggouJYG0NT4jHLn0r
-	 W2rcvGFHnIe6Bz9BQxnnEVD3PxVnB/Fy57D+OdiyXOu7fnT7qKIUS+Zk+XmscRYBvh7wU
-	 aPcj//tr1fRZioNRxMd9SwzLXPKnO0hU/lew88c5pdhZ/ldgrUDDefvbr0unhkQQVlg==
+	t=1795528423;
+	b=2zZtArPv4beVzIrogMiIslyNte+a7nPzxEll8xyaWHnPSeM4NcW72s9aAKdO7SUjycac
+	 Kqx59FluGJroERsPi8QUFBhalMD0BvLdp/uB1/Gqaa+2Ennkbz0F76PHl9F7APMApdZ5/
+	 RJTGlsn9jlx0oKZQdWwHZQ4NLiQmeGayZ0fTPPkohxcPoMQ8/HiUI8oWgXaZ+NzkMifQT
+	 VhnGGSW4xFM+iH74umoI/JQZCYas5DVkT96hlGNlJbatdE0Jz3AjtZQJPYvVwx7+bBlzV
+	 7wdKu3x4bUPIqnS0Eietuq+cn+afKHl9aP5xcDkeKKBvuAClDtVpSm4LOgK8ao99njQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795527984;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=Zc7zKgD/SDYnIbkY4MVpBd0Jo9DiJTva6Dv7og4GVfM=;
-	b=JFEK8GSeK9TjxJlcoIIMXi4ToSqVt0xpzraXqQdmDPTE2c11L4KxC1Ofe6nkLuzENPyj
-	 ZRbZuFE2RDu+W2iUUTspRC5MHIZgndYbAYXSAp1uZLe2JVv4M3UZQv96fRp/F5Vwtve5Y
-	 h/Lqr3sVADhA/dkvR+j82cd8TEcqLknjEAZnf168syFkYaxLZ4A1+6P0S7jZGjF3/dmpa
-	 k2BugguKv/lCHzL9gktboQWh9NvajzZej/JYjYuASr35UFp/CVU4oFzMT5HuV4iw/nTt7
-	 x5m81v1/O1zDLaY4CowbFf/Oak8oDla/KND76Z3/dyp0F9n5mveRq2Vq5mY0Kzgi1PA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795528423;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=MIkTVr4RcMW6zywCfrJZui4jF3ihGLOv2lESiFwO/2g=;
+	b=vIbWaNfIDUEObKgHD65EU4m1Q9oUQaDg8RTxnFBsCBFc3+fvET0LREgkx2Y9SlfCn3Sw
+	 wVT+G/xMWg3hFWanN9aVfIiRvYBLdnMP0kEM0mbdzuwY0RFIfj9Qq9ydm4v92uquzRxXF
+	 dZKVcoPvWjqkj42fovu6BED90u6SjbNesbNPUIc7N5MGtNGsJEGK0bmyI6qs2UvZXgLF8
+	 y7dqBfPDmn1Ho+KoAIFOv4iI2ijUlEKjrWcpGQVwxvvFCJt+dsjqhZ+nVWHn44Co5tk17
+	 iTz4PD1RB89L6FBrG/F47Kv4ERdS1HVBnF463m/Vt8+uxGi8bsYza2Fme8x3unR6bhA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=ziepe.ca;
-	spf=pass smtp.mailfrom=ziepe.ca;
-	dkim=pass header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=EqnpeJwx;
-	arc=none smtp.remote-ip=209.85.160.175
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D7F606A31E
-	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 13:46:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 08D7F606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=nndDHg3l;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED272606A322
+	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 13:53:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ED272606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=EqnpeJwx
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-53664b4860bso52277651cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 05:46:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1795527983; x=1796132783; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Zc7zKgD/SDYnIbkY4MVpBd0Jo9DiJTva6Dv7og4GVfM=;
-        b=EqnpeJwx4IAAp9mfsj00WoR29F/1+r5796MPouaebQUygK4aVUnRa6eVS7qXcaT4ks
-         Cy1SozoWyb/dvImEqPhS5piGTnA+NT7OFO3eWko2Zh3shjWND6NUhDZZUGTo4his9VU8
-         qU/Hj+sBdzclTaKlXDb/qa1g/+8nQCAFYVADWucUf30k7kyCTDmxc9cAiv3P9rg615By
-         dIEnYe6/1/C2VpeNnzi0ixjLPEc3Tyfb17hPezkZxync20ieZ/j49+DFoLdPHOqp2D7J
-         ORJcbgEnXNTXIZifTIp3/jwUYHap6o0pF353gcrfEyNfbXCqGnTLL65RNrBC4/EEmmoW
-         pXeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795527983; x=1796132783;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Zc7zKgD/SDYnIbkY4MVpBd0Jo9DiJTva6Dv7og4GVfM=;
-        b=DVneu7KRnbdcDjy05BWjDtsA/oaRCjT75sF8ndZCwwMWwPMEdJZFZGYTENS3NS2hQ6
-         qC/tAtsjgQPejpYyaQXD7pIBMf3F/8tiatAKR38NEr/VzrulGGEicB5TyDryGkLRfDz5
-         pZ4JUjf8gbjnPyuJ+UfpxVrg8UFsl17qddY7/U7uzGf/AvxB89nrsi8Nq8jckZN0kmCS
-         5hOwHCWDbCDFiIRnBfUNFUq8vPdEOUEwO+t0CWCy89Ql9/tf0JlysYxIK6fDTp3ULeNI
-         oBj/6rdc1ltMzsPJTraIH0eA86HczUwr79m/rl3ukxrPJ0QRLrds8l4tk4Rkk+5+gXb9
-         bYDw==
-X-Forwarded-Encrypted: i=1; AL+hErEoGUkktRbVKr4vzrSAtyDPadRxsimb5XQZbPiozpemDD6bRq6P2SLVV4LIiOWVZvj8oEt3DgA=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/koyiw2339XOylWpcrZyrOJvLf2BGm8ZHqQ50CrP1aijQqRmra
-	1kFV/zhw06+Wr0Yvd6ClcUQq0xCqwd8M+XMLh3ccGBQXSZlilzb32bQC1tLU41CLoJM=
-X-Gm-Gg: AZFdTZdAdGMoTlasNKD+dxjxKMItk8NiImou8gEzGdhPSomDx/ZhZFryfXGqoVJZCZz
-	7guxgipGt7uPkmLYhBJqaAbwNsphwy2bcI9gUeEgFPkD13dWFKuOMj/51jL+V/YvcC5M89U7ToC
-	n9uuIQAX4D6ycyC3c/Hbs+eZFmcVWYahjF0rs6hu6xoF2j9JmI/1MEuXCPGqD+iyhUn1lttTBHK
-	O6Qf/6C6HpP7DJ4cfaFp3VzGSTiYFJlLtGpbFGd82YlwvJHM12jcrxrB+I6iQxTxXwkmSaLJliE
-	vVaEMJ4an2ecHvjmWI1MAzE+vz/V7sWu7U0+XGcu8kL7bvcBjF4Bw0Y1dzEvmOnhxabfZIqZIa+
-	iXMPns/RQQLP6WhIniEJ+0YGp6sC3oZSpg0JpJobVEpqGl2EpO3D3x1rXYetUnkr+8IRBL+8cMr
-	UDMvIlYabwyUAt4hZGoCzx3SEFkWKfudf9+M/C/DLcDExw2MAE4jypswcMBfknCyTrmKIseGfMG
-	37Tcw3ClSxZrtYJzZ82YAjwa+jbIsQWUPXU/9l+33FuhROBVe58v83OdP8L4EPgc2palxJlKGJF
-	ObyR+A==
-X-Received: by 2002:a05:622a:120c:b0:535:a5f9:752e with SMTP id d75a77b69052e-55d76aed568mr264410241cf.77.1795527982900;
-        Tue, 24 Nov 2026 05:46:22 -0800 (PST)
-Received: from ziepe.ca ([142.177.118.84])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-55d78451407sm128368371cf.2.2026.11.24.05.46.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 05:46:22 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1xVqqj-00000000QIG-3EJB;
-	Tue, 24 Nov 2026 09:46:21 -0400
-Date: Tue, 24 Nov 2026 09:46:21 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-coco@lists.linux.dev,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Christian K?nig <christian.koenig@amd.com>,
-	Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-	Brian Starkey <Brian.Starkey@arm.com>,
-	John Stultz <jstultz@google.com>,
-	Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
-	"T.J. Mercier" <tjmercier@google.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	linaro-mm-sig@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH v10 04/13] irqchip/gic-v3-its: Allocate shared tables
- using CoCo shared memory allocator
-Message-ID: <20261124134621.GI9566@ziepe.ca>
-References: <20261116091137.94252-1-aneesh.kumar@kernel.org>
- <20261116091137.94252-5-aneesh.kumar@kernel.org>
- <awQd81MwZqi55gf8@arm.com>
- <yq5aa4mybbmv.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=nndDHg3l
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 27C3E339;
+	Tue, 24 Nov 2026 05:53:39 -0800 (PST)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE6213F763;
+	Tue, 24 Nov 2026 05:53:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795528422; bh=+APSVgCGhYAgoDVaz3XyVGIzx7Jm+ECnvgl+Mo3ccbw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nndDHg3lTtR63L3UJR/QPaZ1wafVNDpQBCCZ+cFzjl1lRrB7pNlrxCK3t2fyafFkt
+	 0/1iW09TNYzVrXfe88pK0leeZh6RmvKXyxAbsp1/DFld5IZ7Cbf3CXC7/KuhEEPeqa
+	 GHttcEwpGz7XbYz+SVSOE/BCApFxVLy7aaxqOCBs=
+Date: Tue, 24 Nov 2026 13:53:27 +0000
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>, Dan Carpenter <dan@pereq.eu>, 
+	stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: nv: Upgrade sub-page TTL hint to maximum size
+Message-ID: <abrygylfbe47jhkufe3hl5wpdawazeno554ovwijwvh43hzpab@uqxszjzp63jc>
+References: <20261123182312.4842-1-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -150,30 +64,63 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq5aa4mybbmv.fsf@kernel.org>
+In-Reply-To: <20261123182312.4842-1-maz@kernel.org>
 
-On Tue, Nov 24, 2026 at 07:00:00PM +0530, Aneesh Kumar K.V wrote:
-
-> Taking Jason's feedback into account, we could have the allocator
-> request compound pages and recover the actual allocation order with
-> compound_order(). That would avoid passing an order to free:
+On Mon, Nov 23, 2026 at 06:23:12PM +0000, Marc Zyngier wrote:
+> Should a guest be slightly foolish and submit a S2 TLBI with a TTL hint
+> that describe a base granule size smaller than the host's page size,
+> we take the resulting size at face value and feed it to the S2 unmapping
+> code. Which legitimately screams about something not being page-aligned.
 > 
-> void *alloc_cc_shared_node(int nid, gfp_t gfp, unsigned int order);
-> void *alloc_cc_shared(gfp_t gfp, unsigned int order);
-> void free_cc_shared(void *addr);
+> The architecture allows us to drop the TLBI on the floor, as we don't
+> support a S2 granule size smaller than the host's page size. But it turns
+> out that doing so is proving pretty hard (we call compute_tlb_inval_range
+> from a number of places, none of which is amenable to an early out).
+> 
+> Instead, detect the annoying case, and pretend that we don't have a TTL
+> hint at all, leaving the size upgrade mechanism to take place and use
+> the largest possible size for the guest's S2 granule size.
+> 
+> This will still allow nonsensical stuff to get through, such as a 4kB
+> level 2 (aka 2MB) from a guest with a 64kB S2 base granule size running
+> on a 16kB page size host, but that's not worse than doing nothing, and
+> the host code won't get shouty.
+> 
+> Reported-by: Dan Carpenter <dan@pereq.eu>
+> Link: https://lore.kernel.org/r/20261123-inval_range-v1-1-815e15797089@pereq.eu
+> Fixes: d1de1576dc21 ("KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
 
-It probably shouldn't be order here, that is hard to use. Just size_t
-len
+Reviewed-by: Wei-Lin Chang <weilin.chang@arm.com>
 
-And round up internally
-
-If we ever want to do some kind of slab sharing scheme then the API is
-already set up for it.
-
-> As you noted, dma-buf would need virt_to_page() to obtain the pages for
-> its scatterlist.
-
-I think that is fine, other places working with kalloc/vmap already do
-that.
-
-Jason
+> ---
+> 
+> Notes:
+>     Reposting this as a first class patch, as I'd like to plug that one
+>     as early as possible (and Dan has plenty of other patches in flight...)
+> 
+>  arch/arm64/kvm/nested.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 78d5b18dbd2d6..36e4e83badf0a 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -714,6 +714,13 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
+>  	 */
+>  	max_size = __ttl_to_size(ttl);
+>  
+> +	/*
+> +	 * IMPDEF behaviour: treat subpage TTL-annotated TLBI as the largest
+> +	 * possible invalidation. Don't try this at home, kids!
+> +	 */
+> +	if (max_size < PAGE_SIZE)
+> +		max_size = 0;
+> +
+>  	if (!max_size) {
+>  		/* Compute the maximum extent of the invalidation */
+>  		switch (vtcr_to_tg0_pgsize(kvm, mmu->tlb_vtcr)) {
+> -- 
+> 2.47.3
+> 
