@@ -1,106 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.201.69
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795554753;
-	b=bbqimTrLAHqhGXFFbBIb9TPa5oeBThyGJjsj4m1qmoY3g3cUQ5CH0ysJRQWiPqGuS5x3
-	 vQRdX49j8RMzk7v0yNXpPtj8+78QcY0/F9xE+mCNH7Hd6rdPhTPt6V0pt1fw8u0ZP9Ryr
-	 eGZ6Yhgw+adLsACeI4jJeGpC8JR8GF+zPNgdsiKGPNu1hu8xm5tu0TpLiztcBCE5ZUCcX
-	 CqGb+7TvE5hMOr0UAPC5S6XjBGy4OgqpDUeNaMXbetcTJOrxQrP5WYtbHX9chibGJIJ0T
-	 By3xT398ZNoWz2HCm3xE9L8TkBVIlQ3ivcVmkmW1S7imO9BSmAH6WN7VFTiboOm7l3Q==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795554753;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 Content-Transfer-Encoding:Content-Type:X-ClientProxiedBy:MIME-Version:
-	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
-	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
-	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=UylABhHfMzOQ0RLRFhdTYzyaF2aCJlo2Dso0YnLTx90=;
-	b=r6UItOaOc1Ne+GCnYHDHTulUWdII5aQXpvose7vAz6hsgInj3+SRFCwL5wi1jIHvl0QY
-	 wnDdjPFLiRZYPCWLi2XabVwri6j3xh3RWZOZ/wSZlnLR+/hs6MjWHnD12nomRhnL5W4e8
-	 Ry2YoQVtCZwDyV+9LNG4MY+Xs4Jl2Uw95OpKqpRhg5ZhlUOQS7LyQatSZUEn18PiOFnq6
-	 AMq5aTNa7/wtZXMwEIMyRWId1C10cxf4BXSTmqhFPPUyRIJiO0zFx5eZsqkhJU9a+c5kT
-	 13riCuHPmUKWRtPpp0I5W3HRJfhNhq540/1D5RUt+lcH57lCbXqxX6jZ8SWsYlIvvDQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=nvidia.com;
-	spf=fail smtp.mailfrom=nvidia.com;
-	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=TwD1yvrl;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.201.69
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013069.outbound.protection.outlook.com [40.93.201.69])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795556083;
+	b=U+8HWLXT6JU+eJb6XiDtyano+5cLoIHgCujQxc2UJ66M1zPFedCA9BpMkZLJvVcvHx3x
+	 G9K1wT0PnXgVYKYZL0YwldMHWhpbHMYo98SLnZalhYm77vWhIvR+cK/Oxldr7d27eHWkW
+	 MoASRKLPyCoYdOiVsEhD8qREJfxk8BC3trx24tdsvuKEUIMi18Hc4QAYHO8Ap91MnTkgP
+	 aej5aOVw6VSLGogxtXrFq7XCp5OBFlnv91IkSbesJUSyJY3+1H7YtepbHKXoVtAQe1tJO
+	 LN+tVRHoVQFczULLtpWA+hWbmkqJM2UaXRuZWh0V/FXqJv6rIJ+kU9hIV8/bZSY329w==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795556083;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=LY4DvxoieU9m+gzGOvWUzLp2xO5b5yJzX0tje1QrOWI=;
+	b=SV/ztR0jDghQOJJq3r50gjayqGc7xs32geC5onVnDgl/rexwnL5kgCOqOkKA5M2U0uPt
+	 dlMwZbaH7Tn8FbICcRmnjcIFTGqCQINaMo3RrEqVjZslRwhCRfV9Uy6+lU9liBmRnu5dC
+	 1DJHDpyengqViABQB7ksA00N41Z2NNf+wP+lPvyNpQxVSSGvGWFEyDHTw6ns3PsB56Yh7
+	 2ub9bcRR4HqAyCQgWBO+o2BfPMTErAQjs254MD/2JQ197sTTdTTuVt1i1YdvBSOD4M7nQ
+	 vxGnaiGQrJq2L0uPaquCk+kg7zqEJwDGyrCTrpetry/lhCgT2WA274l3uCI0zP9JqBQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QdU6qiJl;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0A4606A69E
-	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 21:12:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5A0A4606A69E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7374606A31E
+	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 21:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=TwD1yvrl
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tKQmlN3S4sTb4rM+d7C75nkJp3MRh8V+DL5cv8ufW9LOQSBH37wJfqWV+MiHUx/OhTsthucmK3nuO9TqfaFWzsoCFhvlh1L4vMvGy0brxWS6lHRnJnS+x32nkAwlSA60K8X5GGjwKEAcC5s+BEHM8XlxPpl95ZOzRL0vUSWJU+PYAyHWZAYV4os/9d/WNtG6qF1A6AbUsyOBectc08S62os1nA/YwAdSYQNMYC7vw4IzbO6fz+zkrPC8sVoruvCnU7neDR/W8fqySSxA0sAnC1JJ5lAvwPWvu9VFAxqnHYTmS5OfPgT25DvWrXb+03uGmYSYakvlAaZPVu3IaKwDOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UylABhHfMzOQ0RLRFhdTYzyaF2aCJlo2Dso0YnLTx90=;
- b=ByfjWMGWmJ6A264P7qI5Qc441Q7/UNUGiqrlYmNQXwTWBmrU+L+oEEqzYquKCGPdvneo9KXCCdd3eI5fOyzCDKpaOQj+sBG7NdEDghNaPiVW52sbZD0lIFP8/VnO8NXN4f8IA89NJBOpcvcRiWkUpE94FuG8OZfTfFUKYeqdlyoZOQNZHLzQIradcwMEzuB44i/5DftdhqsVPcKXtcVMTSCThuwrqYu3bBLjiY0/jJ37cgqgw9p+0rgrmM2lHUfp6/ZYoNSIRWLPD+gSWyWYzJGeUM4vOi4bMDCh2aJ6BZkmgbOB1We6JdkDZ4PtfGTM2uep+/xK56NNCAh0aGM7QA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UylABhHfMzOQ0RLRFhdTYzyaF2aCJlo2Dso0YnLTx90=;
- b=TwD1yvrlmdJGM4/JzgPZZTE7d1rbIIWSsXtpANcKai5f6NyQDMcKnzf6dSVFQOy0O3QLjzoerbAtfhk4YIuz02TxRS3HhLrPgatD16dsV8dfED3Rah1vBgY6izquabnDm1oQXiiL3QsfnJqHKRpzwhhdfDJgqyEhQy6oj3INjWju2VVgdnZnGZFhYxll2bDsflhhezu/2zJ31nEkmufMY1OnyzjWvb8gxNKe71XLlflZD9DbQcilv/NYPlkBlve3FCB0iSMaQrzR7BxhAk8BLkWOp/1NJlQ4a55ZlPLbznihV0YIOxSB0vuCBmM0Ltljj3ux74DFsMumi6YMlWoqTA==
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5390.namprd12.prod.outlook.com (2603:10b6:5:389::15)
- by LV9PR12MB9784.namprd12.prod.outlook.com (2603:10b6:408:2ed::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.639.13; Tue, 24 Nov
- 2026 21:12:30 +0000
-Received: from DM4PR12MB5390.namprd12.prod.outlook.com
- ([fe80::2815:c27e:a0a:2720]) by DM4PR12MB5390.namprd12.prod.outlook.com
- ([fe80::2815:c27e:a0a:2720%3]) with mapi id 15.21.0662.001; Tue, 24 Nov 2026
- 21:12:30 +0000
-From: Nathan Chen <nathanc@nvidia.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Tom Matthias <tmatthias@nvidia.com>,
-	Shameer Kolothum Thodi <skolothumtho@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Julian Miller <julianmiller@nvidia.com>
-Subject: [RFC PATCH 6/6] KVM: arm64: nv: Park shadow S2 MMUs emptied by a guest range invalidation
-Date: Tue, 24 Nov 2026 13:12:18 -0800
-Message-ID: <20261124211218.2751086-7-nathanc@nvidia.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261124211218.2751086-1-nathanc@nvidia.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QdU6qiJl
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C39871F000D8;
+	Tue, 24 Nov 2026 21:34:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795556082;
+	bh=LY4DvxoieU9m+gzGOvWUzLp2xO5b5yJzX0tje1QrOWI=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=QdU6qiJllPFGMsPAPklD1Va4ef0h+VUHkz55BMU4M5TaruGsDdSue/U2FMnnDTm61
+	 lMiGvh0YsQ7Gw7LPCwinTZgllmjGRq4GdWYiUj/0GtLDjaBc5tJl5b7o+hrEP1cJWD
+	 sRETZvsq80ul38v3yn9Wzt1PLTxdAqNvGndhEo5nX8Jy5lvaHTarIiZwXZK8PFBig7
+	 kU5m6V13vMA8ih5BnJWdUnNzInk1WOxdQeI75WJocjeHPdyHBl6laYeMbGSP3mZ8lH
+	 hD+gRCkt7C+bbYDTwpGOouUuGlq4QEo8WUVq4bPPaptyq3W8cOo75G6A24Nps9mHu8
+	 IkW0Nog3RfBGA==
+Message-ID: <sashiko-outbox-232050@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [RFC PATCH 4/6] KVM: arm64: nv: Grow the shadow S2 MMU pool on
+ demand
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Nathan Chen" <nathanc@nvidia.com>, kvmarm@lists.linux.dev
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261124211218.2751086-5-nathanc@nvidia.com>
 References: <20261124211218.2751086-1-nathanc@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MW4P223CA0020.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:303:80::25) To DM4PR12MB5390.namprd12.prod.outlook.com
- (2603:10b6:5:389::15)
+ <20261124211218.2751086-5-nathanc@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 24 Nov 2026 21:34:41 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -109,117 +60,175 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5390:EE_|LV9PR12MB9784:EE_
-X-MS-Office365-Filtering-Correlation-Id: 37d5f12e-a84d-484d-197d-08df4a6fa668
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|23010399003|1800799024|261028144727099003|10067099003|11063799006|56012099006|261021121427099003|261022105027099003|261026140227099003|261021123027099003|261009223027099003|261102123227099003|261026121527099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	4SUtxkGzMcIbrQVOXStMGlkJUGER8+t5mUhPFpG0GQ7kfdwPBy0tWsM4fcrl5T5trjnCklC6hqNjIMZq9C2PHpUXFuTXVbsakrVvfCm6YCChQgG1onaj4UTWFKEaFl0CFsZuwAB+m/W+9BRjx5k7gL87b22aikbimkgAt2l+acXdQrqLWzKZ4Wm6D46rZM+l45/uQ5YKCajZ1UbWJ9AYpNyIvX8ZAr8YV56scrpw/xtHHtfRWBmtKWOzpl2a1bypv1laQvylPvaxEFGIOHj/nsUn4hfS2wk+9tSYYoOS6FQFXhzKyDNzyLmtW5NYUuJFiIAcKqZcqzRbTbvHYLKPwdX8CL/xSmdrAGtViirnyMgu1zHj05EshDmR8HoSkDqdEHwAWg0zrx/2HdTHdutfDfPeihNMMbxAE7pogySWxV02W2Pr1Ne/vnp9+yhSS+gk4SchrTVXgFBpmLNVJ3gjvtiFpX3F2Bvgt1trRFkjw7/xO17r616oQ7L4p4If6GuHI1XnYUrjjgTUhhlehLNnScXRqN4ITCz29ZhBnM5LNGSePx99W39wSA5kYWomM+aoRksENUy+XDpvIqZEU1xzIqQ58ixrvVgzA2e/qVJwQuNrdjhwOv/bapc6VHzJw+R1No0Wi+9VxRsc3uqkuCTvzoEx13v6dX+45cDaJlJ8qIw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5390.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(23010399003)(1800799024)(261028144727099003)(10067099003)(11063799006)(56012099006)(261021121427099003)(261022105027099003)(261026140227099003)(261021123027099003)(261009223027099003)(261102123227099003)(261026121527099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?XoJyTobKUAwt8KuAxVTCqeCZgwQs+T6KkwLTNrf4jwkC+BTwU+rU1yyO41LJ?=
- =?us-ascii?Q?bQM+FWPVEQg65TJmcBtwb92UZsMpvw5c3mU/yGB9LEFmGhpPQQAYLWSpG3xq?=
- =?us-ascii?Q?cROE9/kPjwESlJg5RCJWmtNp6FxOkwBUIlQDYxGqJj20SGCIojg5zG4XosKq?=
- =?us-ascii?Q?TsQbQeTLXD7gTl6oQXy2G2UyEGD62XgdzTz0V2teGpVaKjEdS6pv2OYbs9gQ?=
- =?us-ascii?Q?2ulI+bKcWvwyA65PFColIH0n8ECa0btRKB23ZHfrDnVfw8v22XsruZCEio/+?=
- =?us-ascii?Q?gMG+oLqiVONmrUmBQh1TYhl9szyDVoy6pwObEsTwFG6C9/1MuDF5DVMKksRb?=
- =?us-ascii?Q?wtWaP4+FWY/VrZlDB1meqIuM9WSJ7v0rXTf4MZj8NArCr4eTPVS1jbC3n3Uj?=
- =?us-ascii?Q?NanW4w7c5CkstsuHveHNdhInFMwO7B1cSxJSR7FWRmFgwRWvMeKRkSOoG4aS?=
- =?us-ascii?Q?ygGi/Qcn9Pm21ZsSKovSWXpx7sQFeY1tytJ3FxlA2f7yirjt+ZNBdk8W19rN?=
- =?us-ascii?Q?pZFvWnV9NZ7CxYGeWPkCvt9+84fw/FqszC78W8CBNDNA/9dy8TgnLipJQe3x?=
- =?us-ascii?Q?CJBff2RqdSGJt29hjIsaTga9gwuAiOYV4Ezjz+I826p92jRiXnRJEQAGtQi3?=
- =?us-ascii?Q?8PRkOmq6axqdvErgzNLARmbHrrbpavrCt9kBzPFs9byl4shUWU+fa6hUVota?=
- =?us-ascii?Q?gpLX5fILZfVChd4La8ZbxYoPxOfbk0HAsuEC3gS19Dz2JiwaBN4+0EyD1ZbN?=
- =?us-ascii?Q?7AN9RwwU/dwzdPTgClTCrRFKzjo2LIo4NVHru+JLSmxkCRKKjoMDDZO+1vFs?=
- =?us-ascii?Q?eJU7sURIHAHFDTEXWNsc3YRvdvQRQgTAQAqzXb8/oJT7rx1sCPBa3wd0/u3p?=
- =?us-ascii?Q?VT5w9uuLfVa+Tnz/uS1g25oywocENQWCfCZ3TH9c+MdvvvjaLZXipPkpblFA?=
- =?us-ascii?Q?5hFGCUTVcFp3caupZNa1go+9zmKvGlj156PFi355+hp1eIZso+WaDV10bb2g?=
- =?us-ascii?Q?CaoMEx6HMqLeKL4G07FMpSFqXwkOiiNUJyR4GoipJEYwp1meGfT5CdfCh2Ap?=
- =?us-ascii?Q?DD8837IpDCXXNxSJGd80STVH8PGh44oIoo7tfqmOpXALoh12CDSntdvZTk81?=
- =?us-ascii?Q?W2/DoRsHiqpNyTmZ6rKgyaU8y+4pp5/HJi7dwmta8UP88MJp3mfe5D7w8Sld?=
- =?us-ascii?Q?9S5JuvuPTcOiG26vpVcIUBJ2B9aA9rx0hQ+BY/KeoWtbF9Gi+19mfPBWv4ZH?=
- =?us-ascii?Q?n8ojToqaaKCndHXvCaBoAx91t84qq+9fHZt9pJEgOxfCAhvgmYPtOXfERn9Q?=
- =?us-ascii?Q?oTW+bJ0lnDusJyQTFEYn2rfghdSuuvTleCoYPmoxgs7McHHhsMc91Eqzw1WE?=
- =?us-ascii?Q?G+FXvz6bDHpPfOyYPFBvWY0HVQAYbOTA54wRfVJ6jCMZ7xmUAwMVVGxYRXAo?=
- =?us-ascii?Q?UlBxoSVNi7qSMy6rH9HAomlrFHTgkkfpD5E0HA88qdllLQF0svzNlWPCCq/R?=
- =?us-ascii?Q?MdRbxaHcrQ8kEcXRmHpXDdYKzcoq/HjbSatBYCPqsJBFB9oK2RFYuri4Vm8K?=
- =?us-ascii?Q?zGJcfsCLx80X5F1guHgoGK+Y4T9XOzckpw79Lnf/6fOHWxnQHhppA9t34Bt7?=
- =?us-ascii?Q?2n0JnMMx8CVZNqNr+MxMeJcWge4DnBk6qt1G16AjaPRIAgJQkh3qQ+GQd6xc?=
- =?us-ascii?Q?99reEdBlenqxxHiO1iUdg8M5DkPeumRmfafJKWxrEtLxLwkAV+wHw8ey333v?=
- =?us-ascii?Q?d2Bb8z+KeQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 37d5f12e-a84d-484d-197d-08df4a6fa668
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5390.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2026 21:12:30.4825
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0j9yQELjE1nrbxcxF7esoc3HW0wLK8eXkEttCKrmSP+pheTG1qLZeemjwGZGr006KaLjhcUMGIOmd8caNpoJVQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV9PR12MB9784
 
-If a guest TLBI RIPAS2E1IS or VMALLS12E1IS leaves a grown, unreferenced
-MMU empty, park it there rather than leave it valid until a recycle
-unmaps the whole IPA space of an already empty MMU.
+Thank you for your contribution! Sashiko AI review found 3 potential
+issues to consider:
+- [Medium] KVM: arm64: nv: premature pool growth in get_s2_mmu_nested()
+  clock sweep
+- [Medium] KVM: arm64: nv: missing __GFP_NORETRY in init_nested_s2_mmu()
+  on pool grow
+- [Medium] KVM: arm64: nv: skipped baseline MMU allocation in
+  kvm_vcpu_init_nested()
+--
 
-Signed-off-by: Nathan Chen <nathanc@nvidia.com>
----
- arch/arm64/include/asm/kvm_nested.h | 1 +
- arch/arm64/kvm/nested.c             | 2 +-
- arch/arm64/kvm/sys_regs.c           | 8 ++++++++
- 3 files changed, 10 insertions(+), 1 deletion(-)
+commit ed87347a8e1063feec4d2776535ef6edc4da64e2
+Author: Nathan Chen <nathanc@nvidia.com>
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 952853ab245a..164e42376296 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -175,6 +175,7 @@ extern void kvm_nested_unmap_cipa_range(struct kvm *kvm, gpa_t cipa,
- 					size_t unmap_size, bool may_block);
- extern void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block);
- extern void kvm_nested_s2_shrink(struct kvm *kvm);
-+extern bool kvm_nested_s2_park(struct kvm *kvm, struct kvm_s2_mmu *mmu);
- extern void kvm_nested_s2_flush(struct kvm *kvm);
- 
- unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val);
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 9251f3fd4840..e9a2eaef9eda 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -121,7 +121,7 @@ static bool kvm_s2_mmu_empty(struct kvm_s2_mmu *mmu)
-  * mmu_lock never see it go away. Parking always leaves S2_MMU_PER_VCPU
-  * unparked MMUs per vcpu, so the victim search always has a candidate.
-  */
--static bool kvm_nested_s2_park(struct kvm *kvm, struct kvm_s2_mmu *mmu)
-+bool kvm_nested_s2_park(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- {
- 	unsigned int keep = atomic_read(&kvm->online_vcpus) * S2_MMU_PER_VCPU;
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index df81adf96259..99dcd2549b08 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -4123,6 +4123,14 @@ static void s2_mmu_unmap_range(struct kvm_s2_mmu *mmu,
- 	 * the TLBI.
- 	 */
- 	kvm_stage2_unmap_range(mmu, info->range.start, info->range.size, true);
-+
-+	/*
-+	 * The guest hypervisor may have unmapped everything this MMU held,
-+	 * e.g. all memory of a nested VM being torn down. If it is grown and
-+	 * now empty, return it to the budget rather than leave it for a
-+	 * recycle to unmap again.
-+	 */
-+	kvm_nested_s2_park(kvm_s2_mmu_to_kvm(mmu), mmu);
- }
- 
- static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
--- 
-2.43.0
+KVM: arm64: nv: Grow the shadow S2 MMU pool on demand
 
+This commit grows a nested-capable VM's shadow stage-2 MMU pool on demand
+when all free MMUs in the pool have been accessed since the last victim
+sweep, bounded by a per-VM limit and a host-wide VMID budget.
+
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 44dc6780fe6fe..d530a37716be6 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+[ ... ]
+> @@ -91,16 +139,25 @@ static int init_nested_s2_mmu(struct kvm *kvm, struc=
+t kvm_s2_mmu *mmu)
+>  	return kvm_init_stage2_mmu(kvm, mmu, kvm_get_pa_bits(kvm));
+>  }
+> =20
+> -/* Add a block of @nr shadow S2 MMUs to the pool */
+> -static int kvm_nested_add_s2_mmus(struct kvm *kvm, int nr)
+> +/*
+> + * Add a block of @nr shadow S2 MMUs to the pool, reallocating the
+> + * pointer table if it is full. Only the table moves, never the MMUs, so
+> + * cached hw_mmu pointers stay valid. Runtime walkers of the table hold
+> + * mmu_lock, and kvm_arch_flush_shadow_all() only runs once no vcpu can
+> + * enter the guest, so it can't race with a grow.
+> + */
+> +static int kvm_nested_add_s2_mmus(struct kvm *kvm, int nr, bool grow)
+>  {
+> +	gfp_t gfp =3D GFP_KERNEL_ACCOUNT | (grow ? __GFP_NORETRY : 0);
+>  	size_t size =3D kvm->arch.nested_mmus_size;
+> +	size_t cap =3D kvm->arch.nested_mmus_capacity;
+> +	struct kvm_s2_mmu **table =3D NULL;
+>  	struct nested_s2_mmu_block *blk;
+>  	int i, ret =3D 0;
+> =20
+>  	lockdep_assert_held(&kvm->arch.config_lock);
+> =20
+> -	blk =3D kvzalloc_flex(*blk, mmus, nr, GFP_KERNEL_ACCOUNT);
+> +	blk =3D kvzalloc_flex(*blk, mmus, nr, gfp);
+>  	if (!blk)
+>  		return -ENOMEM;
+> =20
+>  	for (i =3D 0; i < nr; i++) {
+>  		ret =3D init_nested_s2_mmu(kvm, &blk->mmus[i]);
+>  		if (ret)
+>  			goto out_free;
+
+[Severity: Medium]
+Should init_nested_s2_mmu() -> kvm_init_stage2_mmu() also receive @gfp so
+that its allocations carry __GFP_NORETRY when @grow is true?
+
+kvzalloc_flex() and kvmalloc_objs() use __GFP_NORETRY on grow, but
+kvm_init_stage2_mmu() still allocates each struct kvm_pgtable and stage-2
+PGD (up to 16 contiguous pages per MMU in kvm_host_zalloc_pages_exact())
+with hardcoded GFP_KERNEL_ACCOUNT.  When a VM near its memcg limit
+triggers kvm_nested_s2_grow(), the small block allocation can succeed
+while the PGD allocations enter full reclaim and trigger the memcg OOM
+killer instead of failing fast and setting nested_mmus_no_grow.
+
+[ ... ]
+
+> @@ -155,7 +270,7 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+>  	num_mmus =3D atomic_read(&kvm->online_vcpus) * S2_MMU_PER_VCPU;
+> =20
+>  	if (num_mmus > kvm->arch.nested_mmus_size) {
+> -		int ret =3D kvm_nested_add_s2_mmus(kvm, S2_MMU_PER_VCPU);
+> +		int ret =3D kvm_nested_add_s2_mmus(kvm, S2_MMU_PER_VCPU, false);
+
+[Severity: Medium]
+Should kvm_vcpu_init_nested() compare num_mmus against the baseline MMU
+count (nested_mmus_size - nested_mmus_grown) rather than
+nested_mmus_size?
+
+If an already-initialized vcpu runs and triggers kvm_nested_s2_grow()
+before the remaining vcpus run KVM_ARM_VCPU_INIT, nested_mmus_size
+already includes nested_mmus_grown.  Later kvm_vcpu_init_nested() calls
+then see num_mmus <=3D nested_mmus_size and skip allocating those vcpus'
+baseline S2_MMU_PER_VCPU MMUs, leaving the pool smaller by
+S2_MMU_PER_VCPU per late-initialized vcpu and keeping their baseline MMUs
+charged against the global nested_s2_mmus_grown budget.
+
+[ ... ]
+
+> @@ -842,6 +957,7 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kv=
+m_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm =3D vcpu->kvm;
+>  	struct kvm_s2_mmu *s2_mmu;
+> +	bool in_use =3D true;
+>  	int i, victim =3D -1;
+> =20
+>  	lockdep_assert_held_write(&vcpu->kvm->mmu_lock);
+> @@ -859,8 +975,8 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kv=
+m_vcpu *vcpu)
+>  	 * hasn't been used since the search last went past it (such as
+>  	 * one left behind by a torn down guest), is recycled straight
+>  	 * away. Other free MMUs lose their accessed bit and get a second
+> -	 * chance. If every free MMU was used since the last pass, the
+> -	 * first one found is recycled.
+> +	 * chance. If every free MMU was used since the last pass, they
+> +	 * are all in concurrent use and the pool is too small.
+>  	 */
+>  	for (i =3D kvm->arch.nested_mmus_next;
+>  	     i < (kvm->arch.nested_mmus_size + kvm->arch.nested_mmus_next);
+> @@ -873,6 +989,7 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kv=
+m_vcpu *vcpu)
+> =20
+>  		if (!kvm_s2_mmu_valid(mmu) || !mmu->accessed) {
+>  			victim =3D i;
+> +			in_use =3D false;
+>  			break;
+>  		}
+> =20
+> @@ -891,6 +1008,14 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct =
+kvm_vcpu *vcpu)
+>  	if (kvm_s2_mmu_valid(s2_mmu))
+>  		s2_mmu->pending_unmap =3D true;
+> =20
+> +	/* Every free MMU is in concurrent use: the pool is too small */
+> +	if (in_use && !READ_ONCE(kvm->arch.nested_mmus_no_grow) &&
+> +	    kvm->arch.nested_mmus_size < S2_MMU_MAX_PER_VM &&
+> +	    nested_s2_mmus_budget_left()) {
+> +		WRITE_ONCE(kvm->arch.nested_mmus_grow, true);
+> +		kvm_make_request(KVM_REQ_NESTED_S2_GROW, vcpu);
+> +	}
+
+[Severity: Medium]
+Does setting s2_mmu->accessed =3D true on a lookup miss cause
+get_s2_mmu_nested() to grow the pool even when old MMUs are never reused?
+
+When the loop picks an invalid or unaccessed slot at nested_mmus_next, it
+breaks on the first iteration, advances nested_mmus_next to victim + 1
+without sweeping other slots, and sets s2_mmu->accessed =3D true at the out
+label:
+
+arch/arm64/kvm/nested.c:get_s2_mmu_nested() {
+    ...
+out:
+	atomic_inc(&s2_mmu->refcnt);
+	s2_mmu->accessed =3D true;
+    ...
+}
+
+Each newly allocated MMU therefore sits right behind the clock hand with
+accessed =3D=3D true before any lookup_s2_mmu() hit has occurred.  After the
+initial 2 * online_vcpus misses fill the invalid slots, the very first
+recycle sees accessed =3D=3D true on every slot and triggers
+KVM_REQ_NESTED_S2_GROW even if the guest only ran one nested VM at a
+time.  After a grow resets nested_mmus_next =3D size, consuming the new
+invalid slots and stepping one by one through the unaccessed slots leaves
+at least size + online_vcpus - 1 slots with accessed =3D=3D true from
+allocation misses alone, so a single active reference or lookup hit on
+the remaining slot triggers another grow cycle, inflating the pool toward
+S2_MMU_MAX_PER_VM (4096) and slowing linear scans over nested_mmus under
+mmu_lock.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261124211218.2751=
+086-1-nathanc@nvidia.com?part=3D4
