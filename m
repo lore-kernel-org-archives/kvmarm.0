@@ -1,76 +1,67 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.82
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795534130;
-	b=4M6aKly1bTy6ON4lc81fhDOZQvEl+LIVV3B8bp+tHYTkFk6S5FhM9QJ7OOj8dY4SMl5f
-	 wqrUsW7ibZ8+wFWjFAjRx9JSPjylRTXAI00Nj13tlJnpyu/bRcQznLGuiiknFZcQ+Ssqk
-	 sExrok/JGrT5wngTw7fIGtR7hsP7L8PS7Im4o3+HuAvT5b13E9i0cpNCdZIquQ0TuwAYI
-	 kOK47RhxSwoqsRrKrRszwvZKglNKB9SFU4+2ZoooiLaurgqPsHi5Ppre7zZWsXT6uu7Iv
-	 9+dkc0cNCBkENR/Tf0XTpHf3p9DRuxvq/vqcww7mchxZxf8Jf265HorF5WeL8xaKq4A==
+	t=1795537228;
+	b=UMM7vdatYrPGiSwkj3BSbPsv+h98NXJH1f8ZjoRafS1QyXAVCrT56J3ORFYde+iOVL8+
+	 PRQUQqaRFB6RMNbXb0hG2ZTHqqss4eFxCQ8wUyAK162LJhoS4GLS5nORcVgiRdHHVQTwS
+	 CpawczKzivclhhjpjf5PLNVYwqTrOSP4r4e0gisWtKmSDKsmJfbz9hmVIRIquh9oDyjrn
+	 ug6cJFRf8X6kNb4rqYyeSDZmLf8uzCVl7aG1A2QRolNxKjxYdh10RgX8Lv35iVKJ72TQ1
+	 8xTpvtANov3aViqYAw1l7eEy3kLzkS9SwpB3Wza8U9ziJZgNM7Oyc6+sBloUYLK9nZg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795534130;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=zvW5z7zfahFNFXi+Ssaf7DpYERKkjJt0YrEyUHja2pk=;
-	b=qyCAZcTP1Qi9sjog4OKPpJhTqzsR12VI4Jj3n+ACLQj6qFOv1sFUb8VdKrLjKP8cdh06
-	 mm4EYweIcL1sFUixNh2ALxpYftispxcQUKicw8smOoHDtGYuB6H5R8EAydiJv6n/0nT2D
-	 izLsXl6Ea/AP4b5y/B7XjPcyxbRX3nWyj9D4kYLXyt3ybPEljGW+BEZGh6uevPx988Q71
-	 qCTRI5NYMoCJjeRKOU97B3LHi8HGshFnX/3eoHQ/JNA7Oq9INRxWjYCvg/YW+mEPhsvEm
-	 KsWxF4EgsGKdiNZMyOJZp3aZq3lgeFshIeRLDO3LFQwWrtO3TkwuJxs0FGkNZrW47Fg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795537228;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=vh0BAdo2m4YNdv43vLdl/BjP3ewFE0kTwJwjZn4sTvQ=;
+	b=xj/VP5UJrltrt86wUX6qceZhCY8RkRwn7BtFjJqAHil5XYu54Wm9xN+P9KQym6bn8znm
+	 aD0gFwUFS6RMk1LZxcKgoHAwmRUicUzyJHs4VvjQJtYCvGmBt9OYcUO5gVZMEdw8jrQZC
+	 mLDBDnitQgKRx3vwLGGQzg//AqEvN/8YIU4jmYgL1hdYM++5dgTbikXFZufCcfUVgNP53
+	 wzoyMkg+aMrd5u3KMl1S6SKMwH/0ceDzdSe3/RG+slEgaam/qtCy8KXHL61UiNZx+NSGC
+	 KfnVL9OwzzPYW/Q+Tcb+0JOOqgO3FyNcPC8WeTPRW4mJ5xFjSj7WM3VPE5HpbC0R22g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=rl5TBK3Q;
-	arc=none smtp.remote-ip=95.215.58.82
-Received: from mta1.migadu.com (out-82.mta1.migadu.com [95.215.58.82])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDF0606A31E
-	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 15:28:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EEDF0606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=LTrMdE1L;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5652B606A321
+	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 16:20:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5652B606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=rl5TBK3Q
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=ZlYt6RHKpSvMzdObJH/W7hyfD0aXwfhI08mgyRDFJwI=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795534126; v=1; x=1796138926;
- b=rl5TBK3QwdTeY1TK3uUsnIKSS4ENLNayfuJ6UfDk+O6b5px3VYGscxsXAKxN/aUgwpcCHM6O
- /hT7SJ+513ynvCXDaDybUTIm49KfFnPT4bIq1+zqi7PEOoDoEgVPUvSFAfzobUW4Vfwurxg4Afl
- 0ygx21yKCVuBT7ig1OntiEGk=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by mta10.migadu.com with ESMTPS id 1820b8d53bebf8b1;
-	Tue, 24 Nov 2026 15:28:46 +0000
-X-Mizu-Trace-ID: 1820b8d53bebf8b1
-X-Migadu-Flow: FLOW_OUT
-From: Usama Arif <usama.arif@linux.dev>
-To: maz@kernel.org,
-	oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	mark.rutland@arm.com,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=LTrMdE1L
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A4EB497;
+	Tue, 24 Nov 2026 08:20:24 -0800 (PST)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 80D4F3F86C;
+	Tue, 24 Nov 2026 08:20:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795537227; bh=mOUbQ4p97y6xrtmHyboo3pUZSt7uQyACpafQkgBuGJE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=LTrMdE1LuQCeoCPryQYYWwwsfV4wPqp2aaCA7ba3L+gGy3IvFi+v/W1gpWNnFTmzm
+	 UPoSXiPVOhIy5qHty1w5p8yUBxGbBhRkalKi3ydK933L1rVp0uKRioH1xQVljuWo0X
+	 P2dg7TH+XlkSbrmvb4PayQNFySKNVu8bzaSnDSDc=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
 	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	riel@surriel.com,
-	shakeel.butt@linux.dev,
-	kernel-team@meta.com,
-	rkeilty@meta.com,
-	atish.patra@linux.dev,
-	dgreid@meta.com
-Cc: Usama Arif <usama.arif@linux.dev>
-Subject: [PATCH] KVM: arm64: Reduce the stage-2 page cache on 64 KiB hosts
-Date: Tue, 24 Nov 2026 07:28:42 -0800
-Message-ID: <20261124152842.2634495-1-usama.arif@linux.dev>
-X-Mailer: git-send-email 2.53.1
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Dan Carpenter <dan@pereq.eu>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: nv: Upgrade sub-page TTL hint to maximum size
+Date: Tue, 24 Nov 2026 16:20:16 +0000
+Message-ID: <awW5QKqGZAqw1ru9@LeoBrasDK>
+X-Mailer: git-send-email 2.56.1
+In-Reply-To: <20261123182312.4842-1-maz@kernel.org>
+References: <20261123182312.4842-1-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -80,59 +71,95 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-When a stage-2 fault may need new page tables, KVM first tops up the
-vCPU's page cache: if it holds fewer pages than the fault might need, it
-is refilled to KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE, which arm64 sets to
-40. Unused pages stay in the cache until the vCPU is destroyed.
+On Mon, Nov 23, 2026 at 06:23:12PM +0000, Marc Zyngier wrote:
+> Should a guest be slightly foolish and submit a S2 TLBI with a TTL hint
+> that describe a base granule size smaller than the host's page size,
+> we take the resulting size at face value and feed it to the S2 unmapping
+> code. Which legitimately screams about something not being page-aligned.
+> 
+> The architecture allows us to drop the TLBI on the floor, as we don't
+> support a S2 granule size smaller than the host's page size. But it turns
+> out that doing so is proving pretty hard (we call compute_tlb_inval_range
+> from a number of places, none of which is amenable to an early out).
+> 
+> Instead, detect the annoying case, and pretend that we don't have a TTL
+> hint at all, leaving the size upgrade mechanism to take place and use
+> the largest possible size for the guest's S2 granule size.
+> 
+> This will still allow nonsensical stuff to get through, such as a 4kB
+> level 2 (aka 2MB) from a guest with a 64kB S2 base granule size running
+> on a 16kB page size host, but that's not worse than doing nothing, and
+> the host code won't get shouty.
+> 
+> Reported-by: Dan Carpenter <dan@pereq.eu>
+> Link: https://lore.kernel.org/r/20261123-inval_range-v1-1-815e15797089@pereq.eu
+> Fixes: d1de1576dc21 ("KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
+> ---
+> 
+> Notes:
+>     Reposting this as a first class patch, as I'd like to plug that one
+>     as early as possible (and Dan has plenty of other patches in flight...)
+> 
+>  arch/arm64/kvm/nested.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 78d5b18dbd2d6..36e4e83badf0a 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -714,6 +714,13 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
+>  	 */
+>  	max_size = __ttl_to_size(ttl);
+>  
+> +	/*
+> +	 * IMPDEF behaviour: treat subpage TTL-annotated TLBI as the largest
+> +	 * possible invalidation. Don't try this at home, kids!
+> +	 */
+> +	if (max_size < PAGE_SIZE)
+> +		max_size = 0;
+> +
+>  	if (!max_size) {
+>  		/* Compute the maximum extent of the invalidation */
+>  		switch (vtcr_to_tg0_pgsize(kvm, mmu->tlb_vtcr)) {
+> -- 
+> 2.47.3
+> 
 
-With 64 KiB pages, that is 2.5 MiB per vCPU, and most of it is never
-used. Stage-2 has at most three levels and the root is preallocated, so
-a fault needs at most two new table pages (kvm_mmu_cache_min_pages()).
-As every last-level table covers 512 MiB, an 8 GiB guest needs just 17
-table pages to map all of its memory, while its four vCPU caches get
-filled with 160.
+Hey Marc,
 
-On a production host with 64 KiB pages running 101 VMs with four vCPUs
-each, the caches were still 86% full. The memory used:
+I think the changes make sense, although rounding up to PAGE_SIZE also 
+looks a valid solution in my unexperienced viewpoint. 
 
-                        before      after
-  per-vCPU capacity     2.5 MB     512 KB
-  all 404 vCPUs         869 MB     <= 202 MB
+I am curious if there is any particular reason not to merge that with the 
+test below, such as:
 
-Let's lower the capacity to 8 with 64 KiB pages, In the production
-usecase above, it frees at least 667 MB. That still covers the two-page
-minimum and leaves room for several table allocations per refill. 4 KB
-and 16 KB pages keep 40.
-
-The temporary cache in kvm_phys_addr_ioremap() uses the same capacity,
-but it is topped up before every page it maps, so 8 is sufficient there
-as well. The pKVM hypervisor memcache and the eager split cache don't
-use this capacity.
-
-Signed-off-by: Usama Arif <usama.arif@linux.dev>
----
- arch/arm64/include/asm/kvm_types.h | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
-index 9a126b9e2d7c99..28568da9ea4a7b 100644
---- a/arch/arm64/include/asm/kvm_types.h
-+++ b/arch/arm64/include/asm/kvm_types.h
-@@ -2,7 +2,12 @@
- #ifndef _ASM_ARM64_KVM_TYPES_H
- #define _ASM_ARM64_KVM_TYPES_H
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 78d5b18dbd2d6..36e4e83badf0a 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -714,6 +714,13 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
+ 	 */
+ 	max_size = __ttl_to_size(ttl);
  
-+/* Must cover kvm_mmu_cache_min_pages(), at most 2 with 64 KiB pages. */
-+#ifdef CONFIG_ARM64_64K_PAGES
-+#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 8
-+#else
- #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
-+#endif
- 
- #endif /* _ASM_ARM64_KVM_TYPES_H */
- 
--- 
-2.53.1-Meta
++	/*
++	 * IMPDEF behaviour: treat subpage TTL-annotated TLBI as the largest
++	 * possible invalidation. Don't try this at home, kids!
++	 */
++	if (max_size < PAGE_SIZE) {
+- 	if (!max_size) {
+ 		/* Compute the maximum extent of the invalidation */
+ 		switch (vtcr_to_tg0_pgsize(kvm, mmu->tlb_vtcr)) {
+--
 
+Given max_size is unsigned (>=0), and it will be changed again in the 
+switch case below, I was not able to understand the need to make it zero 
+first.
+
+Thanks!
+Leo 
