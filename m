@@ -1,90 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=139.138.61.253
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795513665;
-	b=y40psJPmtJIQnZ1JCvmxLcW51/+GCa5+uColCBV8BPXPthRkK5yTjqO68d29XMkJlI04
-	 lj5UpPiizljp5Pt/nEnRUWeeUqiZB5CLyK+X+PdCOLBbKnAS9bb6YEYaVofLDcrDCTlcE
-	 +6BtE90KPKqIr9e3PSthkKoe12DTnhyopzp4L+ew1lgJxqxhJTz6dMGXy6t8yA7zYEjb3
-	 XtLMqbMukJoMKsPlPWj9iYiWtDZvW42vrULS5zJLRXH/9n6Hfyht1Ez/nyXrFrZO7wp3J
-	 Bwa5kBIah71hPsBP905HmrzHuDMo8J2bM2zPGNvCIABATb2cw6yKs4XytLN+PWsFdLA==
+	t=1795517415;
+	b=wEXRi3WXLLF8KcuFFDLLcZ27FT/z8sJmGETqSxcFHjvpD8kXhukaKsHC4n0hESamRmWZ
+	 W3T/4vR9d7XU+W/4j5QRoGcQJkRrYvHifUKYTbmzTKFKrFzHkiA4rwstlntZ+IVs0xcut
+	 PeiSO3jaBAP8tGoh2NyeHvRGNYjAcjzYkvpkFhyc5t8vLHmgqWDrA3nhviO2/7E7PB93D
+	 uUnEtEQG4Mrq+LmRJNCBzIc4wQdjNkP5pQBBSwZnkZOncJrnRkiV8SJ1+3mhp111Gs7pg
+	 NsU9t3VVqnEWmP1qY7iSTonLlURED4+hV4ow9KUnm76MPZ6XNoZUejh5I1F3XbG53eg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795513665;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:Received:Received:Received:Date:
-	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=mCdvX3DKxNd4ufd5SveU6bheHpcm5WlWjpwmAB6yI/I=;
-	b=tSH2JeMQGZcN2pLdBlvhxyz6HDLRNAVoEjuxviORm4TkItDrfO0MAdgxEHiGQw5TG6Rc
-	 AHqWAuyDaJSfrvs9iEBx5GWd6I/Z6x8Fmpp+dILPYEXpr1xHaPWtpIH23ZM8zhr93LUP/
-	 E2kJMwybT/GuGt+v77Od7hGxfxR6ooIZb1/BFiS8nezQQpz17rgn3/I7vbcOYyB5sXuxx
-	 vxI3XlG5xivVQ2AEceo5s9QkzlOHu/jv71E0/58g4D5RBDa9BV+/tG1LaF5d/KyuPzlOe
-	 aMsBMsL11kUcyD8VQLhW0tmUtdv4LQdC2Rs626MbT6UUykMl6N5knUD88L++mH0DWqA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795517415;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=d1InUdNvrxxB04G5bxXtj4JDVBuTsOLfVQpVUmwkbqM=;
+	b=KBOu1xgpknz+GMcgitTqVcDPqbwqPENkr7bac/HG4ySmfAMKAyFFmT0LPmoIxDAktKj6
+	 PKIhNpSzXt4P7Zz++uCUDO/qaitiJsqLbbK1PxEiHlMb/k7uFWEooztZSHASiKZY6YGHA
+	 WsqAqGfNfRQWjq5LBqeSIpukb4WYArWlqDGvOxauzXPpUnz8VV+6QgLMzYbCFbSqTiFn9
+	 ytVJYJB+MTg+vbTBq+p2RXQAYk1TJUpYOO9qkcSMSfXXHhXTUdV4hgIuIGq7dKIlV7XL9
+	 v7+h3lqTTASVu/Hn3lewl1l9aExm5+LETEgooU6zWfCtWnbVgb2kxcosB8MK+1gGKQg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fujitsu.com;
-	spf=pass smtp.mailfrom=fujitsu.com;
-	dkim=pass header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=QIRBOzhl;
-	arc=none smtp.remote-ip=139.138.61.253
-Received: from esa8.hc1455-7.c3s2.iphmx.com (esa8.hc1455-7.c3s2.iphmx.com [139.138.61.253])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XM02+DLz;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FFA606A87A;
-	Tue, 24 Nov 2026 09:47:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 71FFA606A87A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FBA606A322;
+	Tue, 24 Nov 2026 10:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=QIRBOzhl
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1795513660; x=1827049660;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=M5NqBozgTmQWYS9D9HJSCp5Du4EFXSk47fr9zjJkO3M=;
-  b=QIRBOzhlGFqjmQkw86iKR6QcbxzUuAO997/h3zS/1jiqQ+dKy5m7DMDq
-   MiX7gmx90c/SC7XqYkInVX9IzMP2gBxkSipmUKqbFzJ8U2+1ynD8VgHpN
-   It37lWqTffN4BIP1HeiHRRTL2FbrAxq2yxNu/XJI2nRYNkJ2CUXDyb9Vb
-   0fvfqCnHQbrzeeR7nnQVnMomxGeIUYjMvdJ/3eCsHhxmdDwRG4VwIqNAM
-   D1buiHbM5Ht8vHlmuoAANi5cVm+Ez51KGn/nZCL0JPB39zfhBiZgdjdtb
-   q7PzkIGhsp3FzitkNDxXRusS997Pnyzt7ll55NLmKqKqkXHtvad99WIa2
-   w==;
-X-CSE-ConnectionGUID: Kxt87SasQr2zj2SrCRZA/g==
-X-CSE-MsgGUID: O+CkK1/nSX2R7aqnKx7Plg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11975"; a="250865861"
-X-IronPort-AV: E=Sophos;i="6.27,230,1786978800"; 
-   d="scan'208";a="250865861"
-Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa8.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2026 18:47:33 +0900
-Received: from az2uksmgm2.o.css.fujitsu.com (unknown [10.151.22.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 5465AC05C53;
-	Tue, 24 Nov 2026 09:47:33 +0000 (UTC)
-Received: from az2nlsmom2.o.css.fujitsu.com (unknown [10.150.26.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2uksmgm2.o.css.fujitsu.com (Postfix) with ESMTPS id 081191800277;
-	Tue, 24 Nov 2026 09:47:33 +0000 (UTC)
-Received: from FCCLS0092175.localdomain (unknown [10.9.1.165])
-	by az2nlsmom2.o.css.fujitsu.com (Postfix) with SMTP id C668B1800528;
-	Tue, 24 Nov 2026 09:47:23 +0000 (UTC)
-Date: Tue, 24 Nov 2026 18:47:22 +0900
-From: Kohei Enju <enju.kohei@fujitsu.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
-	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
-	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v4 00/11] KVM: arm64: CCA: Prepare Realm memory management
-Message-ID: <awVZ0UrEKN9gLHIZ@FCCLS0092175.localdomain>
-References: <20261123104233.95710-1-steven.price@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XM02+DLz
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 784E31F000C0;
+	Tue, 24 Nov 2026 10:50:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795517414;
+	bh=d1InUdNvrxxB04G5bxXtj4JDVBuTsOLfVQpVUmwkbqM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=XM02+DLzzE4PhFkSToQX7gQrNAky1EYIzU20SU9GIlmoRJjLrx5wEUx63VzSxL1/v
+	 UjVhkTvTFjO75C06GyrybkRR2uMJm8JGAzRCPDZKVy8vaXE981I5yHaQLJilz6DoG9
+	 pYRGSsv0wYct22PwdBhgRm1+tFx/+QS25DHoBOtYf9GkBUJMxJ2ylfJLqPU/TNVEOk
+	 +LY7DpEfCnd6hd+IxhfawETl0j7mRbJFF3GaYwsIOep7nGdCD67ZA1VgJdyHM3eqU9
+	 B3YxGQADb5LGbNJD2p03wiS+cpMJzLSmtCwti9nfEiB3Ns/jhIcArFP2NE0ktmifWL
+	 2I1UJH6xwjR+g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xVo6G-00000002Wua-0c5I;
+	Tue, 24 Nov 2026 10:50:12 +0000
+Date: Tue, 24 Nov 2026 10:50:11 +0000
+Message-ID: <86a4myzeos.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: Drop open-coded GIC idreg sanitisation
+In-Reply-To: <CA+EHjTynhBzhjrFzd514Sycib=1rmh7JqYp0xSPVBvurk6Sm-A@mail.gmail.com>
+References: <20261123192457.8700-1-maz@kernel.org>
+	<20261123192457.8700-4-maz@kernel.org>
+	<CA+EHjTynhBzhjrFzd514Sycib=1rmh7JqYp0xSPVBvurk6Sm-A@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -93,39 +75,76 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20261123104233.95710-1-steven.price@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 11/23 10:42, Steven Price wrote:
-> This series adds the memory management plumbing for CCA, building on the
-> basic RMM support [1]. Thanks to everyone who reviewed and tested the
-> earlier versions.
+On Tue, 24 Nov 2026 09:38:00 +0000,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> The patches introduce internal Realm VM state, prepare Realm stage-2
-> setup and teardown, and provide RTT mapping and invalidation helpers.
-> Realm memslots are restricted to the lower half of the IPA space because
-> the protected and shared halves alias each other. The final patch
-> connects the helpers to KVM's stage-2 MMU operations.
+> Hi Marc,
 > 
-> This is the memory management portion of the larger Realm host series.
-> Realm descriptor creation, REC entry and exit, activation, and the new
-> uAPI follow in the integration stack. This series alone does not enable
-> Realm creation.
+> On Mon, 23 Nov 2026 19:24:57 +0000, Marc Zyngier <maz@kernel.org> wrote:
+> [...]
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> [...]
+> > @@ -5874,51 +5874,6 @@ static int kvm_vm_finalize_sys_regs(struct kvm *kvm)
+> [...]
+> > -                 * On GICv5 hardware that supports FEAT_GCIE_LEGACY we can run
+> > -                 * both GICv3- and GICv5-based guests. Therefore, we initially
+> > -                 * present both ID_AA64PFR0.GIC and ID_AA64PFR2.GCIE as IMP to
+> > -                 * reflect that userspace can create EITHER a vGICv3 or a
+> > -                 * vGICv5. This is an architecturally invalid combination, of
+> > -                 * course. Once an in-kernel GIC is created, the sysreg state is
+> > -                 * updated to reflect the actual, valid configuration.
 > 
-> The integration branch [2] includes Realm creation, REC entry and exit,
-> and the remaining host support on top of this series. The MM branch [3]
-> contains just this series.
+> nit: This comment is the only place that explains why, on a
+> FEAT_GCIE_LEGACY host, a VM's ID registers can show both GIC and GCIE
+> as IMP before the VM first runs. sanitise_id_aa64pfr0_el1() and
+> sanitise_id_aa64pfr2_el1() still set both at reset. Is it worth having
+> a short version of it next to the tables patch 2 adds?
 
-Hi Steve,
+I don't think that's the correct place. If anything, such comment
+should be in the reset code, not in the sanitisation code, which
+actually generates the architecturally compliant view.
 
-I tested the v4 integration branch in the same way as described in the
-following thread, and I haven't seen any issues so far:
-  https://lore.kernel.org/all/avV-P2_fOkFWQVnM@FCCLS0092175.localdomain/
+> 
+> [...]
+> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> [...]
+> > @@ -180,7 +180,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+> >           * We've now created the GIC. Update the system register state
+> >           * to accurately reflect what we've created.
+> >           */
+> > -        kvm_vgic_finalize_idregs(kvm);
+> > +        kvm_idregs_enforce_dependencies(kvm);
+> 
+> This now also applies the S1P[IO]E dependencies when the vGIC is
+> created, at a point where userspace can still write the ID registers.
+> Was that intended? If this clears S1PIE or S1POE, the first KVM_RUN
+> doesn't restore it, so the final ID_AA64MMFR3_EL1 can change with the
+> order in which userspace writes the ID registers and creates the vGIC.
+> If that's the intent, should it say so in the commit message?
 
-For the series:
-Tested-by: Kohei Enju <enju.kohei@fujitsu.com>
+The commit message has no influence on the behaviour of the kernel.
+However, I want to know whether this change is an acceptable behaviour
+or not *from an ABI perspective*. We have several options:
 
-Thanks,
-Kohei
+(1) delay all idreg enforcement to the same (late) point
+
+(2) keep things as currently done, meaning that the GIC fields are
+    special and sanitised at a different time
+
+(3) say that idregs can change at any point if you change the
+    configuration of the system, such as creating a GIC
+
+I'd be tempted to go with either (1) or (3). (2) feels like a total
+bodge.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
