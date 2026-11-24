@@ -1,61 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.128
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795521817;
-	b=FzsJf/11ZiQ6Rfz3zGcOUfWFhyJNRSUURQlN3YUp6J3nayr0hliPxXLO2fnOxwI8bpji
-	 z9HeakDU8XFZh7vpUcNSBzVQ+2jIiva62gRODVhM0jht60AHQkjUkIypEeATkXeOI/KXk
-	 vP7OjcFA1FlmzXIEyoiORgi/2CmQopZH0/wuclBMgfaLmeEIA7scsmPuC1CnMWCjkIE+i
-	 Tgn6Dyomomee8hNYcKjRe89PP5dTG+dlsk7LqAc90ClNaFAHqi+FUPm4DBVpBgKqKKA57
-	 1gZzZBuRgugq647egqK7BF2uo7P1aqUAwoEQw5CLkuHGckt/QnhsXtqBzJ9A2tLSkxw==
+	t=1795524612;
+	b=sQ6ooD8Sfbtc5RoUXDRkCkn53EPd0SwUjwnEZR9PkKQ8UWT21cJZC4IJFnQjZyASyznU
+	 51sAE1mfRebQLH8R4LDUJcEkbMerysr7Gj140MfQ4B6gauLvzXa9TU62ZqibVcX2G/Im1
+	 Ohy0xXqpoYS44HonQ/UKidsbjiQGW7eU39W5XQhzRQH9YreS8Evs2uENrG0CwAk5lSDgL
+	 YyOKel/7GgGIgF87crX6p+iejpXEAHLV5VS5oc1+gGWYT6aKHh9ofKPA6WyT+7ixBP8Dj
+	 HPKhIR0g+b6Q4Vwc2aGM42B6a+BAMkasbcoYi5IaeMn0OcynAf6z5qWDJBc+BH9xU4g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795521817;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Gm-Message-State:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:
-	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type;
-	bh=sr8kNtZUVcrLtCrf+RT8Hi9gA3/tGSBNUGobytTqIAA=;
-	b=gK7XHi15wIgFq01B1NExo9DN1s4xUyPJ0U5jYQzuOOC+nUvktj89rOeHmF2ZnWuSmSVg
-	 o2HmOrXO+HjSQYfueQFz5VqE4y+B/inFO8xfY5Jj9WjbFFk/NaX4z1J9zdeg21E8QJmPE
-	 u1cvLyjmNhs8QiRnXB7TuLDqyw1HSMOnDsFil7/VSQ4XVtHkZbyU9fCtWrusI3sBe0c6m
-	 7Ao3BdncCQE3eRahauSbmDKz0yZzznhuSZXY4vgCZpW/UJt39o6zcvErCQdcgOzuUg56T
-	 unKYz4sE6rFzCqWUrdzVscWVysJZIh2sW9Cxc/7k3tgYLJ/NG9j3HJSCx1/vAby/o4g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795524612;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=fkcXNh2S892P26zeb4v8GatV81GnIFMuUNe4sWAuvks=;
+	b=GUcPvP2SMr9qLHzUpssieGrgCs2eWdDvTIB0I0pJanUYES12weTuDNOCBJtxczRelQYl
+	 HLdTcxvmPDdaZjfF8HzHigGwSFkHBz3R0UJJI4y9D2KKN8kxcqG7ZRWinIyTKO43Db3IL
+	 cZ9KhkVpxK0qFGjwMamHY7PCJLHn4Vp/AXz1FrnGFxy2f4YWgOB8JqnvOkGeKJyzDZyg1
+	 BJXkwq+6LWDwrBziwRyzQWwrHZeOoQEsg+wpqkcSPAx+GaqXkaDJhPuqVQBAsWuNJXkQv
+	 H7w51ZWQvX9Qp4SBc/wKzxRy9C3plkzS3JxM+Pwrqo9UfkBZ/A6m0XCMnFnufqrKx9A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=uirWn9No;
-	arc=none smtp.remote-ip=95.215.58.128
-Received: from mta1.migadu.com (out-128.mta1.migadu.com [95.215.58.128])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Gr2PEFt6;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38807606A31E
-	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 12:03:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 38807606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF30606A31E;
+	Tue, 24 Nov 2026 12:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=uirWn9No
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=sq+1U9QBpgUl6gibIVwLvQO1miis3EZ+uRylCpz45Xo=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795521814; v=1; x=1796126614;
- b=uirWn9NoEnOAGA1QLmhh6dTHi2v2AHIaOs+2kXHIz2N7rAVPplSsN0iZzCh86DSUnHvwCvtx
- GPnZ1o5blQZheFcSII6SWzio4UeyBm3MYx0a74jJNq63ViidFf9YJpI8y469b03pnVLbywnLPHC
- bifBMoiPmc5b0leJKYBO5UT0=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 78a6f0b49a6cb946;
-	Tue, 24 Nov 2026 12:03:34 +0000
-X-Mizu-Trace-ID: 78a6f0b49a6cb946
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5be58ad9600so22970e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 04:03:33 -0800 (PST)
-X-Gm-Message-State: APuU4Z+DWYcydLSTd6hTbYn88ftfTFO8FLdfGYPUFcaAtP0m0zdjdFej
-	8siKfnagDn2G8jhX2rDnYXSDBE1MYYxuSmlIecqXI3SheKbgN2MnsyaJvT9wFPGTdn08LmyQdSD
-	fPX7S9yCCmyGOTBSC9fInss1swe5wbBt6WJ9XCeuM
-X-Received: by 2002:a05:6512:3d1d:b0:5bf:f0fb:2c9c with SMTP id
- 2adb3069b0e04-5c1c8256cebmr422660e87.5.1795521812773; Tue, 24 Nov 2026
- 04:03:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Gr2PEFt6
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80B391F000C0;
+	Tue, 24 Nov 2026 12:50:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795524610;
+	bh=fkcXNh2S892P26zeb4v8GatV81GnIFMuUNe4sWAuvks=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Gr2PEFt6Nif4bgQBkTr20iv52muiiKwwK0cRcdA2K0e825bGiSD/zpBb8TnonFISy
+	 fxqG4PZIaD/LsMIx6VJ2b9q82i6NAso2o9l3lcff2wZgZkU/fYbcM/T1MqnYuWA5Tg
+	 3OeTKCka90kyPatC5NxqPl3gda+lX38e3x5q9Xv9FcQFwO5Hm6v6qeV1eyZY8VMU3F
+	 31mirC74x45EEyhE3MU0Q/la2PlvYX/UX1LzUgFtaIRv/t1AIgC+BMlOFtbXOH4PID
+	 x2aHnvY+gDaxfJFp3TjoCIPM2cpf8Lj3JiVjlcrTrKDx8/nQN8aFOKLv7UkpNWOquZ
+	 swhINiwhDxj8w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xVpyK-00000002Zmv-16Az;
+	Tue, 24 Nov 2026 12:50:08 +0000
+Date: Tue, 24 Nov 2026 12:50:07 +0000
+Message-ID: <868q2iz94w.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Justin He <Justin.He@arm.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey
+ Gouly <Joey.Gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki
+ Poulose <Suzuki.Poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin
+ Marinas <Catalin.Marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark
+ Rutland <Mark.Rutland@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean
+ Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sascha
+ Bischoff <Sascha.Bischoff@arm.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	Lorenzo
+ Stoakes <ljs@kernel.org>, Dan Carpenter <dan@pereq.eu>
+Subject: Re: [PATCH 1/3] KVM: arm64: Don't load hardware vCPU state before first run
+In-Reply-To: <AS2PR08MB978600ED2150F773D3E1631DF7442@AS2PR08MB9786.eurprd08.prod.outlook.com>
+References: <20261123150917.2679600-1-justin.he@arm.com>
+	<20261123150917.2679600-2-justin.he@arm.com>
+	<86eccbzcqh.wl-maz@kernel.org>
+	<AS2PR08MB978600ED2150F773D3E1631DF7442@AS2PR08MB9786.eurprd08.prod.outlook.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -64,53 +97,77 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <20261123192457.8700-1-maz@kernel.org> <20261123192457.8700-4-maz@kernel.org>
- <CA+EHjTynhBzhjrFzd514Sycib=1rmh7JqYp0xSPVBvurk6Sm-A@mail.gmail.com> <86a4myzeos.wl-maz@kernel.org>
-In-Reply-To: <86a4myzeos.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 24 Nov 2026 12:02:56 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTyOzMofQ-7exH65h1G0jCtNy=f9MsW2ORSpLpF4J8xZ5w@mail.gmail.com>
-X-Gm-Features: Aa3M54o_qgTofyawRoobP2Y_UigNAYnryN0_2l63uok4neYEvOqeAAfM8d_tF7s
-Message-ID: <CA+EHjTyOzMofQ-7exH65h1G0jCtNy=f9MsW2ORSpLpF4J8xZ5w@mail.gmail.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: Drop open-coded GIC idreg sanitisation
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, Steffen Eiden <seiden@linux.ibm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Justin.He@arm.com, oupton@kernel.org, fuad.tabba@linux.dev, Joey.Gouly@arm.com, seiden@linux.ibm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, Catalin.Marinas@arm.com, will@kernel.org, Mark.Rutland@arm.com, pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, ljs@kernel.org, dan@pereq.eu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
+Adding Dan to this loop, as I reckon something else is amiss.
 
-On Tue, 24 Nov 2026 10:50:11 +0000, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> However, I want to know whether this change is an acceptable behaviour
-> or not *from an ABI perspective*. We have several options:
->
-> (1) delay all idreg enforcement to the same (late) point
->
-> (2) keep things as currently done, meaning that the GIC fields are
->     special and sanitised at a different time
->
-> (3) say that idregs can change at any point if you change the
->     configuration of the system, such as creating a GIC
->
-> I'd be tempted to go with either (1) or (3). (2) feels like a total
-> bodge.
+On Tue, 24 Nov 2026 01:39:23 +0000,
+Justin He <Justin.He@arm.com> wrote:
+> 
+> Hi, Marc
+> 
+> > -----Original Message-----
+> [...]
+> > > KVM_PRE_FAULT_MEMORY calls vcpu_load() as soon as
+> > KVM_ARM_VCPU_INIT has
+> > > completed. On arm64, however, kvm->arch.sysreg_masks, the trap
+> > > configuration, vncr_tlb and nested vGIC state are only set up on the
+> > > first KVM_RUN in kvm_arch_vcpu_run_pid_change().
+> > 
+> > I think I'm going to queue a patch disabling prefaulting immediately,
+> > and then we can fix this crap.
+> > 
+> Fine with me. I'll rebase on top of it and have v2 re-enable
+> pre-faulting together with the load/put change.
 
-(3) works. The GIC fields can already change when userspace creates
-the vGIC. The final ID_AA64MMFR3_EL1 only depends on the order if
-userspace sets S1PIE or S1POE without the features they imply, creates
-the vGIC, then sets those features.
+Don't worry about that. I can fix that myself when applying the
+patches.
 
-(1) changes one thing afaict. A VMM that saves the ID registers
-between creating the vGIC and the first run, and writes them back once
-the VM has run, would get -EBUSY where the vGIC's GIC fields differ
-from their reset value. QEMU and crosvm copy the registers as a block,
-but I don't know if either ever does that.
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+> > > Since kvm_running_vcpu can now be set without VHE state on the CPU, use
+> > > host_ctxt->__hyp_running_vcpu in VHE enter_vmid_context() (matching
+> > > nVHE)
+> > 
+> > Can you clarify under which circumstances we end-up on the TLB
+> > invalidation path? Simply faulting things in should not result in
+> > invalidation. Unless we end-up with MMU notifiers firing?
+> > 
+> I found this by code inspection, not from a failure. A TLBI from a stage-2
+> BBM or an MMU notifier can hit this path during pre-faulting, but before
+> the first run hw_mmu is canonical, so it makes no difference. As Lorenzo
+> said, I'll drop this hunk.
 
-Cheers,
-/fuad
+vcpu->arch.hw_mmu being the canonical one before the first run doesn't
+hold anymore, since a7602ea542d4e ("KVM: arm64: nv: Initialize hw_mmu
+to NULL for nested vCPUs"), as userspace can configure things for an
+L2, before first run, and bad things happen otherwise.
+
+But the observation remains: if an MMU notifier occurs for any reason
+while pre-faulting (likely a concurrent reclaim), we get the "not
+quite loaded" vcpu in enter_vmid_context(). If vcpu->arch.hw_mmu is a
+valid (non-null) pointer, then we will restore whatever is in that
+structure when reaching exit_vmid_context(), and that's not what is
+intended.
+
+So I think we need that sort of exclusion. Either we track what is
+actually properly loaded (using __hyp_running_vcpu as you did before,
+or by checking whether the vcpu is in a valid state).
+
+I think we have a somewhat similar breakage with 5651590be08a6 ("KVM:
+arm64: Load the vcpu in KVM_SET_VCPU_EVENTS"): as vcpu_load() now
+becomes sensitive to vcpu_has_run_once() being true, we can't tell
+anything of the state that is going to be evaluated by the event
+injection helper.
+
+We could prevent the non-running injection in KVM_SET_VCPU_EVENTS, but
+that's also a change in the API...
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
