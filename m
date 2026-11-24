@@ -1,107 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.47
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795563022;
-	b=zN1Mz1YRugk7kMcRrmt14w0MH05XU71UDkvWpsYTE7Al8kOpLWN/5ujkkZfh3xuXhg5/
-	 aQW77fCDs1I19mPz0nB717b1LyBGWkNCv31muT2JkW0EqKP24k8Q5bYdruflBc1s9EbzU
-	 05ozXhNSoOz8WOq2dcp+bcVMCeVcLkKcD/o1M7nRWpcZNlz6ImmeWYm9u3Q436QfSIH4t
-	 TjyIGXIxk5O5sq68Aa7sMmkGdFgml/spAcZJyIz/i4uKvSvRQIFAE6olK9EI3w/dhjXVf
-	 APWC4AjLOzNuHJ2I+BRhSyPF26cFid0ESQLf2jmfy4yTPozZ4njs/wT5r9Zb8qMgP8A==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795563022;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:In-Reply-To:References:MIME-Version:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=tmoluJRxJ9HN+1c8Y5zGpOvMcLNPpYDSuvXeIRfQoGU=;
-	b=JP/QcDNxh8hNC64/XG71cH88/vmesM6rONpD/75yfCER/3HUPYdcVxZpZ1K6Y25rxxnn
-	 pKFHG70QF2DRTKajS48Obw6qCPyve6dlfxG2NpEsWUitVb5voxPCJ8ilJ5bzccDO1jk8E
-	 8mI53m3WI2rpkWtvCYIVNsNwuh0nD+LJD59pakHfWnCNKg4mgsjykVpJYfzVY7CZi6AMH
-	 D7XD+3/znX8dMmCrI4hu8U2/3cCbMZidCk9QN7qwkNryOqAGkFTXwAhTghSqLSoNhqxlg
-	 0QgIOqxhHw08QeK8t9F1isjO8CF3jYAxu5cM4zzMgwVLFga3lckhJnk5sd11hdZE+CA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BGVTQYwM;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.47
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795564374;
+	b=fPSEQ2LP2LXtfQLjXhQDdt5uxGTNc0/0RGKeRPFHehuJ18+vvaWJFPQBwmoH6GTGx9ZM
+	 XPOihlGO2w/FaQvO45iwWYNEoqOEXzZy/pgw0RjMfF8xLfqECaPnGPYIXYMXl7DYzVMEW
+	 pR+OhxM8g595A28ZXEbWM/9uiQj+RecvpNHl1DzZdXX8Vfq0JcrmYLS7NJtICzC0ZU2p9
+	 cQJ+Iaulh7zr9bk4fHUUxbUoHxfgr9DcQrvA2ZLTscC85TOIp/Ck0VVUkGMFZwNABCphz
+	 Yii4Ntzmz2+C9pwKUcfb7JyKdqDk4fXY1LynpeP9pW1bXxf7gzrAanO0M4UhlAHXQ6g==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795564374;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=FdmbSo5Y/+1WVcBaZi3UOeVDRS7HdI9UnXMTYxRF8pM=;
+	b=11ySd8SdU6FkU1UfZzB2jM7yJcmv/WA8XeAlu37lSJzXClJd3W3M/ReERH/Pf257WOKn
+	 RAduTx+L8kv/qO45FxCM2v+ukESPuw2/F4DiWu8rM7tbxsV1m79GzCM/VlKWofr3JUjDj
+	 16TBb/XJB/gqnRMQ3kAW7+/rDOKX9FY9ysVQ7Cn5WlxCWPLa+uEjyzi6WyLlew1lmPCZj
+	 qUuH7nUTBbss0jWiTvsy+nl8Avq8HydNLLtvvMRc1Q2e2u4hSYA7jwvh2a54wo5a0ixTX
+	 Pd3ufLTPy2i3kZifa7uwvZgm0hNlLIWSjkvrgtI7BDoPd1joToMQ6wOyj+ZoaZ9zpUg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Sxln5p4T;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DCC606A329
-	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 23:30:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 44DCC606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D3E606A31E
+	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 23:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BGVTQYwM
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-9212dac247aso53469796d6.1
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 15:30:22 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795563021; cv=none;
-        d=google.com; s=arc-20260327;
-        b=SKRM1YCKf23UAZ9DaVvvsfiumkqdXoPhCpgNxzn8rSYTrKvtDrv1m0OUhGF3Ojhosi
-         eQvHdoeXVUmlrV4H7HmsQYCBuvM7UtnAoPc1aCzDsY8i336EMNipmX3fROpNuffRCpuF
-         IFGVbCYPUREi16QLiiSl41ZR6CXPQJXHuofVCrDf1kJ3rj/8yfyLb8tOBhPl/VL8Y6wf
-         OGRIfvxd/IcpA749cjI+3dUudR0fpoc1sL1TkNlRn/NubhPakH/orXG7ZkjMmpZ8y/Kj
-         s7dCWrr0rvAr+qs8Po8m/V0oA8/YZiy8Cs36zVif8zZhkkURqv9Jonrb5daum9lGSIGW
-         RFww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date
-         :mime-version:references:in-reply-to:from:dkim-signature;
-        bh=tmoluJRxJ9HN+1c8Y5zGpOvMcLNPpYDSuvXeIRfQoGU=;
-        fh=qMaYGtMmE4/CyY1sp3muIxelC81p9qCp36LMisaFRUI=;
-        b=jJDr1fMovGOk9mry3zb3CJFsfiO66wHwg3fCgZpK2w2VUdSfYocKEW4/xyhi639alX
-         C+XJIOoK+EvMh9g9yb023QG7dtrfa9FpabPMD3hTooMwNWyN9W0WN6vwWrQA6qsgJblX
-         qvzo/KeUg1nnwn7AT1G12B/TGqJaDqjdsZNr1Uv1hbtN2FiL+azwBS+d/GWj6STN3ITi
-         mwn8a80sJsXmhR74/gvB8n59S9JCpj2aKbN6EQ54xk1qIlQbNNKpGz2j1O7lm8hYmD6s
-         ZUx2C7csoIRnKEBuxQbUOIZqjXEsjWI3Y3Cf7n323VUbiriE22SfMdMuMibOpoPL7XsD
-         sPug==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795563021; x=1796167821; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:mime-version:references:in-reply-to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=tmoluJRxJ9HN+1c8Y5zGpOvMcLNPpYDSuvXeIRfQoGU=;
-        b=BGVTQYwMjSGbsaeH8oXvrneOEFc5q2NguhQrm7SzHggbHh5BmXZcQNjGw/PW+hs44K
-         tf0IUOkVOJpe3gv7sXEtb+VR+GOpK17obd0w3pVUKm91fQOne67F6Cif2mv5vDOiG+9Q
-         HMOPeHrk2YUUVES1jnsD6OcJwdVI00cnpDDTcLEJhQFhKjJNoKB1GUbmUDzFAvBmrKSs
-         hqLif+LsjKG1ay//t6biQs3IVMx+vsCHmtEItRHdtNWgcKZ68XREdDUADL8uuN/oFnfE
-         tH5lEM82AsqvqiqOTIYnOM/mJato7/d+h2CpDzuOCuyN6+vKl1Fq9xs54CG6/vkZhxxm
-         S/Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795563021; x=1796167821;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:mime-version:references:in-reply-to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=tmoluJRxJ9HN+1c8Y5zGpOvMcLNPpYDSuvXeIRfQoGU=;
-        b=xk5Z7bYgzonXAhyqrxUq/D7D3qoVYcaeuZdaUoEDNm/hDRWEH451Z0zhSo8DvNHkYE
-         iLfSih0hwvphMlHLMLnL2InxB8odrEb/vtC3Og8uzRVoF7Z35J7oJgV4HDYpk3T992Rb
-         e9z6guTAxjtFPHJg2VrCx9Y9dFHUAepGlS2y2FI0Yejy4rxkVZsqi1bHlvcT3Nmb+WY2
-         3k3rV++8Ojhf4Qap6BU/ZgewE7ZrWOEExt+GeAUcsr/g1VUD0oTzXGq740JxbEXULBhI
-         Bcynt0u5FJ/WGjoqB36/hyvgus0duzCNjlDBqFNJqo511GqpKRDwRYAmatNO6lIheszu
-         eZqw==
-X-Forwarded-Encrypted: i=1; AL+hErFm0loyXcu5BT7PoTFFsguNzCJs7ieg1v314VWsvaNyfzSsxtyulS+tDddYi4Hh4TWxzzzrNxQ=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/3xzWlhec/AmFru/BwCJMA2fBiW/+BPOYD1XzRfS0UorsATOoW
-	031HiH6N7MfEvvTEMt//QeY7Y7s3BDSPZO6/Bm0CEkriL/g6XBmhp4NtDrNmWXD18ENYiXdzOda
-	k98ujUJvcFxZKaqiVA+dYHqMg1CKzLAmmJKqEB67i
-X-Gm-Gg: AZFdTZcBu5ur8oky6qaP1hKk0qowK/mTUHtEurd3EreURJXf89+7i3NyZzteHkgOkap
-	2aBoCL2YvdmGebsGDkA0cOgQKTisUbzE015P3YzMJKsyqVpM75s4Xd8pHE8I2QQoYdIunMWEHQx
-	Fg3EQzhe9zyxFlvyRdNo3jMsILZlTzzePhRYnZPc0SbXIYYOoonkAEmmIV595pvdozcWrjSyWoL
-	uELJfB3O59friwbv8mzyn7pllWmSlUVbiq67+J5Z7FZ8zKgqAw9VBoWpvvdSDSn9gpMTeR03+AU
-	rEfqHFvX+CP7euKmqNoMEK0bL5+dHHP1MYj1jmcl86aywk5spfrEHsbn4v327opgwBoOp3GGDXZ
-	oucKaP+GrdX6KoHcpthq0DlaBvq/KQx1xYuHFGZNkBbjAZEDIyZYJdGpIN65X81m8iaXL27vJDY
-	fhSu+ZgicmjeX5HGRy2hRQgwc=
-X-Received: by 2002:a0c:f412:0:b0:921:541:246b with SMTP id
- 6a1803df08f44-92134a9123cmr301795036d6.38.1795563020302; Tue, 24 Nov 2026
- 15:30:20 -0800 (PST)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 24 Nov 2026 15:30:19 -0800
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <sashiko-outbox-229096@kernel.org>
-References: <20261123104233.95710-1-steven.price@arm.com> <20261123104233.95710-2-steven.price@arm.com>
- <sashiko-outbox-229096@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Sxln5p4T
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D84941F000C4
+	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 23:52:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795564373;
+	bh=FdmbSo5Y/+1WVcBaZi3UOeVDRS7HdI9UnXMTYxRF8pM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=Sxln5p4TnQV37sviKlKWXp5rOvoFAUSUNEhADtcG4eGJK7Roa/GTplzxTEvlNg1FP
+	 tkk2V7FcUY/Xf+cMmNe9kSQPBEICb04tRRJR1S3wgMsgCSboJjspXH9uxM/MnNHr3/
+	 nCOBgg3cBDtm5T5N3aV2U1eqbf16WwXvjzJb6i4ZK2qfWXmnQ/ZRL2SMbhmDSFiZFe
+	 cP0NdDu+5UZDnyTbbAWmjka7cbeq9kMBgDOfnpHG8O4iOsIJ8XuD36ABIWr1xkC3pK
+	 UAnISlFk7aXkcGMluVa/CChhbEH/loe4oHFIQ6UH6A9i7X8tHD2u1XfRG8Pf7N6Bbt
+	 BczI9l5DSCPdg==
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5c158c4c15fso6366841e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 15:52:53 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErEeYlLT/632Gdvc87I5MQGRwF80lUS8EwDlNOq6NQuTqvuEvi+DzAoFyi1qmMv8wWx7OWwsYc8=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+huYSq0q9+y+EFWhx9tyPrsleVbTarUJmGLH5JoD7JEYDyrLMg
+	ze3+TGj25ZZ5FRBh+EHuUk9xocFPfqWvV4XVCvnnDMWV2GEbXcEnpfMlIdzkpQFrg2PBg7jFkLh
+	3zyoUGX61sCRC0F6rB/081smiE6vmB/w=
+X-Received: by 2002:a05:6512:3c86:b0:5bf:a34f:14ce with SMTP id
+ 2adb3069b0e04-5c1b7bcb80cmr4369964e87.11.1795564372635; Tue, 24 Nov 2026
+ 15:52:52 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -111,119 +59,169 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Date: Tue, 24 Nov 2026 15:30:19 -0800
-X-Gm-Features: Aa3M54o433xbzGFqcKUYR3R8okBny6foO_6QsBRN_-OVy4JGrTMEGT43jesbap4
-Message-ID: <CAEvNRgGU+z609edF+Mw8xQ0NDUDKn9jjxJjJWTyUqJ0N2BGEHQ@mail.gmail.com>
-Subject: Re: [PATCH v4 01/11] KVM: arm64: guest_memfd: Check mmap support when
- preparing memslot
-To: sashiko-reviews@lists.linux.dev, Steven Price <steven.price@arm.com>, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+References: <20261015142552.4128028-1-ryan.roberts@arm.com> <20261015142552.4128028-14-ryan.roberts@arm.com>
+In-Reply-To: <20261015142552.4128028-14-ryan.roberts@arm.com>
+From: Linus Walleij <linusw@kernel.org>
+Date: Wed, 25 Nov 2026 00:52:40 +0100
+X-Gmail-Original-Message-ID: <CAD++jLmpMQ1KExszFo-So-dQ2rxDiG2fo1GYGV_T0VPQM2b=MQ@mail.gmail.com>
+X-Gm-Features: Aa3M54pFqitfpRija09wdUEiLNXZP7zwbQjloIBuStVWLIh0bhqixHx00fUO9n0
+Message-ID: <CAD++jLmpMQ1KExszFo-So-dQ2rxDiG2fo1GYGV_T0VPQM2b=MQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 13/15] misc/arm-cla: Add stage-2 MTC and VM context switch
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@nvidia.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jean-Philippe Brucker <jpb@kernel.org>, Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-sashiko-bot@kernel.org writes:
+Hi Ryan, Jean-Philippe,
 
-> Thank you for your contribution! Sashiko AI review found 1 potential
-> issue to consider:
-> - [Medium] KVM: arm64: kvm_arch_prepare_memory_region() rejects non-mmap
->   guest_memfd
-> --
+On Thu, Oct 15, 2026 at 4:27=E2=80=AFPM Ryan Roberts <ryan.roberts@arm.com>=
+ wrote:
+
+> From: Jean-Philippe Brucker <jpb@kernel.org>
 >
-> commit a0665f8dc612d05686ef019cc8462841573fe88c
-> Author: Steven Price <steven.price@arm.com>
+> Add functions to switch the guest MTC. Reset the accelerators and CLA
+> registers on switch. No save/restore of accelerators at the moment, we
+> only restore the kernel's PL0CTL.
 >
-> KVM: arm64: guest_memfd: Check mmap support when preparing memslot
+> Signed-off-by: Jean-Philippe Brucker <jpb@kernel.org>
+(...)
+
+> +/**
+> + * struct cla_regs_pl1 - Saved CLA register state (PL1)
+> + * @pl0ctrl: Host PL0 control register
+> + *
+> + * Most registers are simply reset when transitionning to and from VMs, =
+since we
+> + * don't support shared assignment.
+> + */
+> +struct cla_regs_pl1 {
+> +       u64 pl0ctrl;
+> +};
+> +
+
+> +enum cla_ctx_type {
+> +       CLA_CTX_PL0,
+> +       CLA_CTX_PL1,
+> +};
+
+Please add authoritative definitions of the these two context states
+here so we know exactly what they are for.
+
+>   * Mutable, written by domain reassignment, device work, and CPU hotplug=
+:
+>   * @regs:              State for each device in domain.
+>   * @asid:              Pinned ASID of live context.
+> + * @guest_mmu:         Stage 2 translation configuration.
+
+Since they are now in a union there is some information missing here,
+asid for PL0, guest_mmu for PL1?
+
+>   */
+>  struct cla_ctx {
+>         struct kref refcnt;
+> @@ -191,7 +220,10 @@ struct cla_ctx {
+>         refcount_t users;
+>         struct list_head queue_node;
+>         void **regs;
+> -       unsigned int asid;
+> +       union {
+> +               unsigned int asid;
+> +               struct kvm_arch_guest_mmu *guest_mmu;
+> +       };
+>         wait_queue_head_t waitq;
+>  };
+
+(...)
+
+>  /**
+>   * cla_ctx_create - Create a context or increase its user count
+>   * @domain: CLA domain
+> @@ -48,8 +79,12 @@ struct cla_ctx *cla_ctx_create(struct cla_domain *doma=
+in,
+>         INIT_LIST_HEAD(&ctx->queue_node);
+>         init_waitqueue_head(&ctx->waitq);
 >
-> This commit introduces kvm_gmem_slot_supports_mmap() and uses it in
-> kvm_arch_prepare_memory_region() to require that all guest_memfd-backed
-> memslots on arm64 come from files created with GUEST_MEMFD_FLAG_MMAP.
+> -       mmgrab(key->mm);
+> -       get_file(key->file);
+> +       if (cla_ctx_is_pl0(ctx)) {
+> +               mmgrab(key->mm);
+> +               get_file(key->file);
+> +       } else {
+> +               WARN_ON(!cla_ctx_get_pl1(ctx));
+> +       }
+
+This WARN_ON looks more like an assert() of some kind?
+Since it's an enum and assigned from those everywher
+this is basically a check for memory corruption...?
+
+Well maybe better safe than sorry.
+
+If you want to employ this pattern, and especially if there
+will be PL2, PL3 etc in the future, do a switch?
+
+switch (ctx->key.type) {
+case CLA_CTX_PL0:
+    mmgrab(key->mm);
+    get_file(key->file);
+    break;
+case CLA_CTX_PL1:
+    break;
+default:
+    WARN_ON(1); /* Should never happen */
+    break;
+}
+
+So you would then use that pattern also here:
+
+> -       mmdrop(key->mm);
+> -       fput(key->file);
+> +       if (cla_ctx_is_pl0(ctx)) {
+> +               mmdrop(key->mm);
+> +               fput(key->file);
+> +       } else {
+> +               cla_ctx_put_pl1(ctx);
+> +       }
+
+And here:
+
+> -       mmdrop(ctx->key.mm);
+> -       fput(ctx->key.file);
+> +       if (cla_ctx_is_pl0(ctx)) {
+> +               mmdrop(ctx->key.mm);
+> +               fput(ctx->key.file);
+> +       } else {
+> +               cla_ctx_put_pl1(ctx);
+> +       }
+
+
+>  #define cla_kernel_mtc \
+>         (cla_kernel_pl =3D=3D 2 ? CLA_MTC_REGIDX_PL2 : CLA_MTC_REGIDX_PL1=
+)
 >
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 1db10d8d6db73..2825fccd2a197 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -2839,10 +2839,10 @@ int kvm_arch_prepare_memory_region(struct kvm *k=
-vm,
->>  		return -EFAULT;
->>
->>  	/*
->> -	 * Only support guest_memfd backed memslots with mappable memory, sinc=
-e
->> -	 * there aren't any CoCo VMs that support only private memory on arm64=
-.
->> +	 * All VMs need mappable guest_memfd memory, as the memslot's HVA may =
-be
->> +	 * used to access shared memory even if guest faults use guest_memfd.
->>  	 */
->> -	if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
->> +	if (kvm_slot_has_gmem(new) && !kvm_gmem_slot_supports_mmap(new))
->>  		return -EINVAL;
->>
->>  	/* guest_memfd is incompatible with MTE. */
->
-> [Severity: Medium]
-> As reported by Suzuki K Poulose on v2 [1], should
-> kvm_arch_prepare_memory_region() drop this guest_memfd check altogether
-> rather than rejecting memslots backed by a guest_memfd created without
-> GUEST_MEMFD_FLAG_MMAP?
->
-> Both gmem_abort() and realm_gmem_abort() fault in guest_memfd pages via
-> kvm_gmem_get_pfn() without using new->userspace_addr, and
-> kvm_arch_prepare_memory_region() does not verify that new->userspace_addr
-> maps the guest_memfd or any valid VMA.  Requiring GUEST_MEMFD_FLAG_MMAP
-> here fails KVM_SET_USER_MEMORY_REGION2 with -EINVAL for VMs (such as
-> Realms) that bind private-only guest_memfd instances without allowing hos=
-t
-> userspace mmap, and on v3 the guest_memfd maintainer noted that this chec=
-k
-> is unnecessary and should be removed rather than exposing
-> kvm_gmem_slot_supports_mmap().
->
+> +/**
+> + * struct cla_mtc_s2 - Stage 2 MTC configuration for the host or a VM.
+> + * @hcr: HCR_EL2 register value.
+> + * @vttbr: VTTBR_EL2 register value.
+> + * @vtcr: VTCR_EL2 register value.
+> + */
+> +struct cla_mtc_s2 {
+> +       u64 hcr;
+> +       u64 vttbr;
+> +       u64 vtcr;
+> +};
 
-I agree with Sashiko here. I traced the history of this check:
+At this point I have no idea what "stage 1" and "stage 2" is, but I just
+assume it is something everyone working on virtualization knows about.
+Maybe it could be explained briefly in the commit message for the
+rest of us?
 
-    if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
-        return -EINVAL;
-
-In [1], Arm64 guest_memfd enablement, !kvm_memslot_is_gmem_only(new)
-meant "this guest_memfd does not support mmap()". Arm64 had no CoCo
-private-memory VMs yet, so guest_memfd was only usable for shared memory
-where the host VMM needed mmap() to access guest RAM. Rejecting
-non-mappable guest_memfd slots prevented unusable private-only memslots.
-
-In [2], pKVM support was added. The v1 of [2], [3], says pKVM uses
-anonymous memory. pKVM doesn't really specifically use gmem, so there's
-actually no change, this check doesn't really affect pKVM.
-
-Conversions [4] made stage 2 faults (mostly on x86), always get memory
-from gmem. On arm, as long as it is a gmem memslot, it already always
-got memory from gmem.
-
-Now that ARM CCA supports private memory, we should drop this check
-completely, I think David noted that right when it was added [5], and
-that's what Sean means too [6].
-
-If userspace sets up gmem with a memslot and doesn't set up mmap,
-userspace probably won't be able to set up a running ARM CCA VM, but
-that's userspace's bug imo.
-
-Imo even back in [1] perhaps the check didn't need to be added, it's
-just a userspace bug to try and set up a memslot with gmem that can't
-really be used.
-
-[1] https://lore.kernel.org/all/20250729225455.670324-21-seanjc@google.com/
-[2] https://lore.kernel.org/all/20260330144841.26181-1-will@kernel.org/
-[3] https://lore.kernel.org/all/20260105154939.11041-1-will@kernel.org/
-[4] https://lore.kernel.org/all/20260910-gmem-inplace-conversion-v13-12-dd6=
-fbf94f4e1@google.com/
-[5] https://lore.kernel.org/all/2195c01b-3a17-46c5-a013-66922e8509bd@redhat=
-.com/
-[6] https://lore.kernel.org/all/av8No1rvJLXwciId@seanjc-mac.roam.internal/
-
-> [1] https://lore.kernel.org/r/26a29420-8d27-4069-bbd5-28692c9e8542@arm.co=
-m
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123104233.95=
-710-1-steven.price@arm.com?part=3D1
+Yours,
+Linus Walleij
