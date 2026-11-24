@@ -1,84 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795546936;
-	b=H360a2NqgWLTWe/HQAOvahiy9wVGSAeRIktG9+eMvbS28Op84ubbXU8A7e0M/GkBK5Rx
-	 LINTKblKcbqXjH5IfyyG/OFFKY0ljp+3UyPaDQh4QZw5c40vzTDCceoTJ3K4AVwdzLX4S
-	 h2numOFIVQ+UGPWsvM7+HhKRSurD/h7Rq66X2E4DujqTPHFUwHc0A+xRqXklMZAhvIWcv
-	 piWdXRYFdoCNYFbi4tkMrOB3RAd7YDvQc/+hB1rM7WWA9+aLjsFLHaY6sFx+nVs0ZbIXY
-	 B2n7ScxpQk/GsCpft4m0RO+2ssK89GFerwFp0YQbl9GiQeYj0Jn+yEka3yYMjZUQRgw==
+	t=1795549532;
+	b=qSC+4zomEBZ5q4upnFbrVghiE5A6Ai3HNcIBrWBFjAROsa8gJtsoy0K5KNMESiQRqgoU
+	 waBRm7xd9iNkBEI1Eu9p6+i80dwWCtn4+mxFZ4uTguCANYEKlI/IfxKNPFpJ9K99lnQtK
+	 f5L+Z9auwHwnIxVytrIdzpKlY/bju9xxleOvOUuMAtFw3sWL6809MC6RyKNPCm48TX02S
+	 dZ1WLOq39vE6gwc3JYHimwwrjlvRgDMk88rdHbnPP4nFsRgxTLEYKQmRAiF2UnIQksax7
+	 ErT4rbUFWTTHHu7Wa9RiEOETipulcrTmq9KdZ+9DoTmENs6TR4t8zDWU4zaxep1iCqw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795546936;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Mime-Version:Content-Transfer-Encoding:Content-Type:Date:Message-Id:
-	 Cc:Subject:From:To:X-Mailer:References:In-Reply-To;
-	bh=vmPlBJsxyoTZOO9g2mmGNuUfH7b/frSSah/ZWuzVmhc=;
-	b=0pEKmq1SQjpnlWOSCeovmwMId3WMMGodPoiKGAomxPPD8llBMSFvyHdsOmDU+0w5XfoG
-	 ZNW+1xezVFxOc7RNYR90tgth2sMottk9Yk3sTjgOp6PYDaD8cipD7fd7qT+lODY+UT9Mh
-	 OcQYgZRwIc4a80A+jiwWk+LsHJ2WaqVelyYeqwHmZAEsM8Rrmty8/GnGlpH7Cl6JqGNNH
-	 /4c42p3+EjrsVUl0ovxXPAuDvSZ7kdTBtkxjVarXIcjiQgC7XCPd9s/9MxZYcbbzmxW4K
-	 oiYP5VIevnbsuK7gIKHWmxvI5WrbncPhPN3GJUk7y7ENu7pj3hECTF85rIj4Qh851iw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795549532;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=YxnkC+H0WyqL4UcCcv5HjKqJ5O4y9emPPKJptv760hc=;
+	b=Kgf4zl7G/ZoVtEdgFiqf40gf8YMp5ZuqWxYqCFFg8x30GC1jiwCIv1GUPULJld0qwNSm
+	 IdVrg0QoEEABUe7+de+wMkD6DWsS1OOd97ZE/RkmNpjAeda6QSPaeex41HpDq8FIueTrx
+	 wQo8GnLm/McWn6fnwvNGOrP/34GWyqNYftIR6VqVFAQ/UPmnM/LnygeBE7jU0NRpVOAcs
+	 Wf8AppL8k82dhvP2s16D27nEHszJMlz0UuRaRXH3NOH5ncbyykxiy+7NgcecJTzHZan+U
+	 LFKLwGmEeAuOouKtfB6P1qc4/eE64oItP7qCmtJi9nqZSsApn+3DLA11vQCJKmYIwyw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=KN56XpNr;
-	arc=none smtp.remote-ip=209.85.210.170
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="Yn/l+G+X";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBEE606A321
-	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 19:02:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BCBEE606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C77606A31E;
+	Tue, 24 Nov 2026 19:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=KN56XpNr
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8b66d1a08ccso3432861b3a.1
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 11:02:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795546935; x=1796151735; darn=lists.linux.dev;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=vmPlBJsxyoTZOO9g2mmGNuUfH7b/frSSah/ZWuzVmhc=;
-        b=KN56XpNrGj51CXjSAY7lzcawJYoA2NWATZKstRc6ZCl0CmJQnvcIdP4EsWw/ffhhUb
-         KwPaigyyPAcNEPmpCIRWR40tte3ebqA/XjVFozYdwu5XJWx/TANGHXUg80Py24XBb1Xm
-         1FFyUx4eVgouSSfONFBuxKZVomuOEoltFDcYS+q48Ywfif6rRP28uHXfI5oCap2I0jEf
-         fpupODx0DQuUyuBj60rx3PW3A7buGVJs1ZyPSFBHcc3n4M0eO1txfNPEh67P5G7wd97z
-         Re3vKcYPjngYnFolCBfA04eRw7rxoef18o/UtA/uFeWcZpe6+CmruVq2TtkDE2N2hc2T
-         Q+ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795546935; x=1796151735;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vmPlBJsxyoTZOO9g2mmGNuUfH7b/frSSah/ZWuzVmhc=;
-        b=fJ+XdzKyhWpw13sC43YZbKL1inQ04fSANsyPoGyQQSf3nszehhGOXWGyBMRg94oIGR
-         6a/aC3UZeNKLpA4MI5/lznfXTwrv9B+THBKLfeVI6je/j1NqLzxjLWwrPUXu4nClIVD8
-         1hRPRSEZHdUvoVJJgtdKGspkFePFDkxZAgjQ1NjPHr/ocm+sa0WNnNqUawyfcdGd9PkQ
-         ntCxdSsuvspz3C1kCfWFLghIfC3kHoZj6Gd3ocsTdh/PhJY+qitRlbnKGs4oVvzG+EsB
-         u6yu/waCC+jSTkc6DQoMe1Sibv7aeL2OEQ9Iq12Qfoqv/XUAsQ+ZRWffzxK+45sEzi/z
-         AVUg==
-X-Forwarded-Encrypted: i=1; AL+hErEnr7H9kuijf/DivcsVtFYxCi6iuAgYjbp5B5UoUBawz+LbPmV1UJsVeuiL7yHweji+VewlX4w=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9pq/EmsQNIFyMpz02sbHPErzI4q9E/FUkxTJyAiN75JRho2Av9
-	uMxyOOymz5+FfurcnuHLJAk3XJ0eYrBQ5BF+mVAXGOpD4iioMg+vM+loPS37VdROyQ==
-X-Gm-Gg: AZFdTZc7YPrGCbFDB2Z7LrqqHboU12Z3Zh4G4sR0wklZ4pVtguEoMlB2Em+OXUOd4kz
-	4hqPrKQ8IDe26ueossxL9uyDVpvV5RgvyzGH4Evqcras+Q37aJxl3HU/Br+nRVtFcVGIi3kgHns
-	cmY0vTr06aSs1MS35pngCSohIMNHTiqI6jbkITSAeRDPaxhjFvom4XK9ozYaS6zXoWyGIEhwdPp
-	v58PgVWQqlD3xYgMo6XOOuZhQ1LqDv2YvlfpH6YZZ2FhsUFgIBgfNTlubZW+Iy62152CDJWKQtL
-	JT35Wm95oCCC8SDaRRgi4SS6g6BiEQp/rjrUnU9RcXhevXIvwzKkqoDdXq+QA/0TOhRKmy5CJ9r
-	96zjvP33Gc0FkKLd8HUsJbs2ea4tZ7OJs9kdXFraNGHNRRaU+KZUMlTG9z7s60PFelo4e2O5252
-	tzjXqxZJxdb4nepyElVtoag50ZUw5aNuI87NG6IVc7cPM7PfbEsWasQMP10QV9qtzNl3NFaz7jg
-	yVsfixMLJEC5glCNrjWkTstJ6rjXd5FlPXRQW9UXjGuIlAxVe7ufcPAVt923cACmhxt+RfcYMGl
-	emBfclGduud0XP4yxk5gkc9KFl3OoIU+vBW2D4NszW6Huo1sOodECzo5AWrbemv4DA==
-X-Received: by 2002:a05:6a20:a11f:b0:3e9:f2d:d556 with SMTP id adf61e73a8af0-4014ca44d17mr16159174637.55.1795546934090;
-        Tue, 24 Nov 2026 11:02:14 -0800 (PST)
-Received: from localhost (33.79.127.34.bc.googleusercontent.com. [34.127.79.33])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cde9bb05981sm2247135a12.26.2026.11.24.11.02.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Nov 2026 11:02:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Yn/l+G+X
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D9C81F000C0;
+	Tue, 24 Nov 2026 19:45:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795549532;
+	bh=YxnkC+H0WyqL4UcCcv5HjKqJ5O4y9emPPKJptv760hc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Yn/l+G+XwG6rnIr7gMg63Q/wt9fpkcsxai1AKo/AIZ6U5qrXSvVBszTWQi/D1nkr6
+	 mKmw+HUszIT+CHB/DuzwKgYNByZNvK+BMQzUgDz+0/dyvYt/aaP7yJD45tZLR5xdZz
+	 2MKVFBKpf1EteIKmBf7wAI36O98sFgf3Oj/SyXI0quMfea7ruoC51FEJZiA1mfooLo
+	 9eTLMfj/d8XbP4dbRoyKVQXqAWCUp/QWpy6XqjpPTTI+ey1P37+bmYoZ1beZ8wTdpK
+	 dOComrq2+g9ZhWhVmHaWbVjLrmbXkUtdJefn/0kogerOoJk2we8cmm2+w3+q9V608q
+	 RGxmHDzjeexRQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xVwSI-00000002l5B-0U4K;
+	Tue, 24 Nov 2026 19:45:30 +0000
+Date: Tue, 24 Nov 2026 19:45:29 +0000
+Message-ID: <861p8aypwm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Dan Carpenter <dan@pereq.eu>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: nv: Upgrade sub-page TTL hint to maximum size
+In-Reply-To: <awXSCgN4JLLKXErv@LeoBrasDK>
+References: <20261123182312.4842-1-maz@kernel.org>
+	<awW5QKqGZAqw1ru9@LeoBrasDK>
+	<864id6yyjy.wl-maz@kernel.org>
+	<awXSCgN4JLLKXErv@LeoBrasDK>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -87,78 +79,137 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 24 Nov 2026 11:02:12 -0800
-Message-Id: <DN3O9LHR4XNH.1EYLA6D1F0J2P@google.com>
-Cc: "Tarun Sahu" <tarunsahu@google.com>, "Pasha Tatashin"
- <pasha.tatashin@soleen.com>, "Mike Rapoport" <rppt@kernel.org>,
- <robin.murphy@arm.com>, <maz@kernel.org>, <will@kernel.org>, "Alexander
- Graf" <graf@amazon.com>, <seanjc@google.com>, <jgg@nvidia.com>,
- <loganodell@google.com>, <arnd@arndb.de>, <dwmw2@infradead.org>,
- <baolu.lu@linux.intel.com>, "Bjorn Helgaas" <bhelgaas@google.com>,
- <oupton@kernel.org>, <alex@shazbot.org>, <gle.com@google.com>,
- <pbonzini@redhat.com>, "Andrew Morton" <akpm@linux-foundation.org>,
- <kevin.tian@intel.com>, <joro@8bytes.org>, <kvmarm@lists.linux.dev>,
- <linux-pci@vger.kernel.org>, <kexec@lists.infradead.org>,
- <kvm@vger.kernel.org>, <iommu@lists.linux.dev>,
- <linux-arm-kernel@lists.infradead.org>, <skhawaja@google.com>,
- <sagis@google.com>, <linux-arch@vger.kernel.org>, <linux-mm@kvack.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 05/19] kho: Add feature header for fine-grained ABI
- compatibility
-From: "David Matlack" <dmatlack@google.com>
-To: "Pratyush Yadav" <pratyush@kernel.org>, "David Matlack"
- <dmatlack@google.com>
-X-Mailer: aerc 0.21.0
-References: <20261110050202.529473-1-tarunsahu@google.com>
- <20261110050202.529473-6-tarunsahu@google.com>
- <2vxzse0rzjdn.fsf@kernel.org> <DN2RQ7LGX224.3W3PSQ2PBHTJZ@google.com>
- <2vxz33sqz1xj.fsf@kernel.org>
-In-Reply-To: <2vxz33sqz1xj.fsf@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: leo.bras@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, dan@pereq.eu, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue Nov 24, 2026 at 7:25 AM PST, Pratyush Yadav wrote:
-> I don't think it buys us any functionality. It just hides the problem in
-> some lucky cases.
+On Tue, 24 Nov 2026 18:06:02 +0000,
+Leonardo Bras <leo.bras@arm.com> wrote:
+> 
+> On Tue, Nov 24, 2026 at 04:38:41PM +0000, Marc Zyngier wrote:
+> > On Tue, 24 Nov 2026 16:20:16 +0000,
+> > Leonardo Bras <leo.bras@arm.com> wrote:
+> > > 
+> > > On Mon, Nov 23, 2026 at 06:23:12PM +0000, Marc Zyngier wrote:
+> > > > Should a guest be slightly foolish and submit a S2 TLBI with a TTL hint
+> > > > that describe a base granule size smaller than the host's page size,
+> > > > we take the resulting size at face value and feed it to the S2 unmapping
+> > > > code. Which legitimately screams about something not being page-aligned.
+> > > > 
+> > > > The architecture allows us to drop the TLBI on the floor, as we don't
+> > > > support a S2 granule size smaller than the host's page size. But it turns
+> > > > out that doing so is proving pretty hard (we call compute_tlb_inval_range
+> > > > from a number of places, none of which is amenable to an early out).
+> > > > 
+> > > > Instead, detect the annoying case, and pretend that we don't have a TTL
+> > > > hint at all, leaving the size upgrade mechanism to take place and use
+> > > > the largest possible size for the guest's S2 granule size.
+> > > > 
+> > > > This will still allow nonsensical stuff to get through, such as a 4kB
+> > > > level 2 (aka 2MB) from a guest with a 64kB S2 base granule size running
+> > > > on a 16kB page size host, but that's not worse than doing nothing, and
+> > > > the host code won't get shouty.
+> > > > 
+> > > > Reported-by: Dan Carpenter <dan@pereq.eu>
+> > > > Link: https://lore.kernel.org/r/20261123-inval_range-v1-1-815e15797089@pereq.eu
+> > > > Fixes: d1de1576dc21 ("KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations")
+> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > > Cc: stable@vger.kernel.org
+> > > > ---
+> > > > 
+> > > > Notes:
+> > > >     Reposting this as a first class patch, as I'd like to plug that one
+> > > >     as early as possible (and Dan has plenty of other patches in flight...)
+> > > > 
+> > > >  arch/arm64/kvm/nested.c | 7 +++++++
+> > > >  1 file changed, 7 insertions(+)
+> > > > 
+> > > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > > > index 78d5b18dbd2d6..36e4e83badf0a 100644
+> > > > --- a/arch/arm64/kvm/nested.c
+> > > > +++ b/arch/arm64/kvm/nested.c
+> > > > @@ -714,6 +714,13 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
+> > > >  	 */
+> > > >  	max_size = __ttl_to_size(ttl);
+> > > >  
+> > > > +	/*
+> > > > +	 * IMPDEF behaviour: treat subpage TTL-annotated TLBI as the largest
+> > > > +	 * possible invalidation. Don't try this at home, kids!
+> > > > +	 */
+> > > > +	if (max_size < PAGE_SIZE)
+> > > > +		max_size = 0;
+> > > > +
+> > > >  	if (!max_size) {
+> > > >  		/* Compute the maximum extent of the invalidation */
+> > > >  		switch (vtcr_to_tg0_pgsize(kvm, mmu->tlb_vtcr)) {
+> > > > -- 
+> > > > 2.47.3
+> > > > 
+> > > 
+> > > Hey Marc,
+> > > 
+> > > I think the changes make sense, although rounding up to PAGE_SIZE also 
+> > > looks a valid solution in my unexperienced viewpoint.
+> > 
+> > No, it isn't the same thing. Taker the example I have given, where the
+> > host is 16k, the guest 64k, and the invalidation 4k. If you round
+> > things up to 16k, you're still not invalidating anything that is
+> > consistent with the *minimum page size* for the guest. Anything larger
+> > is a multiple of both the host and guest page sizes, and therefore
+> > always correct.
+> 
+> Ah, right!
+> In this case, could we not invalidate the largest page size supported 
+> (64k)?
 
-Following up on our offline discussion: I think it's worth keeping
-support for optional features, both before and after the spec changes
-land.
+Because that's not what the absence of TTL means.
 
-Before the spec lands, optional features are the only way to enable new
-features at all. For example, the PCI follow-up series [1] preserves
-BARs and bridge windows using an optional flag. It's purely additive: a
-kernel that doesn't understand it keeps behaving the way it does today.
-With optional features it can be enabled as soon as it lands, and Live
-Update keeps working in both directions, including rollback. If every
-feature is required, there is no way to enable it until the outgoing
-kernel can learn what its target supports.
+> 
+> IIUC:
+> - To have max_size between 0 and PAGE_SIZE means it's either 4k or 16k, 
+>   so invalidating the 64k should be enough?
 
-After the spec lands, optional features are still useful, and at worst
-harmless:
+No.
 
- - Kernels that predate the spec mechanism can't provide a spec. As long
-   as one of them is a possible target (e.g. for rollback), optional
-   features are still the only features the outgoing kernel can use.
+>  
+> - max_size=0 from __ttl_to_size() means largest blocksize supported by 
+>   stage2 in current TG.
 
- - The outgoing kernel doesn't need to consult the spec for optional
-   features at all (less complexity), since by definition the target can
-   ignore them. It can always produce the same payload, and only
-   required features need to be gated on what the target supports.
+Yes.
 
- - Nothing prevents an outgoing kernel that has a spec from choosing not
-   to set optional bits its target doesn't understand, if we ever want
-   that.
+> 
+> The two above are opposite ends, no? Like, the first is "this is too small 
+> for us to invalidate, let's pick something bigger", and the other one is 
+> "we want to invalidate the largest supported block".
+> 
+> Is it really ok to put them in the same bucket?
 
-The cost of keeping them is negligible in the current design: the same
-number of bits in the header, and one range check on the incoming side.
+That's the *only* thing you can do, short of not invalidating anything
+at all. The commit message alreayd explains the IMPDEF choice that is
+made, and why it is made. Let me explain it again:
 
-The one rule we need is that optional really means safe to ignore, e.g.
-optional data must not reference preserved memory or carry restrictions
-that the next kernel has to act on. Anything like that must be a
-required feature.
+- An invalid TTL allows us to ignore the TLBI altogether. No ifs, no
+  buts. This is definitely an invalid TTL.
 
-[1] https://lore.kernel.org/linux-pci/20261019213054.3157159-5-dmatlack@goo=
-gle.com/
+- However, by the time we reach this code, we are committed to perform
+  an invalidation, and we can't backtrack (doing so would be really
+  ugly).
 
+- Our next port of call is to still perform an invalidation with
+  something reasonable. Since the TTL is invalid, only the IPA tells
+  us anything. And for any IPA without any range information, the only
+  sane thing to do is to invalidate the largest possible size.
+
+You could refine this a bit more, but frankly this is not worth it. We
+are already allowing a broken guest to do some invalidations, but
+there is no need to go out of our way to do anything more.
+
+The end.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
