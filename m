@@ -1,49 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795532910;
-	b=46CgVTlZV4f0HbHPi+/Mbd9zK1aEinmXv873MGg3wnvmEBin9dufro8lO/6FYPP7ujtC
-	 cua9lCtvGFF5f+oEcANajzXjY7EbgFTNj/Wa/yI+/F2T5yfFIuXinxAHR6bae+UB8yz+Z
-	 dSfvkM3NS8r9NRqrHRIgCWRmQISF6B0Ape97IQP4ud8JdpVZOKhtZSe+6Bt9Rq7Eq039b
-	 YoYr+dj805zvz8G5W5ANjW4CV5qz+FU4KiVw0TLjom3g/6RLL/5/gKmM4lFHv3vnT+7tt
-	 jywhP2BoSySG4Rc60IBHWu5Z3CtTDyKDNqnncLQHg3TlCAMBkP7ZxqStvjY1+E657nw==
+	t=1795533952;
+	b=XxZ2MEM1E1ViOHdlGYWzB0qV8Tef3T1oo/ZIDXn3LRik4lD+HuElmiqCmiJSXF1a447Y
+	 gCk1FYSg8oAm9Zqf2COuJ+cFRAA7PuIMMgwMOySvzadqwhuRg66R+EcXH73juAlC7bUS9
+	 m/qkqni1d9XyO5PVd28zr8V5ej/iX4N9zr2nsHa09HzHt+PZlhrSQ7laqkInclI5GZ0jE
+	 VmGUFJDCSWYGTrMKkPyTT3g/Y5WCeQTbLS0JvoLhYb9PdGHdprxJY1fkv5JTrYfc2iYg+
+	 K3+sUfd07RZc3vbrZbrmFZf59Pof9B3pTBPIkahX/mXy/NV3/wwsFq62JzUKLfi8CDg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795532910;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=wq60eIxGFtR5MCIfyvCnDnihf6Q7VyfR4aAjbX1daU8=;
-	b=RrT7c9WHiwgjRoeg34lF6/4JT76W8gXrO3S6LzNhRnVuVELw96Tb/UUDgCdLuQiyESZJ
-	 Onhx614Catui/KrqXSZUCQ/6W2DQ16HY1h+hi92umTnyfTpET9NXDpEsJIY2vXswQs2Bo
-	 UGBA0k3Mc3oEIk9S9ME3RTpKNwbEft2H66Rv6pIeqcn7iDJ+hfpVTv+tUUSwkzqsyvlXv
-	 /0cI/1r9fckrrG2jChqV/4+7kNOE7EqgrG0rxnPhNl9tfuq1EYG3YJkJL64pNyM/1UldO
-	 Ncdm/2mP5aK+/AYeXVsmdi0jG1VaK98RrtRB+MJWhK1kyoIlQ/79V3FrgEJjDWMtbgg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795533952;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:In-Reply-To:References:
+	 Date:Message-ID:User-Agent:MIME-Version:Content-Type;
+	bh=1UXh4PQJOR3VknqTlOD7G3LYkfB1ZlA2WQOnvCIXzSk=;
+	b=kLq1/+WG4TYcO/uA8IAkGtuy+mV7QZF8nxiKSioWgR+s/CN1rhvTLizJWLtUENrVeb7U
+	 R/4ryCp1D+jUh1SiDuK/uzKhiwBdgnW8iMPZpn3Z0fnhdgT+GEI1U2Fo6ecWeL6E7fAUd
+	 9Mk+97y0WzT9uSFTAb2SbI4gYs+SkiW5+mLsjGDx77jFi4cJjMiuWE6NUxrRw0hQA0VZ/
+	 b7jlWap/BBhip40tN7HhOLD5OoCgDBfo7sXuZ5XWy9pff8bIOFZXc+T1KagCr5CbDy/qa
+	 yQ9QJu9J8ytckSEepFfEECgR+NwocNrnp7gt+u/uG0mtN0gaZz7DXHOAWuPBvjFnBCQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=LTQHz82v;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39965606A31E
-	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 15:08:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 39965606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BZKayue7;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C7D606A32D;
+	Tue, 24 Nov 2026 15:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=LTQHz82v
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5A4C4339;
-	Tue, 24 Nov 2026 07:08:26 -0800 (PST)
-Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BD8013F763;
-	Tue, 24 Nov 2026 07:08:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795532909; bh=iRlHeZwlJBUmCWo6yrgiKKtkerHyE2dksVsYRvvTjXs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=LTQHz82v2MMhRZa2+kkNDv3Dm80KyUhpVlFfWiQhnEiLCftSAmOBBSjtRCK7bheBA
-	 Me1w2DvhHEPrwKhkI0Px3LCTTKLeMh36O60GtvpxUHI5mXMHEeIPP8T2g7MVKnevA3
-	 r6CSDoDpkzlGFnZ9KJYr+ap3IP7r/ghNKtx5Sj+8=
-Message-ID: <090662ee-0d8d-48b5-83f2-8a4d225bef08@arm.com>
-Date: Tue, 24 Nov 2026 15:08:25 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BZKayue7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12CC31F000C6;
+	Tue, 24 Nov 2026 15:25:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795533952;
+	bh=1UXh4PQJOR3VknqTlOD7G3LYkfB1ZlA2WQOnvCIXzSk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=BZKayue7T+OsylZjV79b6R0ytIW756sZrlscpck2YyZhapT9Gi9uxQD2TAqTTjgK1
+	 Ny12Sm0RAzgn+HtgnA1nCyeqansp2lHh7ivIj/Ix1qFbH4HuVOa8qCEjIyvtoi9D6R
+	 +jHmiVlbd0ZMEtoLUPptwix0CB+DWa1XVAy1+YYY895ci0d7bJUu/p9MbsNhjGaGh1
+	 rfdPKCuFn+l+eN4jST+wJuMHZLweG6N0w74drNJ6WDvCm0j+qp/odn0AgQomKQb69w
+	 XBI0ZPyD+v+OEE7bdKKZ7xDxe6TzGo/x9t8gCGRgnlp50DOQffqNVxBveg3UN2VOyB
+	 +YF0ajNdmMBkw==
+From: Pratyush Yadav <pratyush@kernel.org>
+To: "David Matlack" <dmatlack@google.com>
+Cc: "Pratyush Yadav" <pratyush@kernel.org>,  "Tarun Sahu"
+ <tarunsahu@google.com>,  "Pasha Tatashin" <pasha.tatashin@soleen.com>,
+  "Mike Rapoport" <rppt@kernel.org>,  <robin.murphy@arm.com>,
+  <maz@kernel.org>,  <will@kernel.org>,  "Alexander Graf"
+ <graf@amazon.com>,  <seanjc@google.com>,  <jgg@nvidia.com>,
+  <loganodell@google.com>,  <arnd@arndb.de>,  <dwmw2@infradead.org>,
+  <baolu.lu@linux.intel.com>,  "Bjorn Helgaas" <bhelgaas@google.com>,
+  <oupton@kernel.org>,  <alex@shazbot.org>,  <gle.com@google.com>,
+  <pbonzini@redhat.com>,  "Andrew Morton" <akpm@linux-foundation.org>,
+  <kevin.tian@intel.com>,  <joro@8bytes.org>,  <kvmarm@lists.linux.dev>,
+  <linux-pci@vger.kernel.org>,  <kexec@lists.infradead.org>,
+  <kvm@vger.kernel.org>,  <iommu@lists.linux.dev>,
+  <linux-arm-kernel@lists.infradead.org>,  <skhawaja@google.com>,
+  <sagis@google.com>,  <linux-arch@vger.kernel.org>,  <linux-mm@kvack.org>,
+  <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 05/19] kho: Add feature header for fine-grained ABI
+ compatibility
+In-Reply-To: <DN2RQ7LGX224.3W3PSQ2PBHTJZ@google.com> (David Matlack's message
+	of "Mon, 23 Nov 2026 09:32:17 -0800")
+References: <20261110050202.529473-1-tarunsahu@google.com>
+	<20261110050202.529473-6-tarunsahu@google.com>
+	<2vxzse0rzjdn.fsf@kernel.org> <DN2RQ7LGX224.3W3PSQ2PBHTJZ@google.com>
+Date: Tue, 24 Nov 2026 15:25:44 +0000
+Message-ID: <2vxz33sqz1xj.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,296 +75,113 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: CCA: Add support for configuring
- the Realm MEC policy
-To: Kohei Enju <enju.kohei@fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
- Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
- Steffen Eiden <seiden@linux.ibm.com>, Steven Price <steven.price@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- cgroups@vger.kernel.org
-References: <20261112-mm-v1-mec-v2-0-0d1dd260a588@fujitsu.com>
- <20261112-mm-v1-mec-v2-1-0d1dd260a588@fujitsu.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20261112-mm-v1-mec-v2-1-0d1dd260a588@fujitsu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 12/11/2026 03:36, Kohei Enju wrote:
-> Introduce the KVM_ARM_VM_RMI_CTRL device attribute group to allow
-> userspace to configure Realm VM parameters before the Realm is created
-> using KVM_SET_DEVICE_ATTR.
-> 
-> Currently, KVM_ARM_VM_RMI_CTRL_MEC_POLICY is the only supported
-> attribute. Its value can be KVM_ARM_VM_RMI_MEC_POLICY_SHARED or
-> KVM_ARM_VM_RMI_MEC_POLICY_PRIVATE. Reject the private policy if the
-> platform does not support private MECs.
-> 
-> If userspace does not explicitly configure the MEC policy,
-> KVM_ARM_VM_RMI_MEC_POLICY_SHARED is used by default.
-> 
-> Signed-off-by: Kohei Enju <enju.kohei@fujitsu.com>
-> ---
->   Documentation/virt/kvm/devices/vm.rst   | 25 +++++++++++++++
->   arch/arm64/include/asm/kvm_rmi.h        |  5 +++
->   arch/arm64/include/uapi/asm/kvm.h       |  4 +++
->   arch/arm64/kvm/arm.c                    |  4 +++
->   arch/arm64/kvm/rmi.c                    | 57 +++++++++++++++++++++++++++++++++
->   drivers/firmware/arm_rmm/rmi.c          |  6 ++++
->   include/linux/arm-rmi-cmds.h            |  1 +
->   tools/arch/arm64/include/uapi/asm/kvm.h |  4 +++
->   8 files changed, 106 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/devices/vm.rst b/Documentation/virt/kvm/devices/vm.rst
-> index 78e63eb9994e..b0bd30750aa1 100644
-> --- a/Documentation/virt/kvm/devices/vm.rst
-> +++ b/Documentation/virt/kvm/devices/vm.rst
-> @@ -418,3 +418,28 @@ will reject attempts to define a filter for any portion of these ranges:
->           0x8000_0000 0x8000_FFFF
->           0xC000_0000 0xC000_FFFF
->           =========== ===============
-> +
-> +7. GROUP: KVM_ARM_VM_RMI_CTRL
-> +=============================
-> +
-> +:Architectures: arm64
-> +
-> +7.1. ATTRIBUTE: KVM_ARM_VM_RMI_CTRL_MEC_POLICY (w/o)
-> +----------------------------------------------------
-> +
-> +:Parameters: Pointer to a ``__u8`` value
-> +
-> +:Returns:
-> +
-> +  =========  ===========================================================
-> +  ENXIO      The VM is not a Realm VM
-> +  EBUSY      The Realm has already been created
-> +  EINVAL     Invalid MEC policy value
-> +  EOPNOTSUPP Private MEC policy is not supported by the platform
-> +  EFAULT     The value could not be copied from userspace
-> +  =========  ===========================================================
-> +
-> +Configures the MEC policy for a Realm VM before the Realm is created. The value
-> +must be either ``KVM_ARM_VM_RMI_MEC_POLICY_SHARED`` or
-> +``KVM_ARM_VM_RMI_MEC_POLICY_PRIVATE``. If userspace does not explicitly set the
-> +MEC policy, ``KVM_ARM_VM_RMI_MEC_POLICY_SHARED`` is used by default.
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index 3933f8d834b8..08c1f6d0671d 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -59,6 +59,7 @@ enum realm_state {
->    * @state: The lifetime state machine for the realm
->    * @ia_bits: Number of valid Input Address bits in the IPA
->    * @stage2_unmapped: The Realm stage-2 mappings have been removed
-> + * @mec_policy: MEC policy for the Realm VM
->    */
->   struct realm {
->   	void *rd;
-> @@ -73,6 +74,7 @@ struct realm {
->   	enum realm_state state;
->   	unsigned int ia_bits;
->   	bool stage2_unmapped;
-> +	unsigned int mec_policy;
->   };
->   
->   /**
-> @@ -109,9 +111,12 @@ int kvm_realm_teardown_stage2(struct kvm *kvm);
->   void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->   
->   struct kvm_arm_rmi_populate;
-> +struct kvm_device_attr;
->   
->   int kvm_arm_rmi_populate(struct kvm *kvm,
->   			 struct kvm_arm_rmi_populate *arg);
-> +int kvm_vm_rmi_has_attr(struct kvm *kvm, struct kvm_device_attr *attr);
-> +int kvm_vm_rmi_set_attr(struct kvm *kvm, struct kvm_device_attr *attr);
->   
->   enum kvm_gfn_range_filter;
->   
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 65ee09bd1463..aa1e6fe6192e 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -403,6 +403,10 @@ enum {
->   /* Device Control API on vm fd */
->   #define KVM_ARM_VM_SMCCC_CTRL		0
->   #define   KVM_ARM_VM_SMCCC_FILTER	0
-> +#define KVM_ARM_VM_RMI_CTRL		1
-> +#define   KVM_ARM_VM_RMI_CTRL_MEC_POLICY	0
-> +#define     KVM_ARM_VM_RMI_MEC_POLICY_SHARED	0
-> +#define     KVM_ARM_VM_RMI_MEC_POLICY_PRIVATE	1
->   
->   /* Device Control API: ARM VGIC */
->   #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 8e94f1bff830..be676c13e219 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2329,6 +2329,8 @@ static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
->   	switch (attr->group) {
->   	case KVM_ARM_VM_SMCCC_CTRL:
->   		return kvm_vm_smccc_has_attr(kvm, attr);
-> +	case KVM_ARM_VM_RMI_CTRL:
-> +		return kvm_vm_rmi_has_attr(kvm, attr);
->   	default:
->   		return -ENXIO;
->   	}
-> @@ -2339,6 +2341,8 @@ static int kvm_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
->   	switch (attr->group) {
->   	case KVM_ARM_VM_SMCCC_CTRL:
->   		return kvm_vm_smccc_set_attr(kvm, attr);
-> +	case KVM_ARM_VM_RMI_CTRL:
-> +		return kvm_vm_rmi_set_attr(kvm, attr);
->   	default:
->   		return -ENXIO;
->   	}
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 0d254fb80cde..01ac8d4fec7c 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -7,6 +7,7 @@
->   #include <linux/arm-rmi-cmds.h>
->   #include <linux/kvm_host.h>
->   #include <linux/overflow.h>
-> +#include <linux/uaccess.h>
->   
->   #include <asm/daifflags.h>
->   #include <asm/kvm_emulate.h>
-> @@ -586,6 +587,9 @@ static int realm_create_rd(struct kvm *kvm)
->   		params->flags0 |= RMI_REALM_PARAM_FLAG_PMU;
->   	}
->   
-> +	params->flags0 |= FIELD_PREP(RMI_REALM_PARAM_FLAG_MEC_POLICY_MASK,
-> +				    realm->mec_policy);
-> +
->   	r = realm_init_sve_param(kvm, params);
->   	if (r)
->   		goto out_undelegate_tables;
-> @@ -1481,6 +1485,57 @@ int kvm_arm_rmi_populate(struct kvm *kvm,
->   	return ret;
->   }
->   
-> +static int kvm_vm_rmi_set_mec_policy(struct kvm *kvm, u8 policy)
-> +{
-> +	guard(mutex)(&kvm->arch.config_lock);
-> +
-> +	if (!kvm_vm_is_realm(kvm))
-> +		return -ENXIO;
-> +
-> +	if (kvm_realm_state(kvm) != REALM_STATE_NONE)
-> +		return -EBUSY;
-> +
-> +	if (policy != KVM_ARM_VM_RMI_MEC_POLICY_SHARED &&
-> +	    policy != KVM_ARM_VM_RMI_MEC_POLICY_PRIVATE)
-> +		return -EINVAL;
-> +
-> +	if (policy == KVM_ARM_VM_RMI_MEC_POLICY_PRIVATE &&
-> +	    rmi_mec_count() == 0)
-> +		return -EOPNOTSUPP;
-> +
-> +	kvm->arch.realm.mec_policy = policy;
-> +	return 0;
-> +}
-> +
-> +int kvm_vm_rmi_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
-> +{
-> +	if (!kvm_vm_is_realm(kvm))
-> +		return -ENXIO;
-> +
-> +	switch (attr->attr) {
-> +	case KVM_ARM_VM_RMI_CTRL_MEC_POLICY:
+On Mon, Nov 23 2026, David Matlack wrote:
 
-minor nit: Could we reject this if the rmi_mec_count() == 0 ?
-Default policy is "shared" mec, as long as it is documented, this
-would work only on a system that supports Private MEC.
+> On Mon Nov 23, 2026 at 6:56 AM PST, Pratyush Yadav wrote:
+> [...]
+>
+>> When we have all this available, I don't see the point in
+>> differentiating between optional and required features at the ABI level.
+>> At the ABI level, all that matters is what the incoming kernel
+>> understands. If the incoming kernel does not understand a specific
+>> field, the outgoing kernel should just not use it. There's no point.
+>> Best case, it gets ignored.
+>
+> I pretty strongly disagree.
+>
+> An optional feature is one that the next kernel does not need to
+> understand to correctly restore the object. A required feature is one
+> that the next kernel must understand to correctly restore the object.
+> Optional features can be enabled without any compatibility concerns.
+> Required features must be enabled carefully (IMO via uAPI) to avoid
+> breaking Live Update.
+>
+> I agree it's a good idea for the outgoing kernel to check that the next
+> kernel supports all of the required features it is using, so the Live
+> Update can be stopped before the kexec. But that doesn't remove the
+> need for the distinction. The next kernel still has to decide what to
+> do when it sees a feature bit it doesn't understand, e.g. because no
+> spec was provided, the spec was wrong, or we kexec'd into a different
+> kernel than planned. Without the distinction it can only:
+>
+>  A. Treat all features as optional, which risks misinterpreting state
+>     and corrupting memory if the previous kernel did not properly
+>     validate the next kernel's capabilities.
 
+Right, that's a bad idea.
 
-Suzuki
+>
+>  B. Treat all features as required, which means no new feature can be
+>     enabled until every kernel it might Live Update to (including
+>     rollback targets) understands it, even when those kernels could
+>     safely ignore it.
 
+I think this is what we should do.
 
-> +		return 0;
-> +	default:
-> +		return -ENXIO;
-> +	}
-> +}
-> +
-> +int kvm_vm_rmi_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
-> +{
-> +	void __user *uaddr = (void __user *)attr->addr;
-> +	u8 policy;
-> +
-> +	switch (attr->attr) {
-> +	case KVM_ARM_VM_RMI_CTRL_MEC_POLICY:
-> +		if (copy_from_user(&policy, uaddr, sizeof(policy)))
-> +			return -EFAULT;
-> +
-> +		return kvm_vm_rmi_set_mec_policy(kvm, policy);
-> +	default:
-> +		return -ENXIO;
-> +	}
-> +}
-> +
->   static int kvm_create_rec(struct kvm_vcpu *vcpu)
->   {
->   	struct user_pt_regs *vcpu_regs = &vcpu->arch.ctxt.regs;
-> @@ -1695,6 +1750,8 @@ int kvm_init_realm(struct kvm *kvm)
->   {
->   	struct realm *realm = &kvm->arch.realm;
->   
-> +	realm->mec_policy = KVM_ARM_VM_RMI_MEC_POLICY_SHARED;
-> +
->   	realm->sro = kmalloc_obj(*realm->sro);
->   	if (!realm->sro)
->   		return -ENOMEM;
-> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-> index 77255a90e0a6..27edf060d2d9 100644
-> --- a/drivers/firmware/arm_rmm/rmi.c
-> +++ b/drivers/firmware/arm_rmm/rmi.c
-> @@ -793,6 +793,12 @@ unsigned long rmi_feat_reg(unsigned int index)
->   }
->   EXPORT_SYMBOL_GPL(rmi_feat_reg);
->   
-> +u64 rmi_mec_count(void)
-> +{
-> +	return u64_get_bits(rmi_feat_reg(4), RMI_FEATURE_REGISTER_4_MEC_COUNT);
-> +}
-> +EXPORT_SYMBOL_GPL(rmi_mec_count);
-> +
->   static int rmi_rmm_config_set(unsigned long cfg_ptr)
->   {
->   	struct arm_smccc_1_2_regs regs = {
-> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
-> index c13e8775898e..530136ccb791 100644
-> --- a/include/linux/arm-rmi-cmds.h
-> +++ b/include/linux/arm-rmi-cmds.h
-> @@ -68,6 +68,7 @@ static __always_inline void rmi_smccc_invoke_once(struct arm_smccc_1_2_regs *reg
->   }
->   
->   unsigned long rmi_feat_reg(unsigned int index);
-> +u64 rmi_mec_count(void);
->   
->   int rmi_delegate_range(phys_addr_t phys, unsigned long size,
->   		       phys_addr_t *out_phys);
-> diff --git a/tools/arch/arm64/include/uapi/asm/kvm.h b/tools/arch/arm64/include/uapi/asm/kvm.h
-> index 65ee09bd1463..aa1e6fe6192e 100644
-> --- a/tools/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/tools/arch/arm64/include/uapi/asm/kvm.h
-> @@ -403,6 +403,10 @@ enum {
->   /* Device Control API on vm fd */
->   #define KVM_ARM_VM_SMCCC_CTRL		0
->   #define   KVM_ARM_VM_SMCCC_FILTER	0
-> +#define KVM_ARM_VM_RMI_CTRL		1
-> +#define   KVM_ARM_VM_RMI_CTRL_MEC_POLICY	0
-> +#define     KVM_ARM_VM_RMI_MEC_POLICY_SHARED	0
-> +#define     KVM_ARM_VM_RMI_MEC_POLICY_PRIVATE	1
->   
->   /* Device Control API: ARM VGIC */
->   #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
-> 
+Why do all kernels need to understand a new feature?
 
+If a kernel can safely parse an object without ever looking at an
+optional feature, why set it in the first place? The outgoing kernel
+already knows its target can't understand it.
+
+So say you add a new optional feature in kernel X+1. For a rollback, the
+kernel X+1 knows it is going to X which doesn't understand the feature.
+It should just not use it in the payload, which means it never activates
+the bit for that feature. All the feature bits X sees are the ones it
+understand, and everything goes smoothly.
+
+And to be clear, I'm saying that the feature bits in the ABI header
+should be set dynamically based on what is used in the payload. The
+feature bits in the spec are static. They say what the target kernel
+understands. The feature bits in the payload are dynamic. They say what
+features are actually used.
+
+>
+> Neither of those is a good outcome.
+>
+>> The semantics of required or optional then become "can I describe this
+>> object with the capabilities I can use?". If the answer is yes,
+>> serialization succeeds, if the answer is no, serialization fails. So
+>> with this, KHO_MAP_F_MULTI_INDEX or KHO_MAP_F_DYN_DEPTH are indeed
+>> optional. All memfds can be described without these, they just will be
+>> less efficient.
+>
+> I think this is a different meaning of "optional". Whether the outgoing
+> kernel can choose not to use a feature is a decision for the serializer.
+> Whether the next kernel can safely ignore a feature's data is a property
+> of the ABI. KHO_MAP_F_MULTI_INDEX is optional in the first sense, but
+> required in the second: a kernel that doesn't understand it will
+> misinterpret the map. The header needs to convey the second.
+
+Right, which is why a payload handed to an old kernel should never set
+KHO_MAP_F_MULTI_INDEX. Even if you have a property that is truly
+optional and ignoring it will still make things work fine, why would you
+want to set it in the first place? You know it will be ignored, so just
+don't use it.
+
+>
+> So I see the spec and required bits as complementary: the spec lets the
+> outgoing kernel avoid features the next kernel doesn't support and fail
+> before kexec, and required bits let the next kernel fail safely if that
+> check was skipped or wrong.
+
+I see a marginal benefit in setting the optional bits by adding a tiny
+bit more safety. But even then, it only hides the real problem. The
+previous kernel should not be skipping its checks in the first place. If
+you're lucky, it might only end up using an optional feature and you
+might be able to ignore it. But if the checks don't happen or are
+broken, you'd be just as likely to be unlucky and the previous kernel
+might use a required feature if it skips the spec checks.
+
+I don't think it buys us any functionality. It just hides the problem in
+some lucky cases.
+
+In fact, we could even add a "strict" mode in the future, where the
+outgoing kernel refuses KHO if the spec to the incoming kernel is not
+provided.
+
+-- 
+Regards,
+Pratyush Yadav
