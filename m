@@ -1,74 +1,65 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795538324;
-	b=tDDsayZTpEWf0UOU1tLtjRylnTjZfubdYI8tigRI13EwXgsfyv9oRSQ8Mxnx0w6WaKxf
-	 GUlHFGiqi9GKy0dU6jT6AkFkobMQ8kCZkYdndyKvdqPuajCdPL0nvC1GbOJeFM/lxWfQK
-	 CgynO0rMZlhV6RNlHTrnE8+D40gzsqpr80Iz1D2o23TzJfDZCzVtCfxeH8ifPzplFYfSi
-	 qvNlwIFMcd12O/X+sp4EqENp8qv+9zhUpUDJtN2Or63ZvKXHkV/wxLh6+4wDufEfCFq4o
-	 +RJc7lntt9Xo4DlznTB41Cfgp8Z9Trr6rcp8EG+ORFZefR6jIq84yz0Spb+ugDkYDKw==
+	t=1795539190;
+	b=NgwStRfu0Jd9BbJrAksCCbxgjzue+KLqoqpQY9HtAU0+rlXpxtGsJqxqg0EvR3rsjoXh
+	 qjrHIMqZ78AaZpXVab7+qfQZdSyCZxjlyVBjfDc7SFUeitxmzTu/hzRhb1huRBD52fgEU
+	 kolTZHFd8ZDx+BvPfKCNfqFey97TdOimHjMz2/2B3wbiiEba9OLeh+324SCrgAcDXDo6s
+	 DO46g4jqnGAXxz9mz8DdM3MlmTcFmk/jwx8W9k+8QkJ/0AZhnOulwDxqTBPVt57HSoMXJ
+	 5y4sUJ615nnVwEX2j+63UV3JM30HG//Kyuqt3b1tlApUxRAfQ5fqXZUEQVu2iTK81Pg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795538324;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=7ADkkO7OrDOakoZissUe/feLBFMvVo6YnTMs5lxIDuc=;
-	b=oZr7lYC1qPrAojT3qzpuc5Aj5TxtG1io1or9dgVQ0EHcw7ZYTBOkmx2/0uPKifsf3krL
-	 I4dQk7lWTpUzrGZ+CLjbhAsPLjz79yGqxSQTsZdyJdiEhBQLX+XVlrROZV4+g84v7oTTj
-	 odNIGfb0aRgyS5uRKFb2fN+CkNIcwwWFwg8/dCEQ1o5ja+YEvyVmNBz8qyVMiNNZ9jM1U
-	 ikDpwtzP2DrnDpSceuBGxOaLf/3agMH242dkU8jSV4hrHCX8SXoHlJ0xWDRIIEaAWDnLl
-	 4RdT4ZaRB/pQAhAYlArVTC6KgAUlfaoaeVhf1vIwvx7PEtztOgTxjN/ft9UBcF1Kxww==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795539190;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=x/uzChQMb312nOxPDZxs+qjo+ZN0ijU/g8Mc3JJQonU=;
+	b=kJmg+wwQsdgjhmeBdTNZnrLOVAFcqKs+THtoHGY7PSUGewpIzNA3Y/+7XOuMGkjF/xCG
+	 ORItpHSVxawjiXCpfTp26aZsYM2rda1M3nHON5MmKs9Tc4PHRtT8YfdvCYz12FjokNtAV
+	 Z17SKWijI3ZiIc92R4HeYUyB5EGAB0C+FfZGsyE7lfDZx+dmwfZezC3nNb69Qc3Eko7o2
+	 rgPqUwwp+v38PKDwwlIVWz5P1+jVb9iXyEHgwzEaUe0cUkJyDt22kKfPR7s/Dk06heLUL
+	 A1eVuuvWxNXTj3agAeuZeuQS+moT3VNxMLKmCp8Jf2Erb1qeaUUYUKzvrtXKHATWZqQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FwyR1IKx;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OOMLAS+X;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51AC5606A32C;
-	Tue, 24 Nov 2026 16:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501D2606A33D;
+	Tue, 24 Nov 2026 16:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FwyR1IKx
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F35251F000D2;
-	Tue, 24 Nov 2026 16:38:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OOMLAS+X
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FE8E1F000CA;
+	Tue, 24 Nov 2026 16:53:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795538324;
-	bh=7ADkkO7OrDOakoZissUe/feLBFMvVo6YnTMs5lxIDuc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=FwyR1IKxg5LZccDINcjDUnc6lyk1XGb6HBTNrvll1u4ipuyfAQeb4fEqM0eXjX7SM
-	 PRPRC2DYZ8MNcLmvzgqzgxnk+abDN7UJFiJs+Whb8Lc5LRBAFjUGBVW6E22fOFAq1W
-	 VjfbUkP0MdPqTDBmO+oRifVIa7l716FkzcWCzDpuFUK0X/QkoXIkAD1ONEUFjXYiOG
-	 wkCnL4dQhDRlreZZ4ZMenD7XtWULaUo2wSgzz+VAzp6JPr4XgW2Fvc4IVB1X1i3XfZ
-	 Is342rsqStkMEb42NbPEAYrcIkt3YK6J3a+cul02S6tfI6o6mSjCEjIfWEpJzQWHB9
-	 4Y/JznUmdU8Aw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xVtXV-00000002gMn-3c6E;
-	Tue, 24 Nov 2026 16:38:41 +0000
-Date: Tue, 24 Nov 2026 16:38:41 +0000
-Message-ID: <864id6yyjy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Dan Carpenter <dan@pereq.eu>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Upgrade sub-page TTL hint to maximum size
-In-Reply-To: <awW5QKqGZAqw1ru9@LeoBrasDK>
-References: <20261123182312.4842-1-maz@kernel.org>
-	<awW5QKqGZAqw1ru9@LeoBrasDK>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1795539189;
+	bh=x/uzChQMb312nOxPDZxs+qjo+ZN0ijU/g8Mc3JJQonU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=OOMLAS+XbhdnRS7DFxO90ypKtA8PGcVdJZbFI8gljDKch9WCYldkuqZ0kVwuUPZ+6
+	 DJ+PTxVWWPKOiF2iDRt9r3OeLjBPpdenXE1GXapKuoJRyr6FpYRvufwl+XROSY9yho
+	 jTkO8I/BbuB2Mkrtl3WoqPT+Xs9IYfiNc7ya8gNP9Dsm9gZcXM2/h8MvhRFX5GC6r+
+	 fRqG6Z3nr0a1Jpuy2CUXl8X+fANf3mDC+7/YbBfvSpwDRDyqgtrkhl2KY8WxIVvPH2
+	 qZNW4e5PmXeu/A1b+1ldGiTLSLO6MI3VOERij/AB6KsjOvpZThacNm0hGusbxOvNzs
+	 iXZmwZ+SG1Z0g==
+Date: Tue, 24 Nov 2026 16:53:01 +0000
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Justin He <Justin.He@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <Catalin.Marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <Mark.Rutland@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Shuah Khan <shuah@kernel.org>, Sascha Bischoff <Sascha.Bischoff@arm.com>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, Dan Carpenter <dan@pereq.eu>
+Subject: Re: [PATCH 1/3] KVM: arm64: Don't load hardware vCPU state before
+ first run
+Message-ID: <awW1Q2Y9vCdxpjtG@gremlin>
+References: <20261123150917.2679600-1-justin.he@arm.com>
+ <20261123150917.2679600-2-justin.he@arm.com>
+ <86eccbzcqh.wl-maz@kernel.org>
+ <AS2PR08MB978600ED2150F773D3E1631DF7442@AS2PR08MB9786.eurprd08.prod.outlook.com>
+ <868q2iz94w.wl-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -77,121 +68,122 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.bras@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, dan@pereq.eu, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <868q2iz94w.wl-maz@kernel.org>
 
-On Tue, 24 Nov 2026 16:20:16 +0000,
-Leonardo Bras <leo.bras@arm.com> wrote:
-> 
-> On Mon, Nov 23, 2026 at 06:23:12PM +0000, Marc Zyngier wrote:
-> > Should a guest be slightly foolish and submit a S2 TLBI with a TTL hint
-> > that describe a base granule size smaller than the host's page size,
-> > we take the resulting size at face value and feed it to the S2 unmapping
-> > code. Which legitimately screams about something not being page-aligned.
-> > 
-> > The architecture allows us to drop the TLBI on the floor, as we don't
-> > support a S2 granule size smaller than the host's page size. But it turns
-> > out that doing so is proving pretty hard (we call compute_tlb_inval_range
-> > from a number of places, none of which is amenable to an early out).
-> > 
-> > Instead, detect the annoying case, and pretend that we don't have a TTL
-> > hint at all, leaving the size upgrade mechanism to take place and use
-> > the largest possible size for the guest's S2 granule size.
-> > 
-> > This will still allow nonsensical stuff to get through, such as a 4kB
-> > level 2 (aka 2MB) from a guest with a 64kB S2 base granule size running
-> > on a 16kB page size host, but that's not worse than doing nothing, and
-> > the host code won't get shouty.
-> > 
-> > Reported-by: Dan Carpenter <dan@pereq.eu>
-> > Link: https://lore.kernel.org/r/20261123-inval_range-v1-1-815e15797089@pereq.eu
-> > Fixes: d1de1576dc21 ("KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Cc: stable@vger.kernel.org
-> > ---
-> > 
-> > Notes:
-> >     Reposting this as a first class patch, as I'd like to plug that one
-> >     as early as possible (and Dan has plenty of other patches in flight...)
-> > 
-> >  arch/arm64/kvm/nested.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 78d5b18dbd2d6..36e4e83badf0a 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -714,6 +714,13 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
-> >  	 */
-> >  	max_size = __ttl_to_size(ttl);
-> >  
-> > +	/*
-> > +	 * IMPDEF behaviour: treat subpage TTL-annotated TLBI as the largest
-> > +	 * possible invalidation. Don't try this at home, kids!
-> > +	 */
-> > +	if (max_size < PAGE_SIZE)
-> > +		max_size = 0;
-> > +
-> >  	if (!max_size) {
-> >  		/* Compute the maximum extent of the invalidation */
-> >  		switch (vtcr_to_tg0_pgsize(kvm, mmu->tlb_vtcr)) {
-> > -- 
-> > 2.47.3
-> > 
-> 
-> Hey Marc,
-> 
-> I think the changes make sense, although rounding up to PAGE_SIZE also 
-> looks a valid solution in my unexperienced viewpoint.
+On Tue, Nov 24, 2026 at 12:50:07PM +0000, Marc Zyngier wrote:
+> Adding Dan to this loop, as I reckon something else is amiss.
+>
+> On Tue, 24 Nov 2026 01:39:23 +0000,
+> Justin He <Justin.He@arm.com> wrote:
+> >
+> > Hi, Marc
+> >
+> > > -----Original Message-----
+> > [...]
+> > > > KVM_PRE_FAULT_MEMORY calls vcpu_load() as soon as
+> > > KVM_ARM_VCPU_INIT has
+> > > > completed. On arm64, however, kvm->arch.sysreg_masks, the trap
+> > > > configuration, vncr_tlb and nested vGIC state are only set up on the
+> > > > first KVM_RUN in kvm_arch_vcpu_run_pid_change().
+> > >
+> > > I think I'm going to queue a patch disabling prefaulting immediately,
+> > > and then we can fix this crap.
+> > >
+> > Fine with me. I'll rebase on top of it and have v2 re-enable
+> > pre-faulting together with the load/put change.
+>
+> Don't worry about that. I can fix that myself when applying the
+> patches.
+>
+>
+> > > > Since kvm_running_vcpu can now be set without VHE state on the CPU, use
+> > > > host_ctxt->__hyp_running_vcpu in VHE enter_vmid_context() (matching
+> > > > nVHE)
+> > >
+> > > Can you clarify under which circumstances we end-up on the TLB
+> > > invalidation path? Simply faulting things in should not result in
+> > > invalidation. Unless we end-up with MMU notifiers firing?
+> > >
+> > I found this by code inspection, not from a failure. A TLBI from a stage-2
+> > BBM or an MMU notifier can hit this path during pre-faulting, but before
+> > the first run hw_mmu is canonical, so it makes no difference. As Lorenzo
+> > said, I'll drop this hunk.
+>
+> vcpu->arch.hw_mmu being the canonical one before the first run doesn't
+> hold anymore, since a7602ea542d4e ("KVM: arm64: nv: Initialize hw_mmu
+> to NULL for nested vCPUs"), as userspace can configure things for an
+> L2, before first run, and bad things happen otherwise.
 
-No, it isn't the same thing. Taker the example I have given, where the
-host is 16k, the guest 64k, and the invalidation 4k. If you round
-things up to 16k, you're still not invalidating anything that is
-consistent with the *minimum page size* for the guest. Anything larger
-is a multiple of both the host and guest page sizes, and therefore
-always correct.
+Yeah sorry, didn't pull locally so missed that...!
 
-> 
-> I am curious if there is any particular reason not to merge that with the 
-> test below, such as:
-> 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 78d5b18dbd2d6..36e4e83badf0a 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -714,6 +714,13 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
->  	 */
->  	max_size = __ttl_to_size(ttl);
->  
-> +	/*
-> +	 * IMPDEF behaviour: treat subpage TTL-annotated TLBI as the largest
-> +	 * possible invalidation. Don't try this at home, kids!
-> +	 */
-> +	if (max_size < PAGE_SIZE) {
-> - 	if (!max_size) {
->  		/* Compute the maximum extent of the invalidation */
->  		switch (vtcr_to_tg0_pgsize(kvm, mmu->tlb_vtcr)) {
+>
+> But the observation remains: if an MMU notifier occurs for any reason
+> while pre-faulting (likely a concurrent reclaim), we get the "not
+> quite loaded" vcpu in enter_vmid_context(). If vcpu->arch.hw_mmu is a
+> valid (non-null) pointer, then we will restore whatever is in that
+> structure when reaching exit_vmid_context(), and that's not what is
+> intended.
+
+We might also get not-concurrent MMU notifier fun with direct reclaim like:
+
+kvm_vcpu_pre_fault_memory()
+  -> vcpu_load()
+    -> kvm_running_vcpu set
+    -> kvm_arch_vcpu_load()
+      [ skipped with this patch, !vcpu_has_run_once() ]
+  -> kvm_arch_vcpu_pre_fault_memory()
+    -> user_mem_abort()
+      -> kvm_s2_fault_pin_pfn()
+        ...
+        -> get_user_pages_unlocked()
+          -> < try to fault in >
+            [ direct reclaim, tries to unmap a page from another VM ]
+            -> [ mmu notifier ]
+              -> kvm_unmap_gfn_range()
+                -> kvm_stage2_unmap_range()
+                  ...
+                  -> enter_vmid_context()
+                    [ assumes kvm_running_vcpu's hw_mmu is in VTTBR_EL2
+		      so exit_vmid_context() 'restores' it ]
+
+Yeah anyway in general this is clearly _wrong_ so right thing is to keep
+that bit.
+
+>
+> So I think we need that sort of exclusion. Either we track what is
+> actually properly loaded (using __hyp_running_vcpu as you did before,
+> or by checking whether the vcpu is in a valid state).
+
+Yup makes sense!
+
+>
+> I think we have a somewhat similar breakage with 5651590be08a6 ("KVM:
+> arm64: Load the vcpu in KVM_SET_VCPU_EVENTS"): as vcpu_load() now
+> becomes sensitive to vcpu_has_run_once() being true, we can't tell
+> anything of the state that is going to be evaluated by the event
+> injection helper.
+>
+> We could prevent the non-running injection in KVM_SET_VCPU_EVENTS, but
+> that's also a change in the API...
+
+OK so fear is Dan's vcpu load in kvm_arm_vcpu_set_events() now ends up
+doing naff all before vcpu_has_run_once() and thus the bug he fixes might
+be a thing again?
+
+Or is the concern something else?
+
+For the bug I think probably it's fine because the issue there was that you
+had an unload without a load AFAICT, but Jia's change also updates
+kvm_arch_vcpu_put() to be symmetrical, so that should be OK?
+
+>
+> 	M.
+>
 > --
-> 
-> Given max_size is unsigned (>=0), and it will be changed again in the 
-> switch case below, I was not able to understand the need to make it zero 
-> first.
+> Without deviation from the norm, progress is not possible.
 
-There is more than one way to write similar things, and what I wrote
-made the most sense to me.
-
-I want to single out this particular corner case, which is not the
-much more general case if "max_size is 0 because there is no TTL
-information". Lumping these two things together makes it, IMO,
-pointlessly hard to reason about the various cases.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--
+Cheers, Lorenzo
