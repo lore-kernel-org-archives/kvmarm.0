@@ -1,94 +1,146 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.177
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795524612;
-	b=sQ6ooD8Sfbtc5RoUXDRkCkn53EPd0SwUjwnEZR9PkKQ8UWT21cJZC4IJFnQjZyASyznU
-	 51sAE1mfRebQLH8R4LDUJcEkbMerysr7Gj140MfQ4B6gauLvzXa9TU62ZqibVcX2G/Im1
-	 Ohy0xXqpoYS44HonQ/UKidsbjiQGW7eU39W5XQhzRQH9YreS8Evs2uENrG0CwAk5lSDgL
-	 YyOKel/7GgGIgF87crX6p+iejpXEAHLV5VS5oc1+gGWYT6aKHh9ofKPA6WyT+7ixBP8Dj
-	 HPKhIR0g+b6Q4Vwc2aGM42B6a+BAMkasbcoYi5IaeMn0OcynAf6z5qWDJBc+BH9xU4g==
+	t=1795525676;
+	b=i61ds7Wqu8N2YXIMEiPWAW27/OnFB4chuenUUH5jXTulkyVvZGRT/l0V27ryRgHK2hpq
+	 wlKO4RMUWgHKZTkWZPxcy5/vSx/eRcq+95GSdoXXajrYEq4WWFXDnF0vfe7UtNh2CGvX2
+	 HDAxGSGH8tkGRpsypakVeD8ax6MJOzIR0hpmg6oZQRc7fEwxizb0BlhqMYOznJnB7fHPG
+	 I6QLUFjcCCsD2BXuj9ZqTlsyzhcEGc40zOU6MJMXq8GoBuorb4wGUTbCe/oNkU2kRLS45
+	 4u5thU06XqNC4IiXb9a7L9lkOn3yk5N8QVGbD9ZFqE/lEP8/EOMeYzef55FY7qCXX4Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795524612;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=fkcXNh2S892P26zeb4v8GatV81GnIFMuUNe4sWAuvks=;
-	b=GUcPvP2SMr9qLHzUpssieGrgCs2eWdDvTIB0I0pJanUYES12weTuDNOCBJtxczRelQYl
-	 HLdTcxvmPDdaZjfF8HzHigGwSFkHBz3R0UJJI4y9D2KKN8kxcqG7ZRWinIyTKO43Db3IL
-	 cZ9KhkVpxK0qFGjwMamHY7PCJLHn4Vp/AXz1FrnGFxy2f4YWgOB8JqnvOkGeKJyzDZyg1
-	 BJXkwq+6LWDwrBziwRyzQWwrHZeOoQEsg+wpqkcSPAx+GaqXkaDJhPuqVQBAsWuNJXkQv
-	 H7w51ZWQvX9Qp4SBc/wKzxRy9C3plkzS3JxM+Pwrqo9UfkBZ/A6m0XCMnFnufqrKx9A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795525676;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
+	 In-Reply-To;
+	bh=2Jqv6h2U/zwufJIWy6q7C5BzrR7eGEBWyzupif8ezko=;
+	b=q3PwVCKZooEZGXEWA+6yjmTeT89oCY/ZneVqq3+OUvYMlzEAyjZ1c4zx8qeO4eokHINO
+	 wD7ppHZntK6BIcPJLx92Gs/MN4JSMEdvY2ULrzGXmCTkzHaThtKN2V9wRxTc1gYzv/KQg
+	 rc9gMpG5vqBVPvaHnesPHdtl5KPdNgca25Ky/crUSeWlIq8ZZy30ZQciBzJj7SgyTtQ/W
+	 UIgkc+Pos+R6iljsUvJSHtA7Ii1PD3Z5t9HM8pBfkS87kHHaGHpQeQQO1gW+uReeNIhzI
+	 4cl4WZUGRWMAc16oo+jCcg4Fb7U6cfzS5E8wcdm4lxyf0wKuPan/hi1U4oXOSYR0BPg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Gr2PEFt6;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=none header.from=ziepe.ca;
+	spf=pass smtp.mailfrom=ziepe.ca;
+	dkim=pass header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=CJZp6cV7;
+	arc=none smtp.remote-ip=209.85.222.177
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF30606A31E;
-	Tue, 24 Nov 2026 12:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A11606A322
+	for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 13:07:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 44A11606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Gr2PEFt6
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80B391F000C0;
-	Tue, 24 Nov 2026 12:50:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795524610;
-	bh=fkcXNh2S892P26zeb4v8GatV81GnIFMuUNe4sWAuvks=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Gr2PEFt6Nif4bgQBkTr20iv52muiiKwwK0cRcdA2K0e825bGiSD/zpBb8TnonFISy
-	 fxqG4PZIaD/LsMIx6VJ2b9q82i6NAso2o9l3lcff2wZgZkU/fYbcM/T1MqnYuWA5Tg
-	 3OeTKCka90kyPatC5NxqPl3gda+lX38e3x5q9Xv9FcQFwO5Hm6v6qeV1eyZY8VMU3F
-	 31mirC74x45EEyhE3MU0Q/la2PlvYX/UX1LzUgFtaIRv/t1AIgC+BMlOFtbXOH4PID
-	 x2aHnvY+gDaxfJFp3TjoCIPM2cpf8Lj3JiVjlcrTrKDx8/nQN8aFOKLv7UkpNWOquZ
-	 swhINiwhDxj8w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xVpyK-00000002Zmv-16Az;
-	Tue, 24 Nov 2026 12:50:08 +0000
-Date: Tue, 24 Nov 2026 12:50:07 +0000
-Message-ID: <868q2iz94w.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Justin He <Justin.He@arm.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey
- Gouly <Joey.Gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki
- Poulose <Suzuki.Poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin
- Marinas <Catalin.Marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark
- Rutland <Mark.Rutland@arm.com>,
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=CJZp6cV7
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-9496473b511so535204985a.0
+        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 05:07:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1795525675; x=1796130475; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=2Jqv6h2U/zwufJIWy6q7C5BzrR7eGEBWyzupif8ezko=;
+        b=CJZp6cV77fzkUCXvgeGyc7n9vOvZov1aNWjYfoQB8lqfjpe7VVz2pKyasHC0M9bSo3
+         qvoro/45R0bYQRTdO2OhOwP8IqZDTveCj+W0rKGqVuCBz/BgVUCJlNyD58G1GcYb3njP
+         MhERoQBSZF9WEeWN1BrNcXyxnT9a2V9qA6Tztu/pOhGSXK2qaxtPyM7+o3gi7IQ5m8Vl
+         zl9+/Rui9jQl3P++qkZI/CGbAH51e/eughhaB/kN3C/3tgk7TbjbUX+50M64WuaFgcYP
+         wX9YibH8TLZgk0DjcQxRjLhIWJBK9Dfla9PQfVx96fqCzu0PbTcLTtuv2r94I2lv8Uf7
+         UBLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795525675; x=1796130475;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=2Jqv6h2U/zwufJIWy6q7C5BzrR7eGEBWyzupif8ezko=;
+        b=S0rLRx6CUpBY5FpWbnLnLCsS3B7B9OAot2NoRqnzFFPFUrzha5hFfWcyh43W0ik9ci
+         IUL1U72Y39SDMkSSCdeoi/Fu66W8tD13j4AuUo9/yJm6uU9gXJFSlrogwkzOs2tniNrp
+         siGnMGocaKu5gqDELsQ8Z0LgY8eaZ+TCLwjQzVwbzYpjpBLMpNY1i8Hg7Rv6nAhk1qKq
+         tI+IuNoPVPpYFF2wo3zMKmsA/R+JPecN+DSEtGLcOfoCCgFYphvmZKFIbmqAqDvn+pBR
+         4osbLUK1SLB+3XpWEwmyx9NHywFIsMZ9EvWfj9W5YfseLrP3ONcXpAVMEdjqzN0jfq7E
+         kJSQ==
+X-Forwarded-Encrypted: i=1; AL+hErFaHQt1XW0JJj5MS+gkiMHx2gc20vOmV8/bPLCd9KabWBmSxx7M1OA0C0phrGvKikQ1X8i0s0I=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+nI2kWO5dErztWtXsTzU5iejx14SqLlDi63OetYOvWnyI25mPe
+	WREWtum1b2L2mou+W99sA3HNECmhX6/iYXb9lkpqx6ZtLcdulm61NFHAM5CeaQnfLsY=
+X-Gm-Gg: AZFdTZeGlE0kj/4RlYaegFvK6s1RD0gECRUQpRlHqiVCmqI4tr+EhLGOcFmH03+Ic79
+	FMvQMM+vVZ1bNpm6WlZCIHSMOO4gtoDqFqAIdN3zJyNwUhP1dU97oC0uXlsvSA8jQOCjR3FIFGN
+	Jd5roPEZmgpj6S1z5BibFdiy42jVRYMaIn6OGQdL5GTjoba9ibtKm9TFF9WeouWs+2zsWy4s+tW
+	GXREMMatqVDnIv5urwCbpjOfdh8abYFc0BInBqz2Et44/Hqji9az6ZJhQKkvlA+ZxO2ws5N6lfM
+	sc068gLBlefVWr8EVpVLkNkg7TxP67Zmm2poc6hw6B8w1WrfVueADXkBjeLgbySrlOAsveVLAP5
+	iPc4UbKIvzPEdh5tf8wOOOFvHx7BJo57RU0BT46iwUIG8dFSNuBwO1+ddgWEp73x4UIGtei3SDA
+	k0Ic/8bdpevMM3FUzM9giFVXkjMYFLc1F3LOJ/EPHEc9BuIA9vnlXBN/tiJ3zXrLQb/XFHxRBoQ
+	tQYAqec60I2G89Tlr2tqZ90Ymijn53Tw3WQ/BxYmYVIvXOvM4JBIE8/9feocCXfRiPw037b+Ro3
+	RAokCw==
+X-Received: by 2002:a05:620a:2705:b0:949:8ee5:6faa with SMTP id af79cd13be357-949ba818db4mr2224332285a.4.1795525675010;
+        Tue, 24 Nov 2026 05:07:55 -0800 (PST)
+Received: from ziepe.ca ([142.177.118.84])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-949bb4219c4sm1034879485a.41.2026.11.24.05.07.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Nov 2026 05:07:54 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1xVqFV-00000000OKe-3ac5;
+	Tue, 24 Nov 2026 09:07:53 -0400
+Date: Tue, 24 Nov 2026 09:07:53 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	linux-coco@lists.linux.dev,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
+	Brian Starkey <Brian.Starkey@arm.com>,
+	John Stultz <jstultz@google.com>,
+	Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
+	"T.J. Mercier" <tjmercier@google.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <chleroy@kernel.org>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Shrikanth Hegde <sshegde@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean
- Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sascha
- Bischoff <Sascha.Bischoff@arm.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	Lorenzo
- Stoakes <ljs@kernel.org>, Dan Carpenter <dan@pereq.eu>
-Subject: Re: [PATCH 1/3] KVM: arm64: Don't load hardware vCPU state before first run
-In-Reply-To: <AS2PR08MB978600ED2150F773D3E1631DF7442@AS2PR08MB9786.eurprd08.prod.outlook.com>
-References: <20261123150917.2679600-1-justin.he@arm.com>
-	<20261123150917.2679600-2-justin.he@arm.com>
-	<86eccbzcqh.wl-maz@kernel.org>
-	<AS2PR08MB978600ED2150F773D3E1631DF7442@AS2PR08MB9786.eurprd08.prod.outlook.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	linaro-mm-sig@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev
+Subject: Re: [PATCH v10 04/13] irqchip/gic-v3-its: Allocate shared tables
+ using CoCo shared memory allocator
+Message-ID: <20261124130753.GD9566@ziepe.ca>
+References: <20261116091137.94252-1-aneesh.kumar@kernel.org>
+ <20261116091137.94252-5-aneesh.kumar@kernel.org>
+ <awQd81MwZqi55gf8@arm.com>
+ <20261123150041.GB179082@ziepe.ca>
+ <awSGBdS1AiFhJzZV@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -97,77 +149,35 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Justin.He@arm.com, oupton@kernel.org, fuad.tabba@linux.dev, Joey.Gouly@arm.com, seiden@linux.ibm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, Catalin.Marinas@arm.com, will@kernel.org, Mark.Rutland@arm.com, pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, ljs@kernel.org, dan@pereq.eu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <awSGBdS1AiFhJzZV@arm.com>
 
-Adding Dan to this loop, as I reckon something else is amiss.
+On Mon, Nov 23, 2026 at 06:29:25PM +0000, Catalin Marinas wrote:
 
-On Tue, 24 Nov 2026 01:39:23 +0000,
-Justin He <Justin.He@arm.com> wrote:
+> > Exposing struct page to places that just want a kernel addr means they
+> > have to call page_address and we are back to the highmem weirdness.
 > 
-> Hi, Marc
+> dma-buf system heap needs struct page for scatterlist, so we need the
+> virt_to_page() conversion if we return a VA.
+
+Yeah, but if that is a one off I'd give it is own API..
+
+> > > Was there a caller you had in mind that needs the common allocator to
+> > > share less than the whole buddy block?
+> > 
+> > If we want this it definitely needs to be a void * based API not
+> > struct page one though..
 > 
-> > -----Original Message-----
-> [...]
-> > > KVM_PRE_FAULT_MEMORY calls vcpu_load() as soon as
-> > KVM_ARM_VCPU_INIT has
-> > > completed. On arm64, however, kvm->arch.sysreg_masks, the trap
-> > > configuration, vncr_tlb and nested vGIC state are only set up on the
-> > > first KVM_RUN in kvm_arch_vcpu_run_pid_change().
-> > 
-> > I think I'm going to queue a patch disabling prefaulting immediately,
-> > and then we can fix this crap.
-> > 
-> Fine with me. I'll rebase on top of it and have v2 re-enable
-> pre-faulting together with the load/put change.
+> For whole-block sharing, either a VA or a folio works for me. If the
+> allocator takes an order, the requested size and the sharing granule are
+> both powers of two. Rounding up to the granule already gives a valid
+> buddy block size, so there’s no need for a separate shared_size.
 
-Don't worry about that. I can fix that myself when applying the
-patches.
+But you still will need the allocator to use the struct page metadata
+for its own tracking information, so it shouldn't be exposed to the
+caller..
 
-
-> > > Since kvm_running_vcpu can now be set without VHE state on the CPU, use
-> > > host_ctxt->__hyp_running_vcpu in VHE enter_vmid_context() (matching
-> > > nVHE)
-> > 
-> > Can you clarify under which circumstances we end-up on the TLB
-> > invalidation path? Simply faulting things in should not result in
-> > invalidation. Unless we end-up with MMU notifiers firing?
-> > 
-> I found this by code inspection, not from a failure. A TLBI from a stage-2
-> BBM or an MMU notifier can hit this path during pre-faulting, but before
-> the first run hw_mmu is canonical, so it makes no difference. As Lorenzo
-> said, I'll drop this hunk.
-
-vcpu->arch.hw_mmu being the canonical one before the first run doesn't
-hold anymore, since a7602ea542d4e ("KVM: arm64: nv: Initialize hw_mmu
-to NULL for nested vCPUs"), as userspace can configure things for an
-L2, before first run, and bad things happen otherwise.
-
-But the observation remains: if an MMU notifier occurs for any reason
-while pre-faulting (likely a concurrent reclaim), we get the "not
-quite loaded" vcpu in enter_vmid_context(). If vcpu->arch.hw_mmu is a
-valid (non-null) pointer, then we will restore whatever is in that
-structure when reaching exit_vmid_context(), and that's not what is
-intended.
-
-So I think we need that sort of exclusion. Either we track what is
-actually properly loaded (using __hyp_running_vcpu as you did before,
-or by checking whether the vcpu is in a valid state).
-
-I think we have a somewhat similar breakage with 5651590be08a6 ("KVM:
-arm64: Load the vcpu in KVM_SET_VCPU_EVENTS"): as vcpu_load() now
-becomes sensitive to vcpu_has_run_once() being true, we can't tell
-anything of the state that is going to be evaluated by the event
-injection helper.
-
-We could prevent the non-running injection in KVM_SET_VCPU_EVENTS, but
-that's also a change in the API...
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Jason
