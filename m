@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.138
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.115
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795621197;
-	b=S6/U/Xu0jpZKNdg+LHAAvKkkL9L+y2xaB6aKTdzcrbB71zhRmw864eiyhQoB1a9WW//K
-	 YhJZccU+GONRBkycy9OP5+r24RD6NPwngIMWtpe/SStVB2k8KDFt8rvsbqdkk1Yqhyho/
-	 Uh2LVlAIKeCs0z6svfdo952zBIVn5o1Ww3j6/VXqp1sDPbSko58Nn5IYduyhOw1fxI+RY
-	 AwezIPSzBjn8r872diCoXdmqfimEFbvz1tDa781vMf9t01en6ZYjBhD+qAE8tcZ5Ucafk
-	 9a8jCHjuA17pLCqya0IFB2qB60fl1qHJrRgYSKqsJkUCDHifVyGXEo6G7v20Enw//Gw==
+	t=1795621213;
+	b=Oa2wp1wzTkP9LEACUdcrq5+NY4+Qk1AIHYTEgcJijrgTKFDvOgRgdgqaUQfNtFwwU9bs
+	 xndrDM7N/s68LVbx1VkjPeP66RyvLXJ32JTxFpTQ3v63pGCrr1tb+i+4a2ocmV5bxyE45
+	 Z+XZwPtjZVZ1YY37bDJj7Zz9KbZhnnjklKHaPDBO+xSQYk7uQJ/bjLc4PrYcJSE7nFiVV
+	 p0CcJ7l0vwOLbjrcsKMByblFyvpNU839aQadE3HnxYQDobMMZs/ImsaQrv8FC8DoZcqet
+	 I2elz+j6VaRsfDe73cvR56BiyPaPfGSDyGlu4gOkknCL5WdzxYqSvVEBF9zMRrT+C/A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795621197;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795621213;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=HaDpLlZO77/PfdtGsOMSJUUh5Y4j+J367j2Kgogf+tM=;
-	b=XHHt8ib8EQ1qjIZhAp3m3fEjutv6r7owZowr6vnKejES464ePcuuWcPv+jZMOge3dTv8
-	 iTWaipIIRSn31kAnfk6bV25dFAF1wsb548unkWfK81wbVb9H5HyVIhSVWXB8CNPawwPQS
-	 gY6pFPQ9P+b/Mo3YmLFVJm9hstsCkIeJcyLLOuAUz9msWjGusKOXQG9hWvMb5oyfn/GQl
-	 hIjZSi72HZ67kZpWJIUjMCFyYgoy+jWSr0GnOgG2NeQXNa1z4L/fsdh6Kv6MavzYBkO/7
-	 5UYIZbhHOPvzLVfPaCZejZf7fFgBb/7k2bbycWYdzP+poNX3jBUVJthoXWkWcnCKd6w==
+	bh=dD0T8dgSUguzAe93p9YMVxo+6FxHhXvK08KHlYhmqa4=;
+	b=hQkD79ZOjMNuYX4WzwBreF6/TMHD6BXoYIScuoXsYkYDZe/gYmQkLvkc73pcOGTGownv
+	 8L9m23bGjnMNy8bn+G5RRcjwGRrISmj5tKUzC4yqfERK8Gf3qjCKyYv1aHFJXNajEtjcH
+	 B9Eytp07U+cCn4dKDbQVgQIKpgs3H7MR5RKD9ASDgEaOM5wEeAlL8Q2qJGNKwTmasivuG
+	 LlCp4nNn9SK+QrvI43cDXzfW8snLEUMACXdCQbNsrUrhz7r884vr1KorwC3q1DCl08335
+	 GU5cCUiBbLUpMl8m/qfQq6nYCqhD73omAUPZ5neEbivcT1vNdF8q2Fa09isqZQHrBkA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=AUAMMum8;
-	arc=none smtp.remote-ip=91.218.175.138
-Received: from mta0.migadu.com (out-138.mta0.migadu.com [91.218.175.138])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=MpcYAwBM;
+	arc=none smtp.remote-ip=95.215.58.115
+Received: from mta1.migadu.com (out-115.mta1.migadu.com [95.215.58.115])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE8F606A331
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:39:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7BE8F606A331
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1065A60A5BE3
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:40:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1065A60A5BE3
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=AUAMMum8
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=MpcYAwBM
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=GlzUdZprJRkl9i8HWXT3FIkXmSaEpIUlQmDVtwXNSuM=;
+DKIM-Signature: a=rsa-sha256; bh=mvYtBRC2OxyaS9QiFUPVqxRONTSDvgDwLjJRSI4wiFw=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795621194; v=1; x=1796225994;
- b=AUAMMum8C5V/yzYIzbsSmtIcur4UF37a2pxl5ZAI1XD42u3BoF1NRUXz1MGszxEzV3emLB8D
- EZmliY6jPmUJ6iaXtAlr6XlH6uDFxB+s3rw1pPzQS1024DxwbA4fT54NysiqtzRCC3WN8UwwE/E
- 58oCXFxred/kG27tpOTXM1mk=
+ t=1795621211; v=1; x=1796226011;
+ b=MpcYAwBMgb2H7Pe4FNA7hd/Sg44aTvWFUOeAYlCDzxN3HcodWx/ILDnRLRt3RFQbgREdenF4
+ HYl7rcIJfRfu3bqBXe9uDFTKW0gLyWWDkEM2CrxnVxijEw1rlBrByHNFQ8gp5gO3Zpu/gmiI5nI
+ RRYsu4IVEMG0wI/nXPJNV+z0=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id deebcfd6609d8edf;
-	Wed, 25 Nov 2026 15:39:54 +0000
-X-Mizu-Trace-ID: deebcfd6609d8edf
+Received: by smtp.migadu.com with ESMTPS id aa2ea6faef9e16eb;
+	Wed, 25 Nov 2026 15:40:10 +0000
+X-Mizu-Trace-ID: aa2ea6faef9e16eb
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -63,9 +63,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 09/20] KVM: arm64: Report an incomplete feature map with WARN_ON()
-Date: Wed, 25 Nov 2026 15:39:00 +0000
-Message-ID: <20261125153911.106793-10-fuad.tabba@linux.dev>
+Subject: [PATCH v2 10/20] KVM: arm64: Advertise the GICv3 CPU interface to protected VMs on GICv5
+Date: Wed, 25 Nov 2026 15:39:01 +0000
+Message-ID: <20261125153911.106793-11-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261125153911.106793-1-fuad.tabba@linux.dev>
 References: <20261125153911.106793-1-fuad.tabba@linux.dev>
@@ -80,33 +80,38 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-At init, check_feature_map() reports with kvm_err() any feature map
-that doesn't account for every bit of its register. The next patch
-builds config.c into nVHE hyp, which has no printk(), so the check
-would need an #ifdef to keep it out of hyp.
+A GICv5 host with FEAT_GCIE_LEGACY runs GICv3 guests, but its own
+ID_AA64PFR0_EL1.GIC is 0. KVM sets the field to IMP for non-protected
+VMs on such a host, but not for protected VMs, which read it from EL2's
+copy of the register. The next patch computes a protected vCPU's
+fine-grained traps from its ID registers, and with GIC at 0, EL2 would
+then inject an UNDEF for the guest's ICC_IGRPEN<n>_EL1 accesses.
 
-Use WARN_ON() instead, which doesn't need printk().
+Set the field to IMP in EL2's copy as well. The vgic isn't probed yet
+when the copy is made, so test the capability the vgic itself tests.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/config.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ arch/arm64/kvm/arm.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index c65cf1dd27330..eef5ca50fc382 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -1409,9 +1409,7 @@ static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
- 		if (!((map[i].flags & FORCE_RESx) && (map[i].bits & resx)))
- 			mask |= map[i].bits;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 2753686982f0b..3b4bc646d894a 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2819,6 +2819,12 @@ static u64 get_hyp_id_aa64pfr0_el1(void)
+ 	val |= FIELD_PREP(ID_AA64PFR0_EL1_CSV3,
+ 			  arm64_get_meltdown_state() == SPECTRE_UNAFFECTED);
  
--	if (mask != ~resx)
--		kvm_err("Undefined %s behaviour, bits %016llx\n",
--			str, mask ^ ~resx);
-+	WARN_ON(mask != ~resx);
++	/* A GICv5 host with legacy support gives its guests a GICv3. */
++	if (cpus_have_final_cap(ARM64_HAS_GICV5_LEGACY)) {
++		val &= ~ID_AA64PFR0_EL1_GIC;
++		val |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
++	}
++
+ 	return val;
  }
  
- static u64 reg_feat_map_bits(const struct reg_bits_to_feat_map *map)
 -- 
 2.47.3
 
