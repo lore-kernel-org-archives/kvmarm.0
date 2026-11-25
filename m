@@ -1,57 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795621779;
-	b=1zUIX5JlRIaX+rPyHeGm7E18zF14Sk3Gp3rjP39JGzD88FCvtDFsAeL6mcMZFP1+hSHE
-	 G+y5Wt2qvtNW7UAYRoEjVZFcAbzo4MSJhB6urXTHijLXbPHhpz0HdNhiryPWaDyRI2Xjz
-	 uI9jOsrJhEhrPISR+OQTd9razrLWEeJyVMvwFBTSIQCquYhP88mJNqHfv0+oSEEcIJzXE
-	 1X3NS/2zqR8HrHUVcxLtwnC3c9PZcaEBQQwM6mJnStQC9jzZ7renHzqHJxPIuXag0xr50
-	 ieTu5L8jsBIgucqiiLakN0fC9kerHU+kua9i0w5XscXXixmpVE9ROvCkTIZxZ6IV0CA==
+	t=1795621836;
+	b=v49Si1g+go59mgtarlaz6dU6ahdfhya8A6Ukbz8tgFclAMZPIDDHwMRWqBPtAxCAfhJm
+	 iwyBI4S05UelqYdMIi8gBoTL8ouhORsVRM659cOoRUk/zIyIZcWMPC+RSVIpqE80A23zk
+	 blcUH17b3w+AVE7gEGhBco/e/94NvXynkVGYNtFuUjOkTEo0V416sZhpMv1cIcUbw/gAv
+	 w7TOFfaAdfkLHTf/W+nRwkgjvLSQK7YljauVeA3+vebtpzJbt/2bTXwE8h2b1hQW59irA
+	 xp71ycfziikuQUB4GE+0WiDpsEI7PQKzp/npJsgKKzuukGVouV1Ji7O6qnSijzkqPtg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795621779;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=khFMMDagp7G9Nsof8l3eonauio4Yn3HdCBxJqIhS03A=;
-	b=nGWNDjG65ZjH2UjlZ1QaJe/gtvTA96qhcd/+DSsoaDl6xbCJICvy3S/rvMLaNXxT8Fc0
-	 1bPHkgkRZppcZaa+svTLPlniAZOhpoRaWXSdnYAW7U0xtqFzvozTK54THcdcy6z931AUa
-	 hATfSU2+nxfqrud5wg8BjKlP+LighReq3qPMgQOQSVnhsdVtQL4F4hjAvytGFkUAfGjql
-	 tT0nBR7/mdYhDvRO1xkQpuIhTr4UvilO+pTmPrr2Lhms2CcNl5LQz+YEjbVevXhiGkjx5
-	 pfDMuGugeV5ax3jz8JmP5Ob9N2BmII8fPApw9Xxb/KO6TKzGirQkZd8vBrtRg1dHwrg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795621836;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=JOVihf8AZVCZu2Aw4tH3FyKABP4IPNDzRcD+p1XLuhQ=;
+	b=vDjzyfu4ddeBFJLMlZCmAezpRfrNY4cSbpK1u5qJJZXIP/5TFulPJsjJoRyoBsV1zxKf
+	 h0czVQUQeKeEqAuMDGBZJsHy6QAdm7GIA01/0DOyO8XuzGp5VhWwzvvvokWmf7APhVYT8
+	 omNd2DXbI2oKY9Jb3lYHaRzvBQP+anJc86vXjbThgvWPXij9Uqiqx4cIAf1vOEdca3Xul
+	 n4BOVq0zmAJjD0VYZ9HgBsxIl/OuqR6aP0o3EhAqE/plnY2IWwSG5eB71UjKc4IV2qC8z
+	 6+LNIEDR3il+GyGB9WZKfV0DhzGOgB75DWwkVxPWn/huEM8Ao+OthKdGp45DWUV0CJQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fJYkZK8A;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9893606A329;
-	Wed, 25 Nov 2026 15:49:39 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=nnzpdv4a;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77065606A336
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:50:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 77065606A336
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fJYkZK8A
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8D621F000D1;
-	Wed, 25 Nov 2026 15:49:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795621778;
-	bh=khFMMDagp7G9Nsof8l3eonauio4Yn3HdCBxJqIhS03A=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=fJYkZK8AB+TpDaySGfnDb2R0yZEkPn3YQAKsNMN00DuSa+Tm4SDF4D6unWrJuQ3h7
-	 IIjiU2OBpdV/xStna0t+bWrrDM0sNrVXAQ5foIfTY7yg57Pr6JDgFiEojvwBKklOGk
-	 EztuOs4IZxrnpVmzTC2UEAQ288f1VVSazNQ+UCG1OWl/2WNofMPHEABNPBTQv9qLs2
-	 0tqn7ondjXQTwv2ODSHRr8pNlRB6q/tQUhA13M0wemqjq4Akk3KTRkpySHw1Lsj7je
-	 crog3OImTTfCVver/7OhwpGNdlJ234rCUNbwA92CEufn6aLLdZegV+eX4wGtRQX8Kc
-	 GCvCb3cz7xRYA==
-Message-ID: <sashiko-outbox-233677@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 02/20] KVM: arm64: Don't advertise the host's
- MTE_frac to protected VMs
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261125153911.106793-3-fuad.tabba@linux.dev>
-References: <20261125153911.106793-1-fuad.tabba@linux.dev>
- <20261125153911.106793-3-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Nov 2026 15:49:38 +0000
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=nnzpdv4a
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AF45E2F;
+	Wed, 25 Nov 2026 07:50:31 -0800 (PST)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 366B43F86F;
+	Wed, 25 Nov 2026 07:50:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795621834; bh=3GXsX9Ej2LOPIEboRLqmNRTGHxu2WQYYYsQFaNYp5PU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nnzpdv4a7edEwDoby/SAe1cCObZrbza1z5Uv2vVHjkcORf4t0MFuVhBElQK25OB9S
+	 jsyrbmyqaeu43wvjJbZkCpMYMl7dZi5PTu8xZziTyAKzErV1kv3laReYhAPdJ+01A4
+	 7yNbCFhBOGJKRmzvHKPvU3Pt8kmLeZF2xNh+xGIk=
+Date: Wed, 25 Nov 2026 15:50:21 +0000
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: [PATCH 1/3] KVM: arm64: Add enum support to idreg sanitisation
+Message-ID: <m45vlff6a5pyza3enol4uebl6uixcfjqmua3mg3eq3jaqujjev@sbaxsxeedrxm>
+References: <20261123192457.8700-1-maz@kernel.org>
+ <20261123192457.8700-2-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,38 +61,130 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261123192457.8700-2-maz@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Low] KVM: arm64: missing Fixes trailer for commit 3d7ff00700d1
---
+On Mon, Nov 23, 2026 at 07:24:55PM +0000, Marc Zyngier wrote:
+> While a good deal of ID register fields are simple booleans, simply
+> indicating whether a feature is supported, a number of them are more
+> structured and indicate a level of support.
+> 
+> Reuse the existing framework in a nested way to expose which level
+> applies for the current configuration. This relies on the levels
+> being ordered from the most to the least capable, and the fallback
+> to have a NULL callback.
+> 
+> Yes, this is pretty obscure, but the following patches will make
+> this clearer (at least one hopes...).
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/config.c | 44 ++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 43 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index cfdb6c7133204..40965513ebacf 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -28,6 +28,7 @@ struct reg_bits_to_feat_map {
+>  #define	REQUIRES_E2H1	BIT(5)	/* Add HCR_EL2.E2H RES1 as a pre-condition */
+>  #define	RES1_WHEN_E2H0	BIT(6)	/* RES1 when E2H=0 and not supported */
+>  #define	RES1_WHEN_E2H1	BIT(7)	/* RES1 when E2H=1 and not supported */
+> +#define	IDREG_FIELDS	BIT(8)	/* idreg fields */
+>  
+>  	unsigned long	flags;
+>  
+> @@ -40,6 +41,7 @@ struct reg_bits_to_feat_map {
+>  			s8	lo_lim;
+>  		};
+>  		bool	(*match)(struct kvm *);
+> +		const struct reg_bits_to_feat_map *idreg_field_deps;
+>  	};
+>  };
+>  
+> @@ -73,6 +75,13 @@ struct reg_feat_map_desc {
+>  		.lo_lim	= id ##_## fld ##_## lim	\
+>  	}
+>  
+> +#define __NEEDS_FEAT_2(m, f, w, dummy, deps)		\
+> +	{						\
+> +		.w	= (m),				\
+> +		.flags = (f),				\
+> +		.idreg_field_deps = (deps),		\
+> +	}
+> +
+>  #define __NEEDS_FEAT_1(m, f, w, fun)			\
+>  	{						\
+>  		.w	= (m),				\
+> @@ -95,6 +104,11 @@ struct reg_feat_map_desc {
+>  #define NEEDS_FEAT_MASKS(p, ...)				\
+>  	__NEEDS_FEAT_FLAG(p, MASKS_POINTER, masks, __VA_ARGS__)
+>  
+> +#define NEEDS_FEAT_FIELD(m, ...)				\
+> +	__NEEDS_FEAT_FLAG(m, IDREG_FIELDS, bits, blah, __VA_ARGS__)
+> +
+> +#define ENUM_FEAT(e, f)	{ .bits = e, .match = f }
+> +
+>  /*
+>   * Declare the dependency between a set of bits and a set of features,
+>   * generating a struct reg_bit_to_feat_map.
+> @@ -1456,6 +1470,27 @@ static const struct reg_feat_map_desc *idreg_feat_maps[] = {
+>  	&id_aa64mmfr3_el1_desc,
+>  };
+>  
+> +static struct resx compute_idreg_field_deps(struct kvm *kvm,
+> +					    const struct reg_bits_to_feat_map *map)
+> +{
+> +	const struct reg_bits_to_feat_map *tmp;
+> +	struct resx resx;
+> +
+> +	/*
+> +	 * Assume the enum values are ordered in reverse order of
+> +	 * capability (from most to least capable). A NULL callback
+> +	 * value indicates the ultimate fallback (not implemented).
+> +	 */
+> +	for (tmp = map->idreg_field_deps; tmp->match; tmp++)
+> +		if (tmp->match(kvm))
+> +			break;
+> +
+> +	resx.res0 = field_prep(map->bits, ~(tmp->bits));
+> +	resx.res1 = field_prep(map->bits, tmp->bits);
+> +
+> +	return resx;
+> +}
+> +
+>  static bool idreg_apply_deps(struct kvm *kvm, const struct reg_feat_map_desc *r)
+>  {
+>  	struct resx resx = {};
+> @@ -1463,8 +1498,15 @@ static bool idreg_apply_deps(struct kvm *kvm, const struct reg_feat_map_desc *r)
+>  
+>  	for (int i = 0; i < r->bit_feat_map_sz; i++) {
+>  		if ((r->bit_feat_map[i].flags & CALL_FUNC) &&
+> -		    !r->bit_feat_map[i].match(kvm))
+> +		    !r->bit_feat_map[i].match(kvm)) {
+>  			resx.res0 |= reg_feat_map_bits(&r->bit_feat_map[i]);
+> +		} else if (r->bit_feat_map[i].flags & IDREG_FIELDS) {
+> +			struct resx tmp;
+> +
+> +			tmp = compute_idreg_field_deps(kvm, &r->bit_feat_map[i]);
+> +			resx.res0 |= tmp.res0;
+> +			resx.res1 |= tmp.res1;
 
-commit f7eced7525b14181f745f704977ce69bbe4690ce
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+This looks to me like it just forces the bit pattern of the most capable
+enum value the current configuration supports. So if the user sets
+something that is different but less capable we will just raise it to
+the most capable value, is this what we are going for? Or do we only
+want to sanitise it when it is over the maximum allowed value?
 
-> KVM: arm64: Don't advertise the host's MTE_frac to protected VMs
->
-> Protected VMs don't support MTE, so MTE_frac in their ID_AA64PFR1_EL1
-> doesn't apply and is RES0, as it is for a non-protected VM without MTE.
->
-> Commit 3d7ff00700d1a ("KVM: arm64: Rework specifying restricted
-> features for protected VMs") caps the field at NI in the pVM
-> restriction table. However, NI is 0xF and the clamp is unsigned, so the
-> cap does nothing and a protected guest sees the host's value. On a CPU
-> with MTE2 but without FEAT_MTE_ASYNC, that value is 0xF.
->
-> Drop the entry so that the field reads as 0 again. It was the only
-> entry capping an unsigned field at an NI other than 0.
->
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+Thanks,
+Wei-Lin Chang
 
-[Severity: Low]
-Should this include a Fixes tag for the commit that added the MTE_frac
-entry to pvmid_aa64pfr1[]?
-
-  Fixes: 3d7ff00700d1 ("KVM: arm64: Rework specifying restricted features f=
-or protected VMs")
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125153911.1067=
-93-1-fuad.tabba@linux.dev?part=3D2
+> +		}
+>  	}
+>  
+>  	val = kvm->arch.id_regs[r->idreg_idx];
+> -- 
+> 2.47.3
+> 
