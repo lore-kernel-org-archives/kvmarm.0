@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.71
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.71
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795587398;
-	b=hjCmeRTWhIVw/dysu1CjKZl5Ss9yyihYkDEuHQ6C3SUcBXKQqKiCY3UZOfvn1nLl+DYq
-	 SE9CUfgWGUvpqBp7URS36IGoYFW3I+tCyCGTBJ1GfblEjIWqwhKgTsKf8MH7TOSFcgyjX
-	 MYmE99LiIbVtcWpBCvIp2GqHlif8yIrm2XUWfaLtCcsMxDos5IIbL9Y2x6ZnX5PiXAXsk
-	 4AYeePmjd+hEZJ4d/tE0Mk80p3Cpo6wZwZN/p93tiOqzY6l2nb+jYryWvHRGouBFGAfWe
-	 g4S6ThddAd76oPdERm0Izk0hDmB6yeGhTyZL/uKXcjZ/eLTmubIVromzlWKHhhkRTpg==
+	t=1795587399;
+	b=MQ2sg2eXTG4b5mjsVG5Q/VMGj8nqD7ibDiCXaYfLmPjPwCGo52P4NP2d65hm+pRF0m2h
+	 MKv8hBI/7r51hiisGazNf5wpwAs9Hh+BaI7cmofp/9D7f4SA2cnw2WBJk9nJgUSGC8xwT
+	 bmIoDelD/EeFk8jRPlfC6rhUX1YzmZxqKPeSFstSSuEX07i5P992rhTrHWSTdeUZbidIX
+	 NzBrofa9k1/z/KU5xr2yiDfthO/FaJrKBb3dNTfx3FOgtqYPfowNdoWWiWIompuAYb2v2
+	 ZCuPa1bvbjgdXBW2tlipIfKKq069Ebq+VaTsdIH0Z1msqEmPGIBKQRAKh1+PfAhxgJg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795587398;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795587399;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=1M39M3BC8RejWKp1a99LR6YnpQFze4DNErRt/k0WGKw=;
-	b=d6Jv/iXNRJHrHZZnq7JqkZ01rDM5guELLjOjvsxXOGKyHzveggp/6T/kO7Nbxq/EssNr
-	 cPSSduscCLdJrmhXcwt4II7Pr6iimLq0jt01surM86C+de9jGB4iZhayqM1JJWac+1R4G
-	 EXMCjbFirqdHYi6Ag/ZwXE92lhkHxI02ZZfSJpDHqqnuMP+7ScQg4uEtp7C6SfzWzHW4Y
-	 5PeBwbykc2aNElgOHi4laYRoDkoqssaQSxgF9y41s2hFHP6WhEX2xklgf07be0NgTPLJx
-	 O/g+t/z2wMk/70Z8fZuBTTRt60jqAnK5bUNHURBZTDzTZvBONW8LR9qRnX4W57hjvqg==
+	bh=aajn/8LcP4bWu3au0+O3opUba5V5ruiLTgKiznF6dW0=;
+	b=fsnl38Kn5WORstSB8BB5FLGcbCbzuDuylq0tqEhbBlKqU8x23ojWMYLFiD/mRkWllfDU
+	 bWCjOq1+Zcdz5sKqRkTdkJLNk/BBeX8hCykwK1ICojIWIUVxw++egZWpiGAKqXoTw52QL
+	 JgmFpqdyJ3jD7cK9GR+WqsnIdbH7unH2qmZLOLjjcy7MfA/m9guQn3mYwLyKrpihqP6vz
+	 XU5ALEQLO9O2rJwJfE5kb3msO/0D4SzSHSFuh75CgAHHB6rw2sV7wB3mKqQ0TVN900gLS
+	 YlIit4L8N+R+CDvyvJwlNWj5AGHAC+iFXxYuFUmMrKdcR6hRNr4N86ZAuz+pXI3YzAA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--irogers.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=l+Ie6pJW;
-	arc=none smtp.remote-ip=74.125.82.71
-Received: from mail-dl1-f71.google.com (mail-dl1-f71.google.com [74.125.82.71])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=WkB8HeTs;
+	arc=none smtp.remote-ip=209.85.160.71
+Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com [209.85.160.71])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFBE606B3FE
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2FFBE606B3FE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D838606B8FD
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8D838606B8FD
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=l+Ie6pJW
-Received: by mail-dl1-f71.google.com with SMTP id a92af1059eb24-1a5005fd0f8so4003050c88.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=WkB8HeTs
+Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-45e83fd0663so4551862fac.1
+        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795587395; x=1796192195; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1795587398; x=1796192198; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=1M39M3BC8RejWKp1a99LR6YnpQFze4DNErRt/k0WGKw=;
-        b=l+Ie6pJWBVtYctpUnV2zbY9Jwy2FHdMHZ9ysW8vHZW4YF+C0xL2gAcFywkJvhWabXT
-         yLCk/HKj96/42jrMRbf+9bIVj1OVlTAUFqqcN9peFDTZeFQo4cD/K6J3mixHS/36Q/JX
-         UffPZqVrzI1i8tO1+eQE38cZvmejG1o2gF+V9moM6R67RML03snpKtM2mAjGpaumGuLP
-         GsacMIZ7pLq6nCuMiUxpc1Q62E90mpqAvF+8A4wkZuUBpS5MYXBqRx091FCPAYdVcb+d
-         zBD86nNd0UWzzJM53KGlC/ZCA968qnI6+qZk7zdqTVgV47kg+3LNvqdVpBLnNw3QSB1C
-         Lhmg==
+        bh=aajn/8LcP4bWu3au0+O3opUba5V5ruiLTgKiznF6dW0=;
+        b=WkB8HeTsqYYKOGvSRMXmCMmkKH9Pei7Jrt73bd3Pv+9CSjYRBVLWuoHtauFhaBszhu
+         wnvgmDFld3flmnVqpqH8uEO9qHCZ3kzkydlxonvQ5t5Dfe5TyvWc3Evz8BitPict43yZ
+         swshImzH2j3t2qAPOIvq4WWh4OHk6pEL6re6hpFef9UskXkYHWODGTDVy2ROxD7UKY9h
+         rB85uSGA22Rmx3koMCV+4v5TMPhy+TRRBwMCr+A22kGvBlWPhOZx8Zgdh6JbdfMDsisy
+         Ixl7A896Myyao1VmNlbxvxmlHxOnNaYlV+/h53F0dKpj62JptewDSXwZE6cKHsewk3pT
+         IzaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795587395; x=1796192195;
+        d=1e100.net; s=20260707; t=1795587398; x=1796192198;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=1M39M3BC8RejWKp1a99LR6YnpQFze4DNErRt/k0WGKw=;
-        b=HXfHJuSfqXtFjHbQG+9UKyrJs4iI9MNUEhDxAKcPgcm3OTh/z7Rg8ZgvSRgS/PqPkT
-         hSQ33US1fenwchQyMTAiE5AG7+B3mqWG1TaHeA3b1g2RcvrizW/abe4Yy0UL24xjiMxy
-         PrhAQDSPO6ucajDdzXG8uQW1MkZTywqR1dDdxtAeMSQ9ErFZxqePaZgL6700J1QMgqdC
-         Y0OqvfiI6aLPctoi5lJfXL4CXj/qdL5JOcfMgcQzAjnHIFFV9DbGzIX5MvjsUa892iqp
-         BFLXd6tz3IT4BamEI0TXr+GxxMyTMSyekYOijrkQH3GPIjKzm8/5uj4j5WxtTMAkMshX
-         CZ5Q==
-X-Forwarded-Encrypted: i=1; AL+hErE2Xti80yruQoIBAKRzICGGhlgJ+CsZmNJYKzrD+5r/J7/v0tLwkFHv8a6jlPC2KugZKEdcVAc=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+Bc/GprRUAaEWIJ2K5/KGZRuS1IF4r/rcLUNLFtSE5mINKYGt9
-	x0xE8bmlOba6ca3/yG7bp3+CGqyj8L7kNpxJa0bSTLkkQBoorHpc0Zuot8w648azUvIv1z/ElRg
-	8u3LmgyFJmQ==
-X-Received: from dlep20-n2.prod.google.com ([2002:a05:701b:4594:20b0:1b5:7578:79ee])
- (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:e80e:b0:1b5:3b6e:e1ed
- with SMTP id a92af1059eb24-1b55690bcf3mr20050632c88.32.1795587394845; Tue, 24
- Nov 2026 22:16:34 -0800 (PST)
-Date: Tue, 24 Nov 2026 22:15:12 -0800
+        bh=aajn/8LcP4bWu3au0+O3opUba5V5ruiLTgKiznF6dW0=;
+        b=wLUKRTJRuI1XksEeNK4PACKaLWP1i6vlTjrTXCzMoRKZ5RjmFTfj6aW8wSXKSPPGIx
+         z9HvnR9DyFQjKrmTGrk8FAAm4uk+jC1PKOEMIkv6mF5NEIlrZef/Ck+P5j5MljaO2HnC
+         B+NFlv+VffB1Drf8NLqmZtQyxGiva7vPEUQujsB0RCQf+K9cUPsDE+K/TgdIq19uOvs2
+         foTv9LHH+efmsofg83NSovdI0ajDAkoi/OpQiEkuRq9cek/b3HEzMOAji7l2cZUY4BGh
+         KsIaWxp9zfgWZt0JkHSNFvcMb7qlwEYsa/3gdV3E7k2IkIHQfaypjLcY0tlwM0VJRqTi
+         QUKg==
+X-Forwarded-Encrypted: i=1; AL+hErEBHXtzMkq8uGDYGxnRqLmYFCFm6JK1mxkd8wZMrJScU9yGk4NsealUxfzAOonAKTQmbyxAhY0=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+ggboAhNdRZXZHm5B0qGvTJmzWddn8hqa/6KV6wdWbG7iQJ8Vg
+	26g8i746+3/Njyf6E9xF6I+w0aaWzU3/0HDMiLg2WX5PQsnjxONqMeMYns1IQ9ZTrxNMD/ujhT2
+	AU7Jo9RdFAw==
+X-Received: from oakt7-n1.prod.google.com ([2002:a05:687c:41c7:10b0:494:50e2:71dd])
+ (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6870:c087:b0:4a9:58d3:b60c
+ with SMTP id 586e51a60fabf-4bc835713b6mr16383166fac.32.1795587397055; Tue, 24
+ Nov 2026 22:16:37 -0800 (PST)
+Date: Tue, 24 Nov 2026 22:15:13 -0800
 In-Reply-To: <20261125061523.1540234-1-irogers@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,8 +81,9 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261125061523.1540234-1-irogers@google.com>
 X-Mailer: git-send-email 2.56.1.831.g720f3f5937-goog
-Message-ID: <20261125061523.1540234-20-irogers@google.com>
-Subject: [RFC PATCH v2 19/30] riscv/unwind: Add Minimal DWARF CFI kernel unwinder
+Message-ID: <20261125061523.1540234-21-irogers@google.com>
+Subject: [RFC PATCH v2 20/30] selftests/perf_events: Add Minimal DWARF CFI
+ deferred user unwind test
 From: Ian Rogers <irogers@google.com>
 To: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
 	linux-arch@vger.kernel.org
@@ -102,976 +103,541 @@ Cc: jpoimboe@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
 	wnliu@google.com, dylanbhatch@google.com, Ian Rogers <irogers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add CONFIG_UNWINDER_DWARF_CFI as a selectable 64-bit RISC-V kernel
-unwinder (selecting HAVE_RELIABLE_STACKTRACE) in
-arch/riscv/kernel/stacktrace.c:
- - Build C and Rust kernel code with -fomit-frame-pointer and
-   -fasynchronous-unwind-tables, link vmlinux with --eh-frame-hdr, place
-   .eh_frame_hdr and .eh_frame in RO_DATA, and index SHF_ALLOC module
-   .eh_frame sections via dwarf_cfi_mod_alloc()/dwarf_cfi_mod_free_rcu().
- - Implement walk_stackframe_cfi() and arch_stack_walk_reliable() across
-   task, IRQ, and overflow stacks with RVC 16-bit call-site support,
-   SP-keyed ftrace_graph/rethook recovery, BPF frame fallback, and
-   exception/entry root termination.
+Add a multi-architecture kselftest (unwind_user_cfi) under
+tools/testing/selftests/perf_events/ exercising deferred user-space
+callchain unwinding (PERF_RECORD_CALLCHAIN_DEFERRED) compiled with
+-O2 -fomit-frame-pointer -fasynchronous-unwind-tables across:
+ 1. Standard SP-based frames with the architectural frame-pointer
+    register (%rbp / x29 / s0) explicitly clobbered
+ 2. Dynamic alloca() VLA FP-based frames (DW_CFA_def_cfa_register)
+ 3. 64-byte stack-realigned frames (DRAP on x86-64)
+ 4. Shrink-wrapped early-return functions (remember_state/restore_state)
+ 5. Anonymous RX JIT-style frame-pointer stubs lacking .eh_frame_hdr
+    (including a >16-byte AArch64 frame testing state->sp_valid across
+    FP -> CFI transitions), exercising per-frame CFI -> FP -> CFI -> FP
+    -> CFI fallback and negative VMA caching in find_user_eh_frame_hdr()
+
+Skip gracefully via dl_iterate_phdr() if the test binary lacks
+PT_GNU_EH_FRAME (e.g. 32-bit ARM EHABI builds using .ARM.exidx).
 
 Signed-off-by: Ian Rogers <irogers@google.com>
 ---
- arch/riscv/Kconfig                  |   5 +-
- arch/riscv/Kconfig.debug            |  16 +
- arch/riscv/Makefile                 |  15 +-
- arch/riscv/include/asm/ftrace.h     |   1 +
- arch/riscv/include/asm/module.h     |  22 +
- arch/riscv/include/asm/perf_event.h |   2 +
- arch/riscv/include/asm/stacktrace.h |  11 +
- arch/riscv/kernel/Makefile          |   9 +
- arch/riscv/kernel/module.c          |   9 +
- arch/riscv/kernel/stacktrace.c      | 650 +++++++++++++++++++++++++++-
- arch/riscv/kernel/vmlinux.lds.S     |  13 +
- arch/riscv/purgatory/Makefile       |   3 +-
- 12 files changed, 749 insertions(+), 7 deletions(-)
+ .../testing/selftests/perf_events/.gitignore  |   1 +
+ tools/testing/selftests/perf_events/Makefile  |   4 +-
+ .../selftests/perf_events/unwind_user_cfi.c   | 482 ++++++++++++++++++
+ 3 files changed, 486 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/perf_events/unwind_user_cfi.c
 
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index 84b61c755db3..14d64a3fa33c 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -83,7 +83,7 @@ config RISCV
- 	select ARCH_USES_CFI_TRAPS if CFI
- 	select ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH if MMU
- 	select ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT if MMU
--	select ARCH_WANT_FRAME_POINTERS
-+	select ARCH_WANT_FRAME_POINTERS if !UNWINDER_DWARF_CFI
- 	select ARCH_WANT_GENERAL_HUGETLB if !RISCV_ISA_SVNAPOT
- 	select ARCH_WANT_HUGE_PMD_SHARE if 64BIT
- 	select ARCH_WANT_LD_ORPHAN_WARN
-@@ -101,7 +101,7 @@ config RISCV
- 	select CPU_PM if CPU_IDLE || HIBERNATION || SUSPEND
- 	select DYNAMIC_FTRACE if FUNCTION_TRACER
- 	select EDAC_SUPPORT
--	select FRAME_POINTER if PERF_EVENTS || (FUNCTION_TRACER && !DYNAMIC_FTRACE)
-+	select FRAME_POINTER if !UNWINDER_DWARF_CFI && (PERF_EVENTS || (FUNCTION_TRACER && !DYNAMIC_FTRACE))
- 	select FTRACE_MCOUNT_USE_PATCHABLE_FUNCTION_ENTRY if DYNAMIC_FTRACE
- 	select FUNCTION_ALIGNMENT_8B if DYNAMIC_FTRACE_WITH_CALL_OPS
- 	select GENERIC_ARCH_TOPOLOGY
-@@ -195,6 +195,7 @@ config RISCV
- 	select HAVE_PERF_USER_STACK_DUMP
- 	select HAVE_POSIX_CPU_TIMERS_TASK_WORK
- 	select HAVE_REGS_AND_STACK_ACCESS_API
-+	select HAVE_RELIABLE_STACKTRACE if UNWINDER_DWARF_CFI
- 	select HAVE_RETHOOK
- 	select HAVE_RSEQ
- 	select HAVE_RUST if RUSTC_SUPPORTS_RISCV && CC_IS_CLANG
-diff --git a/arch/riscv/Kconfig.debug b/arch/riscv/Kconfig.debug
-index eafe17ebf710..afc8be5ec97f 100644
---- a/arch/riscv/Kconfig.debug
-+++ b/arch/riscv/Kconfig.debug
-@@ -1 +1,17 @@
-+# SPDX-License-Identifier: GPL-2.0-only
+diff --git a/tools/testing/selftests/perf_events/.gitignore b/tools/testing/selftests/perf_events/.gitignore
+index 4931b3b6bbd3..4567b6563646 100644
+--- a/tools/testing/selftests/perf_events/.gitignore
++++ b/tools/testing/selftests/perf_events/.gitignore
+@@ -3,3 +3,4 @@ sigtrap_threads
+ remove_on_exec
+ watermark_signal
+ mmap
++unwind_user_cfi
+diff --git a/tools/testing/selftests/perf_events/Makefile b/tools/testing/selftests/perf_events/Makefile
+index 2e5d85770dfe..6a3a774544e8 100644
+--- a/tools/testing/selftests/perf_events/Makefile
++++ b/tools/testing/selftests/perf_events/Makefile
+@@ -2,5 +2,7 @@
+ CFLAGS += -Wl,-no-as-needed -Wall $(KHDR_INCLUDES)
+ LDFLAGS += -lpthread
+ 
+-TEST_GEN_PROGS := sigtrap_threads remove_on_exec watermark_signal mmap
++TEST_GEN_PROGS := sigtrap_threads remove_on_exec watermark_signal mmap unwind_user_cfi
+ include ../lib.mk
 +
-+config UNWINDER_DWARF_CFI
-+	bool "Minimal DWARF CFI kernel unwinder"
-+	depends on 64BIT && MMU
-+	depends on (!FUNCTION_TRACER || DYNAMIC_FTRACE_WITH_ARGS) && !SHADOW_CALL_STACK
-+	select HAVE_MOD_ARCH_SPECIFIC if MODULES
-+	select UNWIND_DWARF_CFI
-+	select UNWIND_TABLES
-+	help
-+	  This option enables the Minimal DWARF Call Frame Information (CFI)
-+	  unwinder for kernel stack traces on 64-bit RISC-V.  It interprets a
-+	  strictly bounded subset of compiler-generated .eh_frame /
-+	  .eh_frame_hdr tables matching SFrame's stack state model without
-+	  requiring frame pointers.
++$(OUTPUT)/unwind_user_cfi: CFLAGS += $(TOOLS_INCLUDES) -O2 -fomit-frame-pointer -fasynchronous-unwind-tables
+diff --git a/tools/testing/selftests/perf_events/unwind_user_cfi.c b/tools/testing/selftests/perf_events/unwind_user_cfi.c
+new file mode 100644
+index 000000000000..a36e9f4d39e2
+--- /dev/null
++++ b/tools/testing/selftests/perf_events/unwind_user_cfi.c
+@@ -0,0 +1,482 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * unwind_user_cfi.c - Multi-arch selftest for Minimal DWARF CFI user unwinding.
++ *
++ * Verifies that deferred user-space stack unwinding (PERF_RECORD_CALLCHAIN_DEFERRED)
++ * accurately walks user callchains compiled with -fomit-frame-pointer across:
++ *   1. Standard SP-based frames with the frame-pointer register (%rbp / x29 / s0)
++ *      explicitly clobbered to defeat FP unwinding
++ *   2. Dynamic alloca()/VLA FP-based frames (DW_CFA_def_cfa_register)
++ *   3. 64-byte aligned stack-realigned frames (DRAP on x86-64)
++ *   4. Multi-return shrink-wrapped epilogue functions (remember/restore_state)
++ *   5. Anonymous RX JIT-style frame-pointer stubs lacking .eh_frame_hdr,
++ *      verifying per-frame CFI -> FP -> CFI -> FP -> CFI hybrid fallback and
++ *      negative VMA caching in find_user_eh_frame_hdr()
++ */
 +
- source "arch/riscv/kernel/tests/Kconfig.debug"
-diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
-index 44f5a439741a..ffa8842e7959 100644
---- a/arch/riscv/Makefile
-+++ b/arch/riscv/Makefile
-@@ -7,6 +7,9 @@
- #
- 
- LDFLAGS_vmlinux := -z norelro
-+ifeq ($(CONFIG_UNWINDER_DWARF_CFI),y)
-+	LDFLAGS_vmlinux += --eh-frame-hdr
-+endif
- ifeq ($(CONFIG_RELOCATABLE),y)
- 	LDFLAGS_vmlinux += -shared -Bsymbolic -z notext
- 	KBUILD_CFLAGS += -fPIE
-@@ -96,8 +99,18 @@ ifeq ($(CONFIG_CMODEL_MEDANY),y)
- 	KBUILD_CFLAGS += -mcmodel=medany
- endif
- 
--# Avoid generating .eh_frame sections.
-+# Avoid generating .eh_frame sections unless runtime unwind tables are enabled.
-+ifeq ($(CONFIG_UNWIND_TABLES),y)
-+KBUILD_CFLAGS += -fasynchronous-unwind-tables
-+KBUILD_AFLAGS += -fasynchronous-unwind-tables
-+ifeq ($(CONFIG_UNWINDER_DWARF_CFI),y)
-+KBUILD_CFLAGS += -fomit-frame-pointer
-+KBUILD_RUSTFLAGS += -Cforce-unwind-tables=y -Zuse-sync-unwind=n
-+KBUILD_RUSTFLAGS += $(if $(call rustc-min-version,109800),,-Zllvm_module_flag=uwtable:u32:2:max)
-+endif
-+else
- KBUILD_CFLAGS += -fno-asynchronous-unwind-tables -fno-unwind-tables
-+endif
- 
- # The RISC-V attributes frequently cause compatibility issues and provide no
- # information, so just turn them off.
-diff --git a/arch/riscv/include/asm/ftrace.h b/arch/riscv/include/asm/ftrace.h
-index e5026cd8f022..663831d950e5 100644
---- a/arch/riscv/include/asm/ftrace.h
-+++ b/arch/riscv/include/asm/ftrace.h
-@@ -217,6 +217,7 @@ ftrace_partial_regs(const struct ftrace_regs *fregs, struct pt_regs *regs)
- 	regs->sp = afregs->sp;
- 	regs->s0 = afregs->s0;
- 	regs->t1 = afregs->t1;
-+	regs->cause = 0;
- 	return regs;
- }
- 
-diff --git a/arch/riscv/include/asm/module.h b/arch/riscv/include/asm/module.h
-index 0f3baaa6a9a8..2a8dd969c1f8 100644
---- a/arch/riscv/include/asm/module.h
-+++ b/arch/riscv/include/asm/module.h
-@@ -11,18 +11,40 @@ struct module;
- unsigned long module_emit_got_entry(struct module *mod, unsigned long val);
- unsigned long module_emit_plt_entry(struct module *mod, unsigned long val);
- 
-+struct mod_dwarf_cfi_index;
++#define _GNU_SOURCE
++#include <alloca.h>
++#include <errno.h>
++#include <inttypes.h>
++#include <link.h>
++#include <linux/perf_event.h>
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/ioctl.h>
++#include <sys/mman.h>
++#include <sys/syscall.h>
++#include <time.h>
++#include <unistd.h>
 +
- #ifdef CONFIG_MODULE_SECTIONS
- struct mod_section {
- 	Elf_Shdr *shdr;
- 	int num_entries;
- 	int max_entries;
- };
-+#endif
- 
-+#ifdef CONFIG_HAVE_MOD_ARCH_SPECIFIC
- struct mod_arch_specific {
-+#ifdef CONFIG_MODULE_SECTIONS
- 	struct mod_section got;
- 	struct mod_section plt;
- 	struct mod_section got_plt;
-+#endif
-+#if defined(CONFIG_UNWINDER_DWARF_CFI) && defined(CONFIG_MODULES)
-+	struct mod_dwarf_cfi_index __rcu *dwarf_cfi_index;
-+#endif
- };
-+#endif
++#include "../kselftest.h"
++#undef __always_inline
++#undef __attribute_const__
++#undef __must_check
++#undef __printf
++#include "../../../../include/linux/compiler_attributes.h"
 +
-+#if defined(CONFIG_UNWINDER_DWARF_CFI) && defined(CONFIG_MODULES)
-+void riscv_unwind_module_init(struct module *mod, void *eh_frame,
-+			      size_t eh_frame_size);
-+void riscv_unwind_module_cleanup(struct module *mod);
-+#else
-+static inline void riscv_unwind_module_init(struct module *mod, void *eh_frame,
-+					    size_t eh_frame_size) {}
-+static inline void riscv_unwind_module_cleanup(struct module *mod) {}
-+#endif
-+
-+#ifdef CONFIG_MODULE_SECTIONS
- 
- struct got_entry {
- 	unsigned long symbol_addr;	/* the real variable address */
-diff --git a/arch/riscv/include/asm/perf_event.h b/arch/riscv/include/asm/perf_event.h
-index bcc928fd3785..30d0c6b37e91 100644
---- a/arch/riscv/include/asm/perf_event.h
-+++ b/arch/riscv/include/asm/perf_event.h
-@@ -14,9 +14,11 @@
- 
- #define perf_arch_fetch_caller_regs(regs, __ip) { \
- 	(regs)->epc = (__ip); \
-+	(regs)->ra = 0; \
- 	(regs)->s0 = (unsigned long) __builtin_frame_address(0); \
- 	(regs)->sp = current_stack_pointer; \
- 	(regs)->status = SR_PP; \
-+	(regs)->cause = ~0UL; \
- }
- #endif
- 
-diff --git a/arch/riscv/include/asm/stacktrace.h b/arch/riscv/include/asm/stacktrace.h
-index b1495a7e06ce..5a7b77367041 100644
---- a/arch/riscv/include/asm/stacktrace.h
-+++ b/arch/riscv/include/asm/stacktrace.h
-@@ -15,6 +15,17 @@ extern void notrace walk_stackframe(struct task_struct *task, struct pt_regs *re
- 				    bool (*fn)(void *, unsigned long), void *arg);
- extern void dump_backtrace(struct pt_regs *regs, struct task_struct *task,
- 			   const char *loglvl);
-+extern char _start[];
-+asmlinkage void ret_from_fork_kernel_asm(void);
-+asmlinkage void ret_from_fork_user_asm(void);
-+extern unsigned long ret_from_fork_asm_end;
-+#ifdef CONFIG_IRQ_STACKS
-+extern unsigned long call_on_irq_stack_end;
-+#endif
-+#ifdef CONFIG_DYNAMIC_FTRACE_WITH_ARGS
-+void ftrace_caller_saved(void);
-+void ftrace_caller_restore(void);
-+#endif
- 
- static inline bool on_thread_stack(void)
- {
-diff --git a/arch/riscv/kernel/Makefile b/arch/riscv/kernel/Makefile
-index f54c336bf547..7ad74377dd4c 100644
---- a/arch/riscv/kernel/Makefile
-+++ b/arch/riscv/kernel/Makefile
-@@ -42,6 +42,15 @@ CFLAGS_REMOVE_patch.o	= $(CC_FLAGS_FTRACE)
- CFLAGS_REMOVE_sbi.o	= $(CC_FLAGS_FTRACE)
- CFLAGS_REMOVE_return_address.o	= $(CC_FLAGS_FTRACE)
- CFLAGS_REMOVE_sbi_ecall.o = $(CC_FLAGS_FTRACE)
-+ifdef CONFIG_UNWINDER_DWARF_CFI
-+CFLAGS_REMOVE_stacktrace.o = $(CC_FLAGS_FTRACE)
-+endif
-+endif
-+
-+ifdef CONFIG_UNWINDER_DWARF_CFI
-+CFLAGS_stacktrace.o += -fno-optimize-sibling-calls
-+KASAN_SANITIZE_stacktrace.o := n
-+KCOV_INSTRUMENT_stacktrace.o := n
- endif
- 
- always-$(KBUILD_BUILTIN) += vmlinux.lds
-diff --git a/arch/riscv/kernel/module.c b/arch/riscv/kernel/module.c
-index 1961135689db..93092b17b53a 100644
---- a/arch/riscv/kernel/module.c
-+++ b/arch/riscv/kernel/module.c
-@@ -902,5 +902,14 @@ int module_finalize(const Elf_Ehdr *hdr,
- 	if (s)
- 		apply_module_alternatives((void *)s->sh_addr, s->sh_size);
- 
-+	s = find_section(hdr, sechdrs, ".eh_frame");
-+	if (s && (s->sh_flags & SHF_ALLOC))
-+		riscv_unwind_module_init(me, (void *)s->sh_addr, s->sh_size);
-+
- 	return 0;
- }
-+
-+void module_arch_cleanup(struct module *mod)
-+{
-+	riscv_unwind_module_cleanup(mod);
-+}
-diff --git a/arch/riscv/kernel/stacktrace.c b/arch/riscv/kernel/stacktrace.c
-index c7555447149b..45d81aa11a8e 100644
---- a/arch/riscv/kernel/stacktrace.c
-+++ b/arch/riscv/kernel/stacktrace.c
-@@ -6,16 +6,20 @@
- 
- #include <linux/export.h>
- #include <linux/kallsyms.h>
-+#include <linux/module.h>
-+#include <linux/rcupdate.h>
-+#include <linux/rethook.h>
- #include <linux/sched.h>
- #include <linux/sched/debug.h>
- #include <linux/sched/task_stack.h>
- #include <linux/stacktrace.h>
- #include <linux/ftrace.h>
-+#include <linux/unwind_dwarf_cfi.h>
- 
-+#include <asm/irq_stack.h>
-+#include <asm/sections.h>
- #include <asm/stacktrace.h>
- 
--#ifdef CONFIG_FRAME_POINTER
--
- /*
-  * This disables KASAN checking when reading a value from another task's stack,
-  * since the other task could be running on another CPU and could have poisoned
-@@ -35,6 +39,646 @@
- extern asmlinkage void handle_exception(void);
- extern unsigned long ret_from_exception_end;
- 
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+
-+static const struct dwarf_cfi_arch riscv_cfi_arch = {
-+	.ws	= sizeof(unsigned long),
-+	.sp_reg	= 2,	/* sp (x2) */
-+	.fp_reg	= 8,	/* s0/fp (x8) */
-+	.ra_reg	= 1,	/* ra (x1) */
++struct perf_record_deferred {
++	struct perf_event_header header;
++	uint64_t cookie;
++	uint64_t nr;
++	uint64_t ips[];
 +};
 +
-+#ifdef CONFIG_MODULES
-+/**
-+ * riscv_unwind_module_init() - Build Minimal DWARF CFI index for a module
-+ * @mod: Module being loaded.
-+ * @eh_frame: Pointer to the module's SHF_ALLOC .eh_frame section.
-+ * @eh_frame_size: Size in bytes of @eh_frame.
++/*
++ * Tiny architecture-specific machine-code stubs for:
++ *   int jit_stub(int (*fn)(int), int arg);
 + *
-+ * Scans and sorts the module's FDEs and publishes the index to
-+ * @mod->arch.dwarf_cfi_index for RCU-protected lockless unwinding.
++ * Mapped into an anonymous PROT_READ | PROT_EXEC VMA without an ELF header or
++ * PT_GNU_EH_FRAME segment. Each stub establishes a standard architectural
++ * frame-pointer record before calling fn(arg), forcing unwind_user_next() to
++ * fall back from UNWIND_USER_TYPE_CFI to UNWIND_USER_TYPE_FP on the JIT frames
++ * and resume UNWIND_USER_TYPE_CFI on the surrounding -fomit-frame-pointer C
++ * frames.
 + */
-+void riscv_unwind_module_init(struct module *mod, void *eh_frame,
-+			      size_t eh_frame_size)
-+{
-+	struct mod_dwarf_cfi_index *idx;
-+
-+	idx = dwarf_cfi_mod_alloc(eh_frame, eh_frame_size, &riscv_cfi_arch);
-+	if (idx)
-+		rcu_assign_pointer(mod->arch.dwarf_cfi_index, idx);
-+}
-+
-+/**
-+ * riscv_unwind_module_cleanup() - Unpublish and RCU-free module DWARF CFI index
-+ * @mod: Module being unloaded or cleaned up after a failed load.
++#if defined(__x86_64__)
++#define HAVE_JIT_FP_STUB 1
++static const uint8_t jit_stub_code[] = {
++	0xf3, 0x0f, 0x1e, 0xfa,		/* endbr64 */
++	0x55,				/* push   %rbp */
++	0x48, 0x89, 0xe5,		/* mov    %rsp, %rbp */
++	0x48, 0x89, 0xf8,		/* mov    %rdi, %rax */
++	0x89, 0xf7,			/* mov    %esi, %edi */
++	0xff, 0xd0,			/* call   *%rax */
++	0x5d,				/* pop    %rbp */
++	0xc3,				/* ret */
++};
++#elif defined(__i386__)
++#define HAVE_JIT_FP_STUB 1
++static const uint8_t jit_stub_code[] = {
++	0xf3, 0x0f, 0x1e, 0xfb,		/* endbr32 */
++	0x55,				/* push   %ebp */
++	0x89, 0xe5,			/* mov    %esp, %ebp */
++	0x83, 0xec, 0x04,		/* sub    $4, %esp */
++	0xff, 0x75, 0x0c,		/* pushl  12(%ebp) */
++	0xff, 0x55, 0x08,		/* call   *8(%ebp) */
++	0x83, 0xc4, 0x08,		/* add    $8, %esp */
++	0x5d,				/* pop    %ebp */
++	0xc3,				/* ret */
++};
++#elif defined(__aarch64__)
++#define HAVE_JIT_FP_STUB 1
++/*
++ * Allocate a 32-byte frame (> 16 bytes) with {x29, x30} at [sp, #0] per
++ * AArch64 PCS so fp + 16 != caller_sp, exercising state->sp_valid tracking.
 + */
-+void riscv_unwind_module_cleanup(struct module *mod)
-+{
-+	struct mod_dwarf_cfi_index *idx;
-+
-+	idx = rcu_replace_pointer(mod->arch.dwarf_cfi_index, /*ptr=*/NULL,
-+				  /*c=*/true);
-+	dwarf_cfi_mod_free_rcu(idx);
-+}
-+
-+/**
-+ * riscv_dwarf_cfi_module_find() - Look up Minimal DWARF CFI in loadable modules
-+ * @pc: Kernel instruction pointer to evaluate.
-+ * @row: Output evaluated Minimal DWARF CFI row.
-+ *
-+ * Uses rcu_read_lock_sched_notrace() and rcu_dereference_raw() so lookups are
-+ * safe inside noinstr stack walks and NMI contexts.
-+ *
-+ * Return: 0 on success, -ENOENT if @pc is not in a module FDE, or a negative
-+ * errno on invalid FDE bytecode.
-+ */
-+static __always_inline int
-+riscv_dwarf_cfi_module_find(unsigned long pc, struct dwarf_cfi_row *row)
-+{
-+	struct mod_dwarf_cfi_index *idx;
-+	struct module *mod;
-+	int ret;
-+
-+	rcu_read_lock_sched_notrace();
-+	mod = __module_address(pc);
-+	if (!mod) {
-+		rcu_read_unlock_sched_notrace();
-+		return -ENOENT;
-+	}
-+	idx = rcu_dereference_raw(mod->arch.dwarf_cfi_index);
-+	ret = dwarf_cfi_mod_eval(idx, pc, &riscv_cfi_arch, row);
-+	rcu_read_unlock_sched_notrace();
-+	return ret;
-+}
++static const uint32_t jit_stub_code[] = {
++	0xd503245fU,			/* bti    c */
++	0xa9be7bfdU,			/* stp    x29, x30, [sp, #-32]! */
++	0x910003fdU,			/* mov    x29, sp */
++	0xaa0003e9U,			/* mov    x9, x0 */
++	0x2a0103e0U,			/* mov    w0, w1 */
++	0xd63f0120U,			/* blr    x9 */
++	0xa8c27bfdU,			/* ldp    x29, x30, [sp], #32 */
++	0xd65f03c0U,			/* ret */
++};
++#elif defined(__riscv) && __riscv_xlen == 64
++#define HAVE_JIT_FP_STUB 1
++static const uint32_t jit_stub_code[] = {
++	0xff010113U,			/* addi   sp, sp, -16 */
++	0x00813023U,			/* sd     s0, 0(sp) */
++	0x00113423U,			/* sd     ra, 8(sp) */
++	0x01010413U,			/* addi   s0, sp, 16 */
++	0x00050313U,			/* mv     t1, a0 */
++	0x00058513U,			/* mv     a0, a1 */
++	0x000300e7U,			/* jalr   ra, 0(t1) */
++	0x00813083U,			/* ld     ra, 8(sp) */
++	0x00013403U,			/* ld     s0, 0(sp) */
++	0x01010113U,			/* addi   sp, sp, 16 */
++	0x00008067U,			/* ret */
++};
 +#else
-+static __always_inline int
-+riscv_dwarf_cfi_module_find(unsigned long pc, struct dwarf_cfi_row *row)
++#define HAVE_JIT_FP_STUB 0
++#endif
++
++static int (*g_jit_fn)(int (*fn)(int), int arg);
++
++static uintptr_t expect_ip_leaf;
++static uintptr_t expect_ip_shrink;
++static uintptr_t expect_ip_jit;
++static uintptr_t expect_ip_bridge;
++static uintptr_t expect_ip_drap;
++static uintptr_t expect_ip_vla;
++static uintptr_t expect_ip_clobber;
++static uintptr_t expect_ip_main;
++
++static __always_inline uintptr_t caller_return_ip(void)
 +{
-+	return -ENOENT;
++	return (uintptr_t)__builtin_extract_return_addr(__builtin_return_address(0));
 +}
-+#endif /* CONFIG_MODULES */
 +
-+/**
-+ * riscv_dwarf_cfi_find() - Evaluate Minimal DWARF CFI for core or module @pc
-+ * @pc: Kernel instruction pointer to look up.
-+ * @row: Output evaluated Minimal DWARF CFI row.
-+ *
-+ * Return: 0 on success, -ENOENT if no FDE covers @pc, or a negative errno on
-+ * malformed CFI data.
-+ */
-+static __always_inline int
-+riscv_dwarf_cfi_find(unsigned long pc, struct dwarf_cfi_row *row)
++static long sys_perf_event_open(struct perf_event_attr *attr, pid_t pid,
++				int cpu, int group_fd, unsigned long flags)
 +{
-+	size_t hdr_size = __stop_eh_frame_hdr - __start_eh_frame_hdr;
-+	int err;
++	return syscall(__NR_perf_event_open, attr, pid, cpu, group_fd, flags);
++}
 +
-+	err = dwarf_cfi_unwind_eh_frame_hdr(__start_eh_frame_hdr, hdr_size,
-+					    __start_eh_frame, __stop_eh_frame,
-+					    pc, &riscv_cfi_arch, row);
-+	if (!err)
++noinline __noclone
++static void cfi_do_nanosleep(const struct timespec *ts)
++{
++	expect_ip_leaf = caller_return_ip();
++	asm volatile("" ::: "memory");
++	nanosleep(ts, /*rem=*/NULL);
++	asm volatile("" ::: "memory");
++}
++
++noinline __noclone
++static void cfi_leaf_sleep(void)
++{
++	struct timespec ts = { .tv_sec = 0, .tv_nsec = 1000 * 1000 };
++
++	expect_ip_shrink = caller_return_ip();
++	asm volatile("" ::: "memory");
++	cfi_do_nanosleep(&ts);
++	asm volatile("" ::: "memory");
++}
++
++/* 4. Shrink-wrapped early-return epilogue before main call */
++noinline __noclone
++static int cfi_shrink_wrap(int mode)
++{
++	expect_ip_jit = caller_return_ip();
++	if (mode < 0)
++		return -1;
++
++	{
++		char pad[32];
++
++		memset(pad, mode, sizeof(pad));
++		asm volatile("" : "+m"(pad) :: "memory");
++		cfi_leaf_sleep();
++		return pad[0];
++	}
++}
++
++/*
++ * 5. Hybrid CFI -> FP -> CFI -> FP -> CFI bridge:
++ *    cfi_pre_jit -> jit_stub #1 -> cfi_jit_bridge -> cfi_mid_jit ->
++ *    jit_stub #2 -> cfi_shrink_wrap
++ *
++ * Invoking the anonymous RX JIT stub twice with -fomit-frame-pointer C frames
++ * in between exercises both per-frame CFI<->FP transitions and negative VMA
++ * cache insertion + hit in find_user_eh_frame_hdr().
++ */
++noinline __noclone
++static int cfi_mid_jit(int x)
++{
++	size_t sz;
++	char *pad;
++	int res;
++
++	expect_ip_bridge = caller_return_ip();
++	asm volatile("" : "+r"(x));
++	sz = (size_t)((x & 0xf) + 32);
++	pad = alloca(sz);
++	memset(pad, x + 5, sz);
++	asm volatile("" : "+m"(*(char (*)[32])pad) :: "memory");
++	res = g_jit_fn ? g_jit_fn(cfi_shrink_wrap, x) : cfi_shrink_wrap(x);
++	asm volatile("" : "+m"(*(char (*)[32])pad) :: "memory");
++	return res + pad[0];
++}
++
++noinline __noclone
++static int cfi_jit_bridge(int x)
++{
++	char pad[32];
++	int res;
++
++	memset(pad, x + 7, sizeof(pad));
++	asm volatile("" : "+m"(pad) :: "memory");
++	res = cfi_mid_jit(x);
++	asm volatile("" : "+m"(pad) :: "memory");
++	return res + pad[0];
++}
++
++noinline __noclone
++static int cfi_pre_jit(int x)
++{
++	size_t sz;
++	char *pad;
++	int res;
++
++	expect_ip_drap = caller_return_ip();
++	asm volatile("" : "+r"(x));
++	sz = (size_t)((x & 0xf) + 32);
++	pad = alloca(sz);
++	memset(pad, x + 9, sz);
++	asm volatile("" : "+m"(*(char (*)[32])pad) :: "memory");
++	res = g_jit_fn ? g_jit_fn(cfi_jit_bridge, x) : cfi_jit_bridge(x);
++	asm volatile("" : "+m"(*(char (*)[32])pad) :: "memory");
++	return res + pad[0];
++}
++
++/* 3. 64-byte aligned local buffer forcing stack realignment (DRAP on x86-64) */
++noinline __noclone
++static int cfi_drap_realigned(int x)
++{
++	uint8_t __aligned(64) aligned_buf[128];
++
++	expect_ip_vla = caller_return_ip();
++	memset(aligned_buf, x + 3, sizeof(aligned_buf));
++	asm volatile("" : "+m"(aligned_buf) :: "memory");
++	return cfi_pre_jit(x) + aligned_buf[0];
++}
++
++/* 2. Dynamic VLA / alloca() forcing FP-based CFA (DW_CFA_def_cfa_register) */
++noinline __noclone
++static int cfi_vla_fp_frame(int n)
++{
++	size_t sz;
++	char *dyn;
++
++	expect_ip_clobber = caller_return_ip();
++	asm volatile("" : "+r"(n));
++	sz = (size_t)((n & 0x3f) + 32);
++	dyn = alloca(sz);
++
++	memset(dyn, n, sz);
++	asm volatile("" : "+m"(*(char (*)[32])dyn) :: "memory");
++	return cfi_drap_realigned(n + dyn[0]);
++}
++
++/* 1. SP-based frame with FP (%rbp / x29 / s0) clobbered to defeat FP unwinding */
++noinline __noclone
++static int cfi_clobber_fp(int x)
++{
++#if defined(__x86_64__)
++	register long bad_fp asm("rbp") = 0x13579bdfL + x;
++#elif defined(__aarch64__)
++	register long bad_fp asm("x29") = 0x13579bdfL + x;
++#elif defined(__riscv)
++	register long bad_fp asm("s0") = 0x13579bdfL + x;
++#else
++	long bad_fp = 0x13579bdfL + x;
++#endif
++	char pad[48];
++
++	expect_ip_main = caller_return_ip();
++	asm volatile("" : "+r"(x));
++	memset(pad, x, sizeof(pad));
++	asm volatile("" : "+r"(bad_fp), "+m"(pad) :: "memory");
++	return cfi_vla_fp_frame(x + 1) ^ (int)bad_fp ^ pad[1];
++}
++
++static int check_main_eh_frame_cb(struct dl_phdr_info *info, size_t size,
++				  void *data)
++{
++	bool *has_eh_frame = data;
++
++	(void)size;
++	if (!info->dlpi_name || info->dlpi_name[0] != '\0')
 +		return 0;
 +
-+	return riscv_dwarf_cfi_module_find(pc, row);
++	for (int i = 0; i < info->dlpi_phnum; i++) {
++		if (info->dlpi_phdr[i].p_type == PT_GNU_EH_FRAME &&
++		    info->dlpi_phdr[i].p_memsz > 0) {
++			*has_eh_frame = true;
++			return 1;
++		}
++	}
++	return 1;
 +}
 +
-+/**
-+ * riscv_fgraph_recover() - Recover original return address from ftrace_graph
-+ * @task: Task being unwound.
-+ * @graph_idx: Shadow-stack index cursor for ftrace_graph_ret_addr().
-+ * @pc: Candidate return address (potentially &return_to_handler).
-+ * @cfa: Callee frame's Canonical Frame Address (entry SP).
-+ * @ra_slot: Stack slot where @pc was saved (overridden when DYNAMIC_FTRACE_WITH_ARGS).
-+ *
-+ * Return: Restored caller PC if @pc matched &return_to_handler, or @pc.
-+ */
-+static __always_inline unsigned long
-+riscv_fgraph_recover(struct task_struct *task, int *graph_idx,
-+		     unsigned long pc, unsigned long cfa,
-+		     unsigned long *ra_slot)
++int main(void)
 +{
-+#if defined(CONFIG_FUNCTION_GRAPH_TRACER) && defined(CONFIG_DYNAMIC_FTRACE_WITH_ARGS)
-+	unsigned long fregs_addr = cfa - ALIGN(sizeof(struct __arch_ftrace_regs),
-+					       STACK_ALIGN);
++	struct perf_event_attr attr;
++	struct perf_event_mmap_page *mpage;
++	size_t page_sz = (size_t)sysconf(_SC_PAGESIZE);
++	size_t mmap_len = (1 + 16) * page_sz;
++	void *jit_page = MAP_FAILED;
++	uint8_t *ring;
++	uint64_t head, tail;
++	bool got_deferred = false;
++	bool saw_leaf = false, saw_shrink = false, saw_jit = false;
++	bool saw_bridge = false, saw_drap = false, saw_vla = false;
++	bool saw_clobber = false, saw_main = false;
++	bool saw_full_chain = false;
++	bool has_eh_frame = false;
++	int fd, arg = 1;
 +
-+	ra_slot = &((struct __arch_ftrace_regs *)fregs_addr)->ra;
++	ksft_print_header();
++	ksft_set_plan(1);
++
++#if !defined(__x86_64__) && !defined(__i386__) && !defined(__aarch64__) && \
++	!defined(__arm__) && !defined(__riscv)
++	ksft_test_result_skip("Architecture lacks Minimal DWARF CFI user unwind support\n");
++	ksft_finished();
 +#endif
-+	return ftrace_graph_ret_addr(task, graph_idx, pc, ra_slot);
-+}
 +
-+/**
-+ * riscv_recover_ret_addr() - Recover ftrace_graph and rethook return addresses
-+ * @task: Task being unwound.
-+ * @graph_idx: Shadow-stack cursor for ftrace_graph_ret_addr().
-+ * @kr_cur: Shadow-list cursor for rethook_find_ret_addr().
-+ * @pc: Candidate return address to recover.
-+ * @cfa: Callee frame's Canonical Frame Address (entry SP).
-+ * @ra_slot: Stack slot where @pc was saved (or NULL if still in ra).
-+ *
-+ * Recovers original caller PCs across both ftrace_graph and rethook shadow
-+ * stacks in either hooking order, keying rethook lookups on @cfa (matching
-+ * arch_rethook_prepare() under CONFIG_UNWINDER_DWARF_CFI).
-+ *
-+ * Return: Restored caller PC, or 0 if recovery failed.
-+ */
-+static __always_inline unsigned long
-+riscv_recover_ret_addr(struct task_struct *task, int *graph_idx,
-+		       struct llist_node **kr_cur, unsigned long pc,
-+		       unsigned long cfa, unsigned long *ra_slot)
-+{
-+	pc = riscv_fgraph_recover(task, graph_idx, pc, cfa, ra_slot);
-+#ifdef CONFIG_RETHOOK
-+	if (is_rethook_trampoline(pc)) {
-+		pc = rethook_find_ret_addr(task, cfa, kr_cur);
-+		if (!pc || is_rethook_trampoline(pc))
-+			return 0;
-+	}
-+#endif
-+	pc = riscv_fgraph_recover(task, graph_idx, pc, cfa, ra_slot);
-+#ifdef CONFIG_FUNCTION_GRAPH_TRACER
-+	if (pc == (unsigned long)return_to_handler)
-+		return 0;
-+#endif
-+	return pc;
-+}
-+
-+#define RISCV_STACK_TASK	BIT(0)
-+#define RISCV_STACK_IRQ		BIT(1)
-+#define RISCV_STACK_OVERFLOW	BIT(2)
-+
-+/**
-+ * riscv_stack_bounds() - Validate that [@addr, @addr + @size) lies on a stack
-+ * @task: Task whose stacks are checked.
-+ * @addr: Start virtual address of the stack access.
-+ * @size: Access size in bytes.
-+ * @out_low: Output lower bound of the matched stack.
-+ * @out_high: Output upper bound of the matched stack.
-+ *
-+ * Checks @task's task stack, and when unwinding @current in non-preemptible
-+ * context, also checks the per-CPU IRQ and vmap overflow stacks.
-+ *
-+ * Return: RISCV_STACK_* bit for the matched stack, or 0 if out of bounds.
-+ */
-+static __always_inline unsigned int
-+riscv_stack_bounds(struct task_struct *task, unsigned long addr,
-+		   size_t size, unsigned long *out_low,
-+		   unsigned long *out_high)
-+{
-+	unsigned long low, high;
-+
-+	low = (unsigned long)task_stack_page(task);
-+	high = low + THREAD_SIZE;
-+	if (addr >= low && (addr < high || (!size && addr == high)) &&
-+	    addr + size >= addr && addr + size <= high) {
-+		*out_low = low;
-+		*out_high = high;
-+		return RISCV_STACK_TASK;
++	dl_iterate_phdr(check_main_eh_frame_cb, &has_eh_frame);
++	if (!has_eh_frame) {
++		ksft_test_result_skip("Test binary lacks PT_GNU_EH_FRAME\n");
++		ksft_finished();
 +	}
 +
-+	if (task == current && !preemptible()) {
-+#ifdef CONFIG_IRQ_STACKS
-+		low = (unsigned long)raw_cpu_read(irq_stack_ptr);
-+		high = low + IRQ_STACK_SIZE;
-+		if (low && addr >= low &&
-+		    (addr < high || (!size && addr == high)) &&
-+		    addr + size >= addr && addr + size <= high) {
-+			*out_low = low;
-+			*out_high = high;
-+			return RISCV_STACK_IRQ;
-+		}
-+#endif
-+#ifdef CONFIG_VMAP_STACK
-+		low = (unsigned long)raw_cpu_ptr(overflow_stack);
-+		high = low + OVERFLOW_STACK_SIZE;
-+		if (addr >= low && (addr < high || (!size && addr == high)) &&
-+		    addr + size >= addr && addr + size <= high) {
-+			*out_low = low;
-+			*out_high = high;
-+			return RISCV_STACK_OVERFLOW;
-+		}
-+#endif
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * walk_stackframe_cfi() - Unwind a RISC-V kernel stack via Minimal DWARF CFI
-+ * @task: Target task to unwind (NULL defaults to current).
-+ * @regs: Optional starting register state (rejected when @require_reliable).
-+ * @fn: Callback invoked for each unwound PC; returning false stops the walk.
-+ * @arg: Opaque cookie passed to @fn.
-+ * @require_reliable: When true, reject exception boundaries, unannotated leaf
-+ *                    fallbacks, and non-CFI frame-pointer guesses.
-+ *
-+ * Return: 0 on clean stack termination (or early callback stop when
-+ * !@require_reliable), or -EINVAL when a reliable walk cannot be guaranteed.
-+ */
-+static __always_inline int
-+walk_stackframe_cfi(struct task_struct *task, struct pt_regs *regs,
-+		    bool (*fn)(void *, unsigned long), void *arg,
-+		    bool require_reliable)
-+{
-+	unsigned long fp, sp, pc, ra = 0, min_sp = 0, caller_fp = 0, caller_pc = 0;
-+	bool ra_valid = false, exact_pc = false, unreliable = false;
-+	struct llist_node *kr_cur = NULL;
-+	unsigned int used_stacks = 0;
-+	int graph_idx = 0;
-+	int level = 0;
-+
-+	if (!task)
-+		task = current;
-+
-+	if (regs && regs->cause == ~0UL && !regs->ra) {
-+		if (require_reliable || task != current)
-+			return -EINVAL;
-+		min_sp = regs->sp;
-+		caller_fp = regs->s0;
-+		caller_pc = regs->epc;
-+		regs = NULL;
-+	}
-+
-+	if (regs) {
-+		if (require_reliable)
-+			return -EINVAL;
-+		fp = frame_pointer(regs);
-+		sp = kernel_stack_pointer(regs);
-+		pc = instruction_pointer(regs);
-+		ra = regs->ra;
-+		ra_valid = !!ra;
-+		exact_pc = true;
-+	} else if (task == current) {
-+		asm volatile("1: auipc %0, 0\n\t"
-+			     "mv %1, s0"
-+			     : "=r"(pc), "=r"(fp));
-+		sp = current_stack_pointer;
-+		ra = (unsigned long)__builtin_return_address(0);
-+		ra_valid = true;
-+		exact_pc = true;
-+		level = -1;
-+	} else {
-+		fp = task->thread.s[0];
-+		sp = task->thread.sp;
-+		pc = task->thread.ra;
-+	}
-+
-+	for (;;) {
-+		unsigned long lookup_pc, cfa, next_pc, next_fp = fp;
-+		unsigned long cur_low = 0, cur_high = 0, low = 0, high = 0;
-+		unsigned long tsk_low = (unsigned long)task_stack_page(task);
-+		unsigned int cur_stk, next_stk;
-+		struct dwarf_cfi_row row;
-+		bool skip_emit;
-+		int err;
-+
-+		if (!pc) {
-+			if (exact_pc && ra_valid && !require_reliable) {
-+				pc = ra;
-+				ra_valid = false;
-+				exact_pc = false;
-+				unreliable = true;
-+				continue;
-+			}
-+			return require_reliable ? -EINVAL : 0;
-+		}
-+
-+		/*
-+		 * Boot and secondary CPU idle tasks enter C code from
-+		 * .head.text ([_start, _stext)), which precedes _stext.
-+		 */
-+		if (is_idle_task(task) &&
-+		    sp >= (unsigned long)task_pt_regs(task) &&
-+		    sp <= tsk_low + THREAD_SIZE &&
-+		    pc >= (unsigned long)_start &&
-+		    pc < (unsigned long)_stext)
-+			return 0;
-+
-+		if (!__kernel_text_address(pc))
-+			return require_reliable ? -EINVAL : 0;
-+
-+		skip_emit = (level++ < 0) ||
-+			    (min_sp && (sp < min_sp ||
-+					(sp == min_sp && sp < caller_fp &&
-+					 pc != caller_pc)));
-+
-+		if (sp == (unsigned long)task_pt_regs(task) &&
-+		    pc >= (unsigned long)ret_from_fork_kernel_asm &&
-+		    pc < (unsigned long)&ret_from_fork_asm_end) {
-+			if (!skip_emit && !fn(arg, pc))
-+				return require_reliable ? -EINVAL : 0;
-+			return 0;
-+		}
-+
-+		if (!skip_emit && !fn(arg, pc))
-+			return require_reliable ? -EINVAL : 0;
-+		if (!skip_emit)
-+			min_sp = 0;
-+
-+		if (pc >= (unsigned long)handle_exception &&
-+		    pc < (unsigned long)&ret_from_exception_end) {
-+			struct pt_regs *er = (struct pt_regs *)sp;
-+			unsigned long status, next_sp, next_ra;
-+
-+			if (sp & (sizeof(long) - 1))
-+				return -EINVAL;
-+			cur_stk = riscv_stack_bounds(task, sp, sizeof(*er),
-+						     &cur_low, &cur_high);
-+			if (!cur_stk)
-+				return -EINVAL;
-+			status = READ_ONCE_TASK_STACK(task, er->status);
-+			if ((status & SR_PP) == 0)
-+				return 0;
-+			if (require_reliable)
-+				return -EINVAL;
-+
-+			next_pc = READ_ONCE_TASK_STACK(task, er->epc);
-+			next_sp = READ_ONCE_TASK_STACK(task, er->sp);
-+			next_fp = READ_ONCE_TASK_STACK(task, er->s0);
-+			next_ra = READ_ONCE_TASK_STACK(task, er->ra);
-+			if (next_sp & (sizeof(long) - 1))
-+				return -EINVAL;
-+			next_stk = riscv_stack_bounds(task, next_sp,
-+						      /*size=*/0,
-+						      &low, &high);
-+			if (!next_stk)
-+				return -EINVAL;
-+			if (low == cur_low) {
-+				if (next_sp <= sp)
-+					return -EINVAL;
-+			} else {
-+				if (used_stacks & next_stk)
-+					return -EINVAL;
-+				used_stacks |= cur_stk;
-+			}
-+			pc = next_pc;
-+			sp = next_sp;
-+			fp = next_fp;
-+			ra = next_ra;
-+			ra_valid = true;
-+			exact_pc = true;
-+			unreliable = true;
-+			continue;
-+		}
-+
-+		lookup_pc = exact_pc ? pc : pc - 2;
-+		err = riscv_dwarf_cfi_find(lookup_pc, &row);
-+		if (err) {
-+#ifdef CONFIG_DYNAMIC_FTRACE_WITH_ARGS
-+			if (lookup_pc >= (unsigned long)ftrace_caller_saved &&
-+			    lookup_pc < (unsigned long)ftrace_caller_restore &&
-+			    (!exact_pc || !require_reliable)) {
-+				size_t fsize = ALIGN(sizeof(struct __arch_ftrace_regs),
-+						     STACK_ALIGN);
-+				struct __arch_ftrace_regs *fregs = (void *)sp;
-+
-+				if ((sp & (sizeof(long) - 1)) ||
-+				    !riscv_stack_bounds(task, sp, fsize,
-+							&cur_low, &cur_high) ||
-+				    READ_ONCE_TASK_STACK(task, fregs->sp) != sp + fsize)
-+					return -EINVAL;
-+				pc = READ_ONCE_TASK_STACK(task, fregs->epc);
-+				fp = READ_ONCE_TASK_STACK(task, fregs->s0);
-+				ra = READ_ONCE_TASK_STACK(task, fregs->ra);
-+				sp += fsize;
-+				ra_valid = true;
-+				exact_pc = true;
-+				if (!pc)
-+					return -EINVAL;
-+				continue;
-+			}
-+#endif
-+#ifdef CONFIG_IRQ_STACKS
-+			/*
-+			 * call_on_irq_stack() saves {fp, ra} below s0 on the
-+			 * task stack before switching sp to irq_stack_ptr.
-+			 */
-+			if (!require_reliable &&
-+			    task == current && !preemptible() &&
-+			    !(used_stacks & RISCV_STACK_TASK) &&
-+			    pc >= (unsigned long)call_on_irq_stack &&
-+			    pc < (unsigned long)&call_on_irq_stack_end) {
-+				unsigned long irq_low =
-+					(unsigned long)raw_cpu_read(irq_stack_ptr);
-+
-+				if (irq_low && sp > irq_low &&
-+				    sp <= irq_low + IRQ_STACK_SIZE &&
-+				    fp && !(fp & 0x7) &&
-+				    fp >= tsk_low + sizeof(struct stackframe) &&
-+				    fp <= tsk_low + THREAD_SIZE) {
-+					struct stackframe *fr =
-+						(struct stackframe *)fp - 1;
-+					unsigned long old_fp = fp;
-+
-+					next_fp = READ_ONCE_TASK_STACK(task, fr->fp);
-+					next_pc = READ_ONCE_TASK_STACK(task, fr->ra);
-+					next_pc =
-+						riscv_recover_ret_addr(task, &graph_idx,
-+								       &kr_cur, next_pc,
-+								       old_fp, &fr->ra);
-+					if (!next_pc)
-+						return 0;
-+					used_stacks |= RISCV_STACK_IRQ;
-+					fp = next_fp;
-+					pc = next_pc;
-+					sp = old_fp;
-+					ra_valid = false;
-+					exact_pc = false;
-+					unreliable = true;
-+					continue;
-+				}
-+			}
-+#endif
-+			if (exact_pc && ra_valid && !require_reliable &&
-+			    pc >= (unsigned long)_stext &&
-+			    pc < (unsigned long)_etext) {
-+				pc = riscv_recover_ret_addr(task, &graph_idx,
-+							    &kr_cur, ra, sp,
-+							    /*ra_slot=*/NULL);
-+				if (!pc)
-+					return 0;
-+				ra_valid = false;
-+				exact_pc = false;
-+				unreliable = true;
-+				continue;
-+			}
-+
-+			/*
-+			 * Fallback to frame-pointer record at (fp - 16) for
-+			 * JITed BPF programs and BPF trampolines.
-+			 */
-+			if (!require_reliable && !(sp & 0x7) &&
-+			    riscv_stack_bounds(task, sp, /*size=*/0, &cur_low,
-+					       &cur_high) &&
-+			    !(fp & 0x7) &&
-+			    fp >= sp + sizeof(struct stackframe) &&
-+			    fp <= cur_high) {
-+				struct stackframe *fr = (struct stackframe *)fp - 1;
-+				unsigned long old_fp = fp;
-+
-+				next_fp = READ_ONCE_TASK_STACK(task, fr->fp);
-+				next_pc = READ_ONCE_TASK_STACK(task, fr->ra);
-+				next_pc = riscv_recover_ret_addr(task,
-+								 &graph_idx, &kr_cur,
-+								 next_pc, old_fp, &fr->ra);
-+				if (!next_pc)
-+					return 0;
-+				fp = next_fp;
-+				pc = next_pc;
-+				sp = old_fp;
-+				ra_valid = false;
-+				exact_pc = false;
-+				unreliable = true;
-+				continue;
-+			}
-+
-+			if (exact_pc && ra_valid && !require_reliable) {
-+				pc = riscv_recover_ret_addr(task, &graph_idx,
-+							    &kr_cur, ra, sp,
-+							    /*ra_slot=*/NULL);
-+				if (!pc)
-+					return 0;
-+				ra_valid = false;
-+				exact_pc = false;
-+				unreliable = true;
-+				continue;
-+			}
-+			return -EINVAL;
-+		}
-+
-+		if (row.ra_rule == DWARF_CFI_RULE_UNDEFINED)
-+			return require_reliable ? -EINVAL : 0;
-+
-+		if ((sp & (sizeof(long) - 1)) ||
-+		    !riscv_stack_bounds(task, sp, /*size=*/0, &cur_low,
-+					&cur_high))
-+			return -EINVAL;
-+
-+		switch (row.cfa_base) {
-+		case DWARF_CFI_BASE_SP:
-+			cfa = sp + row.cfa_off;
-+			break;
-+		case DWARF_CFI_BASE_FP:
-+			cfa = fp + row.cfa_off;
-+			break;
-+		case DWARF_CFI_BASE_FP_INDIRECT:
-+			if (((fp + row.cfa_off) & (sizeof(long) - 1)) ||
-+			    !riscv_stack_bounds(task, fp + row.cfa_off,
-+						sizeof(long), &low, &high) ||
-+			    low != cur_low)
-+				return -EINVAL;
-+			cfa = READ_ONCE_TASK_STACK(task,
-+						   *(unsigned long *)(fp + row.cfa_off));
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+
-+		if ((cfa & (sizeof(long) - 1)) || cfa < cur_low || cfa > cur_high)
-+			return -EINVAL;
-+
-+		if (row.fp_rule == DWARF_CFI_RULE_OFFSET) {
-+			unsigned long fp_addr = cfa + row.fp_off;
-+
-+			if ((fp_addr & (sizeof(long) - 1)) ||
-+			    !riscv_stack_bounds(task, fp_addr, sizeof(long),
-+						&low, &high) ||
-+			    low != cur_low)
-+				return -EINVAL;
-+			next_fp = READ_ONCE_TASK_STACK(task, *(unsigned long *)fp_addr);
-+		} else if (row.fp_rule == DWARF_CFI_RULE_FP_OFFSET) {
-+			unsigned long fp_addr = fp + row.fp_off;
-+
-+			if ((fp_addr & (sizeof(long) - 1)) ||
-+			    !riscv_stack_bounds(task, fp_addr, sizeof(long),
-+						&low, &high) ||
-+			    low != cur_low)
-+				return -EINVAL;
-+			next_fp = READ_ONCE_TASK_STACK(task, *(unsigned long *)fp_addr);
-+		}
-+
-+		if (row.ra_rule == DWARF_CFI_RULE_SAME) {
-+			if (!ra_valid) {
-+				/*
-+				 * Non-struct_ops BPF trampolines push a
-+				 * synthetic parent frame record above the
-+				 * inner traced-function frame record.
-+				 */
-+				if (!require_reliable && unreliable &&
-+				    row.cfa_base == DWARF_CFI_BASE_SP &&
-+				    row.cfa_off == 0 &&
-+				    fp == sp + sizeof(struct stackframe) &&
-+				    fp <= cur_high) {
-+					struct stackframe *fr =
-+						(struct stackframe *)fp - 1;
-+					unsigned long old_fp = fp;
-+
-+					next_fp = READ_ONCE_TASK_STACK(task, fr->fp);
-+					next_pc = READ_ONCE_TASK_STACK(task, fr->ra);
-+					next_pc =
-+						riscv_recover_ret_addr(task, &graph_idx,
-+								       &kr_cur, next_pc,
-+								       old_fp, &fr->ra);
-+					if (!next_pc)
-+						return 0;
-+					sp = old_fp;
-+					fp = next_fp;
-+					pc = next_pc;
-+					ra_valid = false;
-+					exact_pc = false;
-+					continue;
-+				}
-+				return -EINVAL;
-+			}
-+			if (cfa < sp)
-+				return -EINVAL;
-+			next_pc = riscv_recover_ret_addr(task, &graph_idx,
-+							 &kr_cur, ra, cfa,
-+							 /*ra_slot=*/NULL);
-+		} else if (row.ra_rule == DWARF_CFI_RULE_OFFSET) {
-+			unsigned long *ra_p = (unsigned long *)(cfa + row.ra_off);
-+
-+			if (cfa <= sp ||
-+			    ((unsigned long)ra_p & (sizeof(long) - 1)) ||
-+			    !riscv_stack_bounds(task, (unsigned long)ra_p,
-+						sizeof(long), &low, &high) ||
-+			    low != cur_low)
-+				return -EINVAL;
-+			next_pc = READ_ONCE_TASK_STACK(task, *ra_p);
-+			next_pc = riscv_recover_ret_addr(task, &graph_idx,
-+							 &kr_cur, next_pc, cfa,
-+							 ra_p);
++#if HAVE_JIT_FP_STUB
++	jit_page = mmap(/*addr=*/NULL, page_sz, PROT_READ | PROT_WRITE,
++			MAP_PRIVATE | MAP_ANONYMOUS, /*fd=*/-1, /*offset=*/0);
++	if (jit_page != MAP_FAILED) {
++		memcpy(jit_page, jit_stub_code, sizeof(jit_stub_code));
++		if (mprotect(jit_page, page_sz, PROT_READ | PROT_EXEC) == 0) {
++			__builtin___clear_cache((char *)jit_page,
++						(char *)jit_page + sizeof(jit_stub_code));
++			g_jit_fn = (int (*)(int (*)(int), int))jit_page;
 +		} else {
-+			return -EINVAL;
++			ksft_print_msg("W^X JIT mprotect unavailable (%s); skipping JIT stub\n",
++				       strerror(errno));
++			munmap(jit_page, page_sz);
++			jit_page = MAP_FAILED;
 +		}
-+
-+		if (!next_pc)
-+			return require_reliable ? -EINVAL : 0;
-+
-+		sp = cfa;
-+		fp = next_fp;
-+		pc = next_pc;
-+		ra_valid = false;
-+		exact_pc = row.signal;
-+	}
-+}
-+
-+noinline void notrace walk_stackframe(struct task_struct *task,
-+				      struct pt_regs *regs,
-+				      bool (*fn)(void *, unsigned long),
-+				      void *arg)
-+{
-+	walk_stackframe_cfi(task, regs, fn, arg, /*require_reliable=*/false);
-+}
-+
-+noinline noinstr int arch_stack_walk_reliable(stack_trace_consume_fn consume_entry,
-+					      void *cookie,
-+					      struct task_struct *task)
-+{
-+	return walk_stackframe_cfi(task, /*regs=*/NULL, consume_entry, cookie,
-+				   /*require_reliable=*/true);
-+}
-+
-+#elif defined(CONFIG_FRAME_POINTER)
-+
- static inline int fp_is_valid(unsigned long fp, unsigned long sp)
- {
- 	unsigned long low, high;
-@@ -102,7 +746,7 @@ void notrace walk_stackframe(struct task_struct *task, struct pt_regs *regs,
- 	}
- }
- 
--#else /* !CONFIG_FRAME_POINTER */
-+#else /* !CONFIG_FRAME_POINTER && !CONFIG_UNWINDER_DWARF_CFI */
- 
- void notrace walk_stackframe(struct task_struct *task,
- 	struct pt_regs *regs, bool (*fn)(void *, unsigned long), void *arg)
-diff --git a/arch/riscv/kernel/vmlinux.lds.S b/arch/riscv/kernel/vmlinux.lds.S
-index 1f4f8496941a..f2bd07e08d5e 100644
---- a/arch/riscv/kernel/vmlinux.lds.S
-+++ b/arch/riscv/kernel/vmlinux.lds.S
-@@ -125,6 +125,19 @@ SECTIONS
- 		*(.srodata*)
- 	}
- 
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.eh_frame_hdr : ALIGN(4) {
-+		__start_eh_frame_hdr = .;
-+		*(.eh_frame_hdr)
-+		__stop_eh_frame_hdr = .;
-+	}
-+	.eh_frame : ALIGN(8) {
-+		__start_eh_frame = .;
-+		*(.eh_frame)
-+		__stop_eh_frame = .;
 +	}
 +#endif
 +
- 	. = ALIGN(SECTION_ALIGN);
- 	_data = .;
- 
-diff --git a/arch/riscv/purgatory/Makefile b/arch/riscv/purgatory/Makefile
-index b0358a78f11a..29c23c58b26c 100644
---- a/arch/riscv/purgatory/Makefile
-+++ b/arch/riscv/purgatory/Makefile
-@@ -60,8 +60,9 @@ targets += purgatory.ro purgatory.chk
- # These are adjustments to the compiler flags used for objects that
- # make up the standalone purgatory.ro
- 
--PURGATORY_CFLAGS_REMOVE := -mcmodel=kernel
-+PURGATORY_CFLAGS_REMOVE := -mcmodel=kernel -fasynchronous-unwind-tables -funwind-tables
- PURGATORY_CFLAGS := -mcmodel=medany -ffreestanding -fno-zero-initialized-in-bss
-+PURGATORY_CFLAGS += -fno-asynchronous-unwind-tables -fno-unwind-tables
- PURGATORY_CFLAGS += $(DISABLE_KSTACK_ERASE) -DDISABLE_BRANCH_PROFILING
- PURGATORY_CFLAGS += -fno-stack-protector -g0
- 
++	memset(&attr, 0, sizeof(attr));
++	attr.type = PERF_TYPE_SOFTWARE;
++	attr.size = sizeof(attr);
++	attr.config = PERF_COUNT_SW_CONTEXT_SWITCHES;
++	attr.sample_period = 1;
++	attr.sample_type = PERF_SAMPLE_IP | PERF_SAMPLE_CALLCHAIN;
++	attr.disabled = 1;
++	attr.defer_callchain = 1;
++	attr.defer_output = 1;
++
++	fd = (int)sys_perf_event_open(&attr, /*pid=*/0, /*cpu=*/-1,
++				      /*group_fd=*/-1, /*flags=*/0);
++	if (fd < 0) {
++		if (jit_page != MAP_FAILED)
++			munmap(jit_page, page_sz);
++		if (errno == EACCES || errno == EPERM || errno == EINVAL) {
++			ksft_test_result_skip("perf_event_open(defer_callchain) unavailable: %s\n",
++					      strerror(errno));
++			ksft_finished();
++		}
++		ksft_exit_fail_msg("perf_event_open failed: %s\n", strerror(errno));
++	}
++
++	mpage = mmap(/*addr=*/NULL, mmap_len, PROT_READ | PROT_WRITE,
++		     MAP_SHARED, fd, /*offset=*/0);
++	if (mpage == MAP_FAILED) {
++		if (jit_page != MAP_FAILED)
++			munmap(jit_page, page_sz);
++		close(fd);
++		ksft_exit_fail_msg("mmap failed: %s\n", strerror(errno));
++	}
++
++	ioctl(fd, PERF_EVENT_IOC_RESET, 0);
++	ioctl(fd, PERF_EVENT_IOC_ENABLE, 0);
++
++	asm volatile("" : "+r"(arg));
++	cfi_clobber_fp(arg);
++
++	ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
++
++	ring = (uint8_t *)mpage + page_sz;
++	head = __atomic_load_n(&mpage->data_head, __ATOMIC_ACQUIRE);
++	tail = mpage->data_tail;
++
++	while (tail < head) {
++		size_t mask = 16 * page_sz - 1;
++		struct perf_event_header *hdr =
++			(struct perf_event_header *)(ring + (tail & mask));
++
++		if (hdr->type == PERF_RECORD_CALLCHAIN_DEFERRED) {
++			struct perf_record_deferred *rec = (void *)hdr;
++			bool c_leaf = false, c_shrink = false, c_bridge = false;
++			bool c_drap = false, c_vla = false, c_clobber = false;
++			bool c_main = false, c_jit_ok = false;
++			unsigned int c_jit_hits = 0;
++
++			got_deferred = true;
++			for (uint64_t i = 0; i < rec->nr; i++) {
++				uintptr_t ip = (uintptr_t)rec->ips[i];
++
++				if (ip == expect_ip_leaf)
++					c_leaf = true;
++				else if (ip == expect_ip_shrink)
++					c_shrink = true;
++				else if (ip == expect_ip_jit)
++					c_jit_hits++;
++				else if (ip == expect_ip_bridge)
++					c_bridge = true;
++				else if (ip == expect_ip_drap)
++					c_drap = true;
++				else if (ip == expect_ip_vla)
++					c_vla = true;
++				else if (ip == expect_ip_clobber)
++					c_clobber = true;
++				else if (ip == expect_ip_main)
++					c_main = true;
++			}
++
++#if HAVE_JIT_FP_STUB
++			if (g_jit_fn) {
++				uintptr_t jb = (uintptr_t)jit_page;
++
++				c_jit_ok = expect_ip_jit >= jb &&
++					   expect_ip_jit < jb + sizeof(jit_stub_code) &&
++					   c_jit_hits >= 2;
++			} else {
++				c_jit_ok = c_jit_hits >= 1;
++			}
++#else
++			c_jit_ok = c_jit_hits >= 1;
++#endif
++			saw_leaf |= c_leaf;
++			saw_shrink |= c_shrink;
++			saw_jit |= c_jit_ok;
++			saw_bridge |= c_bridge;
++			saw_drap |= c_drap;
++			saw_vla |= c_vla;
++			saw_clobber |= c_clobber;
++			saw_main |= c_main;
++
++			if (c_leaf && c_shrink && c_jit_ok && c_bridge &&
++			    c_drap && c_vla && c_clobber && c_main)
++				saw_full_chain = true;
++		}
++		tail += hdr->size;
++	}
++
++	munmap(mpage, mmap_len);
++	if (jit_page != MAP_FAILED)
++		munmap(jit_page, page_sz);
++	close(fd);
++
++	if (!got_deferred) {
++		ksft_test_result_skip("No PERF_RECORD_CALLCHAIN_DEFERRED records\n");
++		ksft_finished();
++	}
++
++	ksft_print_msg("def=%d ok=%d leaf=%d shr=%d jit=%d br=%d drap=%d vla=%d fp=%d entry=%d\n",
++		       got_deferred, saw_full_chain, saw_leaf, saw_shrink,
++		       saw_jit, saw_bridge, saw_drap, saw_vla, saw_clobber,
++		       saw_main);
++
++	ksft_test_result(saw_full_chain,
++			 "unwind_user Minimal DWARF CFI across SP, VLA, DRAP, shrink-wrap, and hybrid JIT FP frames\n");
++	ksft_finished();
++}
 -- 
 2.56.1.831.g720f3f5937-goog
 
