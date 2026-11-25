@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795619675;
-	b=mx+oTXnsje6s8U1Zu1bAmnLGUkiq4QdFsWj7B6VI3RX0pjRzNNCkHH1zKkKwfSqWTo1f
-	 h3RvnPuQ3mlzInDNQT1S7+tiM4XpYwHg5yKa9ovcWuVXQW61oOHxIrbi+Wl768Tk8FtvS
-	 oxeGCH+AwQEu5Pb2LNDLdjaCsvo+zV5c6NaYUl0CWKmLFX7GdSwzaO0aAkicdZKtHXB/i
-	 shjj456CBAas0+Qn8VZxPEIlxrgyUYqS2jkLpTwzV8vEhWTDsv4vufrfj1TA5vPdCMNPT
-	 w8K/h12FAvDGFH23q1cEeS9M2UK0j9Af4dLn4tars3mYD1gxNiiVCrkzkuQVl4h2cPw==
+	t=1795619678;
+	b=hbmcJ/ev5CeArl+MyA/LEKLVQfEDeRqgGFnt7heK82Q3dgj0EVIEuPxnuUPGCmzrWWYP
+	 6Qh4C5YyZ9jJFBDxwFI185oHU0KjdicVv7rQxgjR0ZKgVxtq4phJc6VPiLhM5R2/8Q+Qo
+	 WNh8TrD5+i/DiZK6CxxYmDec4MBb4jJusin5NkmLL3WyB323EOTwZcB0Wd78saaVpw1Pt
+	 mKfaKgKDTAPLZHvk/2QzGHhOSjEpqc1OoonP276G5HWE4araP517vGubK8X7XoWgHjItN
+	 73n663Eelaq0XU0C5Su4iE9HJI6Q48Kc7mp7EYTguPqsiIhinaKCa3IibE6lh9FjyUA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795619675;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795619678;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=mn4Ggx29d50a4IUkBOUR4ytr+bcX51/dhy/wZQOyd28=;
-	b=OwB2q2zAGzHyzTHuUjspeaxykaSq6+r1r3bTxHZ1QyKaYsv4xcXEoGE2SgLos8eFAq5T
-	 fN351J6P/aizVQcko7RQDXEVWJaGhkNJGmS83ijaa/9++2ijVAxEDJZZqfE6PokTLlSrw
-	 10DiIut5vIRCBJde6P+lts9HfDeS07MrosUW4xTWK0RVKPbC9j3ix2b7mlseViUEXHUrG
-	 lURkxJRzx2uzOLY7oH7/sv6MEZd/PlJhikd9z6XjlNCQoQ+rh5vmhchoQDnpHvlzKmhp6
-	 9sGpwTehHPzWqUyk8EWbTa/navSwgTYVHS/MX5LKxrVGoSpngpuAnkSWBaz1fleRYCA==
+	bh=kal5s5V/KeJ1pqxxB+KIBbnm37VAV7WRNR8+Kh1sgVk=;
+	b=YjukHv4NIWQdeseFLFcin0T3rJotT2VhCGyy+a4mwtqOCOjIvWgO0mVKDursRyGj3R77
+	 FEZKv3fj6EnCcDIbsZit8pEwgfvupA+BOVhTuYyRK5Gu7IjhZ4txvGzUl+UPnhbalNmr0
+	 k1AhMu8ob6ogfW8PV6Z8cMJ5JbPBrljJc81uBqBdxu2ur0uJh9oFoBBRfHXVnXwuIdW3L
+	 QS2GxZq0k6EVDRsfnVYC2qXYyo+3xbSJKjGlY3x35Q+W/+JhwcRaJUnUJibXULsbCo2v+
+	 bwojTE2er8mq2vtfvr958B5hPiqgacstichQgW8pUXE253thO6AbsmK1deH38ZXipHw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SJ69dlaR;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=NGEcc3dp;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57941606A687
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:14:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 57941606A687
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21154606A327
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:14:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 21154606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SJ69dlaR
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=NGEcc3dp
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0FB692F;
-	Wed, 25 Nov 2026 07:14:31 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF17B339;
+	Wed, 25 Nov 2026 07:14:34 -0800 (PST)
 Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C72383F86F;
-	Wed, 25 Nov 2026 07:14:32 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9C0753F86F;
+	Wed, 25 Nov 2026 07:14:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795619673; bh=k6zuUWy43e72ltP4EH+msPflCCVb8GSqJKNp9NcCmcU=;
+	t=1795619677; bh=P8LPBZh0Gce+XVrMgau/VOwe7x7oFE1Itx8704+WQsk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SJ69dlaR5yuNbfAp5FHsDABqeO9GZULxI6/EobBzvuoL7yiFxuqfsH3Fd9zVv0aNb
-	 J4kNrB8cJdbS3yP3xYOW/TJ3e+2zZsiYbBvpp5ATvH/Y1S+vldaJyHU3HGXaAbSGqQ
-	 E+tjZfycT5cX8WkTFpsPI1qdKjD9FBRpsE6fOBWE=
+	b=NGEcc3dppLQPaaoJXe1n6tkMIPozJxirXnj0PdItp5XNmEzixJLyy3okgvog0L03E
+	 hUd4bjzQTyVEOKKY2J/6hxKBnK/zm2paaSOEVdlmw79eNURRR8hD9PLrOGdxJNOy8x
+	 iAtmH1j8qKMJe/6ZkafHs23L6oZhQ1pFEO8jL8f8=
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 To: will@kernel.org,
 	julien.thierry.kdev@gmail.com
@@ -51,9 +51,9 @@ Cc: vladimir.murzin@arm.com,
 	kvmarm@lists.linux.dev,
 	timothy.hayes@arm.com,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH kvmtool v6 08/23] arm64: Start GICv5 SPI line allocation at zero
-Date: Wed, 25 Nov 2026 15:13:41 +0000
-Message-Id: <20261125151356.2875108-9-sascha.bischoff@arm.com>
+Subject: [PATCH kvmtool v6 09/23] arm64: Configure the GICv5 IRS
+Date: Wed, 25 Nov 2026 15:13:42 +0000
+Message-Id: <20261125151356.2875108-10-sascha.bischoff@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261125151356.2875108-1-sascha.bischoff@arm.com>
 References: <20261125151356.2875108-1-sascha.bischoff@arm.com>
@@ -68,30 +68,131 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-GICv5 SPIs start at zero, while earlier GICs use an offset of 32.
-Select the zero offset before allocating any interrupt lines.
+Place the IRS CONFIG and SETLPI frames in two 64 KiB regions below the
+guest AXI area, and pass the IRS base to KVM through
+KVM_VGIC_V5_ADDR_TYPE_IRS.
+
+The GICv5 NR_IRQS attribute counts SPIs without the 32 SGI/PPI lines
+included for earlier GICs. Use that count for GICv5 while retaining
+the existing count for GICv2/v3. Allow zero-based GICv5 IRQ numbers
+when setting the level through KVM_IRQ_LINE.
 
 Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arm64/gic.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arm64/gic.c                  | 30 ++++++++++++++++++++++++++++--
+ arm64/include/kvm/kvm-arch.h |  8 ++++++++
+ 2 files changed, 36 insertions(+), 2 deletions(-)
 
 diff --git a/arm64/gic.c b/arm64/gic.c
-index df5689a7..58644036 100644
+index 58644036..5034b034 100644
 --- a/arm64/gic.c
 +++ b/arm64/gic.c
-@@ -234,6 +234,9 @@ static int gic__set_spi(enum irqchip_type type)
- 		break;
+@@ -18,6 +18,7 @@
+ static int gic_fd = -1;
+ static u64 gic_redists_base;
+ static u64 gic_redists_size;
++static u64 gicv5_irs_base;
+ static u64 gic_msi_base;
+ static u64 gic_msi_size = 0;
+ static bool vgic_is_init = false;
+@@ -201,6 +202,22 @@ static int gic__set_redist(enum irqchip_type type)
  	}
- 
-+	if (gic_spi_base == GICV5_SPI_IRQ_BASE)
-+		return irq__init_irq_offset(gic_spi_base);
-+
- 	return 0;
  }
  
++static int gic__set_irs(enum irqchip_type type)
++{
++	struct kvm_device_attr irs_attr = {
++		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
++		.attr	= KVM_VGIC_V5_ADDR_TYPE_IRS,
++		.addr	= (u64)(unsigned long)&gicv5_irs_base,
++	};
++
++	switch (type) {
++	case IRQCHIP_GICV5:
++		return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &irs_attr);
++	default:	/* No IRS needed */
++		return 0;
++	}
++}
++
+ static int gic__set_dist(enum irqchip_type type)
+ {
+ 	u64 dist_addr = ARM_GIC_DIST_BASE;
+@@ -291,6 +308,10 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+ 	if (err)
+ 		goto out_err;
+ 
++	err = gic__set_irs(type);
++	if (err)
++		goto out_err;
++
+ 	err = gic__set_dist(type);
+ 	if (err)
+ 		goto out_err;
+@@ -376,6 +397,7 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
+ 		gic_msi_base = gic_redists_base - gic_msi_size;
+ 		break;
+ 	case IRQCHIP_GICV5:
++		gicv5_irs_base = ARM_GICV5_IRS_BASE;
+ 		break;
+ 	default:
+ 		return -ENODEV;
+@@ -397,8 +419,9 @@ static int gic__init_gic(struct kvm *kvm)
+ 	int ret;
+ 
+ 	int lines = irq__get_nr_allocated_lines();
+-	u32 nr_irqs = ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
+ 	u32 maint_irq = GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
++	u32 nr_irqs = max(ALIGN(lines, 32), 32);
++
+ 	struct kvm_device_attr nr_irqs_attr = {
+ 		.group	= KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+ 		.addr	= (u64)(unsigned long)&nr_irqs,
+@@ -412,6 +435,8 @@ static int gic__init_gic(struct kvm *kvm)
+ 		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
+ 	};
+ 
++	nr_irqs += gic__get_spi_base();
++
+ 	/*
+ 	 * If we didn't use the KVM_CREATE_DEVICE method, KVM will
+ 	 * give us some default number of interrupts. The GIC initialization
+@@ -540,12 +565,13 @@ u32 gic__get_fdt_irq_cpumask(struct kvm *kvm)
+ 
+ void kvm__irq_line(struct kvm *kvm, int irq, int level)
+ {
++	int spi_base = gic__get_spi_base();
+ 	struct kvm_irq_level irq_level = {
+ 		.irq	= KVM_IRQCHIP_IRQ(irq),
+ 		.level	= !!level,
+ 	};
+ 
+-	if (irq < GIC_SPI_IRQ_BASE || irq > GIC_MAX_IRQ)
++	if (irq < spi_base || irq > GIC_MAX_IRQ)
+ 		pr_warning("Ignoring invalid GIC IRQ %d", irq);
+ 	else if (ioctl(kvm->vm_fd, KVM_IRQ_LINE, &irq_level) < 0)
+ 		pr_warning("Could not KVM_IRQ_LINE for irq %d", irq);
+diff --git a/arm64/include/kvm/kvm-arch.h b/arm64/include/kvm/kvm-arch.h
+index e7dd5269..94140364 100644
+--- a/arm64/include/kvm/kvm-arch.h
++++ b/arm64/include/kvm/kvm-arch.h
+@@ -57,6 +57,14 @@
+ #define ARM_GIC_CPUI_SIZE	0x20000
+ 
+ 
++/* GICv5 IRS CONFIG and SETLPI frames occupy the end of the MMIO area. */
++#define ARM_GICV5_IRS_BASE		(ARM_AXI_AREA - ARM_GICV5_IRS_SIZE)
++#define ARM_GICV5_IRS_SIZE		(ARM_GICV5_IRS_CONFIG_SIZE + ARM_GICV5_IRS_SETLPI_SIZE)
++#define ARM_GICV5_IRS_CONFIG_BASE	ARM_GICV5_IRS_BASE
++#define ARM_GICV5_IRS_CONFIG_SIZE	0x10000
++#define ARM_GICV5_IRS_SETLPI_BASE	(ARM_GICV5_IRS_CONFIG_BASE + ARM_GICV5_IRS_CONFIG_SIZE)
++#define ARM_GICV5_IRS_SETLPI_SIZE	0x10000
++
+ #define KVM_PCI_CFG_AREA	ARM_AXI_AREA
+ #define ARM_PCI_CFG_SIZE	(1ULL << 28)
+ #define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
 -- 
 2.34.1
 
