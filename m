@@ -1,102 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.70
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795598328;
-	b=rGd4vcsFAspcDU40r8JeGwV+PPjDs7l2zk1ZBaNZR2Qj/OebDH5jXt1qBngUyZKOE74h
-	 y2CE1t+9vBpLpvr8uGw3v9bRbSIsYEBq/A5KYQGUiM0qjC/XtNa4Yh+YhUcfeeAqq8s34
-	 ZveiB/nb1BbEmm6FUE2u8WnrXtmkHt0JuCUnQtElGpOLNQ1SRY/bwJdAlpxotfn2YyRxl
-	 qj20+Ikb+0QG4iqSNvGhqbOsanxuu3TQTVzvn3PV6/Fm7EhdfkFTd9l4s6z5uVzU44a1N
-	 CbT7cmt0hR0jTa3QUzl4HJJxvuuZyMedYPIiSamNuIiXTeHG1gjPDvSCBoqhJN2yu6w==
+	t=1795598417;
+	b=ds+EpuJ/uwKd1gQ3eF6nhkdKinZS201vb6Adw5xRSCzIT50DgSf0UHVeuvQbhvqe/ZdF
+	 zLhJktVLf8qLYDOWdCVLo5eh8LGbb1mEYAJGCX81UhYm40Q8ZNsutEwbAPuYWwDQuw+TS
+	 TXdsEfZ1i3HIB3lxjFo9qjiYCIDYh41uYn6fSlFEP9kj1pQv8G1jExzYWvwmmdF03kwZL
+	 Gg95P4/3xowFjPupbz+mEghNnFmcqtzdzotL8qMNdhbSxf/7bvT9G3oW5LgCVdqk6RovI
+	 oIS59jwkeKFrkp4Qjb3PAdPQpCm/S3e3X5COoPQgYyc+/z+j6mnqoFZdDpEKFu5EJGw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795598328;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=7h2E6/RXXaN8qvTmARnXOrgPNEtAf1zGpXXBrvYlAFw=;
-	b=EGZMDMnKak/EcyT0iZY4SW3+vcvcwvrWN2OiwwYbH8SntbaPuG6Hu/40SXIBrqADmPGr
-	 uUA0G+E1z5yyY4S+f0ufiqBjzpW60M2dHJLKIRAjjkzxyL3SgqheBcw6DS8G4qoGVnq37
-	 snC6GoinrYsS8gMhg2/6u29CmpmXVbkmvuTuvRZZwzdSUaxoUT1rqhKDX5fNKUbejkltJ
-	 gHVpjLjma10iAFKoanMpSELKBxYYtvlq/459leo9AxqA1RFWYpzseH4eU33L/U011P3BP
-	 2HS+LkrYQROWsD+J2TUUmj7gP66nivaWabqywrmoAT2uXb5fJojwSNS/BI36+DZwxrA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795598417;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=F2Xkdeo0HzaNsNuC4QUMqleMrJpmw0zTyb8wkyKNlT0=;
+	b=ylX6+f3TjZDg78wV7HngrcK/W1hkk/4aHcdhWmoif/JyjlMb+3HhqPHIu/HVXaXiJCbb
+	 kxlOl+VS+Wtv9zRJTOQufCCc/Yd4OZkPt7oJltSIWsSri2Y4B0F6hSH7BnMDy+9LgWHww
+	 xnojxKsxiRsjjG+iBuU9c27PSrLFxd0tZ5pUTYP3ydxjPf4fGyfhUzq13kFIu4tf4hRAk
+	 mkuXkRJ+YY7nsSUC8J8qvJ79aV/H8a2K2VkIjahJvMU3WJ5dulXWahN5sWHmtArfwhcHk
+	 OEsTnvmMi6ktkxVbeKBX2KOLB5vzf1aQ3O1EKvsUg9HtQNMK42mIdCsSUL3V48DmwVQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=pereq.eu;
-	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=Z7bJbGjC;
-	arc=none smtp.remote-ip=209.85.128.49
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=MQkRp8Gu;
+	arc=none smtp.remote-ip=91.218.175.70
+Received: from mta0.migadu.com (out-70.mta0.migadu.com [91.218.175.70])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9E3606A33D
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 09:18:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2D9E3606A33D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C43606A686
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 09:20:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 05C43606A686
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=Z7bJbGjC
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4a3517554f7so50344975e9.2
-        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 01:18:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1795598326; x=1796203126; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=7h2E6/RXXaN8qvTmARnXOrgPNEtAf1zGpXXBrvYlAFw=;
-        b=Z7bJbGjCHkHBzkUx2zIJuL3zEa/VxjXh8ZarU6lAURfzL+2N3BKxwcx0zfUZg0xQyO
-         XNev0KjmzCFvIhmW1egJFNIKUxJQOK3R0tnTWS3D/gLUABIgS+pVy00nLfteRb0TqCU+
-         26zjmaIRbKf3xLCYWsnvD49QYg+QAgwxn5VvqG4TSvRqHlGo4T97GC1RYAMXjXY7J+4r
-         dSQFq2099gzdP9nn/7+gYJotOzKGgp9ox4ZjRMVkyD6W8cnY+nSWNN7EqnOfsg7+T9Nd
-         O8jMaFujlxciVu+jRQT0NWX+vaL2eV7IMlKXwBKL0P+Z5Un3T5kxgorEYIQta+OVfe9Z
-         et5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795598326; x=1796203126;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=7h2E6/RXXaN8qvTmARnXOrgPNEtAf1zGpXXBrvYlAFw=;
-        b=vU/YTF5TRCqJLebYpkBjZxdhaAkbtbFoJWUSg3BGsmeTphpTvlFHVUB4zCE29YEZtQ
-         pvluleX2S08BS0NEq3po1QTpsP4Bf0GcaCeTmb3EnnXL/wOfjSZ3JHrSCVB7EwODI/DW
-         pOZlE6Vr3yCEvQ8NJqFB3OlWIkDT2zjEH3BCU8rbR+VOPPkUUgHtwF4JWd7pIbN3WQQa
-         fFBn3MSkwD6J/PV+XgTaCei1MLKRQDHzcyC0nMOj1o9XzgB4U44MAFsIGO3BR/i0MuaA
-         mWkBSe/YXBeX7mU4augAwgDZdBx5xZUx/gmGF5IO36FraK3beI7nAry20haJYTMk1ZQX
-         PRyg==
-X-Gm-Message-State: APuU4Z+p/pifoxqvuwKGGgaEiMmOAED5l644yqy4ecFVI5Fw3+NFJuR2
-	cTbnWizsi4u3KP20tiZhYNDbzQD3b0SmHwEho/H69MPzk9XDUIVhexGbXuB5eo6grsw=
-X-Gm-Gg: AZFdTZcY+PsDC7T2jqO9mhLzcewhA0mb6xp4ZRKuaWDsT/hXRkTCW31koWkkUTCq22R
-	yA4HSaiJ4qS6xI7Tcej6lalkJ4TGZMAt8xk6M6Epi3JF1fVQfRBpFjSKp9HwkiPEcBJR4q0n813
-	DldLXS2GT/8+w3AVPVdut173ST3uGEY80J/qZsKNTwADw2KTaj38NDnq9cPerYhw7LDjpm46R9n
-	gAraXVXnNBK3QQDB8NAgj6J5PNr+BEAcy8RGrG5tDHHXu8JVVT5Um/trBSe6hMIIz7NggBDH7wG
-	hlFbmyd83TTORADcHPKrJdxUbEgi5HMjDQZp8bryiqwAENmZB6XO4DTh0IslxGZWpoMfHeSAcW1
-	6mqg7jC78vH32ZQhpqJnNhBVuB8eKjGU0vezWeNdAiNku9FA9fkt3m0AwXRKyOl3Bm4WXlKexQ+
-	k8ltzsVfOILRbrJgSW5MgomOGxFJWfyYDARn8M8L19Rvz3AM79ljLguBMfM5WNzTJnd6fTZ0AEw
-	kyqjEODv3pLm5C1dnfCGXOoToqcOEFzDpzhWjBAFscz2u2KZ3OKPz5O6b9Nvor++9atsd4/hYqd
-	2TyyB8s1aVOc07/L3oY=
-X-Received: by 2002:a05:600c:3b1a:b0:4bb:875b:3d91 with SMTP id 5b1f17b1804b1-4bb88820bfamr364901185e9.30.1795598326473;
-        Wed, 25 Nov 2026 01:18:46 -0800 (PST)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4b34e9c3ffesm16850149f8f.19.2026.11.25.01.18.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 01:18:45 -0800 (PST)
-Date: Wed, 25 Nov 2026 12:18:42 +0300
-From: Dan Carpenter <dan@pereq.eu>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	linux-s390@vger.kernel.org,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Karthik Bhargavan <karthik@pereq.eu>,
-	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
-Subject: Re: [PATCH v2 2/8] KVM: arm64: Reset SP_EL1, ELR_EL1 and SPSR_EL1
- when resetting a vcpu
-Message-ID: <awan8mSx5cbzXzJ7@stanley.mountain>
-References: <20261125-double_exception-v2-0-224689d8a764@pereq.eu>
- <20261125-double_exception-v2-2-224689d8a764@pereq.eu>
- <sashiko-outbox-232760@kernel.org>
- <awam4std0Zifdn9k@stanley.mountain>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=MQkRp8Gu
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=F2Xkdeo0HzaNsNuC4QUMqleMrJpmw0zTyb8wkyKNlT0=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795598414; v=1; x=1796203214;
+ b=MQkRp8GuJ/ig0B8Td1SADf5vB7lyE4LCsrE8/0XFbARUMBLuR7RAnNILkqCLQiEJwFQzSSpN
+ 92z7gbeCsBRB/glJeS/twWjuSFJUIGJSBHBa0beAEXjfkuUB39d4d5yublBGOepY2KDq0XhRjI9
+ w/ZvpSe74lZV+CbZkPJu+ML8=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 23aec541905c7266;
+	Wed, 25 Nov 2026 09:20:13 +0000
+X-Mizu-Trace-ID: 23aec541905c7266
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5c144eb2f43so26593e87.1
+        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 01:20:09 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErER865lEG8RiI5SARMsd5hiJX7bH96FGk1WTGZhsXSCz1sdlXyhu9nkkPuWxTJU9he7xfa5aaY=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8LzUbneQJmOqpgnJ/egHSHg2nGF8sycPLwLEZJBbtec/KehvCy
+	Y+3628URIhqugVv7i5fEJQUCUYSgWDAMGMyhfzAamQIOZ6nrbljI8rucEmmZKXMhlhwFfgKlqJd
+	J/x7j69EyRtv+Tpgh45wJRRggkjZREhIZJLpkHmpz
+X-Received: by 2002:a05:6512:2249:b0:5c1:ac5e:ee43 with SMTP id
+ 2adb3069b0e04-5c212394558mr484720e87.3.1795598408854; Wed, 25 Nov 2026
+ 01:20:08 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -106,23 +66,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <awam4std0Zifdn9k@stanley.mountain>
+References: <20261102095656.2948964-1-fuad.tabba@linux.dev> <2576e9e5-395e-4842-aa83-e09494e97d4d@arm.com>
+In-Reply-To: <2576e9e5-395e-4842-aa83-e09494e97d4d@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 25 Nov 2026 09:19:32 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTw1higCqZ5eY9_xsegh=C9W_=ba3VSE=8-wa-X-7_oG8w@mail.gmail.com>
+X-Gm-Features: Aa3M54rNelAy3rRx_aqH9o44IgmjZOttEw2zqBrwcOUYh3b1IB0PHZ2N_7TmlyA
+Message-ID: <CA+EHjTw1higCqZ5eY9_xsegh=C9W_=ba3VSE=8-wa-X-7_oG8w@mail.gmail.com>
+Subject: Re: [PATCH v5] KVM: arm64: Trap guest MPAM accesses whenever MPAM is implemented
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Xi Ruoyao <xry111@xry111.site>, 
+	Mark Rutland <mark.rutland@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Gavin Shan <gshan@redhat.com>, 
+	Yuan Yao <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Nov 25, 2026 at 12:14:10PM +0300, Dan Carpenter wrote:
-> Let me add the s390 maintainers to the CC list.
-> 
-> I considered doing it the way Sashiko suggests but s390 doesn't have the
-> __vcpu_assign_sys_reg() helpers so it broke the build.  The registers are
-> not the same so, either way, some of this is going to be specific to
-> arm64.  But Sashiko is correct that s390 probably keeps a stale SP_EL1
-> across a reset.  The s390 maintainers could probably take the selftest in
-> patch 8 and modify it for s390.  :)
-> 
+On Tue, 24 Nov 2026 at 12:00, Ben Horgan <ben.horgan@arm.com> wrote:
+>
+> Hi Fuad,
+>
+> On 02/11/2026 09:56, Fuad Tabba wrote:
+> > finalise_el2_state() clears the EL2 MPAM traps on every CPU whose ID
+> > registers advertise MPAM once the arm64.nompam override is applied.
+> > KVM sets them again on guest entry only when ARM64_MPAM is set, a
+> > capability that also requires MPAM1_EL1.MPAMEN. Without EL3, only
+> > MPAM2_EL2.MPAMEN is writable, and the kernel never sets it, so
+> > ARM64_MPAM stays clear and so do the traps. A guest can then access
+> > MPAM0_EL1, MPAM1_EL1, MPAMSM_EL1 and MPAMIDR_EL1 while its
+> > ID_AA64PFR0_EL1.MPAM reads 0.
+> >
+> > Record two per-CPU flags at KVM's CPU init: whether MPAM is
+> > implemented as finalise_el2_state() tests it, and whether
+> > MPAMIDR_EL1.HAS_HCR is set (MPAMHCR_EL2 is UNDEFINED without it).
+> > Read ID_AA64PFR0_EL1, ID_AA64PFR1_EL1 and MPAMIDR_EL1 from cpu_data,
+> > which holds them with the overrides applied since commit 342e62ded77c6
+> > ("arm64: cpufeature: Read MPAMIDR_EL1 in __cpuinfo_store_cpu()"). Set
+>
+> Ok as long as this patch isn't expected to be backported.
 
-Actually, never mind.  This can be done in kvm_reset_vcpu_core() like
-Suzuki Poulose suggests.
+Nope. I didn't tag it as stable.
 
-regards,
-dan carpenter
+> > the traps from those flags. MPAMEN isn't part of any MPAM trap
+> > condition, so the traps take effect whether or not it is set.
+> >
+> > Fixes: 31ff96c38ea3 ("KVM: arm64: Fix missing traps of guest accesses to the MPAM registers")
+> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+>
+>
+> Reviewed-by: Ben Horgan <ben.horgan@arm.com>
+
+Thanks!
+/fuad
