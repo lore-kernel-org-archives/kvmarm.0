@@ -1,105 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.47
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795565382;
-	b=rjwsn/fx1Jz1WGjPD7LlWpS1s4/7GeUKrk5aiAhuphIovxR5JtM3LpWnYoESs0QskmwU
-	 4fC7U/OiunR45P9JJzCwzscgKAV7urxaGogXT/GBNNV17jpVNMHjxf0qFEI0WqbJqAtTM
-	 4+iPgiR0jxn+KAJUW6/QfdLn+xv6f6MCCBeqwI8crSxHCbD0l5z8IZJCJwRElwxo6ZbmU
-	 TKzzDqOcS3yJ/z8efgoRdXW+BsqeZJqeUGEi7ezfmY7Jti+5ZCvtLbIYqnHC3wsiVM0ws
-	 i60AO5k3RYgjdASuEzXgrBzjooH25gM7avb674UisVy7E08Dms+7GoW6NM2G+e6xgdQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795565382;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.177
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795567195;
+	b=d+yZwHHFTmg2EfgQ3nIxXPn4v3qypw1RofOFmokL8VK7jkBx03Pz/jBJUIlcVsZbU7r6
+	 XTZ1lZYd7WJ7u2ttt3hzxYZnnGSOwK/o8s4mWLJ7NovPJxR/y0lrUSNc1YMA1QuaLg5S/
+	 Nvz3GsDvO5AwvnDxPQVTOsK7maZCvnKLLNvG8Wma8v4zo0jym2QTKolBtYHgw5YYcOBFk
+	 n5ZthbnFe92Z+JcoMry0HT4pmCo6UXXW9bpVjjwEER+LqBHzUieW7eGlXdxZjEZC0+0xC
+	 c6MCrN0rjXe4WXc9ED0mLBt26IUqEThydm7Td/ko0nCX+zzXTLLKIdjT83pb2Le7dyg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795567195;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:In-Reply-To:References:MIME-Version:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=rntaW4qP7qUm/rpCDs8AkAc3u/q2bwtFH1Dwu9ED+9M=;
-	b=zTckzvPMwDwKQtyeaZGrceP/ZePOq5TQ8Zp03X0JNIypYmXojpnmbMpdnRRkY4WojuKR
-	 PgI/KdHINEVpO9t1CcwRzLenkHRmaqDYGGKkO+CDjPY8EwNO8WlAoGO0jbWeOlBsKXDfT
-	 kNR7WwepORHLGQpORG+o38nBtU14rjqgzXTRncZizFTC4kz0Gu6et6SmHgFXGYPkXZHNF
-	 WR40ar8Cc+6RKoWAU+fsWs+mIz/R/M1wewu9XhpOtpGK0qb8jBgml0HOyJ44BiRrHvqHt
-	 BXaWfhy0Elc+cYAaiucM+rFAY7uZazBEao9PMEZdhkOMx9EVqIC7Pm9sEwy+/6Afy1A==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	 Mime-Version:Content-Transfer-Encoding:Content-Type:Date:Message-Id:
+	 Subject:From:To:Cc:X-Mailer:References:In-Reply-To;
+	bh=YKxHcqUXjQp/1J5J8B8/Kkrmh8UptW8ucEK7buHNuos=;
+	b=kB3x49zbd/AY6+jBvxaJgN/4kvNd8qNXDK2LebowiTTxoCgyVWjHTZQ1ILc+TIg34cuU
+	 skOwxOMWHud9IW1c1wwRQfL6A12RhPj28Z/JY4Uy82I63ntEzHSj4DBbitZbwQCpKrnVF
+	 Ngb/8YXeEA6/Tp+b509TBXL4bQIJ/JodDMoJoEBq6cZzaYhN3zPYRqZLBuw2Y5wwsVZd/
+	 LUpCVu9oBSwhADumxSQzggc94OgzIbHz2usgRb1U55l2OCvcUG7an2uErXRO9a0GVvxBy
+	 vvb67dDHBHKnOu3Pbwri2NxEyTJ3u3PNyI88TcNOdo4VOaKs4SV1sl5wOJwhUaotsBA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=bKP5JN+t;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.47
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=nCzlJqch;
+	arc=none smtp.remote-ip=209.85.214.177
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7659F606A323
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 00:09:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7659F606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA12606A332
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 00:39:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9CA12606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=bKP5JN+t
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-9213e130a16so29384326d6.1
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 16:09:41 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795565380; cv=none;
-        d=google.com; s=arc-20260327;
-        b=f9N77U1K3ZQcBiNFKEcVeU3bmX7J+hzENTFhBlfTE8wgqfcmcxbsxe/8uLqdU2+Mpy
-         vqWd4b1khCH6xB4vkq5vtY8uezv1E2JRAuB2h2Itr59ARxuAmHkWmYXjEiOzYZ342BJJ
-         duSyWe6y9OvsBcoWXjn+URXbtJrQELzSrEM637kTKCO94SN4Ce2yKkRWV9VYTQ3yBr6x
-         dWZSyQu3ZOuWlEu/87KQ/RVJobaU1zGA4tIbT30w34orHJ+Eiz7cZe/w4emqRehqyxud
-         pb3glkw5JsIycIq1KoXKlvqxFBwDzpZMOMZZVjvZyx9494uqDLgIaQLUwTckolfJNgEq
-         lOyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=rntaW4qP7qUm/rpCDs8AkAc3u/q2bwtFH1Dwu9ED+9M=;
-        fh=DQMU+4MbdnXphPd50Cvn6k6Ma++X8mbqbA98js7Safk=;
-        b=CkVVWzdhamBfnrdea5QOKO4WQ6tKOQ0S74GBbpzPQwEefYeZC63pTZ5YxsW4A5tnUp
-         M1frVHZTh94DeEuu28dcxU3xvfl8sv9YyWtA4gb32toZ2SAz0o8fYq8oxQ11Rkk61yo7
-         3qpWBAuWVPGyzd5cbYB23eExLTdQK38Oy5Zr84wITMUJ+UqN+cdL9za1fpiwH8kjrDHd
-         YDTmg1H25ib7xClft6P5MnzevFL5JKwvlGYJJ0aVf2FEBFUtN8aUN8aIV+zzUftE9P2c
-         e5mFahJPRU/Kz+14wlI7y31YSsVEPwTVvLClepp10y/4sbmBEBxqG9KyhvrPvSM4aFZa
-         OQaw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=nCzlJqch
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2f05bc71e01so21445325ad.0
+        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 16:39:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795565380; x=1796170180; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:mime-version:references
-         :in-reply-to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=rntaW4qP7qUm/rpCDs8AkAc3u/q2bwtFH1Dwu9ED+9M=;
-        b=bKP5JN+txnagUjrT+KyPlIY5daEWkCg82DFYQvk1pGDMCDG6uu2EjitGLRdfT3VPkW
-         I9THDLfNLN8SotjLCYwRnqEgLJTY4e73uXFOyuo0wfEkkEbAlk/wCYJhLvdQrJptaSPd
-         8TFanXGVkLg8jWdRBQ2xmIvpnRxMzZT9bsYGUuygTtoSGDHyGujGH3609YDgu+IQLDeu
-         R+Vo0l3y1npCwGXht6pwopJOjYkKKaQbmXU2BoyW6ikjkZj3SnI4vP3k9XKm+SoSZvHn
-         J0ioTmsPPDVooTqbo/NH8AqUTD/1qiFwx/N//Tse8kokQ4TpE2CxIbfQhmG6oilD2Azm
-         Inyg==
+        d=google.com; s=20260707; t=1795567194; x=1796171994; darn=lists.linux.dev;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-type:content-transfer-encoding:mime-version:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=YKxHcqUXjQp/1J5J8B8/Kkrmh8UptW8ucEK7buHNuos=;
+        b=nCzlJqchLm9wVfq1hfTMvrl4CGlTPvgGRlXCFvr67M9+kxomxzBfe6jf6It7yRuFjo
+         Iu88IRlIfVu3mfnlUbhpXfvmbEM7Cfi1YZ+Iwvsiahf3GiPYFQYkhsXUa8ibrlDjodd3
+         riMi5ZQPdNCiQ92rBvgXb+o2SCnWHCE1ypTYilpoRfgmNEJF5Iy89YWdMbsFcDMXltQ6
+         ki38FIId3w9rZeY83JAEXF5pWqOf4PNm491qrzEzchzaOg0S/tePlieMC4xYwuDHXhvb
+         +oLQoknGfG2FoM/vroKP+ep5rNgyko0PHDJblSI5dSIvJtXdr0A3lweNldmb4WVkeaDw
+         v8lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795565380; x=1796170180;
-        h=content-type:cc:to:subject:message-id:date:mime-version:references
-         :in-reply-to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=rntaW4qP7qUm/rpCDs8AkAc3u/q2bwtFH1Dwu9ED+9M=;
-        b=qMyxD9vm9jE1M2jjdc7KGLgpzJRy9MiyFzjFbYCKFSNrKhwvE/pl9kK3hB5Ueie7aI
-         B4DuViM1tbS8i4u7Gxr7CShsXvnc/cIsN1ZhKZMbMCUs/3VOROKhHho57DsK6w32zgld
-         1BWTz+k0X+szgkEPgT9bZdH0UF2XMVDCyKKahj01FbML6vBaqoEa5IWbgSQ+PKE99C5q
-         2czP1zcaKFcm2c905SNq394XBZXo2xXsMnN2PDKGSrSwXUdwEmBEqoSJeMdeQq0d3k6s
-         RksCk8nqUvRtik5P7bBG4JyqV1Mz8zOYPGKGG1MCFFNXGO3tDKEkQhEi+vddC5DAfKW9
-         R+oA==
-X-Forwarded-Encrypted: i=1; AL+hErFApJoFvRoZ9XpG2lgNpdI3MkbcoZhKZuIny2S1RjcZ25MUkgcKfVr0kYcEuQYljyvKjypMC4o=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/Wfzcw7+5Z4thPMNlocs0TPlbcmeYn7C1lwpN5WEiGd5VQUPcA
-	rluRi/Hmx1li4bih3D2FQBQhe3iKgkH+F61YQDe3OKMBveOK+WzOJlT2noBGczvmX3wbs1HJl/s
-	R4kWyJr8R9tCMRLR6cm8tYnMl0WtjkG2DrxlIrhma
-X-Gm-Gg: AZFdTZfe9BDMhILsv/1V9shYaOfTBkYTM4ne3JQdX/iHRM4nVnOLh6VQC7cbFTPwlCg
-	OK+9DG91uvbymjGL8x87eyvbwEJPFZv8I2VqOr55uy/Fomw6TM1dDp5XP8wQ0BAuFUWCpNwrxeZ
-	Ks/9qcvqVIf4OCwsftjp08irC63qAE4jWskntfxlV+YeZWpJcdfBfmKFssuOy4kP0y8tsrkG1tS
-	O9TI+GARUNbTsGKowhbuya6/V7LAkKD/CdPjLbL9KKVWIuzewufMTsxhF8zxwhQIZ9dceKdeHqv
-	t1DcpwHx38u0r4Y62+xbm7x9xEs6Red6mut1iDF07b6rUafNm0KP/4gh8KHECyXmnZfJ/E1JUks
-	W/BU8HE/PZ9xYsFeGCduPCGJUPmPhfpSTO//wc0vdFk3WW7VcSpBhFavt2HfROwC1icRUymsxzm
-	Z6aHLj/mvf/U59ARYv5gEqTEk=
-X-Received: by 2002:a05:6214:3c9d:b0:91c:9316:f4e8 with SMTP id
- 6a1803df08f44-92134baab8amr275174306d6.54.1795565379417; Tue, 24 Nov 2026
- 16:09:39 -0800 (PST)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 24 Nov 2026 16:09:38 -0800
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <20261123104233.95710-10-steven.price@arm.com>
-References: <20261123104233.95710-1-steven.price@arm.com> <20261123104233.95710-10-steven.price@arm.com>
+        d=1e100.net; s=20260707; t=1795567194; x=1796171994;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-type:content-transfer-encoding:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=YKxHcqUXjQp/1J5J8B8/Kkrmh8UptW8ucEK7buHNuos=;
+        b=Rz4QONfnCxE7mgIz53JqZnkg4kLL9/HLNr4cHaNAnNRR3GNHyOSZUkFnoTAX99sajX
+         shwvR5ycOClzKB3Yh8r8Q2NR+ca1qwEzjcKB6LKvAp/D2XhrYSANFn9xdQaTOT01qiN/
+         06faIcWEQ+Bld5z7pIS0YJ3QEW48gbZrOJx3jbFMoyL6FzKcTyw9HnSRuckUMt8CFI5v
+         d//3UGzxBfloxLpIOObNulg7b4an1evbOF4IR695k/USlPtzElLJ1mmk1sWfFLk0Ox3c
+         HDbohkrmsPHdR7/F9c7AiAwvFdCSDeEPfo+AFnReqCzosS6Sa6jEY3rKI5H7dXJJHiDK
+         JD1A==
+X-Forwarded-Encrypted: i=1; AL+hErEtspDwAK8oONPPagFuEXbbyJewqYSNqqt/yFoyTy4zFf2rM+pfTacV9TKte6U5EnRISPhvpbw=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8ztY2ChaMqR0Q7yGpyt8OZF99c6RCa8h0eHY1ms7VswUmvPWnr
+	yz5gK1sWnKZGMZ3KWWZiOeiQTXcIkY5+p7VRISur/Ns32YNbdWpAB0Zf25LJ+Krq5Q==
+X-Gm-Gg: AZFdTZdTDJpKa5r0fT+Efv+aFKhz8GpZrCiGhtnB40NxyQxwb/lr6li+M66DtiZ+q0h
+	BdAc8jfmX/YN3RGDvZ5KODQ+1xWD0VW4hW3dVsOsz6AdOvIQmF7pBinQrD814nGtPwn9wVGFThj
+	xPyfZQrohfXfvDjMoCjg/xu5BSlo2ZzDojzU51y94ioT84Ta1GfF2qXXw5VXTOE9qXeRIO5Ym+J
+	26R7ej+4dIbDAEhe3VtEOaWBRz6gvvKtVBZtuRW7Q5YxgX0MmwRjLMJ6LdugOWPIwVKGPZkjY8P
+	F4hNouIb0pdGXxeGtioGKVbmZpemjTes1vC3NZsxjVnsPylUAK8eUfgiOszmXjmdOiW2IhnenLb
+	M7bGzwYh71sXEsjxNTQGLqvBGt0ILIBTAQcW7buhh/QAtwEw6Xh/JhNMszMxzLWvXS/4ioI+OuO
+	45fWCIGxpAE8n3gae+Xy1pKME7C6GQjEqdBuArhPZLOpxtm0Jv2Q7MKl66iApzpyU1zax+aSWFI
+	aeJg25jasuRB+kPw3aZ284URx+yt7wGIkC0FyJZPIouxCahj38XipaEAs5OYiVHnvIeuMaYeE09
+	pyYDkZMHqQQwt7BbUmagSF0IGQHvu98a/eqZECjHWHl9TP00UysBzDV6VwWHcv3C
+X-Received: by 2002:a17:902:eccf:b0:2f0:25ea:8fa8 with SMTP id d9443c01a7336-2f03f176abamr169618335ad.19.1795567193320;
+        Tue, 24 Nov 2026 16:39:53 -0800 (PST)
+Received: from localhost (33.79.127.34.bc.googleusercontent.com. [34.127.79.33])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f03ee848c1sm75603595ad.10.2026.11.24.16.39.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Nov 2026 16:39:52 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -108,186 +87,75 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Date: Tue, 24 Nov 2026 16:09:38 -0800
-X-Gm-Features: Aa3M54oNKjHnmwhcyDiHaoxz_zNMiDJBoB2YChnt0u_TPYjP0NAb6dZlL994CUs
-Message-ID: <CAEvNRgFQ5BXqU3KfPFT8bfZTW=RyvBw25z3GZtr3JA=Wv3Yqfw@mail.gmail.com>
-Subject: Re: [PATCH v4 09/11] KVM: arm64: CCA: Prevent memslot modifications
- after Realm creation
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
-	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, Kohei Enju <enju.kohei@fujitsu.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 24 Nov 2026 16:39:52 -0800
+Message-Id: <DN3VG4JCILOO.YN40XHHSWRPH@google.com>
+Subject: Re: [PATCH v4 03/19] kho, memfd_luo: Reference struct kho_vmalloc
+ via serialized pointer
+From: "David Matlack" <dmatlack@google.com>
+To: "Pratyush Yadav" <pratyush@kernel.org>, "Tarun Sahu"
+ <tarunsahu@google.com>
+Cc: "Pasha Tatashin" <pasha.tatashin@soleen.com>, "Mike Rapoport"
+ <rppt@kernel.org>, <robin.murphy@arm.com>, <maz@kernel.org>,
+ <will@kernel.org>, "David Matlack" <dmatlack@google.com>, "Alexander Graf"
+ <graf@amazon.com>, <seanjc@google.com>, <jgg@nvidia.com>,
+ <loganodell@google.com>, <arnd@arndb.de>, <dwmw2@infradead.org>,
+ <baolu.lu@linux.intel.com>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ <oupton@kernel.org>, <alex@shazbot.org>, <gle.com@google.com>,
+ <pbonzini@redhat.com>, "Andrew Morton" <akpm@linux-foundation.org>,
+ <kevin.tian@intel.com>, <joro@8bytes.org>, <kvmarm@lists.linux.dev>,
+ <linux-pci@vger.kernel.org>, <kexec@lists.infradead.org>,
+ <kvm@vger.kernel.org>, <iommu@lists.linux.dev>,
+ <linux-arm-kernel@lists.infradead.org>, <skhawaja@google.com>,
+ <sagis@google.com>, <linux-arch@vger.kernel.org>, <linux-mm@kvack.org>,
+ <linux-kernel@vger.kernel.org>
+X-Mailer: aerc 0.21.0
+References: <20261110050202.529473-1-tarunsahu@google.com>
+ <20261110050202.529473-4-tarunsahu@google.com>
+ <2vxz4idb1i2w.fsf@kernel.org>
+In-Reply-To: <2vxz4idb1i2w.fsf@kernel.org>
 
-Steven Price <steven.price@arm.com> writes:
+On Fri Nov 20, 2026 at 10:19 AM PST, Pratyush Yadav wrote:
+[...]
 
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> +static size_t memfd_luo_ser_size(void)
+>> +{
+>> +	return sizeof(struct memfd_luo_ser) + sizeof(struct kho_vmalloc);
+>> +}
+>> +
+>> +static struct memfd_luo_ser *memfd_luo_ser_init(void *mem)
+>> +{
+>> +	struct kho_vmalloc *kho_vmalloc =3D mem + sizeof(struct memfd_luo_ser)=
+;
+>> +	struct memfd_luo_ser *ser =3D mem;
+>> +
+>> +	KHOSER_STORE_PTR(ser->folios, kho_vmalloc);
+>> +	return ser;
+>> +}
+>> +
 >
-> Once the Realm is created, prevent changes to guest_memfd backed
-> memslots, which can provide private memory. Validate these changes
-> before KVM invalidates the old memslot, so a rejected deletion leaves
-> its stage-2 mappings intact. Realm stage-2 faults will also validate
-> the private memory backing in a later commit.
+> Hmm, I am not a huge fan of this. This makes doing such allocations
+> quite annoying, and I reckon we will be seeing a fair bit of them in
+> many places.
 >
-> Require Realm memslots to lie in the lower half of the IPA space, as the
-> upper, shared half aliases the lower, protected half.
+> The key observation here is that most file handlers need to allocate a
+> bunch of preserved memory, but they usually can free it all at once. So
+> we can get away with a very simple allocator that hands out memory
+> linearly.
 >
-> Define kvm_arch_has_private_mem() so generic KVM recognizes Realm VMs
-> as supporting private memory. Defining the macro also makes
-> gmem_in_place_conversion true for every arm64 VM, so guest_memfd
-> memslots are marked gmem-only even for non-Realm VMs. A well-formed
-> KVM_SET_MEMORY_ATTRIBUTES2 request on a non-Realm guest_memfd now
-> reaches the VM check and returns -EINVAL instead of -ENOTTY.
+> I have sketched out some code for this, take a look at the patch below.
+> Note that it is only compile tested.
 >
-> Additionally, similar to pKVM, do not support dirty logging or
-> read-only memslots.
->
+> Perhaps give it a try and see if it does the job better.
 
-Imo this could be split into a few patches
+I agree the manual packing in memfd_luo_ser_init() isn't great, but I'm
+not sure we need an arena. This seems like something KHO slab support
+will solve properly, and since kho_alloc_preserve() already takes a
+size, KHO slab can be dropped in underneath it later without changing
+any callers.
 
-1. Add the constraints wrt realm memslots and being in the lower half of
-   the IPA space
-2. Defining arm's support for private mem
-3. Imposing rules on memslot changes
-4. Maybe some others, maybe I'm misunderstanding the patch
-
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
->
-> ---
-> Changes since v3:
-> - Explain the arm64-wide in-place conversion effect and keep the
->   general IPA limit comment.
->
-> Changes since v1:
-> - Preserve private mappings if KVM invalidates a Realm guest_memfd
->   slot before the prepare hook rejects its deletion.
-> ---
->  arch/arm64/include/asm/kvm_host.h |  2 ++
->  arch/arm64/kvm/mmu.c              | 37 ++++++++++++++++++++++++-------
->  2 files changed, 31 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 3ddeddfacd06..55673d08e3eb 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1607,6 +1607,8 @@ struct kvm *kvm_arch_alloc_vm(void);
->
->  #define kvm_vm_is_realm(kvm)		((kvm)->arch.vm_flavor == VM_REALM)
->
-> +#define kvm_arch_has_private_mem(kvm) kvm_vm_is_realm(kvm)
-> +
->  #define kvm_has_mte(kvm)					\
->  	(system_supports_mte() &&				\
->  	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 800333a345cd..9af5fe6d87f0 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2861,17 +2861,32 @@ int kvm_arch_validate_memory_region(struct kvm *kvm,
->  {
->  	lockdep_assert_held(&kvm->slots_lock);
->
-> -	if (kvm_vm_is_protected(kvm)) {
-> +	if (kvm_vm_is_protected(kvm) && new &&
-> +	    (new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)))
-> +		return -EPERM;
-
-gmem is already generically mutually exclusive with
-KVM_MEM_LOG_DIRTY_PAGES and KVM_MEM_READONLY, so before this change,
-pKVM is saying no to KVM_MEM_LOG_DIRTY_PAGES and KVM_MEM_READONLY for
-all memslots, gmem or not, so this check makes sense.
-
-> +
-> +	switch (kvm->arch.vm_flavor) {
-> +	case VM_PROTECTED_PKVM:
->  		/* Cannot modify memslots once a pVM has run. */
->  		if (pkvm_hyp_vm_is_created(kvm) &&
-> -		    (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
-> +		    (change == KVM_MR_DELETE || change == KVM_MR_MOVE))
->  			return -EPERM;
-> -		}
-> +		break;
-
-Not sure why pKVM doesn't allow deleting a memslot after the vm is
-created, but this is no change from before this patch, the removal of {}
-here is mixed in with the other changes in this patch.
-
-> +	case VM_REALM:
-> +		/*
-> +		 * Once the Realm is created, we cannot modify any slots that
-> +		 * could be providing private memory. i.e., guest_memfd backed
-> +		 * slots.
-> +		 * TODO: Handle trusted device private memory slots
-> +		 */
-> +		if (!kvm_realm_is_created(kvm))
-> +			break;
->
-> -		if (new &&
-> -		    new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)) {
-> +		if (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new))
->  			return -EPERM;
-> -		}
-> +		break;
-
-Imo this should be written the same way as the pKVM branch for clarity,
-like
-
-if (kvm_realm_is_created() &&
-    (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new)))
-        return -EPERM;
-
-but that aside,
-
-1. Why block creating memslots after realm is created?
-
-Does ARM CCA have no way to add pages after a VM starts? This isn't
-blocked for TDX and SNP so I think this constraint seems unnecessary.
-
-2. Why block deleting memslots after realm is created?
-
-This also seems like an artificial constraint, and it constrains the way
-the userspace VMM operates when stopping a VM, like the memslots can't
-be removed ever, the VM just has to be closed? (something like that)
-
-> +	default:
-> +		break;
->  	}
->
->  	return 0;
-> @@ -2883,6 +2898,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  				   enum kvm_mr_change change)
->  {
->  	hva_t hva, reg_end;
-> +	gfn_t ipa_limit;
->  	int ret = 0;
->
->  	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
-> @@ -2891,9 +2907,14 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->
->  	/*
->  	 * Prevent userspace from creating a memory region outside of the IPA
-> -	 * space addressable by the KVM guest IPA space.
-> +	 * space addressable by the KVM guest IPA space. Realm shared IPAs alias
-> +	 * the corresponding private IPAs, so Realm memslots must reside entirely
-> +	 * in the lower half of that space.
->  	 */
-> -	if ((new->base_gfn + new->npages) > (kvm_phys_size(&kvm->arch.mmu) >> PAGE_SHIFT))
-> +	ipa_limit = kvm_phys_size(&kvm->arch.mmu) >> PAGE_SHIFT;
-> +	if (kvm_vm_is_realm(kvm))
-> +		ipa_limit >>= 1;
-> +	if (new->base_gfn + new->npages > ipa_limit)
->  		return -EFAULT;
->
->  	/*
-> --
-> 2.43.0
+Until then, maybe we should just allocate struct kho_vmalloc separately
+with kho_alloc_preserve() and accept wasting a folio per object. For
+memfd that's one extra page per preserved file.
