@@ -1,80 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.203
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795616366;
-	b=KEJzqLS76i3fLuPJFoTDXjPC9hMkACMXthdrmihkZXwNYxqZMLlkWg3Psd3u7fS/tEa6
-	 7ooWoryoF1p1jfZ9kSGC1q0Sk5W6oYWoguDt5A5M5px5Sr8fIvbgMCI+1RJZKFlfnerlB
-	 CQG8LCw+WkmEudbSPyPgdgVjUqPLH9WduMdyF0GJ3YYbATDn72P8YmK+6BWIiCwXrQNKG
-	 XaMReT7eZwS2r/yyu4gmbUdc1D29cofU/Uf1tm5c0/WuYpVYCbZ+SXWpev+gd+4rDdLil
-	 kikxK9jRfd8OajsfYjDN08BQFtRx46ANlwu0h+JbYqBWoVPItDOz3ZfXZXGGDqunm+w==
+	t=1795616844;
+	b=WGMJCZPeZQWq9GiNnj8A/MkR5vr6LXsBRbJIsvAU4AHaS25savaMvZ3QBjvhQZcrWdpn
+	 It3n4hEHNiqdaIPNOjwepAPGI4RR8aXKb5lnq32l0a29TW/2LwuzZHUVWLwe/9hyrW6ad
+	 CmeeybtwrmDYLtYw2gSQ+i6rIZ8YyT40lWV5j7b8zWpuBwtCQ1HUOKCrindLp0itzdWGB
+	 tVflCF1/XpA11I8G/5THiuY4ZkAm6W4q2ROsq45PGRQbE3vMubcvzPPs0jIrOx67e3Gvq
+	 HtNgPJg3EUJQIBkOqrCZqgnh+s73gktD6DL7f83044fBv5yqIEcZv40kPUDV+qMSARw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795616366;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=Uw51BNnNSMZkfcts9aiEFizxk6Nl2DC+AS1z+RPufIo=;
-	b=yzcci+9XLZmNj1FbmFdXfw5DRTZc2RxLFWo3gFQM4N4ThemsTEqD8OEUfGLWCFy9HipQ
-	 TNutOkKLj8JirdYUqTkY88uzqqqdRvrBLG/w9cOTFWiQws1CrsVMnizQeLlgWA2LfRgza
-	 Szt8hdsfb7OPF154R6thLx/tEdjh4I39eSMbBlyOJnzjyN6/JHWYD38d0OvlIybmJ3jWe
-	 CkJM+C6V2OX03RPDfQ2PRF0NI1WahTTGCqCUNxdRBxjG8f+dQqdy1dhJlXxqaPksGdjQF
-	 yJ6zTQgIXdSc6gMQmfmvRwPCtv/eV6td8zLoNjszanbLIC2BvJlh/VxjRFbO9A7oAJA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795616844;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=mZc2jCgr+ZEG71mhrtI7bu0QzE46TwhUiStHpCur4nU=;
+	b=XGRkI9IYz/8V4tzFJm/S6lAo+k4TGPJlW8rnKs6189utORL/66Gcv6pm4KXSocB3VDEQ
+	 Wn3Y7QSZivgtN1/dyqXdQ3mnrV5nR9wjqGwJdhc9iNCFJmVEwdrRwSW+XA03iCqMWzL1V
+	 pJi3Ew1SYCFCh3sTOsy5N3upsW3w1bJHydlntXZRXA6F0vzueAyIHbAkgbZJIrzzMzk+S
+	 jHxZnsS/U+vf8dYNuivrriYY6MFGMvnbpnVRX7G6OB6L8s06AzQQxDPP1DFky8zJ54hPR
+	 J4gNvzZDsUHOFpno7x7O9wah82j/R3of0cKf7D4x3yMB0o34CJ9JPCinqj156BkCeAA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=CWOkp8F7;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58EC606A321
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 14:19:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E58EC606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=auEWpafx;
+	arc=none smtp.remote-ip=91.218.175.203
+Received: from mta0.migadu.com (out-203.mta0.migadu.com [91.218.175.203])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A1F606A321
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 14:27:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 96A1F606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=CWOkp8F7
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 46AD32F;
-	Wed, 25 Nov 2026 06:19:22 -0800 (PST)
-Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0D1D03F763;
-	Wed, 25 Nov 2026 06:19:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795616365; bh=zOuTUXAl5Me8B3Bviry0NGcs0zsjWzErFF7qo9A3aGc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CWOkp8F7fQmWiAUNbgy+iHiUf8mWp+DIO06axxeCI11H+sQ6pnGd+zxvlgwqzB9hj
-	 1dmzmWI6vwm1F1TraqVf1cvJPFRIjM7bW54/QNRJWGi2SEwtorVa+EspH4/ZJdZY7V
-	 58m2h8ivwmNm/x1k+jTPsSn1HB7ERn1w+30/1qdw=
-Date: Wed, 25 Nov 2026 14:19:15 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 03/23] arm64: sysreg: Convert OSLSR to automatic
- register generation
-Message-ID: <awbuY0mETtZ_mQh3@e143914.arm.com>
-References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
- <20261106-sysreg-v3-3-75e95980fb10@linux.ibm.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=auEWpafx
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=mZc2jCgr+ZEG71mhrtI7bu0QzE46TwhUiStHpCur4nU=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795616841; v=1; x=1796221641;
+ b=auEWpafxO5FC+N+IWoifGbM9SehItG+Z6S+6/YE/iLY6kN8nvAGhZGwh2h+vw/aJTHnApfU8
+ XnNjcl1SnhqgTMKW5F4/okMoSfE3SutzqfqX2XrEkXjE93XhhbPApcYyRGFOGNPo34i30u1pTv9
+ Rdj6/txOJ72bH2QiXYfXyFkM=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id d6e7e1e82acdb99c;
+	Wed, 25 Nov 2026 14:27:21 +0000
+X-Mizu-Trace-ID: d6e7e1e82acdb99c
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5c14bc5a743so35952e87.0
+        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:27:20 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErGi/UncaEWCasaCjeL3K/EpiGRQwJwi14+Fw7AuhMfEieJYYY4uySav6ybEHlYMIBF1nfEd5rU=@lists.linux.dev
+X-Gm-Message-State: APuU4Z87ElttR8l43af3EO+4PFR9ia1ftdpMx449tDQTq+q+xrVkNWeN
+	kL/t2dVEQdVTfOTGT2BG/ENQZC6TVasn4Imd+fPzBMqpyaDkNPVOcgIqqnJearULfWAV8Dw/X9E
+	zdd0cZZrAwOssOyCTHZPgG281nljm/TNgLRVkeX3M
+X-Received: by 2002:a05:6512:3ca7:b0:5bf:f060:c0f3 with SMTP id
+ 2adb3069b0e04-5c21a26fab2mr555752e87.12.1795616839635; Wed, 25 Nov 2026
+ 06:27:19 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -84,100 +66,32 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261106-sysreg-v3-3-75e95980fb10@linux.ibm.com>
+References: <20261104140612.137869-1-vdonnefort@google.com>
+In-Reply-To: <20261104140612.137869-1-vdonnefort@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 25 Nov 2026 14:26:43 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTy=DTmPBQd1tiM2Qo9CN=wRJT_S+7fX5u+gwUTWXK9+Rw@mail.gmail.com>
+X-Gm-Features: Aa3M54pbT2MD_xSnGtMFqbfMy5Tkwgi8UvFa3y0WAMmC7PRuqL5G_h-h3jfQvGU
+Message-ID: <CA+EHjTy=DTmPBQd1tiM2Qo9CN=wRJT_S+7fX5u+gwUTWXK9+Rw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/5] KVM: arm64: pkvm: Extend hypervisor entering
+ tracing reasons
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
+	qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Hi Vincent,
 
-On Fri, Nov 06, 2026 at 05:07:36PM +0100, Steffen Eiden wrote:
-> Convert OSLSR to automatic register generation as per DDI0601. As
-> OSLSR_OLSM is a composite field using bit 0 and bit 3 the combined
-> values are still defined manually. While at it rename
-> OSLSR_EL1_OSLM_IMPLEMENTED to OSLSR_EL1_OSLM_IMP to be consistent with
-> the rest of the system register values.
-> 
-> No functional changes.
-> 
-> Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
-> Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+For the series:
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-Need to do the Sashiko suggestion, it does fail to build.
+Tested on QEMU with the hypervisor trace enabled, running protected
+and non-protected guests in pKVM and a non-protected guest in nVHE.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-Thanks,
-Joey
-
-> ---
->  arch/arm64/include/asm/sysreg.h | 12 +++++++-----
->  arch/arm64/kvm/sys_regs.c       |  2 +-
->  arch/arm64/tools/sysreg         | 14 ++++++++++++++
->  3 files changed, 22 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index e3b60ee03023..2ec9ba9cd896 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -186,11 +186,13 @@
->  #define SYS_DBGWCRn_EL1(n)		sys_reg(2, 0, 0, n, 7)
->  #define SYS_MDRAR_EL1			sys_reg(2, 0, 1, 0, 0)
->  
-> -#define SYS_OSLSR_EL1			sys_reg(2, 0, 1, 1, 4)
-> -#define OSLSR_EL1_OSLM_MASK		(BIT(3) | BIT(0))
-> -#define OSLSR_EL1_OSLM_NI		0
-> -#define OSLSR_EL1_OSLM_IMPLEMENTED	BIT(3)
-> -#define OSLSR_EL1_OSLK			BIT(1)
-> +#define OSLSR_EL1_OSLM_MASK (OSLSR_EL1_OSLM0_MASK | OSLSR_EL1_OSLM1_MASK)
-> +#define OSLSR_EL1_OSLM_NI						\
-> +	((OSLSR_EL1_OSLM1_NI << OSLSR_EL1_OSLM1_SHIFT) |		\
-> +	(OSLSR_EL1_OSLM0_VAL_0 << OSLSR_EL1_OSLM0_SHIFT))
-> +#define OSLSR_EL1_OSLM_IMP						\
-> +	((OSLSR_EL1_OSLM1_IMP << OSLSR_EL1_OSLM1_SHIFT) |		\
-> +	(OSLSR_EL1_OSLM0_VAL_0 << OSLSR_EL1_OSLM0_SHIFT))
->  
->  #define SYS_OSDLR_EL1			sys_reg(2, 0, 1, 3, 4)
->  #define SYS_DBGPRCR_EL1			sys_reg(2, 0, 1, 4, 4)
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 2b28b929f9f3..8c91de6a4097 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3309,7 +3309,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_MDRAR_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_OSLAR_EL1), trap_oslar_el1 },
->  	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1, reset_val, OSLSR_EL1,
-> -		OSLSR_EL1_OSLM_IMPLEMENTED, .set_user = set_oslsr_el1, },
-> +		OSLSR_EL1_OSLM_IMP, .set_user = set_oslsr_el1, },
->  	{ SYS_DESC(SYS_OSDLR_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_DBGPRCR_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_DBGCLAIMSET_EL1), trap_raz_wi },
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 997c62ab72e6..5d38f115bac1 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -122,6 +122,20 @@ Res0	63:1
->  Field	0	OSLK
->  EndSysreg
->  
-> +Sysreg	OSLSR_EL1	2	0	1	1	4
-> +Res0	63:4
-> +UnsignedEnum	3	OSLM1
-> +	 0b0	NI
-> +	 0b1	IMP
-> +EndEnum
-> +UnsignedEnum	2	nTT
-> +EndEnum
-> +Field	1	OSLK
-> +UnsignedEnum	0	OSLM0
-> +	 0b0	VAL_0
-> +EndEnum
-> +EndSysreg
-> +
->  Sysreg	SPMACCESSR_EL1	2	0	9	13	3
->  UnsignedEnum	63:62	P31
->  	0b00	TRAP_RW
-> 
-> -- 
-> 2.56.0
-> 
+Cheers,
+/fuad
