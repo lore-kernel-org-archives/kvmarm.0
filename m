@@ -1,58 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=139.138.36.225
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795575769;
-	b=q61Xo/OdL8iuE23SOfsDiAnQS9oeQ3oKGT8HODyp5Dh7lnVNiAhIXfIB+ihkaZKO9Kzs
-	 jjiEHuJWoQaJ2v2vG0pNJk4janTzACQMqcI2iqevsnHDnfJNwZDTObaA8K9Ck91ssoteN
-	 GESjntTCILya71GbZBTv+8K95r+otyuoxPv/dOXnwxtmNkQIb3O2H+S81qebA6KW40dWh
-	 cdb0hMlQfjtXGeKDzCk4TmzYKWc40SGvEp1lnT+adZkDPC3JZ3ld5hGTSJiqwTT9XgCtd
-	 0XImQjSMrUwH47Gi4qyvgm4uf7PRMtxfQp08gsrw94Z/L7QhZukslHauALHSuylpz/A==
+	t=1795576668;
+	b=Iuwzb8z57S8VlBnO3cWd8ZEkZaXWyLlLZIYeWCHrLZlww/a9kf1bsOJKu1a1Z9IFjy4M
+	 QX9r+CjrPV1n9wFLlJx1p58Cilw6MmElv6nc58WV409gXgunXYNLJQqBRppgoO9IEERV5
+	 RaAeLZf3BJyMnZT9w3wuitu+wvkk+9cMD8eqZA3OkRAOestmDzJSxVFFAhX7TVgKcNFr3
+	 v3yBB7jOyXyZaM7mN6gFX9XDZlrtnZCIBYNH3QdlbR8aGEkGsry1rmVlnOM4XlYLmROs+
+	 xFiclSVE465ikkfQ+xYToWPbzxj7xCns9vFAcBu3Z+wwZ+8+EpEKHf97Yo+n79TUB9A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795575769;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=ZlJ+QNgY2eTHL284R0Wbw5HiO+XpfwNUzEm+JNX8OsY=;
-	b=4NWm9uW2YPJfyFZqpuhvgM8AeYVptw4nQui9rwJ6dsldGveHStlUBpDPhLrOh9f7VDq0
-	 r7apZBp6cZdF+bGhPTsjp9pCk9CCSB7Y9b9T8BVJBrqYM/s22zkCSI1gjhv2Wp/ut0yTA
-	 FjkW1u8n0IgBb7YdYyYZbvskJaDDyH1ywigYkKk0YDzV6Xoz/5NVaktjb/+YzymrjAGz+
-	 1UBZLGzqMqIAVeln1NqRO0AiUyurdOw0SR2pp2VuYC1IGUT7pTde+A/lEzGlywWqtdErp
-	 kWIpOA0qyAkWcfTRj4KRmrrfmNzZrcqlM8RW+WGXRMVLlRPsWtSkjAEqY+gV/74C+EQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795576668;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:Received:Received:Received:Date:
+	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=23fFU0O+rXserzO3o7D7RV3GbnE7B9R3sHZLTrVXSyk=;
+	b=F1tt3yKo0FzZvMiNLdf4fdo7vzqtFs3d0FmqtEf44ZGL/C+fDwOP8zXYaYSckrZQkj49
+	 tLzJOjk4HRJBHVq5FVJxB/jb2GOB0N3oBiNpRHtepCCi10CLKPxukWoq0H3zWDZZ9K9hp
+	 SjhUTTvSRXWbHfdNnSfjbtB8X6ci2QTPcm+MJMpKiREjRQLt7SFJhnRWpTbBr/3AckaM/
+	 vgAmpXvep3LCzaUMN9/1zngK9ABh6imX/uiJB22gRDkkPjRQShZSW7JoT7fo0lOxoFk+/
+	 emGZXM/XrVhtThmzlF1VnYLQ/MdLO7oHxrZcC1J93kCon/5s2VaJPAVLcGS+XdhV4ww==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DIBam8tJ;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=fujitsu.com;
+	spf=pass smtp.mailfrom=fujitsu.com;
+	dkim=pass header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=FxrXQtku;
+	arc=none smtp.remote-ip=139.138.36.225
+Received: from esa10.hc1455-7.c3s2.iphmx.com (esa10.hc1455-7.c3s2.iphmx.com [139.138.36.225])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DE7606A321;
-	Wed, 25 Nov 2026 03:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B7F606A321
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 03:17:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 75B7F606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DIBam8tJ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F3311F000EF;
-	Wed, 25 Nov 2026 03:02:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795575768;
-	bh=ZlJ+QNgY2eTHL284R0Wbw5HiO+XpfwNUzEm+JNX8OsY=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DIBam8tJqFf/pCR0U3cgTzDFY24t5PhkTuzO76WpTobCG0xoHen8trwY8NSk5Ltas
-	 Ju6yHOMNqeHZ6+oxSTiNeafhTeJETjM1V8q7Jwbi7cYLkMX9UCSbDg/dYanbDLINJ0
-	 /uuxrHT1kKi65A6tSas+tBLgR+doEfKxHFIFXcqrx1731xW4dzLVnQ4Y38b3tuS/2g
-	 N+C1/yYsVBQV8yJkfhop7bzI61gE02kMIqvjTBvfp+i0W8lDIbtryxtOFtxLDUksEQ
-	 gOj14msU//F+3AQO6sFTHFq2bSWxb776zlSOf7ub5mhzmKxku8jjQiIgaXLccX439W
-	 ILqJAfEZYFMQQ==
-Message-ID: <sashiko-outbox-232440@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 2/3] KVM: arm64: selftests: Add a test for VNCR_EL2
- translation faults
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Jia He" <justin.he@arm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20261125024426.3464050-3-justin.he@arm.com>
-References: <20261125024426.3464050-1-justin.he@arm.com>
- <20261125024426.3464050-3-justin.he@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Nov 2026 03:02:40 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=FxrXQtku
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1795576667; x=1827112667;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=P+2esJNoADXhVcXnXeX/GpZHHYhnsn3OGqjyBJ5lLUY=;
+  b=FxrXQtkutOy5HAwzrVtWfYW7/flD3E/bwKTN+DxiT4eQwJC0VFws3jQw
+   FZT/tgEEgNm/rHWViHoBSA/hxHtWh78OtPSd2PH3h5xOK3MfcR9ggWcLS
+   VCyPvuPt1xmV0FEdQ3b9Ni/mQGDOAvgEfg80iOC3RId0rOHagN+wOZosW
+   CM1hqmzwxLOEZdvqNF/ODI8UkuxvbPCRKJYLCI7R60kI0oWBK7uNYSlXp
+   Mi+QH6LEHr8/E3JBEVAEpRjY3yWJfBjy1U8VzCGmx2EbDO1dybR9+G5f1
+   +5Kxkqe1of2bgGrC8SDexMYH0pgNA1IEgOz2KPglRmnP3A53brPL3s6Yr
+   g==;
+X-CSE-ConnectionGUID: nW2h8SU4RUipXwEA7fnroA==
+X-CSE-MsgGUID: AIW7pUcSRt6bzqurQ++ltg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11976"; a="249189417"
+X-IronPort-AV: E=Sophos;i="6.27,232,1786978800"; 
+   d="scan'208";a="249189417"
+Received: from gmgwnl01.global.fujitsu.com ([52.143.17.124])
+  by esa10.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2026 12:17:45 +0900
+Received: from az2nlsmgm1.o.css.fujitsu.com (unknown [10.150.26.203])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id B73091000082
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 03:17:45 +0000 (UTC)
+Received: from az2nlsmom2.o.css.fujitsu.com (unknown [10.150.26.200])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmgm1.o.css.fujitsu.com (Postfix) with ESMTPS id 6C74FC00344
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 03:17:45 +0000 (UTC)
+Received: from FCCLS0092175.localdomain (unknown [10.8.162.75])
+	by az2nlsmom2.o.css.fujitsu.com (Postfix) with SMTP id 6E08D18021BD;
+	Wed, 25 Nov 2026 03:17:39 +0000 (UTC)
+Date: Wed, 25 Nov 2026 12:17:38 +0900
+From: Kohei Enju <enju.kohei@fujitsu.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Steven Price <steven.price@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, cgroups@vger.kernel.org
+Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: CCA: Add support for configuring
+ the Realm MEC policy
+Message-ID: <awZR98W3sP9g12wh@FCCLS0092175.localdomain>
+References: <20261112-mm-v1-mec-v2-0-0d1dd260a588@fujitsu.com>
+ <20261112-mm-v1-mec-v2-1-0d1dd260a588@fujitsu.com>
+ <090662ee-0d8d-48b5-83f2-8a4d225bef08@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -61,116 +92,201 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <090662ee-0d8d-48b5-83f2-8a4d225bef08@arm.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] KVM: arm64: selftests: nv_vncr_abort fails on 16K and 64K
-  host page sizes
---
+Hi Suzuki,
+Thank you for reviewing.
 
-commit 771173f048bfbff4d1afde9bc6d9374d48302af1
-Author: Jia He <justin.he@arm.com>
+On 11/24 15:08, Suzuki K Poulose wrote:
+> On 12/11/2026 03:36, Kohei Enju wrote:
+> > Introduce the KVM_ARM_VM_RMI_CTRL device attribute group to allow
+> > userspace to configure Realm VM parameters before the Realm is created
+> > using KVM_SET_DEVICE_ATTR.
+> > 
+> > Currently, KVM_ARM_VM_RMI_CTRL_MEC_POLICY is the only supported
+> > attribute. Its value can be KVM_ARM_VM_RMI_MEC_POLICY_SHARED or
+> > KVM_ARM_VM_RMI_MEC_POLICY_PRIVATE. Reject the private policy if the
+> > platform does not support private MECs.
+> > 
+> > If userspace does not explicitly configure the MEC policy,
+> > KVM_ARM_VM_RMI_MEC_POLICY_SHARED is used by default.
+> > 
+> > Signed-off-by: Kohei Enju <enju.kohei@fujitsu.com>
+> > ---
+> >   Documentation/virt/kvm/devices/vm.rst   | 25 +++++++++++++++
+> >   arch/arm64/include/asm/kvm_rmi.h        |  5 +++
+> >   arch/arm64/include/uapi/asm/kvm.h       |  4 +++
+> >   arch/arm64/kvm/arm.c                    |  4 +++
+> >   arch/arm64/kvm/rmi.c                    | 57 +++++++++++++++++++++++++++++++++
+> >   drivers/firmware/arm_rmm/rmi.c          |  6 ++++
+> >   include/linux/arm-rmi-cmds.h            |  1 +
+> >   tools/arch/arm64/include/uapi/asm/kvm.h |  4 +++
+> >   8 files changed, 106 insertions(+)
+> > 
+> > diff --git a/Documentation/virt/kvm/devices/vm.rst b/Documentation/virt/kvm/devices/vm.rst
+> > index 78e63eb9994e..b0bd30750aa1 100644
+> > --- a/Documentation/virt/kvm/devices/vm.rst
+> > +++ b/Documentation/virt/kvm/devices/vm.rst
+> > @@ -418,3 +418,28 @@ will reject attempts to define a filter for any portion of these ranges:
+> >           0x8000_0000 0x8000_FFFF
+> >           0xC000_0000 0xC000_FFFF
+> >           =========== ===============
+> > +
+> > +7. GROUP: KVM_ARM_VM_RMI_CTRL
+> > +=============================
+> > +
+> > +:Architectures: arm64
+> > +
+> > +7.1. ATTRIBUTE: KVM_ARM_VM_RMI_CTRL_MEC_POLICY (w/o)
+> > +----------------------------------------------------
+> > +
+> > +:Parameters: Pointer to a ``__u8`` value
+> > +
+> > +:Returns:
+> > +
+> > +  =========  ===========================================================
+> > +  ENXIO      The VM is not a Realm VM
+> > +  EBUSY      The Realm has already been created
+> > +  EINVAL     Invalid MEC policy value
+> > +  EOPNOTSUPP Private MEC policy is not supported by the platform
+> > +  EFAULT     The value could not be copied from userspace
+> > +  =========  ===========================================================
+> > +
+> > +Configures the MEC policy for a Realm VM before the Realm is created. The value
+> > +must be either ``KVM_ARM_VM_RMI_MEC_POLICY_SHARED`` or
+> > +``KVM_ARM_VM_RMI_MEC_POLICY_PRIVATE``. If userspace does not explicitly set the
+> > +MEC policy, ``KVM_ARM_VM_RMI_MEC_POLICY_SHARED`` is used by default.
+> > diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+> > index 3933f8d834b8..08c1f6d0671d 100644
+> > --- a/arch/arm64/include/asm/kvm_rmi.h
+> > +++ b/arch/arm64/include/asm/kvm_rmi.h
+> > @@ -59,6 +59,7 @@ enum realm_state {
+> >    * @state: The lifetime state machine for the realm
+> >    * @ia_bits: Number of valid Input Address bits in the IPA
+> >    * @stage2_unmapped: The Realm stage-2 mappings have been removed
+> > + * @mec_policy: MEC policy for the Realm VM
+> >    */
+> >   struct realm {
+> >   	void *rd;
+> > @@ -73,6 +74,7 @@ struct realm {
+> >   	enum realm_state state;
+> >   	unsigned int ia_bits;
+> >   	bool stage2_unmapped;
+> > +	unsigned int mec_policy;
+> >   };
+> >   /**
+> > @@ -109,9 +111,12 @@ int kvm_realm_teardown_stage2(struct kvm *kvm);
+> >   void kvm_destroy_rec(struct kvm_vcpu *vcpu);
+> >   struct kvm_arm_rmi_populate;
+> > +struct kvm_device_attr;
+> >   int kvm_arm_rmi_populate(struct kvm *kvm,
+> >   			 struct kvm_arm_rmi_populate *arg);
+> > +int kvm_vm_rmi_has_attr(struct kvm *kvm, struct kvm_device_attr *attr);
+> > +int kvm_vm_rmi_set_attr(struct kvm *kvm, struct kvm_device_attr *attr);
+> >   enum kvm_gfn_range_filter;
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index 65ee09bd1463..aa1e6fe6192e 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -403,6 +403,10 @@ enum {
+> >   /* Device Control API on vm fd */
+> >   #define KVM_ARM_VM_SMCCC_CTRL		0
+> >   #define   KVM_ARM_VM_SMCCC_FILTER	0
+> > +#define KVM_ARM_VM_RMI_CTRL		1
+> > +#define   KVM_ARM_VM_RMI_CTRL_MEC_POLICY	0
+> > +#define     KVM_ARM_VM_RMI_MEC_POLICY_SHARED	0
+> > +#define     KVM_ARM_VM_RMI_MEC_POLICY_PRIVATE	1
+> >   /* Device Control API: ARM VGIC */
+> >   #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 8e94f1bff830..be676c13e219 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -2329,6 +2329,8 @@ static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+> >   	switch (attr->group) {
+> >   	case KVM_ARM_VM_SMCCC_CTRL:
+> >   		return kvm_vm_smccc_has_attr(kvm, attr);
+> > +	case KVM_ARM_VM_RMI_CTRL:
+> > +		return kvm_vm_rmi_has_attr(kvm, attr);
+> >   	default:
+> >   		return -ENXIO;
+> >   	}
+> > @@ -2339,6 +2341,8 @@ static int kvm_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+> >   	switch (attr->group) {
+> >   	case KVM_ARM_VM_SMCCC_CTRL:
+> >   		return kvm_vm_smccc_set_attr(kvm, attr);
+> > +	case KVM_ARM_VM_RMI_CTRL:
+> > +		return kvm_vm_rmi_set_attr(kvm, attr);
+> >   	default:
+> >   		return -ENXIO;
+> >   	}
+> > diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> > index 0d254fb80cde..01ac8d4fec7c 100644
+> > --- a/arch/arm64/kvm/rmi.c
+> > +++ b/arch/arm64/kvm/rmi.c
+> > @@ -7,6 +7,7 @@
+> >   #include <linux/arm-rmi-cmds.h>
+> >   #include <linux/kvm_host.h>
+> >   #include <linux/overflow.h>
+> > +#include <linux/uaccess.h>
+> >   #include <asm/daifflags.h>
+> >   #include <asm/kvm_emulate.h>
+> > @@ -586,6 +587,9 @@ static int realm_create_rd(struct kvm *kvm)
+> >   		params->flags0 |= RMI_REALM_PARAM_FLAG_PMU;
+> >   	}
+> > +	params->flags0 |= FIELD_PREP(RMI_REALM_PARAM_FLAG_MEC_POLICY_MASK,
+> > +				    realm->mec_policy);
+> > +
+> >   	r = realm_init_sve_param(kvm, params);
+> >   	if (r)
+> >   		goto out_undelegate_tables;
+> > @@ -1481,6 +1485,57 @@ int kvm_arm_rmi_populate(struct kvm *kvm,
+> >   	return ret;
+> >   }
+> > +static int kvm_vm_rmi_set_mec_policy(struct kvm *kvm, u8 policy)
+> > +{
+> > +	guard(mutex)(&kvm->arch.config_lock);
+> > +
+> > +	if (!kvm_vm_is_realm(kvm))
+> > +		return -ENXIO;
+> > +
+> > +	if (kvm_realm_state(kvm) != REALM_STATE_NONE)
+> > +		return -EBUSY;
+> > +
+> > +	if (policy != KVM_ARM_VM_RMI_MEC_POLICY_SHARED &&
+> > +	    policy != KVM_ARM_VM_RMI_MEC_POLICY_PRIVATE)
+> > +		return -EINVAL;
+> > +
+> > +	if (policy == KVM_ARM_VM_RMI_MEC_POLICY_PRIVATE &&
+> > +	    rmi_mec_count() == 0)
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	kvm->arch.realm.mec_policy = policy;
+> > +	return 0;
+> > +}
+> > +
+> > +int kvm_vm_rmi_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+> > +{
+> > +	if (!kvm_vm_is_realm(kvm))
+> > +		return -ENXIO;
+> > +
+> > +	switch (attr->attr) {
+> > +	case KVM_ARM_VM_RMI_CTRL_MEC_POLICY:
+> 
+> minor nit: Could we reject this if the rmi_mec_count() == 0 ?
+> Default policy is "shared" mec, as long as it is documented, this
+> would work only on a system that supports Private MEC.
 
-KVM: arm64: selftests: Add a test for VNCR_EL2 translation faults
+With SHARED as the default, how about making this a boolean attribute
+named KVM_ARM_VM_RMI_CTRL_MEC_PRIVATE? Then gating its availability on
+rmi_mec_count() > 0 would make sense to me.
 
-This commit adds an arm64 KVM selftest for VNCR_EL2 stage-1 translation
-faults and hardware access flag updates when the last-level page table is in
-a read-only or writable memslot.
+Thanks,
+Kohei
 
-> diff --git a/tools/testing/selftests/kvm/arm64/nv_vncr_abort.c b/tools/te=
-sting/selftests/kvm/arm64/nv_vncr_abort.c
-> new file mode 100644
-> index 0000000000000..d2052b1526111
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/arm64/nv_vncr_abort.c
-[ ... ]
-> +static void setup_vncr_page(struct kvm_vm *vm, enum test_mode mode)
-> +{
-> +	u64 oa_mask =3D GENMASK_ULL(47, 12);
-> +	gpa_t data_gpa, table_gpa;
-> +	u64 *l2e, *table;
-> +	int idx =3D (VNCR_VA >> 12) & 511;
-> +
-> +	data_gpa =3D vm_phy_page_alloc(vm, MEM_REGION_DATA);
-> +	virt_pg_map(vm, VNCR_VA, data_gpa);
-> +	*(u64 *)(addr_gpa2hva(vm, data_gpa) + VNCR_VTTBR_EL2) =3D VNCR_MAGIC;
-> +
-> +	l2e =3D virt_get_pte_hva_at_level(vm, VNCR_VA, 2);
-> +	TEST_ASSERT((*l2e & 3) =3D=3D 3, "level 2 entry is not a table: %lx", *=
-l2e);
-> +	table_gpa =3D *l2e & oa_mask;
-> +	table =3D addr_gpa2hva(vm, table_gpa);
-> +
-> +	if (mode =3D=3D RW_PT_AF_CLEAR) {
-> +		table[idx] &=3D ~PTE_AF;
-> +		return;
-> +	}
-> +
-> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, RO_PT_GPA,
-> +				    RO_PT_SLOT, 1, KVM_MEM_READONLY);
-> +	memcpy(addr_gpa2hva(vm, RO_PT_GPA), table, vm->page_size);
-> +	if (mode =3D=3D RO_PT_AF_CLEAR)
-> +		((u64 *)addr_gpa2hva(vm, RO_PT_GPA))[idx] &=3D ~PTE_AF;
-> +
-> +	*l2e =3D (*l2e & ~oa_mask) | RO_PT_GPA;
-> +}
-> +
-> +static void sigalrm_handler(int sig)
-> +{
-> +}
-> +
-> +static void run_test(enum test_mode mode)
-> +{
-> +	struct kvm_vcpu_init init;
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +	struct ucall uc;
-> +	u64 mmfr1;
-> +	int ret;
-> +
-> +	vm =3D vm_create(1);
-> +	kvm_get_default_vcpu_target(vm, &init);
-> +	init.features[0] |=3D BIT(KVM_ARM_VCPU_HAS_EL2);
-> +	vcpu =3D aarch64_vcpu_add(vm, 0, &init, guest_code);
-> +	kvm_arch_vm_finalize_vcpus(vm);
-> +
-> +	mmfr1 =3D vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR1_EL1));
-> +	__TEST_REQUIRE(SYS_FIELD_GET(ID_AA64MMFR1_EL1, HAFDBS, mmfr1),
-> +		       "Hardware AF management not supported");
-> +	TEST_REQUIRE(vm->page_size =3D=3D 4096);
-
-[Severity: Medium]
-Will this test fail on 16K and 64K host kernels when the CPU supports a 4K
-stage-1 translation granule?
-
-guest_modes_append_default() selects VM_MODE_P40V48_4K whenever the CPU
-supports a 4K granule regardless of the host page size, so vm->page_size is
-4096 and TEST_REQUIRE(vm->page_size =3D=3D 4096) does not skip on 16K or 64K
-hosts.
-
-Passing npages =3D 1 to vm_userspace_mem_region_add() in setup_vncr_page() =
-then
-hits the assertion in vm_mem_add() requiring npages to cover at least one
-host page:
-
-tools/testing/selftests/kvm/lib/kvm_util.c:vm_mem_add() {
-    ...
-	TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) =3D=3D npages,
-		"Number of guest pages is not compatible with the host. "
-		"Try npages=3D%d", vm_adjust_num_guest_pages(vm->mode, npages));
-    ...
-}
-
-Also, in RW_PT_AF_CLEAR mode, vm_phy_page_alloc() returns a 4K-aligned
-data_gpa that is not aligned to a 16K or 64K host page, while KVM maps the
-containing host pfn at the VNCR fixmap and takes the page offset from
-VNCR_VA & (PAGE_SIZE - 1) (which is 0), reading from the start of the host
-page instead of data_gpa.
-
-Should run_test() check TEST_REQUIRE(getpagesize() =3D=3D 4096), or size
-RO_PT_SLOT with vm_adjust_num_guest_pages() and align data_gpa to the host
-page size?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125024426.3464=
-050-1-justin.he@arm.com?part=3D2
+> 
+> 
+> Suzuki
