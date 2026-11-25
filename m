@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.63
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.125
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795621187;
-	b=wBavh+yMbBuvIP4UmEXasdzDRJ+JWFr0roePxBGQLLisFtbSkd8cTgTloFGFiFWsdYyz
-	 JYy5hFzl5T3YWBMROFcHaZjgqm2pNafXXVmC12Es1iVFDeR4HcT3ItecYNhNjzk3uEAxl
-	 L9S/1tHCv6WMEweWhdbpTZM8Tq25t2vl2zBpo+ZqwfL8LIIoK8Cz4aLyWQZjArFH3JVQA
-	 Vt65zB5GKQphnLZIQSElE+Y/XoEN8nu6sd+AC/ANr06aWpijdzLIMCS7N2ZXQVrNssOAa
-	 eiSEGkX2Lp2MRmrIuy9/x5QwxYVqtgQbegIzsXWG2cTTc8XTa71OlLPMeZJwv3Mo8BA==
+	t=1795621191;
+	b=L9TrdeJMRq1uqjwGm4JdXW9NYJT8aTcA1+TQEAvE0lV+HU+IDh2+mfBrqXezgodA/x5E
+	 uvGtINink/HundnCXDikpDoApK4odYO3HRc9f3Q+iBju0+KfPPuvPZy+8fClKECKi2Od4
+	 V8Btaue1Cdlln9pkjZcfe2Q90wVtuZu45UXVF+hGneCxk0MWjV6SJWQKbgY3IHIyvULeq
+	 GzKULzKsfiXBYuw0yBfP7rKW7AugAsVLL8PtBX9QPxC+HzrZTZjRFmTKmY2v8IFWpWxNW
+	 K3nn1HMryFOa6EHWC7jEz3Y48xFbRJ+l0qVy+56yWRb7U5hVYZ9rnDkKQNZtbszuHAQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795621187;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795621191;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=dZq6fx5ackLq8SYaC0RSyUV+QvMuPrzJ354X+a2U30M=;
-	b=SGvGG5Hwo78nLKxVehwGw37lOtYSfaM9i4C1cBJTKvjS1C3Z9uUEcVAdaWJwQnzkg5ee
-	 PvWG38eyFyxsRt2SOZf3FUpqy/ctJUnsUsqGpcaIe8F/VLVq72fG37tTYSTlkv74Il2Yz
-	 kdhyx/1i0mftL5FfWRm/5kf9Z7PhVB+WBgY7bYQ6LnnUYMMIXLgoPoscX7X8BrGdMhGtL
-	 sbCJhr3Hsa6kq32rvLIJdRziy4xkJD+UTQ8h9bToqJSmceuWheT4n1iu1VN/mVsDuyIvY
-	 wl51aOPwGp5Hdk6AWhAoOQ5IA07IJRKqCEd3fWovSp29d356KMAhKVlGoqI9u/QF/lQ==
+	bh=wAhlDYr7g+bzBz0JT2eNMXKL3+lv9GNiMmHUUn7jo0g=;
+	b=jkww9MG+V5gBj/13605CPzZuUfH0l+DGboLfG442djOZ9jaZ0FcprNSHfXmiJBr/FAss
+	 2tBRwnAxRW6/NMLDpM1Ljir7Tyno6I7l7CM/7UE1qiEMDS8wHkUVqaSwpmUL7Im2v2Rhk
+	 QuaKIu5OpLfl6B23hH1X349RgvT627+GSIrjKj8gu331S2XpG0NAwfh1XhqDQlbs7hF8p
+	 QOrz7tlxxxzuOOnL8xA4XFJJ8NxUcwX58GmbwWdE4sm72KK4HUmd/NM+23cN/g8nZZwPi
+	 Y2IteuBPTlskTtafi77ZP3NQK5Ui65wLEgVaxXMYRyfJOqRzUAtL56m/Y8E+ubnjH9Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=lczyu8oU;
-	arc=none smtp.remote-ip=95.215.58.63
-Received: from mta1.migadu.com (out-63.mta1.migadu.com [95.215.58.63])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nkFH+9kk;
+	arc=none smtp.remote-ip=91.218.175.125
+Received: from mta0.migadu.com (out-125.mta0.migadu.com [91.218.175.125])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB61606A686
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:39:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5FB61606A686
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2EF5606A69B
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:39:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D2EF5606A69B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=lczyu8oU
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nkFH+9kk
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=JkCtQAgNMyz6MxyA6TeVj2kcDGllBN1Cmp+JPaexw7k=;
+DKIM-Signature: a=rsa-sha256; bh=gmD2Hw6juO/YQxEfawmZ9o614lN2GWsdiorFlIDxyuo=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795621184; v=1; x=1796225984;
- b=lczyu8oUPBtJD5sf8uTU8KXVvtX8gEFpwnpSLHqAsMmwjBuGgjz36kgJq2e1zAH8mtTHCTzd
- mXoUbIROHP9lO0YGbsFwSZscUy+pGjcvjPaXIFncnxBfs3b9tMIYeCKrpFd5mJDEtr2zl65oYex
- 8k7rmVGCbpRhX27iDOabXt7c=
+ t=1795621189; v=1; x=1796225989;
+ b=nkFH+9kkP1LjqtFxXCIDcnAf9BsMv0vO5XFjQytFTY3K4VbDVLXthl37On/FIP3IxL8hlEXT
+ sGBMeW1LJvG023TsdJXp7VMNrio01VJf7n9mbCCp6XzRBlIjrvky/oHWDUdsJW0mzq5qEIIquUY
+ LnadGRtPePug/rRKEtmGrPkU=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 77b76b0e617b58cd;
-	Wed, 25 Nov 2026 15:39:44 +0000
-X-Mizu-Trace-ID: 77b76b0e617b58cd
+Received: by smtp.migadu.com with ESMTPS id b15b9185e0e5c26b;
+	Wed, 25 Nov 2026 15:39:48 +0000
+X-Mizu-Trace-ID: b15b9185e0e5c26b
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -63,9 +63,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 05/20] KVM: arm64: Allocate a protected vCPU's SVE state at EL2
-Date: Wed, 25 Nov 2026 15:38:56 +0000
-Message-ID: <20261125153911.106793-6-fuad.tabba@linux.dev>
+Subject: [PATCH v2 06/20] KVM: arm64: Advertise ID_AA64ZFR0_EL1 to protected VMs
+Date: Wed, 25 Nov 2026 15:38:57 +0000
+Message-ID: <20261125153911.106793-7-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261125153911.106793-1-fuad.tabba@linux.dev>
 References: <20261125153911.106793-1-fuad.tabba@linux.dev>
@@ -80,176 +80,92 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For a vCPU with SVE, EL2 pins the buffer the host allocated at
-KVM_ARM_VCPU_FINALIZE and saves the guest's SVE registers there. The
-host can still read and write that buffer, so it can't hold a protected
-vCPU's state.
+EL2 builds a protected guest's ID registers from the host's sanitised
+values, most of them capped per field. It has no case for
+ID_AA64ZFR0_EL1, so the register reads as 0, and a protected guest with
+SVE wouldn't see any of the SVE extensions the CPUs implement.
 
-Allocate a protected vCPU's SVE state from the hyp heap instead, and
-free it with the vCPU. When EL2 resets a protected vCPU, zero its SVE
-state and ZCR_EL1, as KVM does for a non-protected one. The host still
-allocates its own buffer, which KVM_{GET,SET}_ONE_REG access before the
-first run, but EL2 doesn't use it.
-
-For a protected vCPU, the host's sve_max_vl now sizes an EL2 allocation
-and is the guest's maximum vector length on every CPU. Give EL2 a copy
-of kvm_sve_max_vl, the largest length all CPUs can give a guest, and
-check every vCPU's sve_max_vl against it rather than clamping it to the
-host's own maximum. set_sve_vls() already keeps the host's value within
-that bound.
+Keep a copy of the host's sanitised ID_AA64ZFR0_EL1 at EL2, and
+advertise it when the guest has SVE, as KVM does for a non-protected
+guest. Cap each field at the highest value the sysreg file defines.
 
 Tested-by: Vincent Donnefort <vdonnefort@google.com>
 Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
  arch/arm64/include/asm/kvm_hyp.h   |  1 +
- arch/arm64/kvm/hyp/nvhe/pkvm.c     | 41 ++++++++++++++++++++----------
- arch/arm64/kvm/hyp/nvhe/sys_regs.c |  1 +
- arch/arm64/kvm/reset.c             |  2 ++
- 4 files changed, 31 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/arm.c               |  1 +
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c | 19 +++++++++++++++++++
+ 3 files changed, 21 insertions(+)
 
 diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 9a785a341090e..22601a4e36f4e 100644
+index 22601a4e36f4e..920c1d8d45b1a 100644
 --- a/arch/arm64/include/asm/kvm_hyp.h
 +++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -158,6 +158,7 @@ extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
- extern enum mitigation_state kvm_nvhe_sym(spectre_v2_state);
- extern enum mitigation_state kvm_nvhe_sym(spectre_v4_state);
- extern enum mitigation_state kvm_nvhe_sym(spectre_bhb_state);
-+extern unsigned int kvm_nvhe_sym(kvm_sve_max_vl);
- extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
- extern unsigned long kvm_nvhe_sym(hyp_nr_cpus);
- extern unsigned int kvm_nvhe_sym(hyp_gicv3_nr_lr);
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 1d484da274c0e..fba8dfe6389d6 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -30,6 +30,7 @@ unsigned long __icache_flags;
- /* Used by kvm_get_vttbr(). */
- unsigned int kvm_arm_vmid_bits;
- 
-+unsigned int kvm_sve_max_vl;
- unsigned int kvm_host_sve_max_vl;
- 
- /*
-@@ -479,7 +480,7 @@ static void unpin_host_vcpu(struct kvm_vcpu *host_vcpu)
- 		hyp_unpin_shared_mem(host_vcpu, host_vcpu + 1);
- }
- 
--static void unpin_host_sve_state(struct pkvm_hyp_vcpu *hyp_vcpu)
-+static void teardown_sve_state(struct pkvm_hyp_vcpu *hyp_vcpu)
- {
- 	void *sve_state;
- 
-@@ -487,8 +488,10 @@ static void unpin_host_sve_state(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	if (!sve_state)
- 		return;
- 
--	hyp_unpin_shared_mem(sve_state,
--			     sve_state + vcpu_sve_state_size(&hyp_vcpu->vcpu));
-+	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
-+		hyp_free(sve_state);
-+	else
-+		hyp_unpin_shared_mem(sve_state, sve_state + vcpu_sve_state_size(&hyp_vcpu->vcpu));
- }
- 
- static void unpin_host_vcpus(struct pkvm_hyp_vcpu *hyp_vcpus[],
-@@ -503,7 +506,7 @@ static void unpin_host_vcpus(struct pkvm_hyp_vcpu *hyp_vcpus[],
- 			continue;
- 
- 		unpin_host_vcpu(hyp_vcpu->host_vcpu);
--		unpin_host_sve_state(hyp_vcpu);
-+		teardown_sve_state(hyp_vcpu);
- 	}
- }
- 
-@@ -546,18 +549,25 @@ static int pkvm_vcpu_init_sve(struct pkvm_hyp_vcpu *hyp_vcpu, struct kvm_vcpu *h
- 		return 0;
- 	}
- 
--	/* Limit guest vector length to the maximum supported by the host. */
--	sve_max_vl = min(READ_ONCE(host_vcpu->arch.sve_max_vl), kvm_host_sve_max_vl);
--	sve_state = kern_hyp_va(READ_ONCE(host_vcpu->arch.sve_state));
--
--	if (!sve_vl_valid(sve_max_vl) || !sve_state)
-+	sve_max_vl = READ_ONCE(host_vcpu->arch.sve_max_vl);
-+	if (!sve_vl_valid(sve_max_vl) || sve_max_vl > kvm_sve_max_vl)
- 		return -EINVAL;
- 
- 	sve_state_size = sve_state_size_from_vl(sve_max_vl);
- 
--	ret = hyp_pin_shared_mem(sve_state, sve_state + sve_state_size);
--	if (ret)
--		return ret;
-+	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-+		sve_state = hyp_alloc(sve_state_size);
-+		if (!sve_state)
-+			return hyp_alloc_errno();
-+	} else {
-+		sve_state = kern_hyp_va(READ_ONCE(host_vcpu->arch.sve_state));
-+		if (!sve_state)
-+			return -EINVAL;
-+
-+		ret = hyp_pin_shared_mem(sve_state, sve_state + sve_state_size);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	vcpu->arch.sve_state = sve_state;
- 	vcpu->arch.sve_max_vl = sve_max_vl;
-@@ -646,7 +656,7 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
- done:
- 	if (ret) {
- 		unpin_host_vcpu(host_vcpu);
--		unpin_host_sve_state(hyp_vcpu);
-+		teardown_sve_state(hyp_vcpu);
- 	}
- 	return ret;
- }
-@@ -1018,7 +1028,7 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu)
- 	ret = register_hyp_vcpu(hyp_vm, hyp_vcpu);
- 	if (ret) {
- 		unpin_host_vcpu(host_vcpu);
--		unpin_host_sve_state(hyp_vcpu);
-+		teardown_sve_state(hyp_vcpu);
- 		goto unclaim;
- 	}
- 	goto unlock;
-@@ -1246,6 +1256,9 @@ int pkvm_reset_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 			    PSCI_0_2_AFFINITY_LEVEL_ON) != PSCI_0_2_AFFINITY_LEVEL_ON_PENDING)
- 		return -ECANCELED;
- 
-+	if (vcpu_has_sve(&hyp_vcpu->vcpu))
-+		memset(hyp_vcpu->vcpu.arch.sve_state, 0, vcpu_sve_state_size(&hyp_vcpu->vcpu));
-+
- 	kvm_reset_vcpu_core(&hyp_vcpu->vcpu);
- 	kvm_reset_pvm_sys_regs(&hyp_vcpu->vcpu);
- 	kvm_load_pvm_debug(&hyp_vcpu->vcpu);
+@@ -144,6 +144,7 @@ void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+ extern u64 kvm_nvhe_sym(id_aa64pfr0_el1_sys_val);
+ extern u64 kvm_nvhe_sym(id_aa64pfr1_el1_sys_val);
+ extern u64 kvm_nvhe_sym(id_aa64pfr2_el1_sys_val);
++extern u64 kvm_nvhe_sym(id_aa64zfr0_el1_sys_val);
+ extern u64 kvm_nvhe_sym(id_aa64isar0_el1_sys_val);
+ extern u64 kvm_nvhe_sym(id_aa64isar1_el1_sys_val);
+ extern u64 kvm_nvhe_sym(id_aa64isar2_el1_sys_val);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index ec90a580e82a4..2753686982f0b 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2827,6 +2827,7 @@ static void kvm_hyp_init_symbols(void)
+ 	kvm_nvhe_sym(id_aa64pfr0_el1_sys_val) = get_hyp_id_aa64pfr0_el1();
+ 	kvm_nvhe_sym(id_aa64pfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
+ 	kvm_nvhe_sym(id_aa64pfr2_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR2_EL1);
++	kvm_nvhe_sym(id_aa64zfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64ZFR0_EL1);
+ 	kvm_nvhe_sym(id_aa64isar0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64ISAR0_EL1);
+ 	kvm_nvhe_sym(id_aa64isar1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
+ 	kvm_nvhe_sym(id_aa64isar2_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64ISAR2_EL1);
 diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 13209786d0a71..3b468ef619ed2 100644
+index 3b468ef619ed2..352998a07512a 100644
 --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
 +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -782,6 +782,7 @@ static const struct sys_reg_desc_reset pvm_sys_reg_reset_vals[] = {
- 	RESET_UNKNOWN(MAIR_EL1),
- 	RESET_ZERO(AMAIR_EL1),
- 	RESET_ZERO(MDSCR_EL1),
-+	RESET_ZERO(ZCR_EL1),
- 	RESET_ZERO(CNTV_CTL_EL0),
- 	RESET_UNKNOWN(TTBR0_EL1),
- 	RESET_UNKNOWN(TTBR1_EL1),
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 10eb7249aa9e8..aaaa1b8634ba4 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -52,6 +52,8 @@ int __init kvm_arm_init_sve(void)
- 		if (WARN_ON(kvm_sve_max_vl > VL_ARCH_MAX))
- 			kvm_sve_max_vl = VL_ARCH_MAX;
+@@ -23,6 +23,7 @@
+ u64 id_aa64pfr0_el1_sys_val;
+ u64 id_aa64pfr1_el1_sys_val;
+ u64 id_aa64pfr2_el1_sys_val;
++u64 id_aa64zfr0_el1_sys_val;
+ u64 id_aa64isar0_el1_sys_val;
+ u64 id_aa64isar1_el1_sys_val;
+ u64 id_aa64isar2_el1_sys_val;
+@@ -123,6 +124,22 @@ static const struct pvm_ftr_bits pvmid_aa64pfr2[] = {
+ 	FEAT_END
+ };
  
-+		kvm_nvhe_sym(kvm_sve_max_vl) = kvm_sve_max_vl;
++static const struct pvm_ftr_bits pvmid_aa64zfr0[] = {
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, SVEver, SVE2p3, vm_has_sve),
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, AES, AES2, vm_has_sve),
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, EltPerm, IMP, vm_has_sve),
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, BitPerm, IMP, vm_has_sve),
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, BF16, EBF16, vm_has_sve),
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, B16B16, B16MM, vm_has_sve),
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, SHA3, IMP, vm_has_sve),
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, SM4, IMP, vm_has_sve),
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, I8MM, IMP, vm_has_sve),
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, F16MM, IMP, vm_has_sve),
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, F32MM, IMP, vm_has_sve),
++	MAX_FEAT_FUNC(ID_AA64ZFR0_EL1, F64MM, IMP, vm_has_sve),
++	FEAT_END
++};
 +
- 		/*
- 		 * Don't even try to make use of vector lengths that
- 		 * aren't available on all CPUs, for now:
+ static const struct pvm_ftr_bits pvmid_aa64mmfr0[] = {
+ 	MAX_FEAT_ENUM(ID_AA64MMFR0_EL1, PARANGE, 40),
+ 	MAX_FEAT_ENUM(ID_AA64MMFR0_EL1, ASIDBITS, 16),
+@@ -242,6 +259,8 @@ static u64 pvm_calc_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+ 		return get_restricted_features(vcpu, id_aa64pfr1_el1_sys_val, pvmid_aa64pfr1);
+ 	case SYS_ID_AA64PFR2_EL1:
+ 		return get_restricted_features(vcpu, id_aa64pfr2_el1_sys_val, pvmid_aa64pfr2);
++	case SYS_ID_AA64ZFR0_EL1:
++		return get_restricted_features(vcpu, id_aa64zfr0_el1_sys_val, pvmid_aa64zfr0);
+ 	case SYS_ID_AA64ISAR0_EL1:
+ 		return id_aa64isar0_el1_sys_val;
+ 	case SYS_ID_AA64ISAR1_EL1:
 -- 
 2.47.3
 
