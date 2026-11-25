@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.200
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.71
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795587394;
-	b=Eov9YJ6lnL9DHCZ/HmWpkWvF/97JAG5AMAkUFUhpq0nA/4RbvlJeKf9AbVkhUdbvpMZ4
-	 pvVZbVw61Q6lpIyk0ysSINsOqmC6YNuUjHbmJZjZ/zm6djR5Pkjm7jw9cXF+/7Rm4lFsY
-	 Xg9BZOAxhcoOTXsi313WB0jctHDICAoE3OfONtbN7TC4EeBU+jOrs/F8ov99WaMYw5iAz
-	 7EH+53l4hXrDgJoS8fnz2dINMh1HLCBHgzKIsJHeFg3Xar1ioq9PihIipmFRy/XcCa2NX
-	 PX4DLhLthAYJJ14NTQH0d+ROh9qVqcmyY1t3Nv2cO3su1X9qSYbqdvs4+bv3Vgdy+AQ==
+	t=1795587398;
+	b=hjCmeRTWhIVw/dysu1CjKZl5Ss9yyihYkDEuHQ6C3SUcBXKQqKiCY3UZOfvn1nLl+DYq
+	 SE9CUfgWGUvpqBp7URS36IGoYFW3I+tCyCGTBJ1GfblEjIWqwhKgTsKf8MH7TOSFcgyjX
+	 MYmE99LiIbVtcWpBCvIp2GqHlif8yIrm2XUWfaLtCcsMxDos5IIbL9Y2x6ZnX5PiXAXsk
+	 4AYeePmjd+hEZJ4d/tE0Mk80p3Cpo6wZwZN/p93tiOqzY6l2nb+jYryWvHRGouBFGAfWe
+	 g4S6ThddAd76oPdERm0Izk0hDmB6yeGhTyZL/uKXcjZ/eLTmubIVromzlWKHhhkRTpg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795587394;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795587398;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=Gv563tOaT9t1DmnC0tzfAtnqlHlK2h3cFSfEVUiDT5g=;
-	b=K2XuK+kKElgZgZ0z/ijADpaZHnbwxitNwnMuTqYUQ98up5gTlcwACcfrmEZLOepRr5hL
-	 0TxLoCUSymkd65vI8OaEs7USFV7bWp12MMfHlAQBdv2/yuX0QiY1CqKXnscwmt40BSbrV
-	 IKbOa/4x/Gx7SiEZKhhFSZ7f2jHGCJhhegqhoRKpdHBaVa0eTz3xqRw8YFQoPUb4+5nWc
-	 7XXgMjx8NJsHG4t+T1aQFU05HPwKGiVJF3MVHBZ+EvoeBr/XACW9NDkqxy0y2Vvo2CsHD
-	 v5jr7CP8ViD6oyJOe/IJnM/GD3E4eg8iD63W1vfThySq6AsBHc6u9h/guI689mtqBkQ==
+	bh=1M39M3BC8RejWKp1a99LR6YnpQFze4DNErRt/k0WGKw=;
+	b=d6Jv/iXNRJHrHZZnq7JqkZ01rDM5guELLjOjvsxXOGKyHzveggp/6T/kO7Nbxq/EssNr
+	 cPSSduscCLdJrmhXcwt4II7Pr6iimLq0jt01surM86C+de9jGB4iZhayqM1JJWac+1R4G
+	 EXMCjbFirqdHYi6Ag/ZwXE92lhkHxI02ZZfSJpDHqqnuMP+7ScQg4uEtp7C6SfzWzHW4Y
+	 5PeBwbykc2aNElgOHi4laYRoDkoqssaQSxgF9y41s2hFHP6WhEX2xklgf07be0NgTPLJx
+	 O/g+t/z2wMk/70Z8fZuBTTRt60jqAnK5bUNHURBZTDzTZvBONW8LR9qRnX4W57hjvqg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--irogers.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=nhcwp2jb;
-	arc=none smtp.remote-ip=74.125.82.200
-Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=l+Ie6pJW;
+	arc=none smtp.remote-ip=74.125.82.71
+Received: from mail-dl1-f71.google.com (mail-dl1-f71.google.com [74.125.82.71])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470B3606B3C4
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 470B3606B3C4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFBE606B3FE
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2FFBE606B3FE
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=nhcwp2jb
-Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-384c78aa0dbso7370691eec.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=l+Ie6pJW
+Received: by mail-dl1-f71.google.com with SMTP id a92af1059eb24-1a5005fd0f8so4003050c88.0
+        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795587393; x=1796192193; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1795587395; x=1796192195; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Gv563tOaT9t1DmnC0tzfAtnqlHlK2h3cFSfEVUiDT5g=;
-        b=nhcwp2jbMqAwGlK4+ZjXrjMbizUnDM/oIwgicDBhj4RXQkocakXzchQYQZCN1Jf5aY
-         rOzRYcJmZogx/oFgWC5wCRBZlEajb7AOWmjGNOE3kcjyeNsGaAemDkq2BqQaMIf9Oylz
-         OmAfdwT24bDGwqTQ37+AvJDnUN6t77xgsnKAG4InsqjBOwUZ3vPxB9SLQSc/XNH2NwIi
-         XT52vXFQ85JmkYGahiBhHDiR8t3i60Jjh2DuRonD9xN9miaK1sFgZ77rt5FVjXWf98Zb
-         JqotQSqoIgXBsufhW2MJer5ILO9qcEI99Vs6ONVOVtbqUcoJ/zhMOaWz466co2Y0tvzL
-         lmyA==
+        bh=1M39M3BC8RejWKp1a99LR6YnpQFze4DNErRt/k0WGKw=;
+        b=l+Ie6pJWBVtYctpUnV2zbY9Jwy2FHdMHZ9ysW8vHZW4YF+C0xL2gAcFywkJvhWabXT
+         yLCk/HKj96/42jrMRbf+9bIVj1OVlTAUFqqcN9peFDTZeFQo4cD/K6J3mixHS/36Q/JX
+         UffPZqVrzI1i8tO1+eQE38cZvmejG1o2gF+V9moM6R67RML03snpKtM2mAjGpaumGuLP
+         GsacMIZ7pLq6nCuMiUxpc1Q62E90mpqAvF+8A4wkZuUBpS5MYXBqRx091FCPAYdVcb+d
+         zBD86nNd0UWzzJM53KGlC/ZCA968qnI6+qZk7zdqTVgV47kg+3LNvqdVpBLnNw3QSB1C
+         Lhmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795587393; x=1796192193;
+        d=1e100.net; s=20260707; t=1795587395; x=1796192195;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Gv563tOaT9t1DmnC0tzfAtnqlHlK2h3cFSfEVUiDT5g=;
-        b=zT83Lr7zKkIs4QSiQnqE3KVX+9MD+eiVhIrtexc0SeDvFZHv/WXpVezgm8qPsrQM8N
-         0cu1ds3sUhms3RGozZaFJLUDIsJ+ufAiycL3FlbDMLDyETJYf9kUE32d31w0QCVgYPl/
-         7VYNA40pUZlwjIITvIVrXQqHR8HqVKXH2AyzMgePgFND+6wtaOlw+nmi54xkQJgNUMB8
-         fpVJGppVKuMg4KPJrKh53DTBMXeN5H7NEnLCDjeRSif7q/SZE6aAnquNzIf1rmuC9Mtw
-         Ku5JjhO+ZDVL6IYEiUKTju7x/SK+JADILWL2SaYt9WjbYi6XZYpe/IpvrQT7a3XC/Iy1
-         ksbQ==
-X-Forwarded-Encrypted: i=1; AL+hErFdunHaP9ML2ddQYRB6yQpJZXZO8EZWIqTA24ZIQW9FuD4NXrzSa9hOBdjbQpEA91623GPh37E=@lists.linux.dev
-X-Gm-Message-State: APuU4Z99hh1IrhW618kqIANb6plhCd7vZSz16Y8SkkTbCVzqcujqGKaC
-	kRs4XAUqlVnWDE6yUUr5zUCUxe27rNj402BH2zUOItTE9IGpolH/ZcjnHKBNTIxxaXlh5Dkevx4
-	WH4WrMvue/Q==
-X-Received: from dydz30.prod.google.com ([2002:a05:7300:22de:b0:382:e403:7217])
- (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7300:c696:b0:386:c4bd:7ff0
- with SMTP id 5a478bee46e88-386c4bd8670mr3588594eec.13.1795587393071; Tue, 24
- Nov 2026 22:16:33 -0800 (PST)
-Date: Tue, 24 Nov 2026 22:15:11 -0800
+        bh=1M39M3BC8RejWKp1a99LR6YnpQFze4DNErRt/k0WGKw=;
+        b=HXfHJuSfqXtFjHbQG+9UKyrJs4iI9MNUEhDxAKcPgcm3OTh/z7Rg8ZgvSRgS/PqPkT
+         hSQ33US1fenwchQyMTAiE5AG7+B3mqWG1TaHeA3b1g2RcvrizW/abe4Yy0UL24xjiMxy
+         PrhAQDSPO6ucajDdzXG8uQW1MkZTywqR1dDdxtAeMSQ9ErFZxqePaZgL6700J1QMgqdC
+         Y0OqvfiI6aLPctoi5lJfXL4CXj/qdL5JOcfMgcQzAjnHIFFV9DbGzIX5MvjsUa892iqp
+         BFLXd6tz3IT4BamEI0TXr+GxxMyTMSyekYOijrkQH3GPIjKzm8/5uj4j5WxtTMAkMshX
+         CZ5Q==
+X-Forwarded-Encrypted: i=1; AL+hErE2Xti80yruQoIBAKRzICGGhlgJ+CsZmNJYKzrD+5r/J7/v0tLwkFHv8a6jlPC2KugZKEdcVAc=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+Bc/GprRUAaEWIJ2K5/KGZRuS1IF4r/rcLUNLFtSE5mINKYGt9
+	x0xE8bmlOba6ca3/yG7bp3+CGqyj8L7kNpxJa0bSTLkkQBoorHpc0Zuot8w648azUvIv1z/ElRg
+	8u3LmgyFJmQ==
+X-Received: from dlep20-n2.prod.google.com ([2002:a05:701b:4594:20b0:1b5:7578:79ee])
+ (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:e80e:b0:1b5:3b6e:e1ed
+ with SMTP id a92af1059eb24-1b55690bcf3mr20050632c88.32.1795587394845; Tue, 24
+ Nov 2026 22:16:34 -0800 (PST)
+Date: Tue, 24 Nov 2026 22:15:12 -0800
 In-Reply-To: <20261125061523.1540234-1-irogers@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,9 +81,8 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261125061523.1540234-1-irogers@google.com>
 X-Mailer: git-send-email 2.56.1.831.g720f3f5937-goog
-Message-ID: <20261125061523.1540234-19-irogers@google.com>
-Subject: [RFC PATCH v2 18/30] riscv: Add DWARF CFI annotations to entry,
- ftrace, rethook, and BPF JIT
+Message-ID: <20261125061523.1540234-20-irogers@google.com>
+Subject: [RFC PATCH v2 19/30] riscv/unwind: Add Minimal DWARF CFI kernel unwinder
 From: Ian Rogers <irogers@google.com>
 To: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
 	linux-arch@vger.kernel.org
@@ -103,272 +102,976 @@ Cc: jpoimboe@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
 	wnliu@google.com, dylanbhatch@google.com, Ian Rogers <irogers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Prepare RISC-V assembly, probe trampolines, and RV64 BPF JIT prologues
-for runtime Minimal DWARF CFI kernel unwinding:
- - Export end labels for ret_from_fork_user_asm, call_on_irq_stack, and
-   ftrace_caller save/restore boundaries, and save s0 in ftrace_caller
-   under CONFIG_UNWINDER_DWARF_CFI.
- - Annotate return_to_handler() and arch_rethook_trampoline() with
-   .cfi_* directives and key rethook shadow stacks on entry SP (CFA)
-   under CONFIG_UNWINDER_DWARF_CFI.
- - Save RV_REG_RA unconditionally in RV64 BPF JIT prologues under
-   CONFIG_UNWINDER_DWARF_CFI so leaf BPF programs unwind into frameless C
-   callers.
+Add CONFIG_UNWINDER_DWARF_CFI as a selectable 64-bit RISC-V kernel
+unwinder (selecting HAVE_RELIABLE_STACKTRACE) in
+arch/riscv/kernel/stacktrace.c:
+ - Build C and Rust kernel code with -fomit-frame-pointer and
+   -fasynchronous-unwind-tables, link vmlinux with --eh-frame-hdr, place
+   .eh_frame_hdr and .eh_frame in RO_DATA, and index SHF_ALLOC module
+   .eh_frame sections via dwarf_cfi_mod_alloc()/dwarf_cfi_mod_free_rcu().
+ - Implement walk_stackframe_cfi() and arch_stack_walk_reliable() across
+   task, IRQ, and overflow stacks with RVC 16-bit call-site support,
+   SP-keyed ftrace_graph/rethook recovery, BPF frame fallback, and
+   exception/entry root termination.
 
 Signed-off-by: Ian Rogers <irogers@google.com>
 ---
- arch/riscv/kernel/entry.S                     |  2 ++
- arch/riscv/kernel/mcount-dyn.S                |  6 ++--
- arch/riscv/kernel/mcount.S                    | 34 +++++++++++++++++--
- arch/riscv/kernel/probes/rethook.c            | 13 +++++--
- arch/riscv/kernel/probes/rethook_trampoline.S | 30 ++++++++++++++++
- arch/riscv/net/bpf_jit_comp64.c               |  6 ++--
- 6 files changed, 81 insertions(+), 10 deletions(-)
+ arch/riscv/Kconfig                  |   5 +-
+ arch/riscv/Kconfig.debug            |  16 +
+ arch/riscv/Makefile                 |  15 +-
+ arch/riscv/include/asm/ftrace.h     |   1 +
+ arch/riscv/include/asm/module.h     |  22 +
+ arch/riscv/include/asm/perf_event.h |   2 +
+ arch/riscv/include/asm/stacktrace.h |  11 +
+ arch/riscv/kernel/Makefile          |   9 +
+ arch/riscv/kernel/module.c          |   9 +
+ arch/riscv/kernel/stacktrace.c      | 650 +++++++++++++++++++++++++++-
+ arch/riscv/kernel/vmlinux.lds.S     |  13 +
+ arch/riscv/purgatory/Makefile       |   3 +-
+ 12 files changed, 749 insertions(+), 7 deletions(-)
 
-diff --git a/arch/riscv/kernel/entry.S b/arch/riscv/kernel/entry.S
-index 61b7a7716697..0a37ac12128c 100644
---- a/arch/riscv/kernel/entry.S
-+++ b/arch/riscv/kernel/entry.S
-@@ -374,6 +374,7 @@ SYM_CODE_START(ret_from_fork_user_asm)
- 	move a0, sp /* pt_regs */
- 	call ret_from_fork_user
- 	j ret_from_exception
-+SYM_INNER_LABEL(ret_from_fork_asm_end, SYM_L_GLOBAL)
- SYM_CODE_END(ret_from_fork_user_asm)
- 
- #ifdef CONFIG_IRQ_STACKS
-@@ -410,6 +411,7 @@ SYM_FUNC_START(call_on_irq_stack)
- 	addi	sp, sp, STACKFRAME_SIZE_ON_STACK
- 
- 	ret
-+SYM_INNER_LABEL(call_on_irq_stack_end, SYM_L_GLOBAL)
- SYM_FUNC_END(call_on_irq_stack)
- #endif /* CONFIG_IRQ_STACKS */
- 
-diff --git a/arch/riscv/kernel/mcount-dyn.S b/arch/riscv/kernel/mcount-dyn.S
-index 082fe0b0e3c0..06c26725a830 100644
---- a/arch/riscv/kernel/mcount-dyn.S
-+++ b/arch/riscv/kernel/mcount-dyn.S
-@@ -85,7 +85,7 @@
- 	addi	sp, sp, -FREGS_SIZE_ON_STACK
- 	REG_S	t0,  FREGS_EPC(sp)
- 	REG_S	x1,  FREGS_RA(sp)
--#ifdef HAVE_FUNCTION_GRAPH_FP_TEST
-+#if defined(HAVE_FUNCTION_GRAPH_FP_TEST) || defined(CONFIG_UNWINDER_DWARF_CFI)
- 	REG_S	x8,  FREGS_S0(sp)
- #endif
- 	REG_S	x6,  FREGS_T1(sp)
-@@ -113,7 +113,7 @@
- 	.macro RESTORE_ABI_REGS
- 	REG_L	t0, FREGS_EPC(sp)
- 	REG_L	x1, FREGS_RA(sp)
--#ifdef HAVE_FUNCTION_GRAPH_FP_TEST
-+#if defined(HAVE_FUNCTION_GRAPH_FP_TEST) || defined(CONFIG_UNWINDER_DWARF_CFI)
- 	REG_L	x8, FREGS_S0(sp)
- #endif
- 	REG_L	x6,  FREGS_T1(sp)
-@@ -183,6 +183,7 @@ SYM_FUNC_START(ftrace_caller)
- #endif
- #endif
- 	SAVE_ABI_REGS
-+SYM_INNER_LABEL(ftrace_caller_saved, SYM_L_GLOBAL)
- 	PREPARE_ARGS
- 
- #ifdef CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS
-@@ -193,6 +194,7 @@ SYM_INNER_LABEL(ftrace_call, SYM_L_GLOBAL)
- 	jalr	ra, 0(ra)
- #endif
- 	RESTORE_ABI_REGS
-+SYM_INNER_LABEL(ftrace_caller_restore, SYM_L_GLOBAL)
- #ifdef CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS
- 	bnez	t1, ftrace_caller_direct
- #endif
-diff --git a/arch/riscv/kernel/mcount.S b/arch/riscv/kernel/mcount.S
-index da4a4000e57e..c13aa07cdb04 100644
---- a/arch/riscv/kernel/mcount.S
-+++ b/arch/riscv/kernel/mcount.S
-@@ -27,8 +27,17 @@
- 	 */
- 	.macro SAVE_RET_ABI_STATE
- 	addi	sp, sp, -FREGS_SIZE_ON_STACK
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_def_cfa_offset FREGS_SIZE_ON_STACK
-+#endif
- 	REG_S	ra, FREGS_RA(sp)
- 	REG_S	s0, FREGS_S0(sp)
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_offset s0, FREGS_S0 - FREGS_SIZE_ON_STACK
-+	la	t0, return_to_handler
-+	REG_S	t0, FREGS_EPC(sp)
-+	.cfi_offset ra, FREGS_EPC - FREGS_SIZE_ON_STACK
-+#endif
- 	REG_S	a0, FREGS_A0(sp)
- 	REG_S	a1, FREGS_A1(sp)
- 	addi	s0, sp, FREGS_SIZE_ON_STACK
-@@ -41,11 +50,16 @@
- 	.endm
- 
- 	.macro RESTORE_RET_ABI_STATE
--	REG_L	ra, FREGS_RA(sp)
- 	REG_L	s0, FREGS_S0(sp)
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_restore s0
-+#endif
- 	REG_L	a0, FREGS_A0(sp)
- 	REG_L	a1, FREGS_A1(sp)
- 	addi	sp, sp, FREGS_SIZE_ON_STACK
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_def_cfa_offset 0
-+#endif
- 	.endm
- 
- SYM_TYPED_FUNC_START(ftrace_stub)
-@@ -69,13 +83,27 @@ SYM_FUNC_START(return_to_handler)
-  *
-  * So alternatively we check the *old* frame pointer position, that is, the
-  * value stored in -16(s0) on entry, and the s0 on return.
-+ *
-+ * Under CONFIG_UNWINDER_DWARF_CFI, FREGS_EPC(sp) is seeded with
-+ * &return_to_handler before ftrace_return_to_handler() overwrites fregs->epc
-+ * with the popped caller PC, allowing walk_stackframe_cfi() to unwind cleanly
-+ * both before and after current->curr_ret_stack is decremented.
-  */
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_startproc
-+#endif
- 	SAVE_RET_ABI_STATE
- 	mv	a0, sp
- 	call	ftrace_return_to_handler
--	mv	a2, a0
-+	mv	ra, a0
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_same_value ra
-+#endif
- 	RESTORE_RET_ABI_STATE
--	jalr	a2
-+	ret
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_endproc
-+#endif
- SYM_FUNC_END(return_to_handler)
- #endif
- 
-diff --git a/arch/riscv/kernel/probes/rethook.c b/arch/riscv/kernel/probes/rethook.c
-index 5c27c1f50989..1ae3faf48218 100644
---- a/arch/riscv/kernel/probes/rethook.c
-+++ b/arch/riscv/kernel/probes/rethook.c
-@@ -10,7 +10,10 @@
- /* This is called from arch_rethook_trampoline() */
- unsigned long __used arch_rethook_trampoline_callback(struct pt_regs *regs)
- {
--	return rethook_trampoline_handler(regs, regs->s0);
-+	unsigned long frame = IS_ENABLED(CONFIG_UNWINDER_DWARF_CFI) ?
-+			      regs->sp : regs->s0;
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 84b61c755db3..14d64a3fa33c 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -83,7 +83,7 @@ config RISCV
+ 	select ARCH_USES_CFI_TRAPS if CFI
+ 	select ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH if MMU
+ 	select ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT if MMU
+-	select ARCH_WANT_FRAME_POINTERS
++	select ARCH_WANT_FRAME_POINTERS if !UNWINDER_DWARF_CFI
+ 	select ARCH_WANT_GENERAL_HUGETLB if !RISCV_ISA_SVNAPOT
+ 	select ARCH_WANT_HUGE_PMD_SHARE if 64BIT
+ 	select ARCH_WANT_LD_ORPHAN_WARN
+@@ -101,7 +101,7 @@ config RISCV
+ 	select CPU_PM if CPU_IDLE || HIBERNATION || SUSPEND
+ 	select DYNAMIC_FTRACE if FUNCTION_TRACER
+ 	select EDAC_SUPPORT
+-	select FRAME_POINTER if PERF_EVENTS || (FUNCTION_TRACER && !DYNAMIC_FTRACE)
++	select FRAME_POINTER if !UNWINDER_DWARF_CFI && (PERF_EVENTS || (FUNCTION_TRACER && !DYNAMIC_FTRACE))
+ 	select FTRACE_MCOUNT_USE_PATCHABLE_FUNCTION_ENTRY if DYNAMIC_FTRACE
+ 	select FUNCTION_ALIGNMENT_8B if DYNAMIC_FTRACE_WITH_CALL_OPS
+ 	select GENERIC_ARCH_TOPOLOGY
+@@ -195,6 +195,7 @@ config RISCV
+ 	select HAVE_PERF_USER_STACK_DUMP
+ 	select HAVE_POSIX_CPU_TIMERS_TASK_WORK
+ 	select HAVE_REGS_AND_STACK_ACCESS_API
++	select HAVE_RELIABLE_STACKTRACE if UNWINDER_DWARF_CFI
+ 	select HAVE_RETHOOK
+ 	select HAVE_RSEQ
+ 	select HAVE_RUST if RUSTC_SUPPORTS_RISCV && CC_IS_CLANG
+diff --git a/arch/riscv/Kconfig.debug b/arch/riscv/Kconfig.debug
+index eafe17ebf710..afc8be5ec97f 100644
+--- a/arch/riscv/Kconfig.debug
++++ b/arch/riscv/Kconfig.debug
+@@ -1 +1,17 @@
++# SPDX-License-Identifier: GPL-2.0-only
 +
-+	return rethook_trampoline_handler(regs, frame);
++config UNWINDER_DWARF_CFI
++	bool "Minimal DWARF CFI kernel unwinder"
++	depends on 64BIT && MMU
++	depends on (!FUNCTION_TRACER || DYNAMIC_FTRACE_WITH_ARGS) && !SHADOW_CALL_STACK
++	select HAVE_MOD_ARCH_SPECIFIC if MODULES
++	select UNWIND_DWARF_CFI
++	select UNWIND_TABLES
++	help
++	  This option enables the Minimal DWARF Call Frame Information (CFI)
++	  unwinder for kernel stack traces on 64-bit RISC-V.  It interprets a
++	  strictly bounded subset of compiler-generated .eh_frame /
++	  .eh_frame_hdr tables matching SFrame's stack state model without
++	  requiring frame pointers.
++
+ source "arch/riscv/kernel/tests/Kconfig.debug"
+diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+index 44f5a439741a..ffa8842e7959 100644
+--- a/arch/riscv/Makefile
++++ b/arch/riscv/Makefile
+@@ -7,6 +7,9 @@
+ #
+ 
+ LDFLAGS_vmlinux := -z norelro
++ifeq ($(CONFIG_UNWINDER_DWARF_CFI),y)
++	LDFLAGS_vmlinux += --eh-frame-hdr
++endif
+ ifeq ($(CONFIG_RELOCATABLE),y)
+ 	LDFLAGS_vmlinux += -shared -Bsymbolic -z notext
+ 	KBUILD_CFLAGS += -fPIE
+@@ -96,8 +99,18 @@ ifeq ($(CONFIG_CMODEL_MEDANY),y)
+ 	KBUILD_CFLAGS += -mcmodel=medany
+ endif
+ 
+-# Avoid generating .eh_frame sections.
++# Avoid generating .eh_frame sections unless runtime unwind tables are enabled.
++ifeq ($(CONFIG_UNWIND_TABLES),y)
++KBUILD_CFLAGS += -fasynchronous-unwind-tables
++KBUILD_AFLAGS += -fasynchronous-unwind-tables
++ifeq ($(CONFIG_UNWINDER_DWARF_CFI),y)
++KBUILD_CFLAGS += -fomit-frame-pointer
++KBUILD_RUSTFLAGS += -Cforce-unwind-tables=y -Zuse-sync-unwind=n
++KBUILD_RUSTFLAGS += $(if $(call rustc-min-version,109800),,-Zllvm_module_flag=uwtable:u32:2:max)
++endif
++else
+ KBUILD_CFLAGS += -fno-asynchronous-unwind-tables -fno-unwind-tables
++endif
+ 
+ # The RISC-V attributes frequently cause compatibility issues and provide no
+ # information, so just turn them off.
+diff --git a/arch/riscv/include/asm/ftrace.h b/arch/riscv/include/asm/ftrace.h
+index e5026cd8f022..663831d950e5 100644
+--- a/arch/riscv/include/asm/ftrace.h
++++ b/arch/riscv/include/asm/ftrace.h
+@@ -217,6 +217,7 @@ ftrace_partial_regs(const struct ftrace_regs *fregs, struct pt_regs *regs)
+ 	regs->sp = afregs->sp;
+ 	regs->s0 = afregs->s0;
+ 	regs->t1 = afregs->t1;
++	regs->cause = 0;
+ 	return regs;
  }
  
- NOKPROBE_SYMBOL(arch_rethook_trampoline_callback);
-@@ -18,7 +21,13 @@ NOKPROBE_SYMBOL(arch_rethook_trampoline_callback);
- void arch_rethook_prepare(struct rethook_node *rhn, struct pt_regs *regs, bool mcount)
+diff --git a/arch/riscv/include/asm/module.h b/arch/riscv/include/asm/module.h
+index 0f3baaa6a9a8..2a8dd969c1f8 100644
+--- a/arch/riscv/include/asm/module.h
++++ b/arch/riscv/include/asm/module.h
+@@ -11,18 +11,40 @@ struct module;
+ unsigned long module_emit_got_entry(struct module *mod, unsigned long val);
+ unsigned long module_emit_plt_entry(struct module *mod, unsigned long val);
+ 
++struct mod_dwarf_cfi_index;
++
+ #ifdef CONFIG_MODULE_SECTIONS
+ struct mod_section {
+ 	Elf_Shdr *shdr;
+ 	int num_entries;
+ 	int max_entries;
+ };
++#endif
+ 
++#ifdef CONFIG_HAVE_MOD_ARCH_SPECIFIC
+ struct mod_arch_specific {
++#ifdef CONFIG_MODULE_SECTIONS
+ 	struct mod_section got;
+ 	struct mod_section plt;
+ 	struct mod_section got_plt;
++#endif
++#if defined(CONFIG_UNWINDER_DWARF_CFI) && defined(CONFIG_MODULES)
++	struct mod_dwarf_cfi_index __rcu *dwarf_cfi_index;
++#endif
+ };
++#endif
++
++#if defined(CONFIG_UNWINDER_DWARF_CFI) && defined(CONFIG_MODULES)
++void riscv_unwind_module_init(struct module *mod, void *eh_frame,
++			      size_t eh_frame_size);
++void riscv_unwind_module_cleanup(struct module *mod);
++#else
++static inline void riscv_unwind_module_init(struct module *mod, void *eh_frame,
++					    size_t eh_frame_size) {}
++static inline void riscv_unwind_module_cleanup(struct module *mod) {}
++#endif
++
++#ifdef CONFIG_MODULE_SECTIONS
+ 
+ struct got_entry {
+ 	unsigned long symbol_addr;	/* the real variable address */
+diff --git a/arch/riscv/include/asm/perf_event.h b/arch/riscv/include/asm/perf_event.h
+index bcc928fd3785..30d0c6b37e91 100644
+--- a/arch/riscv/include/asm/perf_event.h
++++ b/arch/riscv/include/asm/perf_event.h
+@@ -14,9 +14,11 @@
+ 
+ #define perf_arch_fetch_caller_regs(regs, __ip) { \
+ 	(regs)->epc = (__ip); \
++	(regs)->ra = 0; \
+ 	(regs)->s0 = (unsigned long) __builtin_frame_address(0); \
+ 	(regs)->sp = current_stack_pointer; \
+ 	(regs)->status = SR_PP; \
++	(regs)->cause = ~0UL; \
+ }
+ #endif
+ 
+diff --git a/arch/riscv/include/asm/stacktrace.h b/arch/riscv/include/asm/stacktrace.h
+index b1495a7e06ce..5a7b77367041 100644
+--- a/arch/riscv/include/asm/stacktrace.h
++++ b/arch/riscv/include/asm/stacktrace.h
+@@ -15,6 +15,17 @@ extern void notrace walk_stackframe(struct task_struct *task, struct pt_regs *re
+ 				    bool (*fn)(void *, unsigned long), void *arg);
+ extern void dump_backtrace(struct pt_regs *regs, struct task_struct *task,
+ 			   const char *loglvl);
++extern char _start[];
++asmlinkage void ret_from_fork_kernel_asm(void);
++asmlinkage void ret_from_fork_user_asm(void);
++extern unsigned long ret_from_fork_asm_end;
++#ifdef CONFIG_IRQ_STACKS
++extern unsigned long call_on_irq_stack_end;
++#endif
++#ifdef CONFIG_DYNAMIC_FTRACE_WITH_ARGS
++void ftrace_caller_saved(void);
++void ftrace_caller_restore(void);
++#endif
+ 
+ static inline bool on_thread_stack(void)
  {
- 	rhn->ret_addr = regs->ra;
--	rhn->frame = regs->s0;
-+	/*
-+	 * With -fomit-frame-pointer under CONFIG_UNWINDER_DWARF_CFI, nested
-+	 * functions share s0; key the rethook node on the function's entry SP
-+	 * (its DWARF CFA), which matches regs->sp at arch_rethook_trampoline.
-+	 */
-+	rhn->frame = IS_ENABLED(CONFIG_UNWINDER_DWARF_CFI) ?
-+		     regs->sp : regs->s0;
+diff --git a/arch/riscv/kernel/Makefile b/arch/riscv/kernel/Makefile
+index f54c336bf547..7ad74377dd4c 100644
+--- a/arch/riscv/kernel/Makefile
++++ b/arch/riscv/kernel/Makefile
+@@ -42,6 +42,15 @@ CFLAGS_REMOVE_patch.o	= $(CC_FLAGS_FTRACE)
+ CFLAGS_REMOVE_sbi.o	= $(CC_FLAGS_FTRACE)
+ CFLAGS_REMOVE_return_address.o	= $(CC_FLAGS_FTRACE)
+ CFLAGS_REMOVE_sbi_ecall.o = $(CC_FLAGS_FTRACE)
++ifdef CONFIG_UNWINDER_DWARF_CFI
++CFLAGS_REMOVE_stacktrace.o = $(CC_FLAGS_FTRACE)
++endif
++endif
++
++ifdef CONFIG_UNWINDER_DWARF_CFI
++CFLAGS_stacktrace.o += -fno-optimize-sibling-calls
++KASAN_SANITIZE_stacktrace.o := n
++KCOV_INSTRUMENT_stacktrace.o := n
+ endif
  
- 	/* replace return addr with trampoline */
- 	regs->ra = (unsigned long)arch_rethook_trampoline;
-diff --git a/arch/riscv/kernel/probes/rethook_trampoline.S b/arch/riscv/kernel/probes/rethook_trampoline.S
-index c3aa8d8cf5af..f632630846de 100644
---- a/arch/riscv/kernel/probes/rethook_trampoline.S
-+++ b/arch/riscv/kernel/probes/rethook_trampoline.S
-@@ -78,9 +78,27 @@
- 	REG_L x31, PT_T6(sp)
- 	.endm
+ always-$(KBUILD_BUILTIN) += vmlinux.lds
+diff --git a/arch/riscv/kernel/module.c b/arch/riscv/kernel/module.c
+index 1961135689db..93092b17b53a 100644
+--- a/arch/riscv/kernel/module.c
++++ b/arch/riscv/kernel/module.c
+@@ -902,5 +902,14 @@ int module_finalize(const Elf_Ehdr *hdr,
+ 	if (s)
+ 		apply_module_alternatives((void *)s->sh_addr, s->sh_size);
  
-+/*
-+ * Under CONFIG_UNWINDER_DWARF_CFI, PT_EPC(sp) is seeded with
-+ * &arch_rethook_trampoline before rethook_trampoline_handler() overwrites
-+ * regs->epc with the restored caller PC prior to running rethook handlers,
-+ * enabling reliable CFI unwinding across kretprobe return hooks.
++	s = find_section(hdr, sechdrs, ".eh_frame");
++	if (s && (s->sh_flags & SHF_ALLOC))
++		riscv_unwind_module_init(me, (void *)s->sh_addr, s->sh_size);
++
+ 	return 0;
+ }
++
++void module_arch_cleanup(struct module *mod)
++{
++	riscv_unwind_module_cleanup(mod);
++}
+diff --git a/arch/riscv/kernel/stacktrace.c b/arch/riscv/kernel/stacktrace.c
+index c7555447149b..45d81aa11a8e 100644
+--- a/arch/riscv/kernel/stacktrace.c
++++ b/arch/riscv/kernel/stacktrace.c
+@@ -6,16 +6,20 @@
+ 
+ #include <linux/export.h>
+ #include <linux/kallsyms.h>
++#include <linux/module.h>
++#include <linux/rcupdate.h>
++#include <linux/rethook.h>
+ #include <linux/sched.h>
+ #include <linux/sched/debug.h>
+ #include <linux/sched/task_stack.h>
+ #include <linux/stacktrace.h>
+ #include <linux/ftrace.h>
++#include <linux/unwind_dwarf_cfi.h>
+ 
++#include <asm/irq_stack.h>
++#include <asm/sections.h>
+ #include <asm/stacktrace.h>
+ 
+-#ifdef CONFIG_FRAME_POINTER
+-
+ /*
+  * This disables KASAN checking when reading a value from another task's stack,
+  * since the other task could be running on another CPU and could have poisoned
+@@ -35,6 +39,646 @@
+ extern asmlinkage void handle_exception(void);
+ extern unsigned long ret_from_exception_end;
+ 
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++
++static const struct dwarf_cfi_arch riscv_cfi_arch = {
++	.ws	= sizeof(unsigned long),
++	.sp_reg	= 2,	/* sp (x2) */
++	.fp_reg	= 8,	/* s0/fp (x8) */
++	.ra_reg	= 1,	/* ra (x1) */
++};
++
++#ifdef CONFIG_MODULES
++/**
++ * riscv_unwind_module_init() - Build Minimal DWARF CFI index for a module
++ * @mod: Module being loaded.
++ * @eh_frame: Pointer to the module's SHF_ALLOC .eh_frame section.
++ * @eh_frame_size: Size in bytes of @eh_frame.
++ *
++ * Scans and sorts the module's FDEs and publishes the index to
++ * @mod->arch.dwarf_cfi_index for RCU-protected lockless unwinding.
 + */
- SYM_CODE_START(arch_rethook_trampoline)
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_startproc
++void riscv_unwind_module_init(struct module *mod, void *eh_frame,
++			      size_t eh_frame_size)
++{
++	struct mod_dwarf_cfi_index *idx;
++
++	idx = dwarf_cfi_mod_alloc(eh_frame, eh_frame_size, &riscv_cfi_arch);
++	if (idx)
++		rcu_assign_pointer(mod->arch.dwarf_cfi_index, idx);
++}
++
++/**
++ * riscv_unwind_module_cleanup() - Unpublish and RCU-free module DWARF CFI index
++ * @mod: Module being unloaded or cleaned up after a failed load.
++ */
++void riscv_unwind_module_cleanup(struct module *mod)
++{
++	struct mod_dwarf_cfi_index *idx;
++
++	idx = rcu_replace_pointer(mod->arch.dwarf_cfi_index, /*ptr=*/NULL,
++				  /*c=*/true);
++	dwarf_cfi_mod_free_rcu(idx);
++}
++
++/**
++ * riscv_dwarf_cfi_module_find() - Look up Minimal DWARF CFI in loadable modules
++ * @pc: Kernel instruction pointer to evaluate.
++ * @row: Output evaluated Minimal DWARF CFI row.
++ *
++ * Uses rcu_read_lock_sched_notrace() and rcu_dereference_raw() so lookups are
++ * safe inside noinstr stack walks and NMI contexts.
++ *
++ * Return: 0 on success, -ENOENT if @pc is not in a module FDE, or a negative
++ * errno on invalid FDE bytecode.
++ */
++static __always_inline int
++riscv_dwarf_cfi_module_find(unsigned long pc, struct dwarf_cfi_row *row)
++{
++	struct mod_dwarf_cfi_index *idx;
++	struct module *mod;
++	int ret;
++
++	rcu_read_lock_sched_notrace();
++	mod = __module_address(pc);
++	if (!mod) {
++		rcu_read_unlock_sched_notrace();
++		return -ENOENT;
++	}
++	idx = rcu_dereference_raw(mod->arch.dwarf_cfi_index);
++	ret = dwarf_cfi_mod_eval(idx, pc, &riscv_cfi_arch, row);
++	rcu_read_unlock_sched_notrace();
++	return ret;
++}
++#else
++static __always_inline int
++riscv_dwarf_cfi_module_find(unsigned long pc, struct dwarf_cfi_row *row)
++{
++	return -ENOENT;
++}
++#endif /* CONFIG_MODULES */
++
++/**
++ * riscv_dwarf_cfi_find() - Evaluate Minimal DWARF CFI for core or module @pc
++ * @pc: Kernel instruction pointer to look up.
++ * @row: Output evaluated Minimal DWARF CFI row.
++ *
++ * Return: 0 on success, -ENOENT if no FDE covers @pc, or a negative errno on
++ * malformed CFI data.
++ */
++static __always_inline int
++riscv_dwarf_cfi_find(unsigned long pc, struct dwarf_cfi_row *row)
++{
++	size_t hdr_size = __stop_eh_frame_hdr - __start_eh_frame_hdr;
++	int err;
++
++	err = dwarf_cfi_unwind_eh_frame_hdr(__start_eh_frame_hdr, hdr_size,
++					    __start_eh_frame, __stop_eh_frame,
++					    pc, &riscv_cfi_arch, row);
++	if (!err)
++		return 0;
++
++	return riscv_dwarf_cfi_module_find(pc, row);
++}
++
++/**
++ * riscv_fgraph_recover() - Recover original return address from ftrace_graph
++ * @task: Task being unwound.
++ * @graph_idx: Shadow-stack index cursor for ftrace_graph_ret_addr().
++ * @pc: Candidate return address (potentially &return_to_handler).
++ * @cfa: Callee frame's Canonical Frame Address (entry SP).
++ * @ra_slot: Stack slot where @pc was saved (overridden when DYNAMIC_FTRACE_WITH_ARGS).
++ *
++ * Return: Restored caller PC if @pc matched &return_to_handler, or @pc.
++ */
++static __always_inline unsigned long
++riscv_fgraph_recover(struct task_struct *task, int *graph_idx,
++		     unsigned long pc, unsigned long cfa,
++		     unsigned long *ra_slot)
++{
++#if defined(CONFIG_FUNCTION_GRAPH_TRACER) && defined(CONFIG_DYNAMIC_FTRACE_WITH_ARGS)
++	unsigned long fregs_addr = cfa - ALIGN(sizeof(struct __arch_ftrace_regs),
++					       STACK_ALIGN);
++
++	ra_slot = &((struct __arch_ftrace_regs *)fregs_addr)->ra;
 +#endif
- 	addi sp, sp, -(PT_SIZE_ON_STACK)
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_def_cfa_offset PT_SIZE_ON_STACK
++	return ftrace_graph_ret_addr(task, graph_idx, pc, ra_slot);
++}
++
++/**
++ * riscv_recover_ret_addr() - Recover ftrace_graph and rethook return addresses
++ * @task: Task being unwound.
++ * @graph_idx: Shadow-stack cursor for ftrace_graph_ret_addr().
++ * @kr_cur: Shadow-list cursor for rethook_find_ret_addr().
++ * @pc: Candidate return address to recover.
++ * @cfa: Callee frame's Canonical Frame Address (entry SP).
++ * @ra_slot: Stack slot where @pc was saved (or NULL if still in ra).
++ *
++ * Recovers original caller PCs across both ftrace_graph and rethook shadow
++ * stacks in either hooking order, keying rethook lookups on @cfa (matching
++ * arch_rethook_prepare() under CONFIG_UNWINDER_DWARF_CFI).
++ *
++ * Return: Restored caller PC, or 0 if recovery failed.
++ */
++static __always_inline unsigned long
++riscv_recover_ret_addr(struct task_struct *task, int *graph_idx,
++		       struct llist_node **kr_cur, unsigned long pc,
++		       unsigned long cfa, unsigned long *ra_slot)
++{
++	pc = riscv_fgraph_recover(task, graph_idx, pc, cfa, ra_slot);
++#ifdef CONFIG_RETHOOK
++	if (is_rethook_trampoline(pc)) {
++		pc = rethook_find_ret_addr(task, cfa, kr_cur);
++		if (!pc || is_rethook_trampoline(pc))
++			return 0;
++	}
 +#endif
- 	save_all_base_regs
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_offset s0, PT_S0 - PT_SIZE_ON_STACK
-+	la t0, arch_rethook_trampoline
-+	REG_S t0, PT_EPC(sp)
-+	.cfi_offset ra, PT_EPC - PT_SIZE_ON_STACK
++	pc = riscv_fgraph_recover(task, graph_idx, pc, cfa, ra_slot);
++#ifdef CONFIG_FUNCTION_GRAPH_TRACER
++	if (pc == (unsigned long)return_to_handler)
++		return 0;
 +#endif
- 
- 	move a0, sp /* pt_regs */
- 
-@@ -88,9 +106,21 @@ SYM_CODE_START(arch_rethook_trampoline)
- 
- 	/* use the result as the return-address */
- 	move ra, a0
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_same_value ra
++	return pc;
++}
++
++#define RISCV_STACK_TASK	BIT(0)
++#define RISCV_STACK_IRQ		BIT(1)
++#define RISCV_STACK_OVERFLOW	BIT(2)
++
++/**
++ * riscv_stack_bounds() - Validate that [@addr, @addr + @size) lies on a stack
++ * @task: Task whose stacks are checked.
++ * @addr: Start virtual address of the stack access.
++ * @size: Access size in bytes.
++ * @out_low: Output lower bound of the matched stack.
++ * @out_high: Output upper bound of the matched stack.
++ *
++ * Checks @task's task stack, and when unwinding @current in non-preemptible
++ * context, also checks the per-CPU IRQ and vmap overflow stacks.
++ *
++ * Return: RISCV_STACK_* bit for the matched stack, or 0 if out of bounds.
++ */
++static __always_inline unsigned int
++riscv_stack_bounds(struct task_struct *task, unsigned long addr,
++		   size_t size, unsigned long *out_low,
++		   unsigned long *out_high)
++{
++	unsigned long low, high;
++
++	low = (unsigned long)task_stack_page(task);
++	high = low + THREAD_SIZE;
++	if (addr >= low && (addr < high || (!size && addr == high)) &&
++	    addr + size >= addr && addr + size <= high) {
++		*out_low = low;
++		*out_high = high;
++		return RISCV_STACK_TASK;
++	}
++
++	if (task == current && !preemptible()) {
++#ifdef CONFIG_IRQ_STACKS
++		low = (unsigned long)raw_cpu_read(irq_stack_ptr);
++		high = low + IRQ_STACK_SIZE;
++		if (low && addr >= low &&
++		    (addr < high || (!size && addr == high)) &&
++		    addr + size >= addr && addr + size <= high) {
++			*out_low = low;
++			*out_high = high;
++			return RISCV_STACK_IRQ;
++		}
 +#endif
- 
- 	restore_all_base_regs
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_restore s0
++#ifdef CONFIG_VMAP_STACK
++		low = (unsigned long)raw_cpu_ptr(overflow_stack);
++		high = low + OVERFLOW_STACK_SIZE;
++		if (addr >= low && (addr < high || (!size && addr == high)) &&
++		    addr + size >= addr && addr + size <= high) {
++			*out_low = low;
++			*out_high = high;
++			return RISCV_STACK_OVERFLOW;
++		}
 +#endif
- 	addi sp, sp, PT_SIZE_ON_STACK
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_def_cfa_offset 0
++	}
++
++	return 0;
++}
++
++/**
++ * walk_stackframe_cfi() - Unwind a RISC-V kernel stack via Minimal DWARF CFI
++ * @task: Target task to unwind (NULL defaults to current).
++ * @regs: Optional starting register state (rejected when @require_reliable).
++ * @fn: Callback invoked for each unwound PC; returning false stops the walk.
++ * @arg: Opaque cookie passed to @fn.
++ * @require_reliable: When true, reject exception boundaries, unannotated leaf
++ *                    fallbacks, and non-CFI frame-pointer guesses.
++ *
++ * Return: 0 on clean stack termination (or early callback stop when
++ * !@require_reliable), or -EINVAL when a reliable walk cannot be guaranteed.
++ */
++static __always_inline int
++walk_stackframe_cfi(struct task_struct *task, struct pt_regs *regs,
++		    bool (*fn)(void *, unsigned long), void *arg,
++		    bool require_reliable)
++{
++	unsigned long fp, sp, pc, ra = 0, min_sp = 0, caller_fp = 0, caller_pc = 0;
++	bool ra_valid = false, exact_pc = false, unreliable = false;
++	struct llist_node *kr_cur = NULL;
++	unsigned int used_stacks = 0;
++	int graph_idx = 0;
++	int level = 0;
++
++	if (!task)
++		task = current;
++
++	if (regs && regs->cause == ~0UL && !regs->ra) {
++		if (require_reliable || task != current)
++			return -EINVAL;
++		min_sp = regs->sp;
++		caller_fp = regs->s0;
++		caller_pc = regs->epc;
++		regs = NULL;
++	}
++
++	if (regs) {
++		if (require_reliable)
++			return -EINVAL;
++		fp = frame_pointer(regs);
++		sp = kernel_stack_pointer(regs);
++		pc = instruction_pointer(regs);
++		ra = regs->ra;
++		ra_valid = !!ra;
++		exact_pc = true;
++	} else if (task == current) {
++		asm volatile("1: auipc %0, 0\n\t"
++			     "mv %1, s0"
++			     : "=r"(pc), "=r"(fp));
++		sp = current_stack_pointer;
++		ra = (unsigned long)__builtin_return_address(0);
++		ra_valid = true;
++		exact_pc = true;
++		level = -1;
++	} else {
++		fp = task->thread.s[0];
++		sp = task->thread.sp;
++		pc = task->thread.ra;
++	}
++
++	for (;;) {
++		unsigned long lookup_pc, cfa, next_pc, next_fp = fp;
++		unsigned long cur_low = 0, cur_high = 0, low = 0, high = 0;
++		unsigned long tsk_low = (unsigned long)task_stack_page(task);
++		unsigned int cur_stk, next_stk;
++		struct dwarf_cfi_row row;
++		bool skip_emit;
++		int err;
++
++		if (!pc) {
++			if (exact_pc && ra_valid && !require_reliable) {
++				pc = ra;
++				ra_valid = false;
++				exact_pc = false;
++				unreliable = true;
++				continue;
++			}
++			return require_reliable ? -EINVAL : 0;
++		}
++
++		/*
++		 * Boot and secondary CPU idle tasks enter C code from
++		 * .head.text ([_start, _stext)), which precedes _stext.
++		 */
++		if (is_idle_task(task) &&
++		    sp >= (unsigned long)task_pt_regs(task) &&
++		    sp <= tsk_low + THREAD_SIZE &&
++		    pc >= (unsigned long)_start &&
++		    pc < (unsigned long)_stext)
++			return 0;
++
++		if (!__kernel_text_address(pc))
++			return require_reliable ? -EINVAL : 0;
++
++		skip_emit = (level++ < 0) ||
++			    (min_sp && (sp < min_sp ||
++					(sp == min_sp && sp < caller_fp &&
++					 pc != caller_pc)));
++
++		if (sp == (unsigned long)task_pt_regs(task) &&
++		    pc >= (unsigned long)ret_from_fork_kernel_asm &&
++		    pc < (unsigned long)&ret_from_fork_asm_end) {
++			if (!skip_emit && !fn(arg, pc))
++				return require_reliable ? -EINVAL : 0;
++			return 0;
++		}
++
++		if (!skip_emit && !fn(arg, pc))
++			return require_reliable ? -EINVAL : 0;
++		if (!skip_emit)
++			min_sp = 0;
++
++		if (pc >= (unsigned long)handle_exception &&
++		    pc < (unsigned long)&ret_from_exception_end) {
++			struct pt_regs *er = (struct pt_regs *)sp;
++			unsigned long status, next_sp, next_ra;
++
++			if (sp & (sizeof(long) - 1))
++				return -EINVAL;
++			cur_stk = riscv_stack_bounds(task, sp, sizeof(*er),
++						     &cur_low, &cur_high);
++			if (!cur_stk)
++				return -EINVAL;
++			status = READ_ONCE_TASK_STACK(task, er->status);
++			if ((status & SR_PP) == 0)
++				return 0;
++			if (require_reliable)
++				return -EINVAL;
++
++			next_pc = READ_ONCE_TASK_STACK(task, er->epc);
++			next_sp = READ_ONCE_TASK_STACK(task, er->sp);
++			next_fp = READ_ONCE_TASK_STACK(task, er->s0);
++			next_ra = READ_ONCE_TASK_STACK(task, er->ra);
++			if (next_sp & (sizeof(long) - 1))
++				return -EINVAL;
++			next_stk = riscv_stack_bounds(task, next_sp,
++						      /*size=*/0,
++						      &low, &high);
++			if (!next_stk)
++				return -EINVAL;
++			if (low == cur_low) {
++				if (next_sp <= sp)
++					return -EINVAL;
++			} else {
++				if (used_stacks & next_stk)
++					return -EINVAL;
++				used_stacks |= cur_stk;
++			}
++			pc = next_pc;
++			sp = next_sp;
++			fp = next_fp;
++			ra = next_ra;
++			ra_valid = true;
++			exact_pc = true;
++			unreliable = true;
++			continue;
++		}
++
++		lookup_pc = exact_pc ? pc : pc - 2;
++		err = riscv_dwarf_cfi_find(lookup_pc, &row);
++		if (err) {
++#ifdef CONFIG_DYNAMIC_FTRACE_WITH_ARGS
++			if (lookup_pc >= (unsigned long)ftrace_caller_saved &&
++			    lookup_pc < (unsigned long)ftrace_caller_restore &&
++			    (!exact_pc || !require_reliable)) {
++				size_t fsize = ALIGN(sizeof(struct __arch_ftrace_regs),
++						     STACK_ALIGN);
++				struct __arch_ftrace_regs *fregs = (void *)sp;
++
++				if ((sp & (sizeof(long) - 1)) ||
++				    !riscv_stack_bounds(task, sp, fsize,
++							&cur_low, &cur_high) ||
++				    READ_ONCE_TASK_STACK(task, fregs->sp) != sp + fsize)
++					return -EINVAL;
++				pc = READ_ONCE_TASK_STACK(task, fregs->epc);
++				fp = READ_ONCE_TASK_STACK(task, fregs->s0);
++				ra = READ_ONCE_TASK_STACK(task, fregs->ra);
++				sp += fsize;
++				ra_valid = true;
++				exact_pc = true;
++				if (!pc)
++					return -EINVAL;
++				continue;
++			}
 +#endif
- 
- 	ret
-+#ifdef CONFIG_UNWINDER_DWARF_CFI
-+	.cfi_endproc
++#ifdef CONFIG_IRQ_STACKS
++			/*
++			 * call_on_irq_stack() saves {fp, ra} below s0 on the
++			 * task stack before switching sp to irq_stack_ptr.
++			 */
++			if (!require_reliable &&
++			    task == current && !preemptible() &&
++			    !(used_stacks & RISCV_STACK_TASK) &&
++			    pc >= (unsigned long)call_on_irq_stack &&
++			    pc < (unsigned long)&call_on_irq_stack_end) {
++				unsigned long irq_low =
++					(unsigned long)raw_cpu_read(irq_stack_ptr);
++
++				if (irq_low && sp > irq_low &&
++				    sp <= irq_low + IRQ_STACK_SIZE &&
++				    fp && !(fp & 0x7) &&
++				    fp >= tsk_low + sizeof(struct stackframe) &&
++				    fp <= tsk_low + THREAD_SIZE) {
++					struct stackframe *fr =
++						(struct stackframe *)fp - 1;
++					unsigned long old_fp = fp;
++
++					next_fp = READ_ONCE_TASK_STACK(task, fr->fp);
++					next_pc = READ_ONCE_TASK_STACK(task, fr->ra);
++					next_pc =
++						riscv_recover_ret_addr(task, &graph_idx,
++								       &kr_cur, next_pc,
++								       old_fp, &fr->ra);
++					if (!next_pc)
++						return 0;
++					used_stacks |= RISCV_STACK_IRQ;
++					fp = next_fp;
++					pc = next_pc;
++					sp = old_fp;
++					ra_valid = false;
++					exact_pc = false;
++					unreliable = true;
++					continue;
++				}
++			}
 +#endif
- SYM_CODE_END(arch_rethook_trampoline)
-diff --git a/arch/riscv/net/bpf_jit_comp64.c b/arch/riscv/net/bpf_jit_comp64.c
-index 788fcc21fd5b..fb8cc74cff11 100644
---- a/arch/riscv/net/bpf_jit_comp64.c
-+++ b/arch/riscv/net/bpf_jit_comp64.c
-@@ -201,7 +201,7 @@ static void __build_epilogue(bool is_tail_call, struct rv_jit_context *ctx)
++			if (exact_pc && ra_valid && !require_reliable &&
++			    pc >= (unsigned long)_stext &&
++			    pc < (unsigned long)_etext) {
++				pc = riscv_recover_ret_addr(task, &graph_idx,
++							    &kr_cur, ra, sp,
++							    /*ra_slot=*/NULL);
++				if (!pc)
++					return 0;
++				ra_valid = false;
++				exact_pc = false;
++				unreliable = true;
++				continue;
++			}
++
++			/*
++			 * Fallback to frame-pointer record at (fp - 16) for
++			 * JITed BPF programs and BPF trampolines.
++			 */
++			if (!require_reliable && !(sp & 0x7) &&
++			    riscv_stack_bounds(task, sp, /*size=*/0, &cur_low,
++					       &cur_high) &&
++			    !(fp & 0x7) &&
++			    fp >= sp + sizeof(struct stackframe) &&
++			    fp <= cur_high) {
++				struct stackframe *fr = (struct stackframe *)fp - 1;
++				unsigned long old_fp = fp;
++
++				next_fp = READ_ONCE_TASK_STACK(task, fr->fp);
++				next_pc = READ_ONCE_TASK_STACK(task, fr->ra);
++				next_pc = riscv_recover_ret_addr(task,
++								 &graph_idx, &kr_cur,
++								 next_pc, old_fp, &fr->ra);
++				if (!next_pc)
++					return 0;
++				fp = next_fp;
++				pc = next_pc;
++				sp = old_fp;
++				ra_valid = false;
++				exact_pc = false;
++				unreliable = true;
++				continue;
++			}
++
++			if (exact_pc && ra_valid && !require_reliable) {
++				pc = riscv_recover_ret_addr(task, &graph_idx,
++							    &kr_cur, ra, sp,
++							    /*ra_slot=*/NULL);
++				if (!pc)
++					return 0;
++				ra_valid = false;
++				exact_pc = false;
++				unreliable = true;
++				continue;
++			}
++			return -EINVAL;
++		}
++
++		if (row.ra_rule == DWARF_CFI_RULE_UNDEFINED)
++			return require_reliable ? -EINVAL : 0;
++
++		if ((sp & (sizeof(long) - 1)) ||
++		    !riscv_stack_bounds(task, sp, /*size=*/0, &cur_low,
++					&cur_high))
++			return -EINVAL;
++
++		switch (row.cfa_base) {
++		case DWARF_CFI_BASE_SP:
++			cfa = sp + row.cfa_off;
++			break;
++		case DWARF_CFI_BASE_FP:
++			cfa = fp + row.cfa_off;
++			break;
++		case DWARF_CFI_BASE_FP_INDIRECT:
++			if (((fp + row.cfa_off) & (sizeof(long) - 1)) ||
++			    !riscv_stack_bounds(task, fp + row.cfa_off,
++						sizeof(long), &low, &high) ||
++			    low != cur_low)
++				return -EINVAL;
++			cfa = READ_ONCE_TASK_STACK(task,
++						   *(unsigned long *)(fp + row.cfa_off));
++			break;
++		default:
++			return -EINVAL;
++		}
++
++		if ((cfa & (sizeof(long) - 1)) || cfa < cur_low || cfa > cur_high)
++			return -EINVAL;
++
++		if (row.fp_rule == DWARF_CFI_RULE_OFFSET) {
++			unsigned long fp_addr = cfa + row.fp_off;
++
++			if ((fp_addr & (sizeof(long) - 1)) ||
++			    !riscv_stack_bounds(task, fp_addr, sizeof(long),
++						&low, &high) ||
++			    low != cur_low)
++				return -EINVAL;
++			next_fp = READ_ONCE_TASK_STACK(task, *(unsigned long *)fp_addr);
++		} else if (row.fp_rule == DWARF_CFI_RULE_FP_OFFSET) {
++			unsigned long fp_addr = fp + row.fp_off;
++
++			if ((fp_addr & (sizeof(long) - 1)) ||
++			    !riscv_stack_bounds(task, fp_addr, sizeof(long),
++						&low, &high) ||
++			    low != cur_low)
++				return -EINVAL;
++			next_fp = READ_ONCE_TASK_STACK(task, *(unsigned long *)fp_addr);
++		}
++
++		if (row.ra_rule == DWARF_CFI_RULE_SAME) {
++			if (!ra_valid) {
++				/*
++				 * Non-struct_ops BPF trampolines push a
++				 * synthetic parent frame record above the
++				 * inner traced-function frame record.
++				 */
++				if (!require_reliable && unreliable &&
++				    row.cfa_base == DWARF_CFI_BASE_SP &&
++				    row.cfa_off == 0 &&
++				    fp == sp + sizeof(struct stackframe) &&
++				    fp <= cur_high) {
++					struct stackframe *fr =
++						(struct stackframe *)fp - 1;
++					unsigned long old_fp = fp;
++
++					next_fp = READ_ONCE_TASK_STACK(task, fr->fp);
++					next_pc = READ_ONCE_TASK_STACK(task, fr->ra);
++					next_pc =
++						riscv_recover_ret_addr(task, &graph_idx,
++								       &kr_cur, next_pc,
++								       old_fp, &fr->ra);
++					if (!next_pc)
++						return 0;
++					sp = old_fp;
++					fp = next_fp;
++					pc = next_pc;
++					ra_valid = false;
++					exact_pc = false;
++					continue;
++				}
++				return -EINVAL;
++			}
++			if (cfa < sp)
++				return -EINVAL;
++			next_pc = riscv_recover_ret_addr(task, &graph_idx,
++							 &kr_cur, ra, cfa,
++							 /*ra_slot=*/NULL);
++		} else if (row.ra_rule == DWARF_CFI_RULE_OFFSET) {
++			unsigned long *ra_p = (unsigned long *)(cfa + row.ra_off);
++
++			if (cfa <= sp ||
++			    ((unsigned long)ra_p & (sizeof(long) - 1)) ||
++			    !riscv_stack_bounds(task, (unsigned long)ra_p,
++						sizeof(long), &low, &high) ||
++			    low != cur_low)
++				return -EINVAL;
++			next_pc = READ_ONCE_TASK_STACK(task, *ra_p);
++			next_pc = riscv_recover_ret_addr(task, &graph_idx,
++							 &kr_cur, next_pc, cfa,
++							 ra_p);
++		} else {
++			return -EINVAL;
++		}
++
++		if (!next_pc)
++			return require_reliable ? -EINVAL : 0;
++
++		sp = cfa;
++		fp = next_fp;
++		pc = next_pc;
++		ra_valid = false;
++		exact_pc = row.signal;
++	}
++}
++
++noinline void notrace walk_stackframe(struct task_struct *task,
++				      struct pt_regs *regs,
++				      bool (*fn)(void *, unsigned long),
++				      void *arg)
++{
++	walk_stackframe_cfi(task, regs, fn, arg, /*require_reliable=*/false);
++}
++
++noinline noinstr int arch_stack_walk_reliable(stack_trace_consume_fn consume_entry,
++					      void *cookie,
++					      struct task_struct *task)
++{
++	return walk_stackframe_cfi(task, /*regs=*/NULL, consume_entry, cookie,
++				   /*require_reliable=*/true);
++}
++
++#elif defined(CONFIG_FRAME_POINTER)
++
+ static inline int fp_is_valid(unsigned long fp, unsigned long sp)
  {
- 	int stack_adjust = ctx->stack_size, store_offset = stack_adjust - 8;
- 
--	if (seen_reg(RV_REG_RA, ctx)) {
-+	if (seen_reg(RV_REG_RA, ctx) || IS_ENABLED(CONFIG_UNWINDER_DWARF_CFI)) {
- 		emit_ld(RV_REG_RA, store_offset, RV_REG_SP, ctx);
- 		store_offset -= 8;
+ 	unsigned long low, high;
+@@ -102,7 +746,7 @@ void notrace walk_stackframe(struct task_struct *task, struct pt_regs *regs,
  	}
-@@ -2130,7 +2130,7 @@ void bpf_jit_build_prologue(struct rv_jit_context *ctx, bool is_subprog)
- 	if (bpf_stack_adjust)
- 		mark_fp(ctx);
+ }
  
--	if (seen_reg(RV_REG_RA, ctx))
-+	if (seen_reg(RV_REG_RA, ctx) || IS_ENABLED(CONFIG_UNWINDER_DWARF_CFI))
- 		stack_adjust += 8;
- 	stack_adjust += 8; /* RV_REG_FP */
- 	if (seen_reg(RV_REG_S1, ctx))
-@@ -2168,7 +2168,7 @@ void bpf_jit_build_prologue(struct rv_jit_context *ctx, bool is_subprog)
+-#else /* !CONFIG_FRAME_POINTER */
++#else /* !CONFIG_FRAME_POINTER && !CONFIG_UNWINDER_DWARF_CFI */
  
- 	emit_addi(RV_REG_SP, RV_REG_SP, -stack_adjust, ctx);
- 
--	if (seen_reg(RV_REG_RA, ctx)) {
-+	if (seen_reg(RV_REG_RA, ctx) || IS_ENABLED(CONFIG_UNWINDER_DWARF_CFI)) {
- 		emit_sd(RV_REG_SP, store_offset, RV_REG_RA, ctx);
- 		store_offset -= 8;
+ void notrace walk_stackframe(struct task_struct *task,
+ 	struct pt_regs *regs, bool (*fn)(void *, unsigned long), void *arg)
+diff --git a/arch/riscv/kernel/vmlinux.lds.S b/arch/riscv/kernel/vmlinux.lds.S
+index 1f4f8496941a..f2bd07e08d5e 100644
+--- a/arch/riscv/kernel/vmlinux.lds.S
++++ b/arch/riscv/kernel/vmlinux.lds.S
+@@ -125,6 +125,19 @@ SECTIONS
+ 		*(.srodata*)
  	}
+ 
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.eh_frame_hdr : ALIGN(4) {
++		__start_eh_frame_hdr = .;
++		*(.eh_frame_hdr)
++		__stop_eh_frame_hdr = .;
++	}
++	.eh_frame : ALIGN(8) {
++		__start_eh_frame = .;
++		*(.eh_frame)
++		__stop_eh_frame = .;
++	}
++#endif
++
+ 	. = ALIGN(SECTION_ALIGN);
+ 	_data = .;
+ 
+diff --git a/arch/riscv/purgatory/Makefile b/arch/riscv/purgatory/Makefile
+index b0358a78f11a..29c23c58b26c 100644
+--- a/arch/riscv/purgatory/Makefile
++++ b/arch/riscv/purgatory/Makefile
+@@ -60,8 +60,9 @@ targets += purgatory.ro purgatory.chk
+ # These are adjustments to the compiler flags used for objects that
+ # make up the standalone purgatory.ro
+ 
+-PURGATORY_CFLAGS_REMOVE := -mcmodel=kernel
++PURGATORY_CFLAGS_REMOVE := -mcmodel=kernel -fasynchronous-unwind-tables -funwind-tables
+ PURGATORY_CFLAGS := -mcmodel=medany -ffreestanding -fno-zero-initialized-in-bss
++PURGATORY_CFLAGS += -fno-asynchronous-unwind-tables -fno-unwind-tables
+ PURGATORY_CFLAGS += $(DISABLE_KSTACK_ERASE) -DDISABLE_BRANCH_PROFILING
+ PURGATORY_CFLAGS += -fno-stack-protector -g0
+ 
 -- 
 2.56.1.831.g720f3f5937-goog
 
