@@ -1,55 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795602420;
-	b=mTXFILYG8YAzeLgx+l8C5dodG3hH6iPo6PlfBrGL/ZKXdrKkaNTxlO86JPKRBg40EDy+
-	 Z0Zv/+/oOhxJvMj5b8CGR30ek4CPMyV1h42T08tHbsHrwksU/XFJ2f3W+MYHMRU8ZAYNW
-	 7AVDZI/x/Y1fI9BH6knIEogejBoRn8bkX7ypoZxgSvEu8ULhMDjWiKgnx5KhmnuCR7frk
-	 MfUDNzK6JZznUYN768v/f7Em0uSPGDwXePHDidQNeDTMtyHDWwDsXMLYC5uPeN4VWEVyC
-	 hVNtOPOzPMSJ5LOy5hk7IKMRovItvavagrvbGxc7F95/KzF3BE4O5KmhScv13vrePTw==
+	t=1795604758;
+	b=EVoQMqIywFGUsOoY9smuyOypbn9xDA1rOJwR0jT00GQMZIBdRSZvoH0PWcXn/GAt1v+X
+	 q8oKJ/e813RZuRk6z0OmaMUjTtqw58JcdqBf+oGJjYDGV+P5nrdq7VMd0KA72Djoe4Qyn
+	 agRjkAUTiLX7tg0Y4m/Ch6Fl2mTWyxRWGwOT17B3wYwxaW5F53+hnjU5AE0oS6/CeXKBs
+	 IyVO/na6lzRPGR9yBGMvr31dKEMBn2JF02isekPLk1LsDy06e2umxLKtUCtATP3NN3JxH
+	 KDeVElV4NgouqL8o/0RWIexOZFrygm3AZTzpV9RffXak/cKg+iBZniqb1Z1I45tkcrw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795602420;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=usb6Z06Hk8KYQV8odRZafo7lcqGHFhPDFCx6kFOexg8=;
-	b=jiQBm4bG+jZY++Qs+6QM9RdVRfkGcN/b6T6URTZ5wdRYcVWpjuN7CgIAJ4CaOUrt0+BO
-	 tetRdUIKxnH93VyGDZhz1JRN2q/bAW9bKsB4Up1awKtO9VTv2lEh34VGeSbIDELkL3ouh
-	 EWdOW8aNtltRmYfkQ1iGufE386ZLJegLVIXWCVk2rNnA/WKSd3YpSAJFCpsxY3VxEajzo
-	 G9VzmMgv1zCgw5UKk2W5D1U5BXzbZNb/qB/nX6cUW1h7CeB1yJn1aHVneRjiD+2nhnGNy
-	 T8b429ERhyoT8RTeFaVnaddbJcNbK439tAf0yIZAHOFK9eqpOt0AC7EeFmYdtHHqh7Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795604758;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=oS2GSG0gTbNBdIcy/EYt/+8Op7NtDzRF0d79hf39B2Y=;
+	b=mvaL71vgCKiwA269BxbL0oZjoKATXbxH82+vbOobmDGR/1bJsR4Cm1iZPkxw910B+Dgg
+	 SM5EOw7xhPaV8x8YdlUIKbB3wkSgOWIxF7wHqh/0rPEqQhEjFzVrevS7Gtr1TDF8lCUE9
+	 kFWl09o5V4tF/daFNpJ6IfsfduBex8QvYGGHeNpwza9+DVKNknxM2v5Oje/6epZBd6uOt
+	 lrEYRO1BgVwfgkHjZ/eo64I7ifkci0B3KYoeavwiqDBMmhkqsYfNr3pTsuyCYIp5DQdm8
+	 P9H/WSIBOxwShtNx+96jXcgaK9p/+0R9IUB5wGV5FDgUG3yDo5n/J8F9ewfFnn1l1OA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=O4uHgzXP;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=pereq.eu;
+	spf=pass smtp.mailfrom=cryspen.com;
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=ZiLoNCI3;
+	arc=none smtp.remote-ip=209.85.221.43
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C7A606A323
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 10:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD769606A333
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 11:05:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DD769606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=O4uHgzXP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F36C61F000D4
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 10:26:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795602420;
-	bh=usb6Z06Hk8KYQV8odRZafo7lcqGHFhPDFCx6kFOexg8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=O4uHgzXPpddrs5gBqi8u9B2aC0SyE1KCf5EIAftXmQf0Yz2Bd+cgo1AM8A56/XQ9b
-	 QsOVezx8SE9qn+lvrJWJL1PlTp4gI/ODzeAfNUdCBjt4Yzly+8YEdh5lAto1BeiBtW
-	 /7CFZIny7BW8SPGrIJQECs6/L+Gmln25txeh1jerNuB2R5ZuT5WsODPt16jq9ZSXN1
-	 TAdyxky7rcl0q80azCDqg0LQDzoEB1/CSIuA4WL/UAjvZTNT3qWM2GLj5N0aZvZz1R
-	 L8ZFxRiK9+1MKiLQyRnSM6v7F5pPkCH2LHiOaGB1sMe/Gxk8SHMRpzsNCp05SnHtNB
-	 EfR1nLIQmF2Pg==
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5c14f3dab0cso3148444e87.1
-        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 02:26:59 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErGRtUWNClOom6pIvFADlPWuIigiHM03Ry7bOFBfspWRGyhlnkz0geL9MWCsD8r+XxFxDoXBlIM=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+7Ufl4r76c7SE2IeWv0aiyq4M4F+EZ7obSbATMRwt5Jub21G0q
-	q/hkX0azwTPUnH/5nErLkIKXIF7yVfCM+5EO473iZELw6B5Tu+Qo8oM0XAbw6pbIkEaWT4tasyq
-	fgaQae73gGyVs5jejCkveVBSyqMayqVE=
-X-Received: by 2002:a05:6512:104d:b0:5c1:5a83:2fd7 with SMTP id
- 2adb3069b0e04-5c1bc907072mr5199313e87.66.1795602418769; Wed, 25 Nov 2026
- 02:26:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=ZiLoNCI3
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4ac08f4a0b2so3963602f8f.3
+        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 03:05:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pereq.eu; s=google; t=1795604756; x=1796209556; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=oS2GSG0gTbNBdIcy/EYt/+8Op7NtDzRF0d79hf39B2Y=;
+        b=ZiLoNCI3vO7e03Ce6enupaLbQEjPd7/V2CGlrieSFvMF4fMA3qvMiykEH6+G78YcxC
+         PxvxIM9LDL5YYg34uyiMFh6V3gX3KpXok0ADHibfyi0CTzKUS4AdxF5GZOzbS8SW0IUn
+         XHIb+bfD3hTjGOwwF9ojseSdXsluYASM+o0ljpnvyZefLcrsDV++c1YrGi2k1xKakunE
+         Uqt0Leo+RWOjY92izypNiDaNWm/6EVFY9SU8Y9MEDrPFhD7eo/oH9pSnro1CmFUrVaNP
+         aFVkOgOFzZab21Pnc7x6krlqsCtyaYif9JoF4kUCiJTicG7d/K3LWWLlHmkKUt4AVHAI
+         wQGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795604756; x=1796209556;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=oS2GSG0gTbNBdIcy/EYt/+8Op7NtDzRF0d79hf39B2Y=;
+        b=dhnCXMkaCaz1i5bORa7Uw6WsfMz/ZYisbQKkKvKDaGm0HaPAADCPSTvDsCLOB5pytK
+         OdYYW2bv70KdJUEeVe57SrWhAl1JrCUF0SweuW5yS34ZEw/gXHLPJYdGI5NNuw2U3enw
+         mge1QE/z27we3h6T4Sp8gY82dcyGlU+IiAB01ZNbQ/EzbtAHaGx7QJLothFNuYzNE1Z/
+         fECTcnrm6GC3QAK5JCKtn/6OjS1rb39xaBGqGkocTfjbJ7J/UBnMn6it6fiGrBrlcXFo
+         Hymchnrgeqleq2D3xXWe1ukv9ANBY1Svd7dY0EPaWKRHesuYGulZu5UCIYPD/7NcqmsQ
+         lsyw==
+X-Gm-Message-State: APuU4Z+R/5QQa8EpOu0lVgirkb5WJRLC/tmujh6XRyUPLRLsnU7FU575
+	2I2BsTtiaDsO4Jqfh3gTRCCZyFCmUhZHP0oW+x8/T+2dg5LHQNUEu7vxrw4IE0Mnojc=
+X-Gm-Gg: AZFdTZeOsiaZ7CRMvOH2ymrEUzzyqS+zK5WdvNeJgd18HiqsZNaIAJBqB5qqy2ZcGrC
+	ArgQz3pofqp0ZuBGoZpilJsXn0MIL1uAyJnalM9pPAbjOCKNRxuClXF+cRmGgnC8v89r2u8Y9jJ
+	orXz4gdDiQ8ri67/ySUvf5vsjBZNkhOjEZO0RWWxIQ9FkTa0ad4sfvLoYrqkIrxXFcCovcAjHJU
+	UK3dPn28xd1BLftBG17F+MwIAUagqQ66f5U+3HzuGstNK9R9bDcT5NxHfkZerdsQ4MQ9Sxan+E8
+	jlDEDT+V7tD7UZfOZC6w9miM9pRfoGXdmRbOMCdSJ44zrc6lsfHZGqBquHcM++ZFm2APU6sF2Ft
+	gsh6psRlg4FqmVpViRFMz+eNSzPjJxRWNkkODTz/DR4g6mjJG+nZUudFixY/tWsXEUfggUCKWgt
+	wmtym7UQSeRz6QHWKFNVV92sSzCgUD6nhaGo+aa10w01NTNmAV5uXL0AtIX7E5Htf08f1tS5teF
+	x5xcLcG4S39pmoDMi2dc0dmbKA5u3uoYq4FyBYoGXHvHImJhk15aBFpZiPtTAOJ0PBXC7HqmhXJ
+	pJuErhzPe/WwjTHKtvI=
+X-Received: by 2002:a05:6000:990:b0:493:ec0:861c with SMTP id ffacd0b85a97d-4abb0c5d53fmr32529130f8f.16.1795604756007;
+        Wed, 25 Nov 2026 03:05:56 -0800 (PST)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6b10b2c9sm34833647f8f.31.2026.11.25.03.05.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Nov 2026 03:05:55 -0800 (PST)
+Date: Wed, 25 Nov 2026 14:05:51 +0300
+From: Dan Carpenter <dan@pereq.eu>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2 6/8] KVM: arm64: nv: Don't deliver a pending SError to
+ the wrong guest
+Message-ID: <awbBD_8rLYZ9aJTK@stanley.mountain>
+References: <20261125-double_exception-v2-0-224689d8a764@pereq.eu>
+ <20261125-double_exception-v2-6-224689d8a764@pereq.eu>
+ <sashiko-outbox-232776@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,54 +98,31 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261015142552.4128028-1-ryan.roberts@arm.com>
-In-Reply-To: <20261015142552.4128028-1-ryan.roberts@arm.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Wed, 25 Nov 2026 11:26:46 +0100
-X-Gmail-Original-Message-ID: <CAD++jLm6VvPYB5UQS8Zm73pYifr7Oi=xX3S4Wt5c3WE7uMv+fQ@mail.gmail.com>
-X-Gm-Features: Aa3M54rtYXT0tNMww-_rAs-DbnpD3x58pzG3L6crqferpf2a4MJ3rhFXSlspZ40
-Message-ID: <CAD++jLm6VvPYB5UQS8Zm73pYifr7Oi=xX3S4Wt5c3WE7uMv+fQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/15] Arm Core Local Accelerator Driver
-To: Ryan Roberts <ryan.roberts@arm.com>, Arnd Bergmann <arnd@arndb.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@nvidia.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jean-Philippe Brucker <jpb@kernel.org>, Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <sashiko-outbox-232776@kernel.org>
 
-Hi Ryan, Jean-Philippe,
+On Wed, Nov 25, 2026 at 07:24:38AM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential
+> issue to consider:
+> - [High] KVM: arm64: nv: sleeping in atomic context via
+>   kvm_nested_flush_hwstate()
+> --
 
-regarding this patch set I looked into historical precursors and
-ongoing developments that could benefit from the same infrastructure.
+This is an existing bug but my patchset makes it worse.
 
-1. Apple AMX: there is no ongoing effort for this accelerator but it
-exists in all Apple silicon. This accelerator appears to be synchronous
-using extended instructions and is just "some different SVE" and would
-be handled the same way as these.
+I didn't have CONFIG_DEBUG_ATOMIC_SLEEP enabled when I tested my patch
+but I have enabled it now (although it wouldn't have caught the bug
+anyway).
 
-2. The PowerPC Cell SPU (Playstation 3)
+Claude says Smatch probably would have caught this bug, but I haven't
+been rebuilding the cross function DB since I started using AI for
+static analysis...  I guess I will do that again.
 
-This is more interesting: the Cell has accelerator cores that execute
-entire litte programs (shaders?) on behalf of the CPU. These are
-however not poilled like the CLA, but signal completion using a
-mailbox interrupt. The accelerators are
+Anyway, I will also add checking for sleeping in atomic to the standard
+review.
 
-What is interesting with the SPU is that it communicates by creating
-a custom filesystem (spufs) mounted at /spu, so this is apparently
-another design venue to consider.
+regards,
+dan carpenter
 
-I think Arnd Bergmann has worked extensively on the SPU so he will
-likely be able to provide input on lessons learned, do's and dont's
-when it comes to this and other accelerators.
 
-My superficial appraisal is that the CLA is probably executing smaller
-jobs, snippets of work rather than entire little programs/shaders like
-the SPU does, so it is conceptually different, but may provide
-additional ideas anyway. Arnd?
-
-Yours,
-Linus Walleij
