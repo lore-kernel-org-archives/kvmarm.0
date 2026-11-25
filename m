@@ -1,49 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795618717;
-	b=h+nUdR1KbpBrUqFdtsSIdyH/OS2CWuSyNSyCHS628weOLtLXEzBg3piMHrDNSJkaf7Md
-	 gVykTj5uM582M5L+q8/PhomcA9ssTvZR6Ym+tZQEfrdXq739NgMSmUGTA8SPny8Zo+X3K
-	 qvn29jcYrdRJzmfU2Aaf+nnFL6kmdoVr6/4zNbGQrUGF8+gP65nDCNmAgkw2eG2rE/OXr
-	 KRh5Y5RFv2UWfJ4/IGxnpvpLUrA5TL7GUmP4KpxVhQLTtNtJ7Z/Ut58HRObQOnGdTWfbW
-	 srNj2bRJiMYm73qe549jk54HEXJ9tncPja3/Vccu4U+5q9pomrgR2OAhgw3qN2Tg5ZQ==
+	t=1795619644;
+	b=XoRqg/h9HiDO2TxvV+sYVrbVoiNmqNKBEomtfqy9luVdRGknjfagC5YotOXPcT4dH91U
+	 2FRVH2bJZdN5R7WC+cO6uKM1psFS4sM9WHG2TIgfjgsQFFh6AblI7IZ9MJJkjs1DVPV7q
+	 Hq5nf9S9wkLkMoO8/uJCXwK0rxp232BGCCT9E0MRGWJDUt5vtEo6ESvonKYXCyk8lix1C
+	 Gr9QYwgrsZ6izWILVeJI0XmizrleCou1Y6FOXigf8w12FP2CpjltuQDH+vi3afPynM1Z5
+	 uEDS7mKmjW2crhdpkjvZOdjxYvNpSNu2026LLgFk5pIzlDujXtFefQ58sdNHVBm0qGQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795618717;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=X3zNXgFcgKkRvrebQOQS0iqgUmCxBf+Rl6iIn0IF0a4=;
-	b=UNorMIIaElp417Yyn7OuNR/bfrFNopZ0QknMDJu8he+NgfYS7a7HVgtza0PonltL93wP
-	 NQzuHf4Pw/9+DggFtiKzSU+BfyaPlXwAk44oyN8oLZNAHUIygWeHXjQmuMlyeT5D7zjk/
-	 0yLVhFT+uMFeLpv4ImbIOy4oWMmh2jBpNCocEQjLhaMhpakZdGB28TP79OqTxxDaw32Om
-	 CJ4Dt80goYzHXNvkHKhtmc31DJMxT7zrd6bJ8q3M9aVmbGv9oun06YqKdQs+vWcwc4dDZ
-	 aeNQCLBdb1EKjiO1IVZvZlGBWO4N0hq6Rke8WWE+kJ6bgk4LeuL30GmBh8ejDmMdfwA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795619644;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=bGnf7IpqYD/0ZUcDQjAGShI74EbjTS0C+XDIaOAqBlw=;
+	b=go6AlMffwnVQMixsLGn6zUv251I+bl7xyo5hYd7Nhg0uyvKJ7dvyX3k4kswHcOX6Zc+D
+	 2zjYkIt10eoKOZCe6wRjaHsswcvnmftgsGz7nxgHsEOqOTjkQUZj5keuEiwm0wBuUMbyd
+	 T3NeRuWRGO5zZsiCxop7+xQo0QXKfJxYV3eAZvQcMx70AalDi1fzLQ9iHuL31ClyLpjhz
+	 pP4kgiKC5Sq1Pq61MH3kr3sxyddPKE2gWVyx9OUi65sEbYcU6o3NqleOloqHZfGMMrAsr
+	 ipYRTE6pBH8gmMO3B53NJIpWQIAr0FsCpYJmR3mxHyUChowcuFWiFUSi24RgzMzO++g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ZoJs1Pdu;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=jpEaHt4X;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353E1606A326;
-	Wed, 25 Nov 2026 14:58:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 353E1606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB98F606A326
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:14:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CB98F606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ZoJs1Pdu
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=jpEaHt4X
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8E0592F;
-	Wed, 25 Nov 2026 06:58:33 -0800 (PST)
-Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2ECBB3F632;
-	Wed, 25 Nov 2026 06:58:33 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 36E242F;
+	Wed, 25 Nov 2026 07:14:00 -0800 (PST)
+Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F40613F86F;
+	Wed, 25 Nov 2026 07:14:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795618716; bh=D/n+P8rGctWCPmcRxey9aK7QCr6PlKd7Fo3q+ESxtX8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZoJs1PduoU0ULUyP6YVRCRXGnlHrzR4tGX0ZOcuxgF6JCfnSb+OxspbajzsG32Dkt
-	 1Z730FRcVZHXhbCFzLBFONsxqLNfCmyWjC9hIcdqTHJqPbmaKso6xMf1aEIsjGw9Wq
-	 eAw3xOv2uegtqNUIFjfCGzV9mXZb+s9Cr4kaU0jc=
-Message-ID: <e4108d4f-e84c-444c-aa7a-18e823816eae@arm.com>
-Date: Wed, 25 Nov 2026 14:58:31 +0000
+	t=1795619643; bh=cw++yBZS8jlRB00548KczTX1DkOn+4sdOCjlk32jvuQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jpEaHt4XRasO5Owe1M4sHNyr1grHVrZy8T1oERHdOcgTPSDcPALWH7LxyZREBs2bn
+	 8CEHOkNX4ciCKhNhfUea5NFJD9UrFaLenWrEumFt1Wth6H9MTsPxihycOAqDwBrkGC
+	 4qvvf34OtsSnI3SIzMaMvzOaE4HuRKSMpOHyV3Ak=
+From: Sascha Bischoff <sascha.bischoff@arm.com>
+To: will@kernel.org,
+	julien.thierry.kdev@gmail.com
+Cc: vladimir.murzin@arm.com,
+	maz@kernel.org,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	timothy.hayes@arm.com,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH kvmtool v6 00/23] arm64: Support GICv5-based guests
+Date: Wed, 25 Nov 2026 15:13:33 +0000
+Message-Id: <20261125151356.2875108-1-sascha.bischoff@arm.com>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,229 +63,90 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 09/11] KVM: arm64: CCA: Prevent memslot modifications
- after Realm creation
-To: Ackerley Tng <ackerleytng@google.com>, Steven Price
- <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Kohei Enju <enju.kohei@fujitsu.com>
-References: <20261123104233.95710-1-steven.price@arm.com>
- <20261123104233.95710-10-steven.price@arm.com>
- <CAEvNRgFQ5BXqU3KfPFT8bfZTW=RyvBw25z3GZtr3JA=Wv3Yqfw@mail.gmail.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <CAEvNRgFQ5BXqU3KfPFT8bfZTW=RyvBw25z3GZtr3JA=Wv3Yqfw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Ackerley
+This series adds support for GICv5-based VMs to kvmtool. These are
+exposed as --irqchip=gicv5 and --irqchip=gicv5-its, where the former
+creates a vGICv5 device and the latter adds a GICv5 ITS. The GICv5
+specification can be found at [1].
 
-On 25/11/2026 00:09, Ackerley Tng wrote:
-> Steven Price <steven.price@arm.com> writes:
-> 
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->> Once the Realm is created, prevent changes to guest_memfd backed
->> memslots, which can provide private memory. Validate these changes
->> before KVM invalidates the old memslot, so a rejected deletion leaves
->> its stage-2 mappings intact. Realm stage-2 faults will also validate
->> the private memory backing in a later commit.
->>
->> Require Realm memslots to lie in the lower half of the IPA space, as the
->> upper, shared half aliases the lower, protected half.
->>
->> Define kvm_arch_has_private_mem() so generic KVM recognizes Realm VMs
->> as supporting private memory. Defining the macro also makes
->> gmem_in_place_conversion true for every arm64 VM, so guest_memfd
->> memslots are marked gmem-only even for non-Realm VMs. A well-formed
->> KVM_SET_MEMORY_ATTRIBUTES2 request on a non-Realm guest_memfd now
->> reaches the VM check and returns -EINVAL instead of -ENOTTY.
->>
->> Additionally, similar to pKVM, do not support dirty logging or
->> read-only memslots.
->>
-> 
-> Imo this could be split into a few patches
-> 
-> 1. Add the constraints wrt realm memslots and being in the lower half of
->     the IPA space
-> 2. Defining arm's support for private mem
-> 3. Imposing rules on memslot changes
-> 4. Maybe some others, maybe I'm misunderstanding the patch
+The GICv5 support in KVM needed by --irqchip=gicv5 is available as of
+Linux v7.4-rc1. The GICv5 ITS support is described in [2]; using
+--irqchip=gicv5-its requires a KVM build with those changes.
 
-Agree
+The series teaches kvmtool to create the GICv5 irqchip and ITS KVM
+devices. It describes the GICv5 CPU interface, IRS and ITS in the
+guest DT, updates the timer and PMU interrupt descriptions, and
+generates GICv5 interrupt specifiers for platform devices and PCI. It
+also maps PCI MSI requester IDs to the ITS. The IRS support is built
+and exposed before the ITS support, so the GICv5 irqchip support can
+be merged separately from the ITS changes.
 
+Compared with v5 [3]:
 
-> 
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->>
->> ---
->> Changes since v3:
->> - Explain the arm64-wide in-place conversion effect and keep the
->>    general IPA limit comment.
->>
->> Changes since v1:
->> - Preserve private mappings if KVM invalidates a Realm guest_memfd
->>    slot before the prepare hook rejects its deletion.
->> ---
->>   arch/arm64/include/asm/kvm_host.h |  2 ++
->>   arch/arm64/kvm/mmu.c              | 37 ++++++++++++++++++++++++-------
->>   2 files changed, 31 insertions(+), 8 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 3ddeddfacd06..55673d08e3eb 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -1607,6 +1607,8 @@ struct kvm *kvm_arch_alloc_vm(void);
->>
->>   #define kvm_vm_is_realm(kvm)		((kvm)->arch.vm_flavor == VM_REALM)
->>
->> +#define kvm_arch_has_private_mem(kvm) kvm_vm_is_realm(kvm)
->> +
->>   #define kvm_has_mte(kvm)					\
->>   	(system_supports_mte() &&				\
->>   	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 800333a345cd..9af5fe6d87f0 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -2861,17 +2861,32 @@ int kvm_arch_validate_memory_region(struct kvm *kvm,
->>   {
->>   	lockdep_assert_held(&kvm->slots_lock);
->>
->> -	if (kvm_vm_is_protected(kvm)) {
->> +	if (kvm_vm_is_protected(kvm) && new &&
->> +	    (new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)))
->> +		return -EPERM;
-> 
-> gmem is already generically mutually exclusive with
-> KVM_MEM_LOG_DIRTY_PAGES and KVM_MEM_READONLY, so before this change,
-> pKVM is saying no to KVM_MEM_LOG_DIRTY_PAGES and KVM_MEM_READONLY for
-> all memslots, gmem or not, so this check makes sense.
-> 
->> +
->> +	switch (kvm->arch.vm_flavor) {
->> +	case VM_PROTECTED_PKVM:
->>   		/* Cannot modify memslots once a pVM has run. */
->>   		if (pkvm_hyp_vm_is_created(kvm) &&
->> -		    (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
->> +		    (change == KVM_MR_DELETE || change == KVM_MR_MOVE))
->>   			return -EPERM;
->> -		}
->> +		break;
-> 
-> Not sure why pKVM doesn't allow deleting a memslot after the vm is
-> created, but this is no change from before this patch, the removal of {}
-> here is mixed in with the other changes in this patch.
+* Dropped the SETLPI frame from the IRS DT description because KVM
+  reserves but does not emulate it. Updated patch 15's commit message
+  accordingly.
 
-IIRC, pKVM relies on pinning the stage2 until the teardown ?
-ed
-from the Stage2 unless we d
+* Added Vladimir's Reviewed-by trailers to patches 9 and 15.
 
-> 
->> +	case VM_REALM:
->> +		/*
->> +		 * Once the Realm is created, we cannot modify any slots that
->> +		 * could be providing private memory. i.e., guest_memfd backed
->> +		 * slots.
->> +		 * TODO: Handle trusted device private memory slots
->> +		 */
->> +		if (!kvm_realm_is_created(kvm))
->> +			break;
->>
->> -		if (new &&
->> -		    new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)) {
->> +		if (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new))
->>   			return -EPERM;
->> -		}
->> +		break;
-> 
-> Imo this should be written the same way as the pKVM branch for clarity,
-> like
-> 
-> if (kvm_realm_is_created() &&
->      (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new)))
->          return -EPERM;
-> 
-> but that aside,
-> 
-> 1. Why block creating memslots after realm is created?
-> 
-> Does ARM CCA have no way to add pages after a VM starts? This isn't
-> blocked for TDX and SNP so I think this constraint seems unnecessary.
+The v7.4-rc1 header sync includes GICv5 IRS UAPI, but not GICv5 ITS
+UAPI. Patch 19 mirrors the ITS definitions from [2]. Once that UAPI
+lands upstream, the headers should be resynced against the latest
+Linux headers before merging the ITS support.
 
-This and (2) was triggered by the following thread, raised by Catalin.
+Thanks,
+Sascha
 
-https://lore.kernel.org/all/aqrGPK0lFBFXL2qY@arm.com
+[1] https://developer.arm.com/documentation/aes0070/latest
+[2] https://lore.kernel.org/all/20261102194454.4086911-1-sascha.bischoff@arm.com/
+[3] https://lore.kernel.org/all/20261118175755.1946977-1-sascha.bischoff@arm.com/
 
-But having said that, since then, we now have :
+Sascha Bischoff (23):
+  arm64: Propagate IRQ routing initialisation errors
+  arm64: Close the ITS descriptor when setup fails
+  arm64: Split GIC device setup
+  Sync kernel UAPI headers with v7.4-rc1
+  arm64: Add GICv5 irqchip device support
+  arm64: Configure GIC interrupt bases
+  irq: Allow the initial interrupt line number to be set
+  arm64: Start GICv5 SPI line allocation at zero
+  arm64: Configure the GICv5 IRS
+  arm64: Define GICv5 interrupt types
+  arm64: Describe the PMU interrupt for GICv5
+  arm64: Describe timer PPIs for GICv5
+  arm64: Assign CPU DT phandles
+  arm64: Describe the GICv5 CPU interface in the DT
+  arm64: Describe the GICv5 IRS in the DT
+  arm64: Generate GICv5 SPI specifiers for platform devices
+  arm64: Generate GICv5 PCI INTx specifiers
+  arm64: Expose the GICv5 irqchip option
+  arm64: Add proposed GICv5 ITS UAPI definitions
+  arm64: Add GICv5 ITS device support
+  arm64: Describe the GICv5 ITS in the DT
+  arm64: Map PCI MSI requester IDs to the GICv5 ITS
+  arm64: Expose the GICv5 ITS irqchip option
 
-1) All private faults must be serviced by realm_gmem_abort(), which 
-mandates Guest memfd slot. (See Patch 11, realm_mem_abort())
+ arm64/fdt.c                         |  13 +-
+ arm64/gic.c                         | 359 ++++++++++++++++++++++++----
+ arm64/include/asm/kvm.h             |  18 ++
+ arm64/include/kvm/fdt-arch.h        |   1 +
+ arm64/include/kvm/gic.h             |  15 ++
+ arm64/include/kvm/kvm-arch.h        |  16 ++
+ arm64/include/kvm/kvm-config-arch.h |   2 +-
+ arm64/pci.c                         |  24 +-
+ arm64/pmu.c                         |  13 +-
+ arm64/timer.c                       |   8 +-
+ include/kvm/irq.h                   |   1 +
+ include/linux/kvm.h                 |  23 ++
+ include/linux/virtio_console.h      |   2 +-
+ include/linux/virtio_ids.h          |   1 +
+ irq.c                               |  15 +-
+ powerpc/include/asm/kvm.h           |  18 ++
+ riscv/include/asm/kvm.h             |  17 ++
+ x86/include/asm/kvm.h               |   4 +-
+ 18 files changed, 481 insertions(+), 69 deletions(-)
 
-2) realm_gmem_abort() matches the "private" attribute for a "protected"
-fault, failing which causes a memory fault exit.
-
-So I think we can remove these memslot restrictions.
-
-> 
-> 2. Why block deleting memslots after realm is created?
-> 
-> This also seems like an artificial constraint, and it constrains the way
-> the userspace VMM operates when stopping a VM, like the memslots can't
-> be removed ever, the VM just has to be closed? (something like that)
-
-As mentioned above, I think we are good to remove the restrictions.
-
-Suzuki
-
-
-> 
->> +	default:
->> +		break;
->>   	}
->>
->>   	return 0;
->> @@ -2883,6 +2898,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->>   				   enum kvm_mr_change change)
->>   {
->>   	hva_t hva, reg_end;
->> +	gfn_t ipa_limit;
->>   	int ret = 0;
->>
->>   	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
->> @@ -2891,9 +2907,14 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->>
->>   	/*
->>   	 * Prevent userspace from creating a memory region outside of the IPA
->> -	 * space addressable by the KVM guest IPA space.
->> +	 * space addressable by the KVM guest IPA space. Realm shared IPAs alias
->> +	 * the corresponding private IPAs, so Realm memslots must reside entirely
->> +	 * in the lower half of that space.
->>   	 */
->> -	if ((new->base_gfn + new->npages) > (kvm_phys_size(&kvm->arch.mmu) >> PAGE_SHIFT))
->> +	ipa_limit = kvm_phys_size(&kvm->arch.mmu) >> PAGE_SHIFT;
->> +	if (kvm_vm_is_realm(kvm))
->> +		ipa_limit >>= 1;
->> +	if (new->base_gfn + new->npages > ipa_limit)
->>   		return -EFAULT;
->>
->>   	/*
->> --
->> 2.43.0
+-- 
+2.34.1
 
