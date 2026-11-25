@@ -1,67 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795608902;
-	b=e3LfQ4jn544gtfL7eCm0UB5eAFSQSzODUhHpM+JW5SZn6pHMd2x0hxGV60lsFBY/spAc
-	 FDT3Lp2sBEinO4UiOUGilAfJ8YDxbye2TaYxsDh/l30TKklV/OqpZiZ56WUW0ulf/BT+d
-	 7jhqzyjH+P3QYR8dAVxJ4iprBkY9gU5ijLM8wBlEKv2tcwxQt2GnOQAeMHVPI/WelHVds
-	 b3GCKmU7eY5aUaey5TpWZ+4IPqoZ8cXSEg8dru89PBbMDd/SORPf8gH1P+ISPSnP78mv/
-	 l960LpibwVb17r8mfX1cEu87/yrQK6X6+M8uFY5kz7F52QEgbZSQ1+KIpDIRQfgsgug==
+	t=1795609620;
+	b=Cj74+r8PkjkQQxUARS+mUX6t465zkFUVgtGyOeYhu5vNYfSFOGzh4gytAAvhhSn8laKX
+	 2LBOFVL69BPc6jue9aKx9eE5LaMa6sZRp2HevJsoAIL8day4w8Vg+jvMyVMeJJ1Wj5IgH
+	 q+mzkpxs+DsAbJTUk/z5VnGLW96wAYM+0mZmOSwm/MeNN+oUnYiaIqon+EooQc9330d79
+	 RHczT6Y9uO5VsEIEKOea1rreWtP6bvTm/znqN259YEVEIdpLHCGIYsGZad5GlwOpVP1aF
+	 AsStq9fDtOlm3zJqJZHKcBX960xSkEsLzGJ97mMsmjUOls5cAfphdp0YfRoXQLD3Akg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795608902;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=1dlKiXXZxapqG9zmCLzBg4HgKnlbFOylWso5ueo6Lqs=;
-	b=jb/EJJa8UaQ2UZ6alrq878/SNXGXbEsRAkNlLf45RhvSrKDhzalt1z1wilLN6RqWfvoy
-	 ivo/O2+RmnruEJT+k3NFJOwUB9kfG33ocnMRcQA9lVp0rAgtmFhCjWuOlqQ5UZy0vVfPx
-	 3NY6iUDWOhDlXebmLv32A28DNmZijEdjev+6E5s4IdEKHVGtRIHNeRxBrGC+FPMwzRXmB
-	 02rkzT1KBepR9IKMgVmuzhJPGgaYY9Gf6sHWAKqI2w81rPceMgYD3Vmi0+HpL2fFMFs0V
-	 JRU+gH3w8BAUrlIYDf098WElgMRvKa45ijlkl4KqOXqEJwXGWKZHDNQvE04n3AkUoFg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795609620;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer;
+	bh=MFSOXianfxaj57yMPDU1y2qVIXC/Ket1cVe0mZA7fvM=;
+	b=FkPlzGXayVXeUnMgQ8gePK1x0iHqHSZCSnUv5ZOAk4KPDfE009tGRQciys4FhdxVIX4j
+	 acms7ul2nBAthF1U+ul0jBo6bLJCD2emNl6pW/rrg0jFFrVMtdWAMqlTNCHwaN0yJgmPQ
+	 zi4BeQkhY/eE0KPltKsFrD9Wu1KJQvDmMFc2RDbHFq0vrDNZimES5Im48mWs4DCHtgZe+
+	 dLzQy1Jqez4m1xxzMcw+zcVSRoFYtVzHV9L70m7riSyvhdX6DjY9JXejpBIisvXbFsWQB
+	 0fr/5kJFEiBFLUg6LBdLCXSm2tH3Ql1cewN4DEwNa1N5H9ZeZTbSZ23/ya2BKTRr76w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=KHoa5xei;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB7C0606A32D
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 12:15:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BB7C0606A32D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=pereq.eu;
+	spf=pass smtp.mailfrom=cryspen.com;
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=H9rbcrVh;
+	arc=none smtp.remote-ip=209.85.221.46
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A7E606A31E
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 12:26:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 79A7E606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=KHoa5xei
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0EEA82F;
-	Wed, 25 Nov 2026 04:14:58 -0800 (PST)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CD653F86C;
-	Wed, 25 Nov 2026 04:14:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795608900; bh=3ky9MZu7q3SGrdCRfqYJILwZNULnWYwWi99eFamj3MQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KHoa5xeilBF+RK+hbrr2Y7ZE5qO8WxJ58QHngjpz9aWYvycsi7kgc7TteMwFWr72q
-	 BxBFdzLppDoHL6b4G/rj+T3b9NpXhCCI3jgnIXnv4vIpLdsXen9gQNgMHQnn22zNGd
-	 tZwUIekdnZXXfdMv8pX/KT7JXPo3nw37FGFDrBtY=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Dan Carpenter <dan@pereq.eu>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Upgrade sub-page TTL hint to maximum size
-Date: Wed, 25 Nov 2026 12:14:46 +0000
-Message-ID: <awbRNvgY3c-Oql-E@LeoBrasDK>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <861p8aypwm.wl-maz@kernel.org>
-References: <20261123182312.4842-1-maz@kernel.org> <awW5QKqGZAqw1ru9@LeoBrasDK> <864id6yyjy.wl-maz@kernel.org> <awXSCgN4JLLKXErv@LeoBrasDK> <861p8aypwm.wl-maz@kernel.org>
+	dkim=pass (2048-bit key, unprotected) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=H9rbcrVh
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-490d59c3edaso3883309f8f.1
+        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 04:26:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pereq.eu; s=google; t=1795609618; x=1796214418; darn=lists.linux.dev;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=MFSOXianfxaj57yMPDU1y2qVIXC/Ket1cVe0mZA7fvM=;
+        b=H9rbcrVhQ0J8dzZVk2TXflcOeVCu4YE8apew2ZeuEOIy3gU899zjw3ITq0EoH6gI7z
+         FedItxi3ISh9jZNs9W226S7FhioXuMOaueLnIpOCX9WtgMbFsRzFL+rTL7efzjJC+xO5
+         2mWOBEdThcDSwuyggXWCaT0nVSaVDQaqO4c1nBmyCy3d5SL0hIiw//Q4NzY1q2OE0sU0
+         eKYJNKEaZMNIqpiEXfSF7+hols5KsNEa7KyyyT6k7QrUC/kNIHMSeK9f4yleFprFEeVq
+         dp4KXu98xHlckJx4v5p42LzuaG+bEdbSh7Q61CyZ9B54H2+ZRH3NVmIUnqw703v4QrVb
+         P3bA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795609618; x=1796214418;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=MFSOXianfxaj57yMPDU1y2qVIXC/Ket1cVe0mZA7fvM=;
+        b=e4410D3JHJ9gfQQczT8e9gL5aC5rkXXf7dz6eXSJrqSVsdn4OMpQJmXlugwmwvC1hG
+         ylwSpSBtAskNFYmL1zfZK3y4BFXQIukdut4VsrtpEsypsPs2P4BK6UPaaZrtlDQpUM7W
+         G10Qfzwqw7TP1O+ipmJY4AxgiLWBVyw2gwmL/TPG3s7RCHacLyr88aqWyihJ4b/aoOSp
+         b3ppNQi/ZbXcd4ZlRLv52Nk8lj8k9AhGVxx+9r/lDWapGr1Zj1RgYTELDCQgq4w5a4ry
+         T3+VMsmaNUV6RUlv2Hn4A3hROnccUYmwVKjVk4Wv/jy6zF2yyh9vAyFY4m9RkLg2aBN/
+         rCuw==
+X-Forwarded-Encrypted: i=1; AL+hErHpFSyC76SjN0H9/+6qRlU3WKiICOzqbSCp5ZM+MfOZOs3sxYhulzfT5289QuJSaLM9PGBl+0I=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+ej5cEr6rohv77VGzfeITS++/ONZ3okunEi3cZimfKAmuEt6Xt
+	pZ8PjIVqIUvkYhCIoAdYLYNSk8TZBZoathyFvzDlIi3OnMt1jyrlxX69ZsW8fAGybSc=
+X-Gm-Gg: AZFdTZfC/VX5Alu8UviEuxyJI8BGLB4nZKcQKbzsrTiV6e11N/oCU/l3AuaROlbcXgv
+	4hujJB69p5AUJQ8XFjbcMPcPgzHLxDY6MigeufAyWqp5HyVIK0nB4cF5TPF1r8uBfJqYBd9sLjX
+	CHtsPIK0KVLbG1idu+1rWplyYyfEBvV0AdXHRE1VwaqOZ1SI1BVGjtgQPzXDOlcmSzQZV3cwXUp
+	/fD4ACfxjnaIRvjIo6unymSgas8Og49Eog8a84NCeNE5UkfaS+OtJjyUae3OPukdNtcezSgaPPg
+	iWD1jBPIJ20rg4nOPOorf9qNNViQpNjXQHkNRJalxyGSpI3aBxJBaZeCb+5trB94C8NZwOywD7F
+	xjSxQelEkPtmS0rbKkd24ArBTcNeisjeTT7qTZzayd3u+89jhjQlmVFmJPzEatYECooIotaC0xD
+	Ic4aAWA7aIoslKZ5jg451d8n8j+05Ens1IOmMYd5O7pToErhYHYiybfkLWwKpJvTO3iwMNd1xfY
+	vfT8DuQCPVrHADK2jq4+ZAl7+F6txarKV+Hda5K1iln3bDXIVZTZkvEzYzycyMYShmNLetfeuxD
+	Ot3/DevTSu5bSeDF0Fk=
+X-Received: by 2002:a05:6000:455c:b0:4b2:1d92:211b with SMTP id ffacd0b85a97d-4b21d922811mr12250324f8f.17.1795609617689;
+        Wed, 25 Nov 2026 04:26:57 -0800 (PST)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab65cb4341sm34272184f8f.4.2026.11.25.04.26.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Nov 2026 04:26:57 -0800 (PST)
+From: Dan Carpenter <dan@pereq.eu>
+Date: Wed, 25 Nov 2026 15:26:47 +0300
+Subject: [PATCH] KVM: arm64: Drop a pending MMIO access when injecting an
+ unmasked SError
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -71,144 +91,81 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261125-serror-drop-mmio-v1-1-48076f59608c@pereq.eu>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/2WMywrCQAxFf6VkbcAMVYq/Ii7mkdoInSmJFaH03
+ 53RpctzH2cDYxU2uHQbKL/EpOQKdOggTj7fGSVVBnd0ZyJ3wrrXopi0LDjPUpDC2LuUhqGnCPW
+ 2KI/y/iqvtx/bGh4cn83TFsEbY1Cf49SiP2PrYd8/9QctN5wAAAA=
+X-Change-ID: 20261125-serror-drop-mmio-1bf42dd8841c
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+ Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Mark Rutland <mark.rutland@arm.com>
+Cc: Karthik Bhargavan <karthik@pereq.eu>, 
+ =?utf-8?q?Cl=C3=A9ment_Blaudeau?= <clement@cryspen.com>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ Dan Carpenter <dan@pereq.eu>
+X-Mailer: b4 0.16.0
 
-On Tue, Nov 24, 2026 at 07:45:29PM +0000, Marc Zyngier wrote:
-> On Tue, 24 Nov 2026 18:06:02 +0000,
-> Leonardo Bras <leo.bras@arm.com> wrote:
-> > 
-> > On Tue, Nov 24, 2026 at 04:38:41PM +0000, Marc Zyngier wrote:
-> > > On Tue, 24 Nov 2026 16:20:16 +0000,
-> > > Leonardo Bras <leo.bras@arm.com> wrote:
-> > > > 
-> > > > On Mon, Nov 23, 2026 at 06:23:12PM +0000, Marc Zyngier wrote:
-> > > > > Should a guest be slightly foolish and submit a S2 TLBI with a TTL hint
-> > > > > that describe a base granule size smaller than the host's page size,
-> > > > > we take the resulting size at face value and feed it to the S2 unmapping
-> > > > > code. Which legitimately screams about something not being page-aligned.
-> > > > > 
-> > > > > The architecture allows us to drop the TLBI on the floor, as we don't
-> > > > > support a S2 granule size smaller than the host's page size. But it turns
-> > > > > out that doing so is proving pretty hard (we call compute_tlb_inval_range
-> > > > > from a number of places, none of which is amenable to an early out).
-> > > > > 
-> > > > > Instead, detect the annoying case, and pretend that we don't have a TTL
-> > > > > hint at all, leaving the size upgrade mechanism to take place and use
-> > > > > the largest possible size for the guest's S2 granule size.
-> > > > > 
-> > > > > This will still allow nonsensical stuff to get through, such as a 4kB
-> > > > > level 2 (aka 2MB) from a guest with a 64kB S2 base granule size running
-> > > > > on a 16kB page size host, but that's not worse than doing nothing, and
-> > > > > the host code won't get shouty.
-> > > > > 
-> > > > > Reported-by: Dan Carpenter <dan@pereq.eu>
-> > > > > Link: https://lore.kernel.org/r/20261123-inval_range-v1-1-815e15797089@pereq.eu
-> > > > > Fixes: d1de1576dc21 ("KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations")
-> > > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > > Cc: stable@vger.kernel.org
-> > > > > ---
-> > > > > 
-> > > > > Notes:
-> > > > >     Reposting this as a first class patch, as I'd like to plug that one
-> > > > >     as early as possible (and Dan has plenty of other patches in flight...)
-> > > > > 
-> > > > >  arch/arm64/kvm/nested.c | 7 +++++++
-> > > > >  1 file changed, 7 insertions(+)
-> > > > > 
-> > > > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > > > > index 78d5b18dbd2d6..36e4e83badf0a 100644
-> > > > > --- a/arch/arm64/kvm/nested.c
-> > > > > +++ b/arch/arm64/kvm/nested.c
-> > > > > @@ -714,6 +714,13 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
-> > > > >  	 */
-> > > > >  	max_size = __ttl_to_size(ttl);
-> > > > >  
-> > > > > +	/*
-> > > > > +	 * IMPDEF behaviour: treat subpage TTL-annotated TLBI as the largest
-> > > > > +	 * possible invalidation. Don't try this at home, kids!
-> > > > > +	 */
-> > > > > +	if (max_size < PAGE_SIZE)
-> > > > > +		max_size = 0;
-> > > > > +
-> > > > >  	if (!max_size) {
-> > > > >  		/* Compute the maximum extent of the invalidation */
-> > > > >  		switch (vtcr_to_tg0_pgsize(kvm, mmu->tlb_vtcr)) {
-> > > > > -- 
-> > > > > 2.47.3
-> > > > > 
-> > > > 
-> > > > Hey Marc,
-> > > > 
-> > > > I think the changes make sense, although rounding up to PAGE_SIZE also 
-> > > > looks a valid solution in my unexperienced viewpoint.
-> > > 
-> > > No, it isn't the same thing. Taker the example I have given, where the
-> > > host is 16k, the guest 64k, and the invalidation 4k. If you round
-> > > things up to 16k, you're still not invalidating anything that is
-> > > consistent with the *minimum page size* for the guest. Anything larger
-> > > is a multiple of both the host and guest page sizes, and therefore
-> > > always correct.
-> > 
-> > Ah, right!
-> > In this case, could we not invalidate the largest page size supported 
-> > (64k)?
-> 
-> Because that's not what the absence of TTL means.
-> 
-> > 
-> > IIUC:
-> > - To have max_size between 0 and PAGE_SIZE means it's either 4k or 16k, 
-> >   so invalidating the 64k should be enough?
-> 
-> No.
-> 
-> >  
-> > - max_size=0 from __ttl_to_size() means largest blocksize supported by 
-> >   stage2 in current TG.
-> 
-> Yes.
-> 
-> > 
-> > The two above are opposite ends, no? Like, the first is "this is too small 
-> > for us to invalidate, let's pick something bigger", and the other one is 
-> > "we want to invalidate the largest supported block".
-> > 
-> > Is it really ok to put them in the same bucket?
-> 
-> That's the *only* thing you can do, short of not invalidating anything
-> at all. The commit message alreayd explains the IMPDEF choice that is
-> made, and why it is made. Let me explain it again:
-> 
-> - An invalid TTL allows us to ignore the TLBI altogether. No ifs, no
->   buts. This is definitely an invalid TTL.
-> 
-> - However, by the time we reach this code, we are committed to perform
->   an invalidation, and we can't backtrack (doing so would be really
->   ugly).
-> 
-> - Our next port of call is to still perform an invalidation with
->   something reasonable. Since the TTL is invalid, only the IPA tells
->   us anything. And for any IPA without any range information, the only
->   sane thing to do is to invalidate the largest possible size.
-> 
-> You could refine this a bit more, but frankly this is not worth it. We
-> are already allowing a broken guest to do some invalidations, but
-> there is no need to go out of our way to do anything more.
-> 
-> The end.
-> 
+Oliver's commit bfb7a30b1986 ("KVM: arm64: Don't retire MMIO instruction
+w/ pending (emulated) SError") established the rule that when userspace
+injects an SError that we drop the MMIO.  An MMIO access dropped this way
+runs again when the guest returns from the SError.
 
-I think I got the whole picture now.
-Since guest page size has to be at least the same size as the host, it 
-would make no sense for a guest tlbi to ask for an invalidation smaller 
-than the host page size, and therefore it's an invalid TTL hint, and we 
-should invalidate the whole block, because at this point we can't 
-backtrack.
+However, since commit 3bd107ed6b23 ("KVM: arm64: Only emulate an SError's
+entry for vCPUs with NV"), a vcpu without EL2 pends the SError through
+HCR_EL2.VSE instead.  The next KVM_RUN completes the access, and then
+the guest takes the SError.  So the behavior is not consistent depending
+on whether the vcpu has EL2 (MMIO dropped) or not (MMIO completes).
 
-FWIW:
-Reviewed-by: Leonardo Bras <leo.bras@arm.com>
+To make things consistent, drop the pending MMIO access in the non-EL2
+case as well.
 
-Thanks for having the patience to help me understand!
-Leo
+This change only affects unmasked SErrors, if they are masked the MMIO
+always completes.  Protected vcpus are left alone, because the host's
+copy of their PSTATE can't be trusted.
+
+I discovered this inconsistency while writing a selftest and I don't
+believe real life users have noticed it.
+
+Fixes: 3bd107ed6b23 ("KVM: arm64: Only emulate an SError's entry for vCPUs with NV")
+Signed-off-by: Dan Carpenter <dan@pereq.eu>
+---
+I think this patch is correct but it's also easy enough to modify my
+selftest to accept the current behavior.
+---
+ arch/arm64/kvm/inject_fault.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 1d5dfd4b9e00..91b835bc939b 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -396,6 +396,14 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
+ 		return 1;
+ 	}
+ 
++	/*
++	 * Like the emulated entry above, an unmasked SError cancels the MMIO
++	 * access the vcpu exited on.  The host's copy of a protected vcpu's
++	 * PSTATE is stale so checking serror_is_masked() doesn't make sense.
++	 */
++	if (!vcpu_is_protected(vcpu) && !serror_is_masked(vcpu))
++		vcpu->mmio_needed = false;
++
+ 	vcpu_set_vsesr(vcpu, esr & ESR_ELx_ISS_MASK);
+ 	*vcpu_hcr(vcpu) |= HCR_EL2_VSE;
+ 	return 1;
+
+---
+base-commit: 4a1b7259e337e8a2ea999436b47151a75c7572dc
+change-id: 20261125-serror-drop-mmio-1bf42dd8841c
+
+Best regards,
+--  
+Dan Carpenter <dan@pereq.eu>
+
