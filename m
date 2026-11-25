@@ -1,76 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795626906;
-	b=POZOK9RbZEl86c1MQWAKPUzGyBmFsCscWM2Znw+ImWPtYWJBVx5UxsGrLdoa4z3y8G8M
-	 BFwkVG3tJfxBAQ4kbVWRttv/eDyaleO5iQ2kzfYz8opaXpWGdl/fgK3Goi08rW7NUhjhF
-	 +/1qv5amRl2cWznnw13u/9M/Hjhe4PT8oNfmdyICjas+F4L+vHvXq6X9qyIxxYJTC0qPh
-	 WKIUzQ2Wbh4YgcoFWTbUC1oQHPmGyAhaSVoUGuSmxO9aa1OGAkpzo2BwJVfGH2pzCU2wX
-	 sFKRXC+awX6T93XunppP/LtyJ9ph1TU8cliBcYtM1sDtPMkT1LORwQZv7mKqDvyL11g==
+	t=1795628450;
+	b=DUJ8ZQYh3dKh6fVfLGpk+JfXYX1lsMLmcsUsFwuJDR5MWmq6Mi3U2xtaAbs42iFwk9+T
+	 SdO9rzTZwCDaAttffORfGxFXpDpC685iRwPYmfcy9lxOSTD017rya/WnxPvQyoEAm+Ktg
+	 IKunFhVnW/2GeuWHfsZ4X0CVXrZsZo+p2m6PAvDWQtZWILUIpZUyOcF8Zp4OE1y1slrdO
+	 b7xF7gqIyoeq0q0cbJqqja6VB9KcIgL9V9isCfNlA8EEtd/vJxFlDBuTZ9+9jL0PvXzIv
+	 X0KCcUekefwZCJ+tNdlG2TIegzoUpYilf3DnNUhEGUrQ6lvcfMffi//h4yCDXV0WXiQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795626906;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=66XtB+U2+4to9qy3PAxUKRgvt3J9EZgv7Tv26f9LUCA=;
-	b=kLh5LxX0+F+XAuSfHyAJuWtSEO8rAHcj0EHL8qoTOBevn1NztXHM0Vy/q9xF9mbp3ZGg
-	 gcS1XLF86Tn6LdUM0zTrqbtlwi46rmix+B+nH8BGv80WLubILmbbMLyNAIcJRGoMQoJjg
-	 4uWpqSLcpVfHpgx2XeaGyr8+kyLJ+avNYv19r5imjy7xFySDbun+K4w2p9CDSNksCX6ls
-	 gSJDrj28IeSKcc+EbuAks8pPK2Z3D8oEP47L4YFRmVOtlr7fGmaYvLacHjYhNU6LbaRt9
-	 JElfTYkd3sE6+6eioHXaJCa2WduxAywfIGkG8ZIkxcPMBiFd5ZUivwCSfWqO6iogHyg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795628450;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Mime-Version:Content-Transfer-Encoding:Content-Type:Date:Message-Id:
+	 Cc:Subject:From:To:X-Mailer:References:In-Reply-To;
+	bh=nYycouvr6zOSJsdG8B1rvzwHCG0khxitcfoXgjaouMs=;
+	b=XVT+ctC2yG1NA1Tp+Dxyq/9v5ftzmpbCfcit5hTU7wPl+7WX8xENrcnRR6VgjKtP0Ky7
+	 gmCrhPNHCmIxmNh9/ghqE7HyV+k0FtpiKaj0BNq4YlQMZUl1Pjpi5yRHU2h6jHp0z2Tjo
+	 Nj7FmVkSZWEvMH1EjtmsPNAfKmnWE7b7EDZOjuHhEEB+glYLnhrFbxpnP8pI9AWpn/KAX
+	 LJ1O5yHDt0dhbzG39NFwWYnCGO/gU33wFojly5eB0SQuk97/PAVGalTY+n6XFLTL+AiVa
+	 iPCqWNgQp/Hy8GNdvqeYndv6UXRyQuQinytbqFwXjUk9ws8pvSkLDbm5NiHE0BSTuEw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=P4Lj0TYQ;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DF9F606A326
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 17:15:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8DF9F606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="Oxmr2/iN";
+	arc=none smtp.remote-ip=209.85.216.48
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E79606A32C
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 17:40:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 46E79606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=P4Lj0TYQ
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C5EA2F;
-	Wed, 25 Nov 2026 09:15:00 -0800 (PST)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AAD523F86F;
-	Wed, 25 Nov 2026 09:15:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795626903; bh=Fa3kAtHgk384B8+kxGzOb41KHv8hVt7t5M1nRsdUqZw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P4Lj0TYQ1E2+KwPgoQLRQawek111L2jgfj75ceRrVPopmPV5WEC/jimuonWU6uuxu
-	 EPZTdtrW87BBPVddh55ElWuKDXIJrsOdHpPbvGvJoGflbaT5vYzk+3qfshOpGYyIrb
-	 FujYylv/+RGIMBvs0/t1VJiWOYQxE1j5mLCUP92U=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Usama Arif <usama.arif@linux.dev>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	maz@kernel.org,
-	oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	mark.rutland@arm.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	riel@surriel.com,
-	shakeel.butt@linux.dev,
-	kernel-team@meta.com,
-	rkeilty@meta.com,
-	atish.patra@linux.dev,
-	dgreid@meta.com,
-	"ARM ljs@kernel.org" <LorenzoStoakes@leobrasdk>
-Subject: Re: [PATCH] KVM: arm64: Reduce the stage-2 page cache on 64 KiB hosts
-Date: Wed, 25 Nov 2026 17:14:46 +0000
-Message-ID: <awcXhk885lqDRAHy@LeoBrasDK>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <20261124152842.2634495-1-usama.arif@linux.dev>
-References: <20261124152842.2634495-1-usama.arif@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Oxmr2/iN
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3b41188c8b9so4282118a91.0
+        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 09:40:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1795628450; x=1796233250; darn=lists.linux.dev;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:content-transfer-encoding:mime-version:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=nYycouvr6zOSJsdG8B1rvzwHCG0khxitcfoXgjaouMs=;
+        b=Oxmr2/iNXHIYGO97eStW5GFs/7nSwJvY060y9XktMXf45GGOIPddX2tvelqwgjRGqS
+         qx7FcuiNtxRV4Gnm42uQT8W0CVzxPVrBHYSTwQs0M8ZV3MBRHt5jRBcLC0VGHCMuXj7+
+         ZqKwMWge8sctBL4MhdArAuKHJhSFWZuKxBLI5KqAoQJVAkb8lDSD3ZJufCfePDB/lbAb
+         hMx70nET13ew7mgloCsmTIGydgXAcTR8Ma0hmfj/V5K2sVfLL/I340PXIO04CjHyqG9V
+         +2/l3AXo8TFmoOwET8oKCAjQ+xtEQSPQyrRCS4SkxjT5be5E+aE+GaGU0v/osNgAMoei
+         XUAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795628450; x=1796233250;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:content-transfer-encoding:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=nYycouvr6zOSJsdG8B1rvzwHCG0khxitcfoXgjaouMs=;
+        b=xOslNUdVznuug0Cpq/si4ncPt9YPWwFXHVhcGmJjKTY8y7ftnvA9iMQd1vkccKjWEe
+         HKgSCG9Ps9QWmssO3iBxoQAcotRn0HxFwDGqfDlzi+D7cFYo7ot154gbyMp75KvQTBQn
+         SWMy+vUvbl/Za+gTz0LZvUpoG6lIXvSziPWXVTW8EX56pcgJkfh1nUFzZ0rX1Z71Hy6p
+         O3RjCu0FQvDc6nQ93aiwGwaFt9XcADhseud58BryEROn6kdNQuv2iRTYuqaRhrfc450E
+         Jdp8OJV1rZFYD4wtJw9xm/PlLzk+jYu2c2hpD3XAsEOzkzkGLIbi64Hqh/Lhw2eq6PNQ
+         xkjQ==
+X-Forwarded-Encrypted: i=1; AL+hErGUfxy+1tEjMajDP3cbNqKpDHSje9QAhVa+mkrnKDBzaxHMpxPxZktaoEM9h4WBZelpZG+KuXs=@lists.linux.dev
+X-Gm-Message-State: APuU4Z846Jk9wjieGBJGn4tkB7P+POyH+DAv1hmgRpsZBi+5poEuc3q+
+	2vCMzY4UdZ6yy3zknuQmvjYKpteuEXETcchaPwEe3YEvcGZMTYiGEhaDADcW7ob0UQ==
+X-Gm-Gg: AZFdTZcVONtTwNyHgiPU7ZU3MTEzSVh24XfDy24X7A6CNsBvMiPTCCCl05a8EQxq+Br
+	Cu+VB/pNnThGtMPgr3AB0o7bzJehexo/YdX08w1PUm1H56mAX/e5tKkBJJBApl0sxAgjcHQFNo8
+	r42jluUw83t9E2SY8GyHckVD+P+bFlIdPxiwHEr8JCx8N5tnrn2rFcKxM2I+AFWvRr3FRLYQkyR
+	PoUL7E9CsPeMdgUHtG7k8yg+1DSsRO3nX1pxLblkKepAiudLQY9DlzWiVQ2RM+KcyhdTQtf4KYm
+	ufZ2HSW/yOE17HpDYjZgknqGv32A6mRGbRIU6XnBu+KNCTpGCQBTuk8JTwxsaqo7Q4lfZGmqiFr
+	AdewWTv7Qaywa1GFRtgdmo/h8F6o0sXrKhnjvxYBdo6s1eysoR+6g6sC+RD84W2OgI9hBqLWIy6
+	yEwuIYTBN3XJcF+cTxxD8Uk6BaWD8JuIWDu+EaroF9u7QBKXx/UVj3mtLCOsbytUSor7bFU88IW
+	M9sGKOA8AFWAX8szfadyoQorfQkhuUbnRlAlytrDrev2JND18NQSXoKsPOYEL2J/JtU8gKy1LUM
+	4K2Dgyp2NnKkHWrQPbP8vCa1dNmgUbQG8Hd6aW1j3Z4Y+oclNea2S93+o0/52N8i
+X-Received: by 2002:a17:90b:390b:b0:3b3:fe22:2745 with SMTP id 98e67ed59e1d1-3b41c933edamr18216503a91.45.1795628448898;
+        Wed, 25 Nov 2026 09:40:48 -0800 (PST)
+Received: from localhost (33.79.127.34.bc.googleusercontent.com. [34.127.79.33])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b405ecbd0bsm31676002a91.15.2026.11.25.09.40.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Nov 2026 09:40:47 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -79,81 +87,51 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 25 Nov 2026 09:40:47 -0800
+Message-Id: <DN4H5ST3X9L1.3IUEC1CA5QI8H@google.com>
+Cc: "Tarun Sahu" <tarunsahu@google.com>, "Pasha Tatashin"
+ <pasha.tatashin@soleen.com>, "Mike Rapoport" <rppt@kernel.org>,
+ <robin.murphy@arm.com>, <maz@kernel.org>, <will@kernel.org>, "Alexander
+ Graf" <graf@amazon.com>, <seanjc@google.com>, <jgg@nvidia.com>,
+ <loganodell@google.com>, <arnd@arndb.de>, <dwmw2@infradead.org>,
+ <baolu.lu@linux.intel.com>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ <oupton@kernel.org>, <alex@shazbot.org>, <gle.com@google.com>,
+ <pbonzini@redhat.com>, "Andrew Morton" <akpm@linux-foundation.org>,
+ <kevin.tian@intel.com>, <joro@8bytes.org>, <kvmarm@lists.linux.dev>,
+ <linux-pci@vger.kernel.org>, <kexec@lists.infradead.org>,
+ <kvm@vger.kernel.org>, <iommu@lists.linux.dev>,
+ <linux-arm-kernel@lists.infradead.org>, <skhawaja@google.com>,
+ <sagis@google.com>, <linux-arch@vger.kernel.org>, <linux-mm@kvack.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 03/19] kho, memfd_luo: Reference struct kho_vmalloc
+ via serialized pointer
+From: "David Matlack" <dmatlack@google.com>
+To: "Pratyush Yadav" <pratyush@kernel.org>, "David Matlack"
+ <dmatlack@google.com>
+X-Mailer: aerc 0.21.0
+References: <20261110050202.529473-1-tarunsahu@google.com>
+ <20261110050202.529473-4-tarunsahu@google.com>
+ <2vxz4idb1i2w.fsf@kernel.org> <DN3VG4JCILOO.YN40XHHSWRPH@google.com>
+ <2vxzld6hx97g.fsf@kernel.org>
+In-Reply-To: <2vxzld6hx97g.fsf@kernel.org>
 
-On Tue, Nov 24, 2026 at 07:28:42AM -0800, Usama Arif wrote:
-> When a stage-2 fault may need new page tables, KVM first tops up the
-> vCPU's page cache: if it holds fewer pages than the fault might need, it
-> is refilled to KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE, which arm64 sets to
-> 40. Unused pages stay in the cache until the vCPU is destroyed.
-> 
-> With 64 KiB pages, that is 2.5 MiB per vCPU, and most of it is never
-> used. Stage-2 has at most three levels and the root is preallocated, so
-> a fault needs at most two new table pages (kvm_mmu_cache_min_pages()).
-> As every last-level table covers 512 MiB, an 8 GiB guest needs just 17
-> table pages to map all of its memory, while its four vCPU caches get
-> filled with 160.
-> 
-> On a production host with 64 KiB pages running 101 VMs with four vCPUs
-> each, the caches were still 86% full. The memory used:
-> 
->                         before      after
->   per-vCPU capacity     2.5 MB     512 KB
->   all 404 vCPUs         869 MB     <= 202 MB
-> 
-> Let's lower the capacity to 8 with 64 KiB pages, In the production
-> usecase above, it frees at least 667 MB. That still covers the two-page
-> minimum and leaves room for several table allocations per refill. 4 KB
-> and 16 KB pages keep 40.
-> 
-> The temporary cache in kvm_phys_addr_ioremap() uses the same capacity,
-> but it is topped up before every page it maps, so 8 is sufficient there
-> as well. The pKVM hypervisor memcache and the eager split cache don't
-> use this capacity.
-> 
-> Signed-off-by: Usama Arif <usama.arif@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_types.h | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
-> index 9a126b9e2d7c99..28568da9ea4a7b 100644
-> --- a/arch/arm64/include/asm/kvm_types.h
-> +++ b/arch/arm64/include/asm/kvm_types.h
-> @@ -2,7 +2,12 @@
->  #ifndef _ASM_ARM64_KVM_TYPES_H
->  #define _ASM_ARM64_KVM_TYPES_H
->  
-> +/* Must cover kvm_mmu_cache_min_pages(), at most 2 with 64 KiB pages. */
-> +#ifdef CONFIG_ARM64_64K_PAGES
-> +#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 8
-> +#else
->  #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
-> +#endif
->  
->  #endif /* _ASM_ARM64_KVM_TYPES_H */
->  
-> -- 
-> 2.53.1-Meta
-> 
+On Wed Nov 25, 2026 at 6:43 AM PST, Pratyush Yadav wrote:
+[...]
 
-Hi Usama,
+> So I wouldn't want to support slab until we have file handlers that
+> churn through a lot of preserved objects.
 
-Have you tried to reproduce this issue in v7.4-rc1 or newer?
+Makes sense. If KHO slab isn't coming, then I'm fine with the arena.
 
-IIUC Lorenzo Stoakes introduced a change that would cause the memcache to 
-skip topup if the cache contains a minimum of ~4 pages, so it can possibly 
-improve that issue.
+One thing I realized is that the choice between the two is visible to
+the incoming kernel. With separate allocations, the incoming kernel has
+to free struct kho_vmalloc and struct memfd_luo_ser separately. With
+the arena, it must only free the top-level allocation. So we should
+pick one now (while memfd is bumping its compatible string anyway)
+rather than switching later.
 
-Although I can see that when it's below that minimum it fills the whole 
-capacity (40) of the cache.
-
-In any case, Lorenzo, could you advise?
-
-CC:Lorenzo Stoakes (ARM) (ljs@kernel.org) 
-
-Thanks,
-Leo
+Separate allocations leaves the door open to KHO slab but wastes memory
+in the short term. It's not obvious to me which direction to go :)
