@@ -1,58 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795588332;
-	b=a/JDXD7W7ftQYc8U4b739KEkODbDuegNjkMAIuPYyUgv7cE46q4+Eb8iWcpE9OHjvn49
-	 EfGYQyM52oWofD6pFIAxTOwlA2xlbiZ5g2lXiKbjBwtHofOzr5OIeqsGQNW24hVmHcHaj
-	 Dq7n+Dhu1h8TQdXsClIDvC+zm7RZsjsDNS/RdvFmzo78Yl5mkyh5HI+YOt2uqBpH7LdqE
-	 0DwPR9mH/zd6KYp3L/jfNtenQ2+GLkpZsFIYnO1WewgPxR038GP7H4ZnDUd4zfuj8JCIM
-	 +9HVkzg54oiA4Ho0YPfRMg/bRZUrC2qwQpyklDVvKImXSwrNBOjbI20maBhtCAZuQwA==
+	t=1795588634;
+	b=I5TVFQUYGv1LEF0JKiBcD+D7qAeVqo9bv3+EYh1oYhhiTCwEbu9bryFu6AezYpgvleTJ
+	 C8GhJYXKYNwM4d7CVJMBHfP68K2f6iy2nDuViSRyyjSW8tRiH3NkG5cDAeCTfNdz1Biye
+	 gdIht0rZTowgK4XpI3yfsc+/Wn37sV87CJqyZoVRf85uUrp3oai2urWZ0D5JfRHECbqLm
+	 3HvAAq0JR7SAjmenZiO9XHXAFopyGXAOTZ30IZP1lE6UHM8cvUpAfnloNX/U033aWijd9
+	 1z4OgqeJfwVsMkUoYrofcRFvH4Yigro8hOIgnRiNRn5m9oe8LS5Fz/No+IHo+tAj+Hw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795588332;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795588634;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=lN0/IceNSq/tJfj0XM571/oGNRiYEMA+7QT5WkAGDPo=;
-	b=y5mBJkOt+A23ZROr7X4AEMqX6PytkoQjfdGN9xJRbS5aDUy171SdfAdnWf8XfBRWHj3o
-	 jCVFFXgXvbMwFB0EL9gKVZs8WjPoBRdMhQehZ73+55STmaaqXMgmTXd1bJkaHi5naL/pV
-	 pGHdnS0f1hsZAEjNMQrsBS4N8TTEUIpTMIouqdqJv1S3z0NBZure+xwchN0K+I5L1EJsg
-	 vzRwn0ooxSs+cJBLFRDGWC+HJ4MCqF+Cp/XjYAgZ7f5TTkvl1hNwoV2xgXWYsuV1W91/O
-	 mnlSUxr98fhwNTJoYobKBr/B91qHkyHcIZeDwnbDi14AA2plSDpLpEC+rZLZqxMukjg==
+	bh=RszRfCKfbcgcbLkX4hDIS/N4LcUZfX68oWST1IeO/EU=;
+	b=3/phIeEpHSwFl2byFCPrQRqnQEXa/KRVT2wmNRrLXP22uCTvQHboTWHcin7sizcgBs8f
+	 cmk8nbM7EynWkTL+MAE6bnh4aFVCtlI976EgA8ntdPQhQM4pGs6hzsgk3pkdqNt9OVsdT
+	 P/CP6pwI3u3TvMZNBunYoXDC1C4mDXfV+7no1JtL4u8nwzZQbye/1J8E7a9HDTERUSJF4
+	 8oAjWE5tP4LysGtq5dfc40we8K8ozICxYtmOfTs2IfvFEBPrJkgvRJdoe5nAuVIpPpfFJ
+	 icm/F+4fgdeSYg00b8WPUfDjEKJE2lfeRrJT6dfS1je6RrR4H49L014Yrhbl7xaqseg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UHyDqgjG;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nibebcfs;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E986606A32C;
-	Wed, 25 Nov 2026 06:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8514E606A31E;
+	Wed, 25 Nov 2026 06:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UHyDqgjG
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6692E1F000D3;
-	Wed, 25 Nov 2026 06:32:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nibebcfs
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52B211F000D0;
+	Wed, 25 Nov 2026 06:37:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795588332;
-	bh=lN0/IceNSq/tJfj0XM571/oGNRiYEMA+7QT5WkAGDPo=;
+	s=k20260515; t=1795588634;
+	bh=RszRfCKfbcgcbLkX4hDIS/N4LcUZfX68oWST1IeO/EU=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=UHyDqgjGATZQTJAtY/qhXxBpvhVzI3nUCjjnlA+J1+wzYfEh+daYTDwpZPRR8G/a/
-	 UXvic48AGJEdsn/7AD13JK/PhMNN8TbDTrR5sfaIuK6RdL34LZNXVbSqkh4tnL8P9/
-	 zalBtZflVtve2LXPyIrRdrr0ecP7opSXkGzkHkagC/nNZ/S71BRL96KUsINOQ/+PSu
-	 vRjvDrWqCkt4UIj2KZwTD96Ns7q0TT9RADkDWMcx+HeQh8R/FUh9QsUPBEKvnLk4rA
-	 dR0kl1zCR/qf6ebS90O1IJGCp85/X5rrx1TOAAv3Dc8nL8WYqT/00bBFR6dp3grynI
-	 qtCQTpLBTb30w==
-Message-ID: <sashiko-outbox-232708@kernel.org>
+	b=nibebcfsU9mj8cSUzsxuTfZ9vOxoWLO3oET56dfD2Y7MfogwFR89AkVQMhRpQg9Jt
+	 vWQ3sz5AzLFKLMMMRuz2HxjMvvXR9q/uEuHApp4+pCN/bE4bS7DSU64GD7VBpgjcSZ
+	 VclnJDdLZq51vZ1Hi2HreXdqr/+FSglVL+H5cSDzoFB7CunHviXlCsu2v5p7i8JN4U
+	 XhoR7z3G94TKFFNF+HbtnftZD/18xrVcrOXYuj04Yl08H+HfPVoMqRt8TfOjGuvEoM
+	 VIM8/nus6WVMG6qNtyHMynSjsviOxGptUUYyAdF4YbBaM01R0NGNBFwvqOstqMPWL6
+	 KrRrLw8mVs8og==
+Message-ID: <sashiko-outbox-232718@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v2 01/30] unwind: Add Minimal DWARF CFI bytecode
- interpreter
+Subject: Re: [RFC PATCH v2 26/30] tools/unwind: Add standalone libLLVM
+ Minimal DWARF CFI verifier
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Ian Rogers" <irogers@google.com>, linux-trace-kernel@vger.kernel.org
 Cc: jpoimboe@kernel.org, rostedt@goodmis.org, peterz@infradead.org, mingo@redhat.com, tglx@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, acme@kernel.org, namhyung@kernel.org, linux-perf-users@vger.kernel.org, mhiramat@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, bpf@vger.kernel.org, nathan@kernel.org, nsc@kernel.org, linux-kbuild@vger.kernel.org, ojeda@kernel.org, ardb@kernel.org, linux-efi@vger.kernel.org, "Marc
  Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, shuah@kernel.org, indu.bhagat@oracle.com, jremus@linux.ibm.com, wnliu@google.com, dylanbhatch@google.com, gary@garyguo.net
-In-Reply-To: <20261125061523.1540234-2-irogers@google.com>
+In-Reply-To: <20261125061523.1540234-27-irogers@google.com>
 References: <20261125061523.1540234-1-irogers@google.com>
- <20261125061523.1540234-2-irogers@google.com>
+ <20261125061523.1540234-27-irogers@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Nov 2026 06:32:09 +0000
+Date: Wed, 25 Nov 2026 06:37:11 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -62,93 +62,92 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] unwind: dwarf_cfi: noinstr violations via
-  kmsan_unpoison_memory() and likely()
+Thank you for your contribution! Sashiko AI review found 2 potential
+issues to consider:
+- [Medium] tools/unwind: missing host arch include path breaks build on
+  RISC-V hosts
+- [Low] tools/unwind: uint64_t overflow in verifyFile() kmem_arena
+  bounds check
 --
 
-commit a47eb90bddad018f7c1af29e002c5e94dbaf8bab
+commit 8799e1737c7df626cec2cf3930d6a2c81661a407
 Author: Ian Rogers <irogers@google.com>
 
-unwind: Add Minimal DWARF CFI bytecode interpreter
+tools/unwind: Add standalone libLLVM Minimal DWARF CFI verifier
 
-This commit adds a bounded DWARF Call Frame Information (.eh_frame and
-.eh_frame_hdr) bytecode interpreter for kernel, module, and user-space
-stack unwinding.
+This commit adds a standalone host tool (tools/unwind/verify_cfi) that links
+against kernel/unwind/dwarf_cfi.c and compares its unwind results against
+libLLVM's reference DWARFUnwindTable.
 
-> diff --git a/kernel/unwind/Makefile b/kernel/unwind/Makefile
-> index eae37bea54fdb..f772fc6079855 100644
-> --- a/kernel/unwind/Makefile
-> +++ b/kernel/unwind/Makefile
-> @@ -1 +1,11 @@
-> - obj-$(CONFIG_UNWIND_USER)	+=3D user.o deferred.o
-> +ifdef CONFIG_FUNCTION_TRACER
-> +CFLAGS_REMOVE_dwarf_cfi.o =3D $(CC_FLAGS_FTRACE)
-> +endif
-> +KASAN_SANITIZE_dwarf_cfi.o :=3D n
-> +KCSAN_SANITIZE_dwarf_cfi.o :=3D n
-> +UBSAN_SANITIZE_dwarf_cfi.o :=3D n
-> +KMSAN_SANITIZE_dwarf_cfi.o :=3D n
-> +KCOV_INSTRUMENT_dwarf_cfi.o :=3D n
-> +
-> +obj-$(CONFIG_UNWIND_DWARF_CFI)		+=3D dwarf_cfi.o
-> +obj-$(CONFIG_UNWIND_USER)		+=3D user.o deferred.o
-> diff --git a/kernel/unwind/dwarf_cfi.c b/kernel/unwind/dwarf_cfi.c
+> diff --git a/tools/unwind/Makefile b/tools/unwind/Makefile
 > new file mode 100644
-> index 0000000000000..8b8004b1b8d15
+> index 0000000000000..ca6b84dbd31a3
 > --- /dev/null
-> +++ b/kernel/unwind/dwarf_cfi.c
+> +++ b/tools/unwind/Makefile
+> @@ -0,0 +1,123 @@
 
 [ ... ]
 
-> +static __always_inline int
-> +dwarf_cfi_eval_fde_streams(struct dwarf_cfi_stream *cie_s,
-> +			   struct dwarf_cfi_stream *fde_s,
-> +			   unsigned long pc,
-> +			   const struct dwarf_cfi_arch *arch,
-> +			   struct dwarf_cfi_row *out_row,
-> +			   bool is_user)
-> +{
-
-[ ... ]
-
-> +	*out_row =3D row;
-> +	kmsan_unpoison_memory(out_row, sizeof(*out_row));
-> +	return 0;
-> +}
-
-[ ... ]
-
-> +noinstr int dwarf_cfi_eval_fde_kmem(const u8 *fde, const u8 *eh_start,
-> +				    const u8 *eh_end, unsigned long pc,
-> +				    const struct dwarf_cfi_arch *arch,
-> +				    struct dwarf_cfi_row *out_row)
-> +{
-
-[ ... ]
-
-> +	return dwarf_cfi_eval_fde_streams(&cie_s, &fde_s, pc, arch, out_row,
-> +					  /*is_user=3D*/false);
-> +}
+> +TOOLS_INCLUDES :=3D -I$(srctree)/tools/include -I$(srctree)/tools/includ=
+e/uapi \
+> +		  -I$(srctree)/tools/arch/x86/include
 
 [Severity: Medium]
-Can the noinstr functions in dwarf_cfi.c call into instrumented .text when
-CONFIG_KMSAN or CONFIG_TRACE_BRANCH_PROFILING is enabled?
+Does hardcoding only tools/arch/x86/include in TOOLS_INCLUDES break the bui=
+ld
+on RISC-V hosts?
 
-dwarf_cfi_eval_fde_kmem() is marked noinstr and inlines
-dwarf_cfi_eval_fde_streams(), which calls kmsan_unpoison_memory().
-Because kmsan_unpoison_memory() in include/linux/kmsan-checks.h is gated
-on CONFIG_KMSAN rather than __SANITIZE_MEMORY__, KMSAN_SANITIZE_dwarf_cfi.o=
- :=3D n
-does not stub it out, leaving a direct call from .noinstr.text to .text.
+dwarf_cfi_host.c includes kernel/unwind/dwarf_cfi.c, which pulls in
+tools/include/linux/nospec.h -> tools/include/asm/barrier.h ->
+tools/arch/riscv/include/asm/barrier.h -> <asm/fence.h>.  Without
+-I$(srctree)/tools/arch/$(HOSTARCH)/include (via ../scripts/Makefile.arch),
+the compiler cannot find tools/arch/riscv/include/asm/fence.h when building
+on riscv64.
 
-In addition, neither kernel/unwind/Makefile nor dwarf_cfi.c defines
-DISABLE_BRANCH_PROFILING, so under CONFIG_TRACE_BRANCH_PROFILING=3Dy every
-likely() and unlikely() in the noinstr functions and their inlined helpers
-expands to a call to ftrace_likely_update() in .text, triggering objtool
-noinstr warnings and running instrumented code in noinstr contexts.
+> diff --git a/tools/unwind/verify_cfi.cpp b/tools/unwind/verify_cfi.cpp
+> new file mode 100644
+> index 0000000000000..15d99ba57ce35
+> --- /dev/null
+> +++ b/tools/unwind/verify_cfi.cpp
+> @@ -0,0 +1,789 @@
+
+[ ... ]
+
+> +static int verifyFile(const char *path, const VerifyOptions &opts)
+> +{
+
+[ ... ]
+
+> +	uint64_t min_eh_vma =3D std::min(eh_hdr_vma, eh_vma);
+> +	uint64_t max_eh_end =3D std::max(eh_hdr_vma + eh_hdr_bytes.size(),
+> +				       eh_vma + eh_bytes.size());
+> +	std::vector<uint8_t> kmem_arena;
+> +	bool can_test_kmem =3D
+> +		(max_eh_end >=3D min_eh_vma) &&
+> +		(max_eh_end - min_eh_vma) <=3D (64ULL * 1024 * 1024) &&
+> +		isRelativeEhEncoding((uint8_t)eh_hdr_bytes[1]) &&
+> +		isRelativeEhEncoding((uint8_t)eh_hdr_bytes[3]);
+> +	const uint8_t *kmem_hdr =3D nullptr;
+> +	const uint8_t *kmem_eh_start =3D nullptr;
+> +	const uint8_t *kmem_eh_end =3D nullptr;
+> +	if (can_test_kmem) {
+> +		kmem_arena.assign(max_eh_end - min_eh_vma, 0);
+> +		memcpy(kmem_arena.data() + (eh_hdr_vma - min_eh_vma),
+> +		       eh_hdr_bytes.data(), eh_hdr_bytes.size());
+> +		memcpy(kmem_arena.data() + (eh_vma - min_eh_vma),
+> +		       eh_bytes.data(), eh_bytes.size());
+
+[Severity: Low]
+Can an integer overflow in the section end calculation bypass the kmem_arena
+bounds check and write out of bounds?
+
+In a malformed ELF file where one section end addition wraps around 64 bits
+(for example eh_hdr_vma + eh_hdr_bytes.size()) while the other does not,
+std::max() selects the un-wrapped end address.  max_eh_end >=3D min_eh_vma =
+and
+the 64 MiB limit can then both hold, leaving kmem_arena smaller than
+(eh_hdr_vma - min_eh_vma) + eh_hdr_bytes.size() when memcpy() runs.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125061523.1540=
-234-1-irogers@google.com?part=3D1
+234-1-irogers@google.com?part=3D26
