@@ -1,58 +1,73 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795591479;
-	b=zp3FQtlHrUQLxV6LsohCZ7TCzuUEvL6cG6MAz6glg6m0M5G5IWWaZQWNFU6pl7xPuIPQ
-	 BYs7L3Hu3ZmGAlHQXk5vlLyOXer6uPKlRBaEKTum1u7hIuLuE5VvPTmkE3CezRW9vhN98
-	 6vMJPSDELzI+vsdqxPV+W9jokvMdzz2kkYK36ScAhJI1A3ulJv4Z1kXPbnnwb5L3Jo27c
-	 WrzTCiKZNLGMWJXPCc8RYp6W7ETeuVlS7C2yTNk6YDhcxwf9+BeGh/BlmzI+cVklDrKbc
-	 7OOjqHJlTalEcnKTvQnU1uZtT8WWYpu8jP/YtUxNLX5KRdD4G0U5VzotEzB4fMkMimw==
+	t=1795593617;
+	b=kbAXf29K9HJZLQdZ8hSmAM+BVj8aQ2LGtG9kjzU53EUs3p2qQdsYtTCB07fZGdELLg1U
+	 kBKsEeRzahl6Hnx/aDrs8aZl1XXkx4ssUWbtElsniU3cB+zQXk06kyQGOrwJ82ilsNOH9
+	 XYWzY3zcyqlvUkPUVAVEWCNUvt3LYwiLLNcGlbHBIQdx0yTbUC/D1C9a62ViANQZL18uj
+	 f+m5Yo0hb/DnQO6vbFTSuiL/xoYcJVb37k0wcns9IXcZW1wR48x8o0/XZM3pQnjJmP9w8
+	 6ot/A4dgQ9fSTlgU49pv+gcKU9W5VrIsMGhP3ouRj25a9wuu58l9GLaxLLZWENrkyog==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795591479;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=+l93dXtHRQW0EV58b/3nKh4/KSBiO7DJ6aZmG48jBL8=;
-	b=A5sh4YDKYXTn2hP6how7pirnXXaIqnqf++EyT03GyPMsHztqEW80FVZ1bOTWAvfNI3pt
-	 JT5esQHg+W3jjl6j7uMKRnCNBScNlRW9c+gPCRsT/bL3cUBhUKEBv9F32NZ4AKV0lxxju
-	 KQbvQiJrrNjr11buKgZnu2lGlIINHFylNnfGmQF631s9W/WMktttqci5nEKi1mLGfy69R
-	 n9EBcYt4U9na+shfHjGZhF0GAdaCmfwu1oA7g7ij0VGvNOEQ2sDsSVQJGAwETCckA42Mr
-	 InVqM0VSLgIXw/e7MycDhiruRnKuHSoiHHd3lBmbC9ZTb/t+a/0k26oSZUASCjF1ykg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795593617;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=3JXKHxrVmfq0TiEVcdvg17Zz9dDLxpeu9nQ6Vk0bf9U=;
+	b=pxr3AIkOQuG15AYRjbEf0CgmkA+MB26X6RO5v+VrCcMYvVhDUWDUYrb8X0OhrTVlmy0d
+	 wC+lG/4xMWUPrlbLscz5NgNFNWZ2Xz0AcAyILDB2xK0BvcGHl3GS8b5zI3uyveuPNH/Ud
+	 kAxbT3Xu9vcGYsL4BD+U9EyJ6hMN/wlchiBBIV6kVuuY/FgxbBISs6GvZuARtmmW/tb2N
+	 kilQUiFsjOrgpUX4QamtCsQt/+WIO70+FBV5ISVEDFD9sCHgaL2qrwJdP5hjIrQPN16gX
+	 Y+AJU8+BOJaf05SuREMHVVMuAoy+0XTBfAFx/KBPTukvO+J189t728IGHM2FxIyCs8w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=loeKHpXa;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dVZLEuUu;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26D5606A321;
-	Wed, 25 Nov 2026 07:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC62D60A2610;
+	Wed, 25 Nov 2026 08:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=loeKHpXa
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C43C1F000C6;
-	Wed, 25 Nov 2026 07:24:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dVZLEuUu
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91DA11F000C0;
+	Wed, 25 Nov 2026 08:00:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795591479;
-	bh=+l93dXtHRQW0EV58b/3nKh4/KSBiO7DJ6aZmG48jBL8=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=loeKHpXaBC9FrNf66nSNMrP9Axjcq9SJIDc5wrvXJgRG/vfAoOI3DI0Wv4zSWAbb7
-	 ZNbGCJGZzOZCJGQcdoSvVxSZIx/AqIuKtHInsbChPb4Rjn5r5eegCXwOTt1SUhmFY/
-	 lLsrUwRJo0qNDGT7ht72vkgms8Sw6eyHAsUFEn4yuD+0yRJPpXCMpxlcpeiMiETtbS
-	 AbZTAdXEnd3AYqHnoXk9Cryi3KjUte8jI4rPRzEGHwhcYOJIayjbFM0COMkHzyljQy
-	 UaaFQwdK1w5AA9aEA/h88YBPzp/h2rflaQHM7gueiZETbKxuLmG6iHjOwlG7T2MH8e
-	 hQCqgoJziUalg==
-Message-ID: <sashiko-outbox-232776@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 6/8] KVM: arm64: nv: Don't deliver a pending SError
- to the wrong guest
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Dan Carpenter" <dan@pereq.eu>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20261125-double_exception-v2-6-224689d8a764@pereq.eu>
+	s=k20260515; t=1795593616;
+	bh=3JXKHxrVmfq0TiEVcdvg17Zz9dDLxpeu9nQ6Vk0bf9U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=dVZLEuUu30Bp0Mh++rmExNRXqzfiexWadppURIK/+VKrCSdKwgsrU5sSKafqAoMVX
+	 RtpJk1zM4M8Ozkq3n2tUfIqN+dazbRh0Uk7tMt4ZKtCp7Ik1X2ra2vvZj3cHCkYNkX
+	 zuXHvYHAOKfV4dqS/c9v6ph+IVGU+V0EM3zsIhN334mSVLff8iGgpVz0EnVdps9F9v
+	 lvttxclF3v13FajsFkdWXUAd9uDcBXebqbW8913/zEe90DATxMaaeCz18gzbwRYCac
+	 3vztu/ALwxVnGZRTyZ/1AgydZcZmYQzBw8Vsp4D0WPSLc0s4EKB6yJgnt7x2ZIftB3
+	 QdvdlQRkUaauA==
+Date: Wed, 25 Nov 2026 00:00:15 -0800
+From: Oliver Upton <oupton@kernel.org>
+To: Dan Carpenter <dan@pereq.eu>
+Cc: Marc Zyngier <maz@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Christoffer Dall <c.dall@virtualopensystems.com>,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>, Karthik Bhargavan <karthik@pereq.eu>,
+	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Sashiko <sashiko-bot@kernel.org>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2 5/8] KVM: arm64: nv: Replace a pending SError when
+ injecting a new one
+Message-ID: <awaVj0Aa6dMSksxX@kernel.org>
 References: <20261125-double_exception-v2-0-224689d8a764@pereq.eu>
- <20261125-double_exception-v2-6-224689d8a764@pereq.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Nov 2026 07:24:38 +0000
+ <20261125-double_exception-v2-5-224689d8a764@pereq.eu>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -61,82 +76,68 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261125-double_exception-v2-5-224689d8a764@pereq.eu>
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [High] KVM: arm64: nv: sleeping in atomic context via
-  kvm_nested_flush_hwstate()
---
+Hi Dan,
 
-commit 81f527c7f211ae919b4cadce520f83a546cfd38d
-Author: Dan Carpenter <dan@pereq.eu>
+On Wed, Nov 25, 2026 at 09:56:20AM +0300, Dan Carpenter wrote:
+> The kvm_inject_serror_esr() function injects SErrors as the name
+> implies.  The bug is that it doesn't handle already pending errors
+> correctly in nested virtualization.
+> 
+> In vanilla KVM the kvm_inject_serror_esr() function always sets
+> the SError to pending.  However with nested KVM, it might set it
+> to pending or it might deliver the SError directly.  We can only
+> have one pending error at a time.  Imagine we enter the function
+> with an SError pending already.  In the current code if we decide
+> to pend the new error that's fine, everything works.  However if
+> we decide to deliver it directly then the pend flags should be
+> cleared but they are not.  So we deliver the SError directly and
+> then the SError that was pending on the next exit or entry.
 
-KVM: arm64: nv: Don't deliver a pending SError to the wrong guest
+I could use a bit more color on how we got here. From what I can tell
+this state is only possible if userspace changed the routing / masking
+of the SError outside the context of a KVM_RUN. Otherwise, if the SError
+is deliverable on guest exit we perform the injection prior to exiting
+to userspace.
 
-This commit stashes a pending HCR_EL2.VSE bit into NESTED_SERROR_PENDING
-when switching between L1 and L2 so that kvm_nested_flush_hwstate()
-re-evaluates SError routing in the new context.
+Thanks,
+Oliver
 
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
-ted.c
-> index 39136a89d74bb..cccaf02610e87 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2792,6 +2792,18 @@ static u64 kvm_check_illegal_exception_return(stru=
-ct kvm_vcpu *vcpu, u64 spsr)
->  	return spsr;
->  }
-> =20
-> +/*
-> + * HCR_EL2.VSE was set for the context we are leaving.  Store the SError
-> + * instead, so that kvm_nested_flush_hwstate() routes it in the new cont=
-ext.
-> + */
-> +static void kvm_nested_stash_serror(struct kvm_vcpu *vcpu)
-> +{
-> +	if (*vcpu_hcr(vcpu) & HCR_EL2_VSE) {
-> +		*vcpu_hcr(vcpu) &=3D ~HCR_EL2_VSE;
-> +		vcpu_set_flag(vcpu, NESTED_SERROR_PENDING);
-> +	}
-> +}
-> +
->  void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+> Clear the pend flags unconditionally at the start of the function.
+> 
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Closes: https://lore.kernel.org/all/sashiko-outbox-229065@kernel.org/
+> Fixes: ce66109cec86 ("KVM: arm64: nv: Take "masked" aborts to EL2 when HCRX_EL2.TMEA is set")
+> Fixes: 77ee70a07357 ("KVM: arm64: nv: Honor SError exception routing / masking")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Dan Carpenter <dan@pereq.eu>
+> ---
+> v2: New patch
+> ---
+>  arch/arm64/kvm/inject_fault.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index aa2011cc0d5a..0f6a89b65074 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -361,6 +361,10 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
 >  {
->  	u64 spsr, elr, esr;
-> @@ -2823,6 +2835,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
->  	preempt_disable();
->  	vcpu_set_flag(vcpu, IN_NESTED_ERET);
->  	kvm_arch_vcpu_put(vcpu);
-> +	kvm_nested_stash_serror(vcpu);
-
-[Severity: High]
-Can stashing NESTED_SERROR_PENDING here cause sleeping in atomic context
-on the next guest entry when a virtual PMU counter is active?
-
-When L1 has a masked pending SError in HCR_EL2_VSE with HCR_EL2.AMO set
-and executes ERET into L2, setting NESTED_SERROR_PENDING causes the next
-iteration of kvm_arch_vcpu_ioctl_run() to re-inject the SError back to
-vEL2 while preemption is disabled:
-
-  kvm_arch_vcpu_ioctl_run()
-    preempt_disable()
-    kvm_nested_flush_hwstate()
-      kvm_inject_serror_esr()
-        kvm_inject_nested_serror()
-          kvm_inject_nested()
-            preempt_disable()
-            ...
-            preempt_enable()
-            kvm_pmu_nested_transition()
-              kvm_pmu_create_perf_event()
-
-Because kvm_inject_nested() only balances its own inner preempt_disable(),
-the outer preempt_disable() from kvm_arch_vcpu_ioctl_run() is still in
-effect when kvm_pmu_nested_transition() recreates perf events for counters
-whose EL1 and EL2 filters differ.  kvm_pmu_create_perf_event() then calls
-perf_event_release_kernel() and perf_event_create_kernel_counter(), which
-acquire sleeping mutexes and allocate with GFP_KERNEL while atomic.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125-double_exc=
-eption-v2-0-224689d8a764@pereq.eu?part=3D6
+>  	lockdep_assert_held(&vcpu->mutex);
+>  
+> +	/* A new SError replaces any that is already pending. */
+> +	vcpu_clear_flag(vcpu, NESTED_SERROR_PENDING);
+> +	*vcpu_hcr(vcpu) &= ~HCR_EL2_VSE;
+> +
+>  	if (is_nested_ctxt(vcpu) && kvm_serror_target_is_el2(vcpu))
+>  		return kvm_inject_nested_serror(vcpu, esr);
+>  
+> 
+> -- 
+> 2.53.0
+> 
+> 
