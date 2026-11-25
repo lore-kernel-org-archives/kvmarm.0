@@ -1,55 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795611060;
-	b=pXPKsQPfLUOdnCdAVqQB4rmVa7yJxW8C4GLnwleZ/RZE+Rr47+E9cHNg8vcM+oH7hysD
-	 mqVStYK1ey8ESK+F1iRBn9z3xoHqBwmFa2CQyV8EkHjRTfOPPx5tQKT6Y9fMbZIuxwpep
-	 cK03hImIZ3eUIf+kMx3cVwoATkTvJIQM+pePQfiKoW5y6qVbONECy5c1ytVw7B03Oq/gV
-	 SCPByJlE8j5GRAxxLUA82APq0kQ06O56pDi+c4qvT9uABgTLVgoPWmLdskOZ+rVfZw5OR
-	 rdXHjwgSvHva2oFEhcjCXViWZ751d2c4HNtzoef05ziUwgpK2WWxpmsYjTvFocEHFEA==
+	t=1795611483;
+	b=hayBwbfLTtuCoOeGEo6tlEg+l+IcejmVTRo5tYIlCxEEYwbUFTqvjSFagpmq+UiH9KSx
+	 dRiIpbQAOwl2DJjB9S/Zrh0PUxHE4EVKFBAGGfyHBJIIc4CWyWDJsRKkXP9yWMY8ABCcQ
+	 XfPq5NAcj51r3JdXNqAXqHbROBa6LUNGNgiW9YNhLD7KxwcjdjULlgXg7RGbMahwTChZq
+	 jDCnqLAsXr+i+wkWOYIMudBA8arFHCa53bOg1kU5NevZ08Z7JMppQ/xxnlCh31Ru9IgUz
+	 eqRnuLZMOuNzRK7h2xUoz/imqoIYXBx6kOS3WHVP5PmHyouYTO14Q0vPpfvlz12irsA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795611060;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=DyEorIb3YQV9W3rofRkOYXMRRHlntcXL31fCsbNM/3A=;
-	b=FLlb3WgNbOqou5aMtXqzV75+ueWNV0TEVkXmL3mpe9osOKgw0k1/4j/2fVBHhoGlfyVZ
-	 CNmCJ1NNAvvoXTsZBVhkYSgc65hOb/BFUafixjP27yH8tHZ0zckkQsnIJezp/MXSNFyXL
-	 hLeh4aNOnW+KnKC6zgI5jicvhnUL9L1nlQseb+UPkiWQ50+/iNrrbZlRbN8Ua2cVtPbpN
-	 YWHGaJfecxnlNwFq/2fdWXjIAW3NXXieLtVUJ8Ji1KjtRB7jNSKzHQi4y2kqim/lG+Xtb
-	 blhklJJ+kNwqS7dh7KIJe59Tn1a8MDhzhdeqDtQH95Q2x0giEoFMf8+NdPpe3jKv78Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795611483;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=FOKGiPhLWzMZA6RUtm5hBEIHlhphW7VCRIG+uLWfOxs=;
+	b=I1mYXo1GQhyuF5bpF1UDk/s/fr1qwoKZGJnuwK45zh11B3zaYG/BEaUrv0PM1yHKhfQd
+	 fSVd7mTH+UqWdVinnn3jFWYYOW6H+7XcVPK37SdObzPvZpMjeQO6sR9mUOtE7vWukLWdA
+	 A68LltmUlgNFRAa8iRP+khuLD3HPitIl+uo+Hp8Xts6rpnJkLGRiXJtrEj4dOCOql2U3d
+	 0Acg25qTnQx3nZScVSN3THXpQi+dbWQBAwjCIEE6GlfjJYTIT2gDKtvV/4aqS/9sZFBD+
+	 deiUTauav+HYdFIV52BLK3PkQywKbkFIzRnZT1nbIX7IW6HnW7bu6+BMmFz4j1G3EFg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UwYZU3mw;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=pereq.eu;
+	spf=pass smtp.mailfrom=cryspen.com;
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=HsXeaPU8;
+	arc=none smtp.remote-ip=209.85.128.51
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3D1606A329
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 12:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7FF606A326
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 12:58:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD7FF606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UwYZU3mw
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF7151F000EB
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 12:51:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795611060;
-	bh=DyEorIb3YQV9W3rofRkOYXMRRHlntcXL31fCsbNM/3A=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=UwYZU3mwA9JsLehwkXz8XAj07Bh9/su0TBbOh70QrX4w76x7+3sHWj97ycEpp1nHc
-	 Kqcyrn3I/yVAajGkRe+YP9EUwGQu2aN03YY6gExBjaWOLX5CNsUjKYs2+ekwlN2JWt
-	 1n6i1dI81XbKyGIH+qjm1K+Hxn2NlwfJiL8lQ0IX0ONGKT4fBMgRVHMHfAJx6+c+7G
-	 ynBLIKXqp8O+hgRKS8hVCFwpQQg6QefloW0iLgeO2xQFNjO0QAU95r1e6kRFLe42Yu
-	 sqCR/JSySOep4mPYXx4Pd1qXSj+rFv9dcwjG4b3A96342s7ePdYRLrEooCDv6n/PT1
-	 gkWiuT21XXoCg==
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5c1a3374400so4604252e87.2
-        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 04:51:00 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErEqBCYEMkYa5x77D4TLXKOBy8n6UrrA1qFUnEqk1x7y93OqcvVGIvk6Njh3NolJVa0w6mzTVLQ=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9JFxusub4JoG27R+vEMr53sEnrH2lpSOfHYYfePb9UGplPesMx
-	L5nrVM9hn6J6DgKj10TN7pY/wfGi1Wd99wpHPwUoFj8T9Lqf/xuuZDioqxxWlkzIexYX9OK1tJs
-	bX9zOGpYHJs1a6udW3jYkpPrQ4Cq+g84=
-X-Received: by 2002:ac2:4c54:0:b0:5c1:4e18:39ca with SMTP id
- 2adb3069b0e04-5c1bc7cf9a4mr5279949e87.21.1795611059465; Wed, 25 Nov 2026
- 04:50:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=HsXeaPU8
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4a5b2be99a8so48862515e9.2
+        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 04:58:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pereq.eu; s=google; t=1795611481; x=1796216281; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=FOKGiPhLWzMZA6RUtm5hBEIHlhphW7VCRIG+uLWfOxs=;
+        b=HsXeaPU8Z0lAOtEkoozbrMhS+WDvdN7odg4AKVsLv7ioOIvbVbOD9qAeY+DiHkdTUA
+         jYHYH/VnIXMCR1uozN0DzNG5do4GDG8TZoFY+CqdGBMEqVwtJqJ1u3qE37rxAhGzUwR/
+         1MZWyUp20wDAai4J5ByWbmdSf4iDS4k6A6V0RtQQwuhaVXSKOw1SVe4a2T1/2boJulOD
+         9tMUPqG4PZ2/jBoWZoGT11QuujrFCy57bjX/yvYKEJq9m4pgvK1xvgv5jR33Vp5JYyVf
+         fmSGLor1ecBy42Rky4i5mEAzxV2hNBwjOBySaRh/moUjUGS32QYqI1h6xPzQ6NL7rAZK
+         lI8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795611481; x=1796216281;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=FOKGiPhLWzMZA6RUtm5hBEIHlhphW7VCRIG+uLWfOxs=;
+        b=ue50vrH7tmH3ywf9Te3m1biiJpjIlPakVBvdcufFeSUEwIJTentFekk4c30DUw1LpP
+         QDN63stwL4Khlk0VkdOj9a4uLOU2sBtuuJCuKsZ3qNjOy3kQR7iRuvnNctbiN9vlMMkf
+         6NUUDQO8PdvdX6TXmFq9Luk/KGtZLQOQ7eSrB63fpjAjKf4tHZ06z0cPBuU2i/uJUZTS
+         MvBrOfRB4eZX9A93rswxrDYCvC+S3i3MrKlwgq8OS/ohgHyEs29fSpaGsz3+ewt5R1E2
+         lkcg09Wap3gwUdToW4zM9+k3lsEQ5dzdB67PDu15vuwSFwvxKo4znVd0IWldWoG9sBmn
+         LQBw==
+X-Gm-Message-State: APuU4Z9QzWsV86zUp9urV10g8i9dFFzCnTwVO9xu4prNmhXRe31L1cfQ
+	xhIAtZNkd51yLvQWDEj64cL5CQ9B0wLxuarevbLG2nUsSoipBJqJLWmzPciziDAtOLo=
+X-Gm-Gg: AZFdTZcCDx2tOvG9Mo2b1xIPq4XqqVR2JCVP8n8MB1H77LitOVea6rC8qSjv7zLw4SP
+	Mi8lFaLdFFl87U82tIRzwBKcFtFRQnL+JfiQZv0umJTfOvhEU40sDg0Dpdm/+IUCJKXIt0cANvE
+	8FvBwLPMok+gChZPjlhjnwEQBZvHTytxf48cowrsbnlvEhBVO2MLUYOvSLiNsvZsD8lWxf2b9PX
+	P7GKovVss1M0MqTIZHrq5iTStu5MuiV+qo6kBk5Vn3st6trUhqtpIZYiteNfrIp3RGL3T0NvD4A
+	/1Fouuyd0PBLgu5rVMJQYbiHOCW2ZXC5ah51ROX/P3gQUNIHnzmat3ksREMtvPdE6Sp9zN4bT5y
+	kYVtWjWMO7GHf//i3z0ilsCCYRDFWPTx+NKljXid/L6lD7/KT0tlW7VQE77sd5zKRqABGUNxP4J
+	rXe0Fpc39QDLsDeGbciysmWLxqDojXKya/32Kjgvw2OZ+BT0IgJEUKaBThpGjsc2pzg8sz2fMQF
+	BJ1k307jvEpJ5y45eYzApJkcPmgRrov5xW+tvcxoGMZsUUAWZY601IvueiGOaB2foGGBOVZJaNf
+	g0XHAWxCfBum96EP0Dc=
+X-Received: by 2002:a05:600c:6290:b0:4a3:59c9:a743 with SMTP id 5b1f17b1804b1-4bb8882a21amr347767215e9.27.1795611480907;
+        Wed, 25 Nov 2026 04:58:00 -0800 (PST)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb884b7515sm711211175e9.13.2026.11.25.04.57.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Nov 2026 04:58:00 -0800 (PST)
+Date: Wed, 25 Nov 2026 15:57:57 +0300
+From: Dan Carpenter <dan@pereq.eu>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Drop a pending MMIO access when injecting an
+ unmasked SError
+Message-ID: <awbbVSeRRxHjvFYx@stanley.mountain>
+References: <20261125-serror-drop-mmio-v1-1-48076f59608c@pereq.eu>
+ <sashiko-outbox-233383@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,61 +97,20 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261015142552.4128028-1-ryan.roberts@arm.com>
- <20261015142552.4128028-16-ryan.roberts@arm.com> <20261015164102.GC13920@nvidia.com>
- <CABCqBse_aZL-EH0us2uA5X10q6E4WP02MoHTYf+M9ezRZr26WQ@mail.gmail.com>
- <20261016144202.GG13920@nvidia.com> <375868af-d0bd-4278-83e6-f8429df130e9@arm.com>
-In-Reply-To: <375868af-d0bd-4278-83e6-f8429df130e9@arm.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Wed, 25 Nov 2026 13:50:46 +0100
-X-Gmail-Original-Message-ID: <CAD++jLkO-xdHHL9SH3JOBkXPE6WMsrX3Tw+N5y501-PpiT3yCQ@mail.gmail.com>
-X-Gm-Features: Aa3M54pxVYAbo3CvBXpwpR1y88w6a7Lowveq_8IpxEozPbKGTRZduKVgmRQQdyI
-Message-ID: <CAD++jLkO-xdHHL9SH3JOBkXPE6WMsrX3Tw+N5y501-PpiT3yCQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 15/15] misc/arm-cla: Add vfio-mdev user interface
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Jean-Philippe Brucker <jpb@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Alex Williamson <alex@shazbot.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <sashiko-outbox-233383@kernel.org>
 
-Hi Ryan,
+On Wed, Nov 25, 2026 at 12:40:53PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found no new issues
+> in this patch, but noticed 1 related pre-existing issue it does not
+> introduce:
+> - [High] KVM: arm64: nv: sleep in atomic in kvm_pmu_nested_transition()
+>   during KVM_RUN [1]
+> --
 
-a quick question here:
+Already discussed.  I'll send the patch for this later.
 
-On Tue, Oct 20, 2026 at 12:42=E2=80=AFPM Ryan Roberts <ryan.roberts@arm.com=
-> wrote:
+regards,
+dan carpenter
 
->  - Split the existing CLA driver into three components:
->     - cla-core: Hardware discovery, domain configuration, struct device
->       registration and CPU hotplug
->     - cla-native driver: Provides the user space accelerator interfaces
->     - cla-vfio driver: Enables domains to be assigned to virtual machines
-
-This design implicitly rules out any in-kernel users. Make this
-explicit (in cover-letter or similar).
-
-This could be a problem because historically where there is computation
-there is a datapath and now this is constrained to userspace, or even users=
-pace
-inside a virtual machine.
-
-Sooner or later someone is going to come with a use case where that
-datapath is very intense and say something along the line, "what
-about I just pass you an in-kernel dmabuf and you do you computation
-on that and pass it on to the next stage" such as data captured from
-network cards, high speed  serial links, sensor arrays, cameras, etc etc.
-This is already done for drivers under drivers/accel, they import and
-export dmabufs.
-
-So we need a coherent story here.
-
-Yours,
-Linus Walleij
