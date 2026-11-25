@@ -1,74 +1,74 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.198
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795587362;
-	b=oKZLHZ0YmStCXVcgKS29EW/1INq6Xp9Z8Xlp+gk8WROdrxMFIQJxECnKnTDbEGof0KPo
-	 0pM/uGxtxgQGSN+9133pZ+QmFuLdSZbQ4Qrh0h2XxpO1yMin/kOGbtjoFpDB+8kDa8U8l
-	 bT8JD6f+RzxZ1zBcbB5bZ5U2xBJrA+j9Ikon4jeJPt5RrD0RJuIa3TwVETGkj/aJtrqDx
-	 krfB8QYx96I/IAFZ12gCN6uVTZfyXzUqD5iBgXaeVZl5trWWbHEmADEOc81Jh9JGsYhOd
-	 RHCcHH7vTE73GskMf+X4UNUw7NBdckDpRLvTVhjXSP3l+EV5aoBYSq0+2fEDYmbi74w==
+	t=1795587365;
+	b=17SM6+HKJ2AQPns1oSGBArmAc6BOaPUCa6rKocJHoUlKiRZFDdOrOfNdQWGkiwkH8wlf
+	 sah6O5bMQdL1GLfNOtpmPpnskRszwp9Cb9jogL38wbYZXlO3vfOGN4SiV2OgJc0NXlqsN
+	 60fA91ZjHnMCBaMbRkXNUDEJNYxykGQGsCYlHeFKX4ZwBbG5tYjhyIombt6AZz33oOeQZ
+	 G0KIuPj2OH2mQIUEjt6fTgUb9+8QZclLpOwhBty07yTroQZ5CK5F1TFPwzwJ78FGJTPMO
+	 dP8hYY0ebAPVSbDkNuDiIgcnfm8ZOiCqGS3lxbvctC3sqgC9H74Ipon09Oy0Q2DYXHg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795587362;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795587365;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=t9I8cNuBP7ebVAP5Sxu6FvkQwNvgLeon4MVqc5DF214=;
-	b=WqIoxdCJrf943E6JBJlenQ0A0TnlmKV8KNIpQSNPZl1FJh4GSNEEo6QRb/iJc9mvxCV7
-	 Z+y8yOJqYgLvyEkAMLVK4sp25pLGJHrBMpx3QzTp4lbDXB6FeBf7Hsbq3VjzY25XyGTSy
-	 y4K3Cs9nPCI9gJoEAoO9m/F5TdE2LH0vfcKiVdaNjhMTgji7wN6VZYdSXdTMM8/wjoGip
-	 BoeFhdqp+LlSuO4N5PQWLIRwlZ5atcZ7lg4lrtR2H3kWr5l/2oNuhssoTN7U4bVwAqr9b
-	 JMiqanbtnw8gnRrw7kIlhFMKtW3WizO+zh9/QUU8fwxTuhYP3H9K1CfXuW/uk/4A3+w==
+	bh=tWd9OqXk32u4mIL9RulhgYbdAvWhEF1Nkf6jnv3xQps=;
+	b=WVMXq6jV0wPxxMoHpOHaiiL3GBrGS7kaTCHzQwnlYDBtU7uFR5dBqVY/bpep4db2Jo0a
+	 yEKfVyeBAqP9E+cF6yZpgUYF/86BYlb1J2rpOcp/vlbNExzKzcT6ZAlaY/CbvsyWGdN4i
+	 m5x/QOf78WnIRfs/UO/r4q8B6g72IwdSUs1KnhKLlvZkMkCSFGE5nS3N4VDQRqfSe/Ise
+	 Q78sgrtWn0SA4ZdS9b7TxLfIKzEyV9GfmUIgs7Jg+ogPE9QOGdwIAt61Sc5Hr/1ejw5xn
+	 w05H2LrVhxwSmYC87agB91CRUWPC8AgAwsGHuHetLLq+I6Ma5Tc7h55rO6qGdMg/vXw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--irogers.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ZYtaCEma;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=MLpGu3sg;
 	arc=none smtp.remote-ip=74.125.82.198
 Received: from mail-dy1-f198.google.com (mail-dy1-f198.google.com [74.125.82.198])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF99D606D319
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AF99D606D319
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84972606DE41
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 84972606DE41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ZYtaCEma
-Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-30bcb065bfdso5895064eec.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=MLpGu3sg
+Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-341eff9e381so8413996eec.1
+        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795587361; x=1796192161; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1795587363; x=1796192163; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=t9I8cNuBP7ebVAP5Sxu6FvkQwNvgLeon4MVqc5DF214=;
-        b=ZYtaCEma8NVeYhzg/jOaZvwUD4waMLE3tHBi+1hSl2MWaM6VynzPfXfrd7GpgFzYdl
-         wf8dcLDyu52s47x3tMc7pZZTY0mKji80LNBH281X3pnkwXE6r1S4ZN5ulUwW9Ui6uBNS
-         BTcIQPR6NzEiu4XISX6oZCgCzZ7XxMvoFehd5wDxHwOQvwk116EB+dzgqhAPdyvIKbY1
-         EnKD8j/fq8FAFIiDMWEe9hCW49gOHFMe37OnqYVWZB3AQ89v9OabTm90N5SdheYd5tnh
-         7cPa5zwei4LPfF5tq/S2lExkaeOgGNsuUxVVwcSB/veiAozZ8dtM/VPBu8aBseDPnhFy
-         0kwQ==
+        bh=tWd9OqXk32u4mIL9RulhgYbdAvWhEF1Nkf6jnv3xQps=;
+        b=MLpGu3sgkCB7YVxwDi03DNp0eiisTLT537OTBeW9hnZjCp+LF0m4AXteokeFoAN9DJ
+         22DfGsU+aUK5uiDMWqA6bfQnp81Regjxt29fE2Qvf9TpUFRxx/wyquLOz2dC5k9V69nz
+         fIfDRCouaa5Dc99BB0VW1WiugywsLKURNBppdY65TWVA9pS2BBJK5lXi3rBYOVzm5peS
+         4x+pZIlUvtHlMnWqV/DHyI+QI4Mp56O7cyrpTpQMFpCbd5ljsFz48YIt3QlrfXHFivrU
+         yVVR93h8CsbBmUmfipIPBSkiUbX0/caLRYddL5hvgGx5/+3XrdiMKhVaOUx8xaLTMj1V
+         8XiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795587361; x=1796192161;
+        d=1e100.net; s=20260707; t=1795587363; x=1796192163;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=t9I8cNuBP7ebVAP5Sxu6FvkQwNvgLeon4MVqc5DF214=;
-        b=GVLl9Vu8wqIHzyQCqPLZgkT/X1zDifnd/jztn7AY9cbkC2s4YjAlXEFu9uJkkW3+hl
-         pjUFWfpsAmW+GgZvIBbSzxflYHpJeuO6VBArvhqH9cIYkjYNfNkH9N7BtRwwMcW4RN/3
-         9HAyZFjjMRfbjvX6/X5ysPRc+7ZS3m3+UCV22zTgeVqKsA+PYjX2OmEkLKIyHbIzyM3R
-         StLALAiawu3pwm4OLRmDkl05U6APwqatvlonmZQNM2JnbEKjUIKgyBVWe7poPpSrJqw+
-         sseR26TjUI1ivNJUL0AL2qhLisdLns5AwzmBMJT1YgL5PBHN2oBeKzbpyf+cavaky2Kb
-         foUA==
-X-Forwarded-Encrypted: i=1; AL+hErEcwHW4E58nVj8I/LM1XL0bfIZrL8IO/aj0ziZG9BJ50oW58gf654y05QfUQjnqRchKfO8OWEQ=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8+kJTEmNIcV2ofSPffL1AE7yaHCppHEQL+qCXDGP6fj7fggyoK
-	ROyRyImUWIAaZ4Rg0pFXpqom86W83e44UPNdgshGKYiIB7sGQeGVnW7VyGCymGQogiZX6nAj+Mx
-	BOp8PpM2FQQ==
-X-Received: from dlec1-n2.prod.google.com ([2002:a05:701b:4281:20b0:1ab:a092:67c3])
- (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:701b:2083:10b0:164:4e36:f956
- with SMTP id a92af1059eb24-1b5568b47a4mr17852731c88.16.1795587360305; Tue, 24
- Nov 2026 22:16:00 -0800 (PST)
-Date: Tue, 24 Nov 2026 22:14:55 -0800
+        bh=tWd9OqXk32u4mIL9RulhgYbdAvWhEF1Nkf6jnv3xQps=;
+        b=OoBqqXP97+m36t02DF++yN+3nnVxAQ8GXv33xAhBMGsXu//NewppDnR6rQ5irhzowj
+         UrYZNTHwBkQQ/MtPWC3NHrFS/r6JDMzNUMzsEeyrAH2FEd5hkeK8vOfU12JqE3Sj9QZP
+         3iq3bQBgUinHwPK0V5n+kYuT4zwKbhKcUCrmGonW6O8+5R0mFQIIhScqdpCZDe41S/F4
+         OXNYru0Ng0DnryUTujivHMAcx2/eyjkFuJ2c5gmHr/1AVHfjZtjzBL9341TP0f3SfkW5
+         UiLUGxcKlfG4kjh8VeGBEq1ATdspA1RHpiomKJC59WSEjD8JMKIpoj7sMnalfuDmeysf
+         G3Zw==
+X-Forwarded-Encrypted: i=1; AL+hErGtC8syeIIN80glAzKxxthHdxYBmv8kfpqJ+cDeI/IzuzTRDpRVzB832FKXOD2rmfRObv3V4CE=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8JbM+0hSxLIkz5og4Ri6vQxZkI2btkdkAHemsZBIOCZ3fuCQ+q
+	1Fu0zu3BDlBjfCmy0hkwRbUrF1w+/034n2wvfTl8PhyDXIALbbuf36boHp8jfPo5X/WN/RHieBq
+	TaMp5x/CGuw==
+X-Received: from dldz4-n1.prod.google.com ([2002:a05:701b:4184:10b0:1b3:af3d:1632])
+ (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:290:b0:191:444:425
+ with SMTP id a92af1059eb24-1b5567c0fbdmr16137433c88.2.1795587362159; Tue, 24
+ Nov 2026 22:16:02 -0800 (PST)
+Date: Tue, 24 Nov 2026 22:14:56 -0800
 In-Reply-To: <20261125061523.1540234-1-irogers@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,8 +81,9 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261125061523.1540234-1-irogers@google.com>
 X-Mailer: git-send-email 2.56.1.831.g720f3f5937-goog
-Message-ID: <20261125061523.1540234-3-irogers@google.com>
-Subject: [RFC PATCH v2 02/30] unwind: Add KUnit tests for Minimal DWARF CFI interpreter
+Message-ID: <20261125061523.1540234-4-irogers@google.com>
+Subject: [RFC PATCH v2 03/30] unwind_user: Support Minimal DWARF CFI
+ user-space unwinding
 From: Ian Rogers <irogers@google.com>
 To: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
 	linux-arch@vger.kernel.org
@@ -102,828 +103,1023 @@ Cc: jpoimboe@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
 	wnliu@google.com, dylanbhatch@google.com, Ian Rogers <irogers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a built-in KUnit test suite (CONFIG_UNWIND_DWARF_CFI_KUNIT_TEST) in
-kernel/unwind/dwarf_cfi_kunit.c exercising the Minimal DWARF CFI
-interpreter across:
- - SP-based and FP-based stack frames and ignored callee-saved GPR spills
- - Shrink-wrapped DW_CFA_remember_state / DW_CFA_restore_state stacks
- - DRAP stack realignment and 64-bit / 32-bit vdso32 sigreturn frames
- - ARM64 PAC-RET (DW_CFA_AARCH64_negate_ra_state) and RISC-V leaf frames
- - Malformed bytecode, negative sdata4 range, and overflow rejections
- - Linear .eh_frame scanning (dwarf_cfi_scan_eh_frame_kmem()) and live
-   CALLER_ADDR0/1 and kernel stack walks
+Extend the generic user-space unwinder (kernel/unwind/user.c) with
+UNWIND_USER_TYPE_CFI (CONFIG_HAVE_UNWIND_USER_CFI), resolving ELF
+PT_GNU_EH_FRAME headers across executable VMAs in kernel/unwind/user_cfi.c.
+
+Key design details:
+ - Find the executable VMA and its base ELF mapping (vm_pgoff == 0)
+   under mmap_read_lock_killable(), then drop mmap_read_lock() before
+   issuing any faultable copy_from_user() reads.
+ - Cache VMA -> PT_GNU_EH_FRAME lookups (including negative lookups for
+   anonymous/JIT VMAs so unwind_user_next() falls back per frame to FP)
+   in a 4-slot per-walk cache on struct unwind_user_state.
+ - Track stack-pointer validity (state->sp_valid and
+   unwind_user_fp_sets_sp()) across mixed CFI -> FP -> CFI walks so
+   architectures whose FP step does not recover exact caller SP reject
+   SP-based rules until an outer FP-based FDE or sigreturn restores SP,
+   and support signal-frame SP recovery from *(CFA + sp_off).
+ - Provide overridable unwind_user_frame_pointer() (guarded by
+   CONFIG_HAVE_UNWIND_USER_FP), unwind_user_fp_sets_sp(), and
+   unwind_user_sigreturn() hooks alongside unwind_user_link_register()
+   and unwind_user_strip_pac(), and allow up to UNWIND_USER_MAX_SIGNALS
+   signal frames per walk to switch stacks (SA_ONSTACK).
+ - Support link-register leaf frames, DRAP/sigframe indirect CFA rules,
+   and clean bottom-of-stack termination on DW_CFA_undefined or zero RA.
 
 Signed-off-by: Ian Rogers <irogers@google.com>
 ---
- arch/Kconfig                    |  10 +
- kernel/unwind/Makefile          |   1 +
- kernel/unwind/dwarf_cfi_kunit.c | 767 ++++++++++++++++++++++++++++++++
- 3 files changed, 778 insertions(+)
- create mode 100644 kernel/unwind/dwarf_cfi_kunit.c
+ arch/Kconfig                      |   5 +
+ include/linux/unwind_user.h       | 104 ++++++++
+ include/linux/unwind_user_types.h | 101 +++++++-
+ kernel/unwind/Makefile            |   1 +
+ kernel/unwind/user.c              | 169 +++++++++++--
+ kernel/unwind/user_cfi.c          | 392 ++++++++++++++++++++++++++++++
+ 6 files changed, 753 insertions(+), 19 deletions(-)
+ create mode 100644 kernel/unwind/user_cfi.c
 
 diff --git a/arch/Kconfig b/arch/Kconfig
-index 5ed64e6cc72e..03399120aa8f 100644
+index 03399120aa8f..340a7ecbfc68 100644
 --- a/arch/Kconfig
 +++ b/arch/Kconfig
-@@ -506,6 +506,16 @@ config UNWIND_TABLES
- config UNWIND_DWARF_CFI
+@@ -523,6 +523,11 @@ config HAVE_UNWIND_USER_FP
  	bool
+ 	select UNWIND_USER
  
-+config UNWIND_DWARF_CFI_KUNIT_TEST
-+	bool "KUnit tests for Minimal DWARF CFI unwinder" if !KUNIT_ALL_TESTS
-+	depends on KUNIT=y && UNWIND_DWARF_CFI
-+	default KUNIT_ALL_TESTS
-+	help
-+	  Builds KUnit tests for the Minimal DWARF Call Frame Information (CFI)
-+	  bytecode interpreter and stack unwinder.  Covers SP/FP-based frames,
-+	  callee-saved GPR opcode skipping, shrink-wrapped state stacks, DRAP
-+	  stack realignment, malformed bytecode rejections, and live walks.
++config HAVE_UNWIND_USER_CFI
++	bool
++	select UNWIND_USER
++	select UNWIND_DWARF_CFI
 +
- config UNWIND_USER
+ config HAVE_PERF_REGS
  	bool
+ 	help
+diff --git a/include/linux/unwind_user.h b/include/linux/unwind_user.h
+index 64618618febd..5a05182825a5 100644
+--- a/include/linux/unwind_user.h
++++ b/include/linux/unwind_user.h
+@@ -2,6 +2,7 @@
+ #ifndef _LINUX_UNWIND_USER_H
+ #define _LINUX_UNWIND_USER_H
  
-diff --git a/kernel/unwind/Makefile b/kernel/unwind/Makefile
-index f772fc607985..73a1ccc2ad77 100644
---- a/kernel/unwind/Makefile
-+++ b/kernel/unwind/Makefile
-@@ -9,3 +9,4 @@ KCOV_INSTRUMENT_dwarf_cfi.o := n
++#include <linux/ptrace.h>
+ #include <linux/unwind_user_types.h>
+ #include <asm/unwind_user.h>
  
- obj-$(CONFIG_UNWIND_DWARF_CFI)		+= dwarf_cfi.o
- obj-$(CONFIG_UNWIND_USER)		+= user.o deferred.o
-+obj-$(CONFIG_UNWIND_DWARF_CFI_KUNIT_TEST) += dwarf_cfi_kunit.o
-diff --git a/kernel/unwind/dwarf_cfi_kunit.c b/kernel/unwind/dwarf_cfi_kunit.c
-new file mode 100644
-index 000000000000..5e8e0ff2ec36
---- /dev/null
-+++ b/kernel/unwind/dwarf_cfi_kunit.c
-@@ -0,0 +1,767 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * KUnit tests for Minimal DWARF Call Frame Information (CFI) unwinder.
+@@ -16,6 +17,12 @@
+ #endif
+ 
+ #ifndef unwind_user_at_function_start
++/**
++ * unwind_user_at_function_start() - Default stub for function-entry detection
++ * @regs: User-mode register state.
++ *
++ * Return: false when the architecture does not override entry detection.
 + */
-+
-+#include <kunit/test.h>
-+#include <linux/ftrace.h>
-+#include <linux/kernel.h>
-+#include <linux/stacktrace.h>
-+#include <linux/unaligned.h>
-+#include <linux/unwind_dwarf_cfi.h>
-+
-+static __always_inline unsigned long record_here_ip(void)
+ static inline bool unwind_user_at_function_start(struct pt_regs *regs)
+ {
+ 	return false;
+@@ -23,6 +30,103 @@ static inline bool unwind_user_at_function_start(struct pt_regs *regs)
+ #define unwind_user_at_function_start unwind_user_at_function_start
+ #endif
+ 
++#ifndef unwind_user_frame_pointer
++/**
++ * unwind_user_frame_pointer() - Default helper returning @regs's frame pointer
++ * @regs: User-mode register state.
++ *
++ * Return: Architectural user frame pointer from frame_pointer(@regs) when
++ * CONFIG_HAVE_UNWIND_USER_FP is enabled, or 0 otherwise.
++ */
++static inline unsigned long unwind_user_frame_pointer(struct pt_regs *regs)
 +{
-+	unsigned long ip;
-+
-+#if defined(__x86_64__)
-+	asm volatile("1: lea 1b(%%rip), %0" : "=r"(ip));
-+#elif defined(__aarch64__)
-+	asm volatile("1: adr %0, 1b" : "=r"(ip));
-+#elif defined(__riscv)
-+	asm volatile("1: auipc %0, 0" : "=r"(ip));
++#ifdef CONFIG_HAVE_UNWIND_USER_FP
++	return frame_pointer(regs);
 +#else
-+	ip = _THIS_IP_;
++	return 0;
 +#endif
++}
++
++#define unwind_user_frame_pointer unwind_user_frame_pointer
++#endif
++
++#ifndef unwind_user_fp_sets_sp
++/**
++ * unwind_user_fp_sets_sp() - Whether FP unwinding recovers exact caller SP
++ *
++ * Return: true on architectures where the frame record resides at a fixed
++ * offset from the caller's stack pointer (e.g. x86 and RISC-V), or false when
++ * it resides at the bottom of the callee's frame (e.g. ARM64).
++ */
++static inline bool unwind_user_fp_sets_sp(void)
++{
++	return true;
++}
++
++#define unwind_user_fp_sets_sp unwind_user_fp_sets_sp
++#endif
++
++#ifndef unwind_user_link_register
++/**
++ * unwind_user_link_register() - Default stub for architectures without an LR
++ * @regs: User-mode register state.
++ * @ra: Unused output link register pointer.
++ *
++ * Return: false on architectures where calls push the return address on stack.
++ */
++static inline bool unwind_user_link_register(struct pt_regs *regs,
++					     unsigned long *ra)
++{
++	return false;
++}
++
++#define unwind_user_link_register unwind_user_link_register
++#endif
++
++#ifndef unwind_user_strip_pac
++/**
++ * unwind_user_strip_pac() - Default no-op PAC stripping helper
++ * @ip: Recovered user instruction pointer.
++ * @ra_signed: Whether CFI marked the return address as PAC-signed.
++ *
++ * Return: @ip unchanged on architectures without pointer authentication.
++ */
++static inline unsigned long unwind_user_strip_pac(unsigned long ip,
++						  bool ra_signed)
++{
 +	return ip;
 +}
 +
-+static const struct dwarf_cfi_arch test_x86_64_arch = {
-+	.ws	= 8,
-+	.sp_reg	= 7,	/* rsp */
-+	.fp_reg	= 6,	/* rbp */
-+	.ra_reg	= 16,	/* rip */
-+};
-+
-+static const struct dwarf_cfi_arch test_i386_arch = {
-+	.ws	= 4,
-+	.sp_reg	= 4,	/* esp */
-+	.fp_reg	= 5,	/* ebp */
-+	.ra_reg	= 8,	/* eip */
-+};
-+
-+static const struct dwarf_cfi_arch test_arm64_arch = {
-+	.ws	= 8,
-+	.sp_reg	= 31,	/* sp */
-+	.fp_reg	= 29,	/* x29 */
-+	.ra_reg	= 30,	/* x30 (lr) */
-+};
-+
-+static const struct dwarf_cfi_arch test_riscv64_arch = {
-+	.ws	= 8,
-+	.sp_reg	= 2,	/* sp (x2) */
-+	.fp_reg	= 8,	/* s0/fp (x8) */
-+	.ra_reg	= 1,	/* ra (x1) */
-+};
-+
-+/*
-+ * Helper to construct a compact [CIE | FDE] .eh_frame blob in kernel memory
-+ * with absptr encoding so tests can use arbitrary synthetic PCs.
-+ */
-+struct test_eh_blob {
-+	u8 buf[256];
-+	size_t fde_off;
-+	size_t total_len;
-+};
-+
-+static void build_arch_eh_blob(struct test_eh_blob *b,
-+			       const struct dwarf_cfi_arch *arch,
-+			       u8 code_align, u8 data_align_sleb,
-+			       const char *aug, u8 fde_enc,
-+			       const u8 *cie_insns, size_t cie_insns_len,
-+			       unsigned long init_pc, unsigned long pc_range,
-+			       const u8 *fde_insns, size_t fde_insns_len)
-+{
-+	u8 *p = b->buf;
-+	size_t cie_start = 0, cie_len_pos, fde_start, fde_len_pos;
-+
-+	memset(b, 0, sizeof(*b));
-+
-+	/* CIE */
-+	cie_len_pos = p - b->buf;
-+	p += 4;
-+	put_unaligned_le32(0, p);
-+	p += 4;
-+	*p++ = 1;
-+	memcpy(p, aug, strlen(aug) + 1);
-+	p += strlen(aug) + 1;
-+	*p++ = code_align;
-+	*p++ = data_align_sleb;
-+	*p++ = arch->ra_reg;
-+	if (aug[0] == 'z') {
-+		*p++ = 1;
-+		*p++ = fde_enc;
-+	}
-+	if (cie_insns_len) {
-+		memcpy(p, cie_insns, cie_insns_len);
-+		p += cie_insns_len;
-+	}
-+	while ((p - b->buf) & 3)
-+		*p++ = 0x00;
-+	put_unaligned_le32((u32)((p - b->buf) - cie_start - 4),
-+			   b->buf + cie_len_pos);
-+
-+	/* FDE */
-+	fde_start = p - b->buf;
-+	b->fde_off = fde_start;
-+	fde_len_pos = fde_start;
-+	p += 4;
-+	put_unaligned_le32((u32)((p - b->buf) - cie_start), p);
-+	p += 4;
-+	if ((fde_enc & 0x07) == 0x03 || (arch->ws == 4 && (fde_enc & 0x0f) == 0)) {
-+		put_unaligned_le32((u32)init_pc, p);
-+		p += 4;
-+		put_unaligned_le32((u32)pc_range, p);
-+		p += 4;
-+	} else {
-+		put_unaligned_le64(init_pc, p);
-+		p += 8;
-+		put_unaligned_le64(pc_range, p);
-+		p += 8;
-+	}
-+	if (aug[0] == 'z')
-+		*p++ = 0;
-+	if (fde_insns_len) {
-+		memcpy(p, fde_insns, fde_insns_len);
-+		p += fde_insns_len;
-+	}
-+	while ((p - b->buf) & 3)
-+		*p++ = 0x00;
-+	put_unaligned_le32((u32)((p - b->buf) - fde_start - 4),
-+			   b->buf + fde_len_pos);
-+
-+	b->total_len = p - b->buf;
-+}
-+
-+static void build_test_eh_blob(struct test_eh_blob *b, const char *aug,
-+			       u8 fde_enc, unsigned long init_pc,
-+			       unsigned long pc_range,
-+			       const u8 *fde_insns, size_t fde_insns_len)
-+{
-+	static const u8 x86_cie_insns[] = { 0x0c, 7, 8, 0x80 | 16, 1 };
-+
-+	build_arch_eh_blob(b, &test_x86_64_arch, /*code_align=*/1,
-+			   /*data_align_sleb=*/0x78, aug, fde_enc,
-+			   x86_cie_insns, sizeof(x86_cie_insns),
-+			   init_pc, pc_range, fde_insns, fde_insns_len);
-+}
-+
-+static void test_cfi_sp_and_ignored_gprs(struct kunit *test)
-+{
-+	/*
-+	 * Simulate a typical -fomit-frame-pointer function at 0x1000..0x1040:
-+	 *   +0..+1: push %r12 -> advance_loc 2, def_cfa_offset 16, offset r12 at cfa-16
-+	 *   +2..+2: push %rbx -> advance_loc 1, def_cfa_offset 24, offset rbx at cfa-24
-+	 *   +3..+6: sub $32, %rsp -> advance_loc 4, def_cfa_offset 56
-+	 *   +7:     GNU_args_size 16
-+	 */
-+	static const u8 insns[] = {
-+		0x40 | 2,		/* DW_CFA_advance_loc 2 -> 0x1002 */
-+		0x0e, 16,		/* DW_CFA_def_cfa_offset 16 */
-+		0x80 | 12, 2,		/* DW_CFA_offset r12, 2 (ignored) */
-+		0x40 | 1,		/* DW_CFA_advance_loc 1 -> 0x1003 */
-+		0x0e, 24,		/* DW_CFA_def_cfa_offset 24 */
-+		0x80 | 3, 3,		/* DW_CFA_offset rbx, 3 (ignored) */
-+		0x40 | 4,		/* DW_CFA_advance_loc 4 -> 0x1007 */
-+		0x0e, 56,		/* DW_CFA_def_cfa_offset 56 */
-+		0x2e, 16,		/* DW_CFA_GNU_args_size 16 (ignored) */
-+	};
-+	struct test_eh_blob blob;
-+	struct dwarf_cfi_row row;
-+
-+	build_test_eh_blob(&blob, "zR", 0x04 /* udata8 abs */, 0x1000, 0x40,
-+			   insns, sizeof(insns));
-+
-+	/* At entry (0x1000): CFA = rsp + 8, RA = cfa - 8, FP = same */
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x1000,
-+						&test_x86_64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_base, DWARF_CFI_BASE_SP);
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 8);
-+	KUNIT_EXPECT_EQ(test, row.fp_rule, DWARF_CFI_RULE_SAME);
-+	KUNIT_EXPECT_EQ(test, row.ra_rule, DWARF_CFI_RULE_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.ra_off, -8);
-+
-+	/* Mid-prologue (0x1002): CFA = rsp + 16 */
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x1002,
-+						&test_x86_64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 16);
-+	KUNIT_EXPECT_EQ(test, row.fp_rule, DWARF_CFI_RULE_SAME);
-+
-+	/* Body (0x1020): CFA = rsp + 56, r12/rbx spills ignored */
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x1020,
-+						&test_x86_64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_base, DWARF_CFI_BASE_SP);
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 56);
-+	KUNIT_EXPECT_EQ(test, row.fp_rule, DWARF_CFI_RULE_SAME);
-+
-+	/* Out-of-range PC (0x1040) returns -ENOENT */
-+	KUNIT_EXPECT_EQ(test, -ENOENT,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x1040,
-+						&test_x86_64_arch, &row));
-+}
-+
-+static void test_cfi_fp_and_remember_restore(struct kunit *test)
-+{
-+	/*
-+	 * Simulate an FP frame with a mid-function shrink-wrapped epilogue:
-+	 *   0x2001: def_cfa_offset 16, offset rbp at cfa-16
-+	 *   0x2004: def_cfa_register rbp
-+	 *   0x2010: remember_state; def_cfa rsp, 8; restore rbp (early ret)
-+	 *   0x2012: restore_state (cold tail still uses rbp frame)
-+	 */
-+	static const u8 insns[] = {
-+		0x40 | 1,		/* advance 1 -> 0x2001 */
-+		0x0e, 16,		/* def_cfa_offset 16 */
-+		0x80 | 6, 2,		/* offset rbp(6), cfa-16 */
-+		0x40 | 3,		/* advance 3 -> 0x2004 */
-+		0x0d, 6,		/* def_cfa_register rbp(6) */
-+		0x40 | 12,		/* advance 12 -> 0x2010 */
-+		0x0a,			/* DW_CFA_remember_state */
-+		0x0c, 7, 8,		/* def_cfa rsp(7), 8 */
-+		0xc0 | 6,		/* restore rbp(6) */
-+		0x40 | 2,		/* advance 2 -> 0x2012 */
-+		0x0b,			/* DW_CFA_restore_state */
-+	};
-+	struct test_eh_blob blob;
-+	struct dwarf_cfi_row row;
-+
-+	build_test_eh_blob(&blob, "zR", 0x04, 0x2000, 0x30, insns, sizeof(insns));
-+
-+	/* In body (0x2008): CFA = rbp + 16, FP = *(cfa - 16) */
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x2008,
-+						&test_x86_64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_base, DWARF_CFI_BASE_FP);
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 16);
-+	KUNIT_EXPECT_EQ(test, row.fp_rule, DWARF_CFI_RULE_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.fp_off, -16);
-+
-+	/* At early ret (0x2011): CFA = rsp + 8, FP restored to SAME */
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x2011,
-+						&test_x86_64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_base, DWARF_CFI_BASE_SP);
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 8);
-+	KUNIT_EXPECT_EQ(test, row.fp_rule, DWARF_CFI_RULE_SAME);
-+
-+	/* After restore_state (0x2020): back to CFA = rbp + 16, FP at cfa-16 */
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x2020,
-+						&test_x86_64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_base, DWARF_CFI_BASE_FP);
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 16);
-+	KUNIT_EXPECT_EQ(test, row.fp_rule, DWARF_CFI_RULE_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.fp_off, -16);
-+}
-+
-+static void test_cfi_drap_realigned_frame(struct kunit *test)
-+{
-+	/*
-+	 * Simulate GCC x86-64 DRAP stack-realigned function (e.g. shrink_lruvec):
-+	 *   0x2805: def_cfa r10, 0
-+	 *   0x2810: DW_CFA_expression rbp(6), [DW_OP_breg6(0x76), 0]
-+	 *   0x281a: DW_CFA_def_cfa_expression [DW_OP_breg6(0x76), -40(0x58), DW_OP_deref(0x06)]
-+	 *           DW_CFA_expression r12(12), [DW_OP_breg6(0x76), -32(0x60)] (ignored)
-+	 */
-+	static const u8 insns[] = {
-+		0x40 | 5,			/* advance 5 -> 0x2805 */
-+		0x0c, 10, 0,			/* def_cfa r10(10), 0 */
-+		0x40 | 11,			/* advance 11 -> 0x2810 */
-+		0x10, 6, 2, 0x76, 0x00,		/* expression rbp: breg6 + 0 */
-+		0x40 | 10,			/* advance 10 -> 0x281a */
-+		0x0f, 3, 0x76, 0x58, 0x06,	/* def_cfa_expr: *(breg6 - 40) */
-+		0x10, 12, 2, 0x76, 0x60,	/* expression r12: ignored */
-+	};
-+	struct test_eh_blob blob;
-+	struct dwarf_cfi_row row;
-+
-+	build_test_eh_blob(&blob, "zR", 0x04, 0x2800, 0x40, insns, sizeof(insns));
-+
-+	/* Transient prologue at 0x2806: DWARF_CFI_BASE_REG (r10) */
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x2806,
-+						&test_x86_64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_base, DWARF_CFI_BASE_REG);
-+	KUNIT_EXPECT_EQ(test, row.cfa_reg, 10);
-+
-+	/* Function body at 0x2820: CFA = *(rbp - 40), FP = *(rbp + 0) */
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x2820,
-+						&test_x86_64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_base, DWARF_CFI_BASE_FP_INDIRECT);
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, -40);
-+	KUNIT_EXPECT_EQ(test, row.fp_rule, DWARF_CFI_RULE_FP_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.fp_off, 0);
-+}
-+
-+static void test_cfi_sigreturn_frame(struct kunit *test)
-+{
-+	/*
-+	 * Matches glibc x86-64 __restore_rt ("zRS") FDE:
-+	 *   DW_CFA_def_cfa_expression [DW_OP_breg7 + 160, DW_OP_deref]
-+	 *   DW_CFA_expression r6 (rbp), [DW_OP_breg7 + 120]
-+	 *   DW_CFA_expression r7 (rsp), [DW_OP_breg7 + 160]
-+	 *   DW_CFA_expression r16 (rip), [DW_OP_breg7 + 168]
-+	 */
-+	static const u8 sig_insns[] = {
-+		0x0f, 4, 0x77, 0xa0, 0x01, 0x06,
-+		0x10, 6, 3, 0x77, 0xf8, 0x00,
-+		0x10, 7, 3, 0x77, 0xa0, 0x01,
-+		0x10, 16, 3, 0x77, 0xa8, 0x01,
-+	};
-+	/*
-+	 * Matches 32-bit x86 vdso32 __kernel_rt_sigreturn ("zRS", data_align=-4):
-+	 *   DW_CFA_def_cfa esp(4), 160 (&sigcontext)
-+	 *   DW_CFA_offset_extended_sf eip(8), -14 (+56)
-+	 *   DW_CFA_offset_extended_sf esp(4), -7  (+28)
-+	 *   DW_CFA_offset_extended_sf ebp(5), -6  (+24)
-+	 */
-+	static const u8 vdso32_cie[] = { 0x0c, 4, 4 };
-+	static const u8 vdso32_sig_insns[] = {
-+		0x0c, 4, 0xa0, 0x01,
-+		0x11, 8, 0x72,
-+		0x11, 4, 0x79,
-+		0x11, 5, 0x7a,
-+	};
-+	struct test_eh_blob blob;
-+	struct dwarf_cfi_row row;
-+
-+	build_test_eh_blob(&blob, "zRS", 0x04, 0x2c00, 0x10,
-+			   sig_insns, sizeof(sig_insns));
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x2c01,
-+						&test_x86_64_arch, &row));
-+	KUNIT_EXPECT_TRUE(test, row.signal);
-+	KUNIT_EXPECT_EQ(test, row.cfa_base, DWARF_CFI_BASE_SP_INDIRECT);
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 160);
-+	KUNIT_EXPECT_EQ(test, row.fp_rule, DWARF_CFI_RULE_SP_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.fp_off, 120);
-+	KUNIT_EXPECT_EQ(test, row.ra_rule, DWARF_CFI_RULE_SP_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.ra_off, 168);
-+
-+	build_arch_eh_blob(&blob, &test_i386_arch, /*code_align=*/1,
-+			   /*data_align_sleb=*/0x7c, "zRS", /*fde_enc=*/0x03,
-+			   vdso32_cie, sizeof(vdso32_cie), /*init_pc=*/0x2d00,
-+			   /*pc_range=*/0x08, vdso32_sig_insns,
-+			   sizeof(vdso32_sig_insns));
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x2d00,
-+						&test_i386_arch, &row));
-+	KUNIT_EXPECT_TRUE(test, row.signal);
-+	KUNIT_EXPECT_EQ(test, row.cfa_base, DWARF_CFI_BASE_SP);
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 160);
-+	KUNIT_EXPECT_EQ(test, row.sp_rule, DWARF_CFI_RULE_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.sp_off, 28);
-+	KUNIT_EXPECT_EQ(test, row.fp_rule, DWARF_CFI_RULE_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.fp_off, 24);
-+	KUNIT_EXPECT_EQ(test, row.ra_rule, DWARF_CFI_RULE_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.ra_off, 56);
-+}
-+
-+static void test_cfi_arm64_pac_and_riscv_leaf(struct kunit *test)
-+{
-+	/*
-+	 * AArch64 CIE: code_align=4, data_align=-8 (0x78), ra_reg=30,
-+	 * initial: DW_CFA_def_cfa sp(31), 0 (RA starts as SAME in x30).
-+	 * FDE at 0x4000..0x4020:
-+	 *   +4  (0x4004): paciasp -> DW_CFA_AARCH64_negate_ra_state (0x2d)
-+	 *   +8  (0x4008): stp x29,x30,[sp,#-32]! -> cfa=sp+32, x29@-32, x30@-24, x19@-16
-+	 *   +24 (0x4018): ldp x29,x30,[sp],#32   -> restore x19/x29/x30, cfa=sp+0
-+	 *   +28 (0x401c): autiasp -> DW_CFA_AARCH64_negate_ra_state (0x2d)
-+	 */
-+	static const u8 arm64_cie[] = { 0x0c, 31, 0 };
-+	static const u8 arm64_fde[] = {
-+		0x41, 0x2d,
-+		0x41, 0x0e, 32, 0x80 | 29, 4, 0x80 | 30, 3, 0x80 | 19, 2,
-+		0x44, 0xc0 | 19, 0xc0 | 29, 0xc0 | 30, 0x0e, 0,
-+		0x41, 0x2d,
-+	};
-+	/*
-+	 * RISC-V CIE: code_align=1, data_align=-4 (0x7c), ra_reg=1,
-+	 * initial: DW_CFA_def_cfa sp(2), 0 (RA starts as SAME in x1/ra).
-+	 * FDE at 0x5000..0x501a:
-+	 *   +2 (0x5002): c.addi16sp -16 -> cfa=sp+16
-+	 *   +6 (0x5006): sd s0, 0(sp); sd ra, 8(sp) -> s0(8)@-16, ra(1)@-8
-+	 */
-+	static const u8 rv_cie[] = { 0x0c, 2, 0 };
-+	static const u8 rv_fde[] = {
-+		0x42, 0x0e, 16,
-+		0x44, 0x80 | 8, 4, 0x80 | 1, 2,
-+	};
-+	struct test_eh_blob blob;
-+	struct dwarf_cfi_row row;
-+
-+	build_arch_eh_blob(&blob, &test_arm64_arch, /*code_align=*/4,
-+			   /*data_align_sleb=*/0x78, "zR", /*fde_enc=*/0x04,
-+			   arm64_cie, sizeof(arm64_cie), /*init_pc=*/0x4000,
-+			   /*pc_range=*/0x20, arm64_fde, sizeof(arm64_fde));
-+
-+	/* Entry leaf state at 0x4000: CFA=sp+0, RA=SAME (unsigned) */
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x4000,
-+						&test_arm64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_base, DWARF_CFI_BASE_SP);
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 0);
-+	KUNIT_EXPECT_EQ(test, row.ra_rule, DWARF_CFI_RULE_SAME);
-+	KUNIT_EXPECT_FALSE(test, row.ra_signed);
-+
-+	/* Body at 0x400c: CFA=sp+32, FP@cfa-32, RA@cfa-24 (PAC-signed) */
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x400c,
-+						&test_arm64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 32);
-+	KUNIT_EXPECT_EQ(test, row.fp_rule, DWARF_CFI_RULE_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.fp_off, -32);
-+	KUNIT_EXPECT_EQ(test, row.ra_rule, DWARF_CFI_RULE_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.ra_off, -24);
-+	KUNIT_EXPECT_TRUE(test, row.ra_signed);
-+
-+	/* Epilogue after autiasp at 0x401c: CFA=sp+0, RA=SAME (unsigned) */
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x401c,
-+						&test_arm64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 0);
-+	KUNIT_EXPECT_EQ(test, row.ra_rule, DWARF_CFI_RULE_SAME);
-+	KUNIT_EXPECT_FALSE(test, row.ra_signed);
-+
-+	/* DW_CFA_AARCH64_negate_ra_state (0x2d) must be rejected on x86_64 */
-+	KUNIT_EXPECT_EQ(test, -EINVAL,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x400c,
-+						&test_x86_64_arch, &row));
-+
-+	/* RISC-V leaf + non-leaf prologue */
-+	build_arch_eh_blob(&blob, &test_riscv64_arch, /*code_align=*/1,
-+			   /*data_align_sleb=*/0x7c, "zR", /*fde_enc=*/0x04,
-+			   rv_cie, sizeof(rv_cie), /*init_pc=*/0x5000,
-+			   /*pc_range=*/0x1a, rv_fde, sizeof(rv_fde));
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x5000,
-+						&test_riscv64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 0);
-+	KUNIT_EXPECT_EQ(test, row.ra_rule, DWARF_CFI_RULE_SAME);
-+
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x5008,
-+						&test_riscv64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, row.cfa_off, 16);
-+	KUNIT_EXPECT_EQ(test, row.fp_rule, DWARF_CFI_RULE_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.fp_off, -16);
-+	KUNIT_EXPECT_EQ(test, row.ra_rule, DWARF_CFI_RULE_OFFSET);
-+	KUNIT_EXPECT_EQ(test, row.ra_off, -8);
-+}
-+
-+static void test_cfi_security_rejections(struct kunit *test)
-+{
-+	/* 1. Arbitrary DW_CFA_def_cfa_expression must be rejected */
-+	static const u8 expr_insns[] = { 0x0f, 0x01, 0x57 };
-+	/* 2. Arbitrary DW_CFA_expression on RA (rip=16) must be rejected */
-+	static const u8 ra_expr_insns[] = { 0x10, 16, 2, 0x76, 0x00 };
-+	/* 3. Excessive remember_state nesting (> 4) must be rejected */
-+	static const u8 deep_state_insns[] = { 0x0a, 0x0a, 0x0a, 0x0a, 0x0a };
-+	/* 4. DW_CFA_set_loc must be rejected */
-+	static const u8 set_loc_insns[] = { 0x01, 0, 0, 0, 0, 0, 0, 0, 0 };
-+	/* 7. 5-byte SLEB128 outside s32 range (5th byte 0x08 / 0x77) must return -EOVERFLOW */
-+	static const u8 sleb_pos_ovf[] = { 0x13, 0x80, 0x80, 0x80, 0x80, 0x08 };
-+	static const u8 sleb_neg_ovf[] = { 0x13, 0x80, 0x80, 0x80, 0x80, 0x77 };
-+	/* 8. DW_CFA_def_cfa_offset after indirect CFA expression must return -EINVAL */
-+	static const u8 def_off_after_ind[] = { 0x0f, 3, 0x76, 0x58, 0x06, 0x0e, 16 };
-+	struct test_eh_blob blob;
-+	struct dwarf_cfi_row row;
-+
-+	build_test_eh_blob(&blob, "zR", 0x04, 0x3000, 0x20,
-+			   expr_insns, sizeof(expr_insns));
-+	KUNIT_EXPECT_EQ(test, -EINVAL,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x3004,
-+						&test_x86_64_arch, &row));
-+
-+	build_test_eh_blob(&blob, "zR", 0x04, 0x3000, 0x20,
-+			   ra_expr_insns, sizeof(ra_expr_insns));
-+	KUNIT_EXPECT_EQ(test, -EINVAL,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x3004,
-+						&test_x86_64_arch, &row));
-+
-+	build_test_eh_blob(&blob, "zR", 0x04, 0x3000, 0x20,
-+			   deep_state_insns, sizeof(deep_state_insns));
-+	KUNIT_EXPECT_EQ(test, -EINVAL,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x3004,
-+						&test_x86_64_arch, &row));
-+
-+	build_test_eh_blob(&blob, "zR", 0x04, 0x3000, 0x20,
-+			   set_loc_insns, sizeof(set_loc_insns));
-+	KUNIT_EXPECT_EQ(test, -EINVAL,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x3004,
-+						&test_x86_64_arch, &row));
-+
-+	/* 5. DW_EH_PE_indirect (0x80) in CIE 'R' encoding must be rejected */
-+	build_test_eh_blob(&blob, "zR", /*fde_enc=*/0x80 | 0x04,
-+			   /*init_pc=*/0x3000, /*pc_range=*/0x20,
-+			   /*fde_insns=*/NULL, /*fde_insns_len=*/0);
-+	KUNIT_EXPECT_EQ(test, -EINVAL,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x3004,
-+						&test_x86_64_arch, &row));
-+
-+	/* 6. Out-of-bounds FDE pointers (fde >= eh_end or fde < eh_start) must not underflow */
-+	build_test_eh_blob(&blob, "zR", /*fde_enc=*/0x04, /*init_pc=*/0x3000,
-+			   /*pc_range=*/0x20, /*fde_insns=*/NULL,
-+			   /*fde_insns_len=*/0);
-+	KUNIT_EXPECT_EQ(test, -EINVAL,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.total_len + 64, blob.buf,
-+						blob.buf + blob.total_len, 0x3004,
-+						&test_x86_64_arch, &row));
-+	KUNIT_EXPECT_EQ(test, -EINVAL,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.total_len, blob.buf,
-+						blob.buf + blob.total_len, 0x3004,
-+						&test_x86_64_arch, &row));
-+
-+	build_test_eh_blob(&blob, "zR", 0x04, 0x3000, 0x20,
-+			   sleb_pos_ovf, sizeof(sleb_pos_ovf));
-+	KUNIT_EXPECT_EQ(test, -EOVERFLOW,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x3004,
-+						&test_x86_64_arch, &row));
-+
-+	build_test_eh_blob(&blob, "zR", 0x04, 0x3000, 0x20,
-+			   sleb_neg_ovf, sizeof(sleb_neg_ovf));
-+	KUNIT_EXPECT_EQ(test, -EOVERFLOW,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x3004,
-+						&test_x86_64_arch, &row));
-+
-+	build_test_eh_blob(&blob, "zR", 0x04, 0x3000, 0x20,
-+			   def_off_after_ind, sizeof(def_off_after_ind));
-+	KUNIT_EXPECT_EQ(test, -EINVAL,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len, 0x3004,
-+						&test_x86_64_arch, &row));
-+
-+	/*
-+	 * 9. Slow-path DW_EH_PE_sdata4 (0x0b) FDE pc_range with bit 31 set
-+	 * (0xffffffe0) must be decoded unsigned rather than sign-extending to
-+	 * 0xffffffffffffffe0 on 64-bit platforms.
-+	 */
-+#ifdef CONFIG_64BIT
-+	build_test_eh_blob(&blob, "zR", /*fde_enc=*/0x0b,
-+			   /*init_pc=*/0x10, /*pc_range=*/0xffffffe0UL,
-+			   /*fde_insns=*/NULL, /*fde_insns_len=*/0);
-+	KUNIT_EXPECT_EQ(test, -ENOENT,
-+			dwarf_cfi_eval_fde_kmem(blob.buf + blob.fde_off, blob.buf,
-+						blob.buf + blob.total_len,
-+						0x100000000UL, &test_x86_64_arch,
-+						&row));
++#define unwind_user_strip_pac unwind_user_strip_pac
 +#endif
-+}
 +
-+static void test_cfi_scan_eh_frame(struct kunit *test)
++#ifndef unwind_user_sigreturn
++/**
++ * unwind_user_sigreturn() - Default stub for arch signal-trampoline unwinding
++ * @state: Current user unwind state.
++ *
++ * Return: false on architectures whose signal trampolines unwind via CFI/FP.
++ */
++static inline bool unwind_user_sigreturn(struct unwind_user_state *state)
 +{
-+	const struct dwarf_cfi_arch native_arch = {
-+		.ws	= sizeof(unsigned long),
-+		.sp_reg	= 7,
-+		.fp_reg	= 6,
-+		.ra_reg	= 16,
-+	};
-+	static const u8 cie_insns[] = { 0x0c, 7, sizeof(unsigned long) };
-+	struct test_eh_blob b1, b2;
-+	struct eh_frame_hdr_entry entries[2];
-+	u8 combined[512];
-+	unsigned long base;
-+	unsigned int count = 0;
-+	size_t fde2_len;
-+
-+	base = (unsigned long)combined;
-+	build_arch_eh_blob(&b1, &native_arch, /*code_align=*/1,
-+			   /*data_align_sleb=*/0x78, "zR", /*fde_enc=*/0x00,
-+			   cie_insns, sizeof(cie_insns), base + 0x100, 0x20,
-+			   /*fde_insns=*/NULL, /*fde_insns_len=*/0);
-+	build_arch_eh_blob(&b2, &native_arch, /*code_align=*/1,
-+			   /*data_align_sleb=*/0x78, "zR", /*fde_enc=*/0x00,
-+			   cie_insns, sizeof(cie_insns), base + 0x200, 0x30,
-+			   /*fde_insns=*/NULL, /*fde_insns_len=*/0);
-+
-+	memset(combined, 0, sizeof(combined));
-+	memcpy(combined, b1.buf, b1.total_len);
-+	fde2_len = b2.total_len - b2.fde_off;
-+	memcpy(combined + b1.total_len, b2.buf + b2.fde_off, fde2_len);
-+	/* Point second FDE's CIE_pointer back to the shared CIE at offset 0 */
-+	put_unaligned_le32((u32)(b1.total_len + 4), combined + b1.total_len + 4);
-+
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_scan_eh_frame_kmem(combined,
-+						     b1.total_len + fde2_len + 4,
-+						     &native_arch, base,
-+						     /*entries=*/NULL,
-+						     /*max_entries=*/0, &count));
-+	KUNIT_EXPECT_EQ(test, count, 2U);
-+
-+	KUNIT_EXPECT_EQ(test, -ENOSPC,
-+			dwarf_cfi_scan_eh_frame_kmem(combined,
-+						     b1.total_len + fde2_len + 4,
-+						     &native_arch, base, entries,
-+						     /*max_entries=*/1, &count));
-+
-+	KUNIT_ASSERT_EQ(test, 0,
-+			dwarf_cfi_scan_eh_frame_kmem(combined,
-+						     b1.total_len + fde2_len + 4,
-+						     &native_arch, base, entries,
-+						     ARRAY_SIZE(entries), &count));
-+	KUNIT_EXPECT_EQ(test, count, 2U);
-+	KUNIT_EXPECT_EQ(test, entries[0].start_off, 0x100);
-+	KUNIT_EXPECT_EQ(test, entries[0].fde_off, (s32)b1.fde_off);
-+	KUNIT_EXPECT_EQ(test, entries[1].start_off, 0x200);
-+	KUNIT_EXPECT_EQ(test, entries[1].fde_off, (s32)b1.total_len);
++	return false;
 +}
 +
-+#ifdef CONFIG_STACKTRACE
-+struct live_walk_ctx {
-+	unsigned long *entries;
-+	unsigned int size;
-+	unsigned long leaf_ip;
-+	unsigned long realign_ip;
-+	unsigned long mid_ip;
-+	unsigned long caller_ip;
-+	unsigned long caller_addr0;
-+	unsigned long caller_addr1;
-+};
++#define unwind_user_sigreturn unwind_user_sigreturn
++#endif
 +
-+static noinline unsigned int unwind_test_leaf(struct live_walk_ctx *ctx)
-+{
-+	unsigned int nr;
-+
-+	nr = stack_trace_save(ctx->entries, ctx->size, /*skipnr=*/0);
-+	ctx->caller_addr0 = CALLER_ADDR0;
-+	ctx->caller_addr1 = CALLER_ADDR1;
-+	ctx->leaf_ip = record_here_ip();
-+	OPTIMIZER_HIDE_VAR(nr);
-+	return nr;
-+}
-+
-+static noinline unsigned int unwind_test_realigned(struct live_walk_ctx *ctx)
-+{
-+	/* Force dynamic stack realignment (DRAP) on 8-byte aligned kernel stack */
-+	u8 __aligned(64) aligned_buf[64];
-+	unsigned int nr;
-+
-+	aligned_buf[0] = (u8)ctx->size;
-+	asm volatile("" : "+m"(aligned_buf) :: "memory");
-+	nr = unwind_test_leaf(ctx);
-+	ctx->realign_ip = record_here_ip();
-+	OPTIMIZER_HIDE_VAR(nr);
-+	return nr;
-+}
-+
-+static noinline unsigned int unwind_test_mid(struct live_walk_ctx *ctx,
-+					     int depth)
-+{
-+	unsigned long local_buf[4];
-+	unsigned int nr;
-+
-+	local_buf[0] = depth;
-+	asm volatile("" : "+m"(local_buf) :: "memory");
-+	if (depth > 1)
-+		nr = unwind_test_mid(ctx, depth - 1);
-+	else
-+		nr = unwind_test_realigned(ctx);
-+	ctx->mid_ip = record_here_ip();
-+	OPTIMIZER_HIDE_VAR(nr);
-+	return nr;
-+}
-+
-+static inline bool ip_within(unsigned long ip, unsigned long ref_ip)
-+{
-+	return ip + 256 >= ref_ip && ip <= ref_ip + 256;
-+}
-+
-+static void test_live_kernel_stack_walk(struct kunit *test)
-+{
-+	unsigned long entries[32];
-+	struct live_walk_ctx ctx = {
-+		.entries = entries,
-+		.size = ARRAY_SIZE(entries),
-+	};
-+	unsigned int nr, i;
-+	int rel_nr;
-+	bool saw_leaf = false, saw_realign = false, saw_mid = false, saw_caller = false;
-+
-+	nr = unwind_test_mid(&ctx, /*depth=*/3);
-+	ctx.caller_ip = record_here_ip();
-+	KUNIT_ASSERT_GT(test, nr, 4U);
-+
-+	for (i = 0; i < nr; i++) {
-+		unsigned long sym_ip = entries[i];
-+
-+		if (ip_within(sym_ip, ctx.leaf_ip))
-+			saw_leaf = true;
-+		if (ip_within(sym_ip, ctx.realign_ip))
-+			saw_realign = true;
-+		if (ip_within(sym_ip, ctx.mid_ip))
-+			saw_mid = true;
-+		if (ip_within(sym_ip, ctx.caller_ip))
-+			saw_caller = true;
-+	}
-+
-+	KUNIT_EXPECT_TRUE(test, saw_leaf);
-+	KUNIT_EXPECT_TRUE(test, saw_realign);
-+	KUNIT_EXPECT_TRUE(test, saw_mid);
-+	KUNIT_EXPECT_TRUE(test, saw_caller);
-+	KUNIT_EXPECT_TRUE(test, ip_within(ctx.caller_addr0, ctx.realign_ip));
-+	if (ctx.caller_addr1)
-+		KUNIT_EXPECT_TRUE(test, ip_within(ctx.caller_addr1, ctx.mid_ip));
-+
-+	if (IS_ENABLED(CONFIG_HAVE_RELIABLE_STACKTRACE)) {
-+		rel_nr = stack_trace_save_tsk_reliable(current, entries,
-+						       ARRAY_SIZE(entries));
-+		KUNIT_EXPECT_GT(test, rel_nr, 0);
-+	}
-+}
++#ifdef CONFIG_HAVE_UNWIND_USER_CFI
++int unwind_user_next_cfi(struct unwind_user_state *state,
++			 struct unwind_user_frame *out_frame, bool *out_signal);
 +#else
-+static void test_live_kernel_stack_walk(struct kunit *test)
++static inline int unwind_user_next_cfi(struct unwind_user_state *state,
++				       struct unwind_user_frame *out_frame,
++				       bool *out_signal)
 +{
-+	kunit_skip(test, "CONFIG_STACKTRACE disabled");
++	return -EINVAL;
 +}
-+#endif /* CONFIG_STACKTRACE */
++#endif
 +
-+static struct kunit_case dwarf_cfi_test_cases[] = {
-+	KUNIT_CASE(test_cfi_sp_and_ignored_gprs),
-+	KUNIT_CASE(test_cfi_fp_and_remember_restore),
-+	KUNIT_CASE(test_cfi_drap_realigned_frame),
-+	KUNIT_CASE(test_cfi_sigreturn_frame),
-+	KUNIT_CASE(test_cfi_arm64_pac_and_riscv_leaf),
-+	KUNIT_CASE(test_cfi_security_rejections),
-+	KUNIT_CASE(test_cfi_scan_eh_frame),
-+	KUNIT_CASE(test_live_kernel_stack_walk),
-+	{}
+ int unwind_user(struct unwind_stacktrace *trace, unsigned int max_entries);
+ 
+ #endif /* _LINUX_UNWIND_USER_H */
+diff --git a/include/linux/unwind_user_types.h b/include/linux/unwind_user_types.h
+index 412729a269bc..b78b86f8d423 100644
+--- a/include/linux/unwind_user_types.h
++++ b/include/linux/unwind_user_types.h
+@@ -4,41 +4,132 @@
+ 
+ #include <linux/types.h>
+ 
+-/*
+- * Unwind types, listed in priority order: lower numbers are attempted first if
+- * available.
++/**
++ * enum unwind_user_type_bits - Priority bit indices for user-space unwinders
++ * @UNWIND_USER_TYPE_CFI_BIT: Bit index for Minimal DWARF CFI (.eh_frame_hdr).
++ * @UNWIND_USER_TYPE_FP_BIT: Bit index for architectural frame-pointer chains.
++ * @NR_UNWIND_USER_TYPE_BITS: Total number of user-space unwind method bits.
++ *
++ * Listed in priority order: lower bit indices are attempted first on each
++ * frame when enabled in &unwind_user_state.available_types.
+  */
+ enum unwind_user_type_bits {
+-	UNWIND_USER_TYPE_FP_BIT =		0,
++	UNWIND_USER_TYPE_CFI_BIT =		0,
++	UNWIND_USER_TYPE_FP_BIT =		1,
+ 
+ 	NR_UNWIND_USER_TYPE_BITS,
+ };
+ 
++/**
++ * enum unwind_user_type - Bitmask values identifying a user-space unwind method
++ * @UNWIND_USER_TYPE_NONE: No active unwind method (initial or terminal state).
++ * @UNWIND_USER_TYPE_CFI: Unwind using Minimal DWARF CFI via PT_GNU_EH_FRAME.
++ * @UNWIND_USER_TYPE_FP: Unwind using architectural frame-pointer records.
++ */
+ enum unwind_user_type {
+-	/* Type "none" for the start of stack walk iteration. */
+ 	UNWIND_USER_TYPE_NONE =			0,
++	UNWIND_USER_TYPE_CFI =			BIT(UNWIND_USER_TYPE_CFI_BIT),
+ 	UNWIND_USER_TYPE_FP =			BIT(UNWIND_USER_TYPE_FP_BIT),
+ };
+ 
++/**
++ * struct unwind_stacktrace - Captured user-space callchain buffer
++ * @nr: Number of instruction pointers stored in @entries.
++ * @entries: Caller-allocated array of user instruction pointers.
++ */
+ struct unwind_stacktrace {
+ 	unsigned int	nr;
+ 	unsigned long	*entries;
+ };
+ 
++/**
++ * struct unwind_user_frame - Evaluated unwind rule for stepping one user frame
++ * @cfa_off: Byte offset added to FP (when @use_fp is true) or SP to form CFA.
++ * @sp_off: Byte offset from CFA to saved caller SP when @sp_from_cfa is true.
++ * @ra_off: Byte offset from CFA (or SP when @ra_from_sp is true) to saved RA.
++ * @fp_off: Byte offset from CFA, FP, or SP to saved caller FP (0 if unchanged,
++ *          unless @fp_from_fp or @fp_from_sp is set).
++ * @use_fp: True if the CFA base register is FP rather than SP.
++ * @cfa_indirect: True if the computed CFA address must be dereferenced once in
++ *                user memory (DRAP or signal trampoline frame).
++ * @sp_from_cfa: True if saved SP is located at *(cfa + @sp_off) (e.g. vdso32
++ *               sigreturn frame where CFA points at sigcontext).
++ * @fp_from_fp: True if saved FP is located at *(state->fp + @fp_off).
++ * @fp_from_sp: True if saved FP is located at *(old_sp + @fp_off).
++ * @ra_from_sp: True if saved RA is located at *(old_sp + @ra_off).
++ * @ra_from_reg: True if RA is still in @state->ra rather than on the stack.
++ * @ra_signed: True if the recovered RA carries an AArch64 PAC signature.
++ */
+ struct unwind_user_frame {
+ 	s32 cfa_off;
++	s32 sp_off;
+ 	s32 ra_off;
+ 	s32 fp_off;
+ 	bool use_fp;
++	bool cfa_indirect;
++	bool sp_from_cfa;
++	bool fp_from_fp;
++	bool fp_from_sp;
++	bool ra_from_sp;
++	bool ra_from_reg;
++	bool ra_signed;
 +};
 +
-+static struct kunit_suite dwarf_cfi_test_suite = {
-+	.name = "unwind_dwarf_cfi",
-+	.test_cases = dwarf_cfi_test_cases,
-+};
++/**
++ * struct unwind_user_cfi_cache - Per-walk cache entry mapping a VMA to EH_FRAME
++ * @vma_start: Start virtual address of the cached executable VMA.
++ * @vma_end: End virtual address (exclusive) of the cached executable VMA.
++ * @eh_hdr_uaddr: User virtual address of PT_GNU_EH_FRAME (0 for negative cache
++ *                entries when an executable VMA has no PT_GNU_EH_FRAME).
++ * @eh_hdr_size: Size in bytes of the PT_GNU_EH_FRAME segment.
++ * @valid: True if this cache slot holds a populated entry.
++ */
++struct unwind_user_cfi_cache {
++	unsigned long	vma_start;
++	unsigned long	vma_end;
++	unsigned long	eh_hdr_uaddr;
++	size_t		eh_hdr_size;
++	bool		valid;
+ };
+ 
++#define UNWIND_USER_MAX_SIGNALS	4U
 +
-+kunit_test_suites(&dwarf_cfi_test_suite);
++/**
++ * struct unwind_user_state - Iteration state for a user-space stack walk
++ * @ip: Current frame's user instruction pointer.
++ * @sp: Current frame's user stack pointer.
++ * @fp: Current frame's user frame pointer.
++ * @ra: Link register value for leaf/topmost frames when @ra_valid is true.
++ * @ws: User word size in bytes (4 for compat 32-bit tasks, 8 for 64-bit tasks).
++ * @current_type: Unwind method used for the current step.
++ * @available_types: Bitmask of &enum unwind_user_type methods available.
++ * @cfi_cache_next: Round-robin replacement cursor into @cfi_cache.
++ * @cfi_cache: Small per-walk cache of executable VMA PT_GNU_EH_FRAME lookups.
++ * @nr_signals: Number of signal frames unwound so far during this walk.
++ * @ra_valid: True if @ra holds a live link register value for this frame.
++ * @sp_valid: True if @sp holds the exact stack pointer of the current frame;
++ *            false after an architectural FP step that only establishes a lower
++ *            bound on the caller's SP.
++ * @signal: True if the current frame was entered from a signal trampoline, so
++ *          @ip points directly at the interrupted instruction rather than
++ *          immediately after a call instruction.
++ * @topmost: True when unwinding the innermost interrupted user frame.
++ * @done: True once the stack walk has reached the bottom or terminated.
++ */
+ struct unwind_user_state {
+ 	unsigned long				ip;
+ 	unsigned long				sp;
+ 	unsigned long				fp;
++	unsigned long				ra;
+ 	unsigned int				ws;
+ 	enum unwind_user_type			current_type;
+ 	unsigned int				available_types;
++	unsigned int				cfi_cache_next;
++	struct unwind_user_cfi_cache		cfi_cache[4];
++	unsigned int				nr_signals;
++	bool					ra_valid;
++	bool					sp_valid;
++	bool					signal;
+ 	bool					topmost;
+ 	bool					done;
+ };
+diff --git a/kernel/unwind/Makefile b/kernel/unwind/Makefile
+index 73a1ccc2ad77..954083868790 100644
+--- a/kernel/unwind/Makefile
++++ b/kernel/unwind/Makefile
+@@ -9,4 +9,5 @@ KCOV_INSTRUMENT_dwarf_cfi.o := n
+ 
+ obj-$(CONFIG_UNWIND_DWARF_CFI)		+= dwarf_cfi.o
+ obj-$(CONFIG_UNWIND_USER)		+= user.o deferred.o
++obj-$(CONFIG_HAVE_UNWIND_USER_CFI)	+= user_cfi.o
+ obj-$(CONFIG_UNWIND_DWARF_CFI_KUNIT_TEST) += dwarf_cfi_kunit.o
+diff --git a/kernel/unwind/user.c b/kernel/unwind/user.c
+index 90ab3c1a205e..4a3db15970f2 100644
+--- a/kernel/unwind/user.c
++++ b/kernel/unwind/user.c
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*
+-* Generic interfaces for unwinding user space
+-*/
++ * Generic interfaces for unwinding user space.
++ */
+ #include <linux/kernel.h>
+ #include <linux/sched.h>
+ #include <linux/sched/task_stack.h>
+@@ -11,14 +11,25 @@
+ #define for_each_user_frame(state) \
+ 	for (unwind_user_start(state); !(state)->done; unwind_user_next(state))
+ 
++/**
++ * get_user_word() - Read a native or compat-sized word from the user stack
++ * @word: Output zero-extended word value.
++ * @base: Base user virtual address.
++ * @off: Signed byte offset from @base.
++ * @ws: Word size in bytes (4 for compat 32-bit tasks, sizeof(long) otherwise).
++ *
++ * Return: 0 on success, or -EFAULT if the user memory access faults.
++ */
+ static inline int
+ get_user_word(unsigned long *word, unsigned long base, int off, unsigned int ws)
+ {
+ 	unsigned long __user *addr = (void __user *)base + off;
 +
-+MODULE_DESCRIPTION("KUnit tests for Minimal DWARF CFI unwinder");
-+MODULE_LICENSE("GPL");
+ #ifdef CONFIG_COMPAT
+ 	if (ws == sizeof(int)) {
+ 		unsigned int data;
+ 		int ret = get_user(data, (unsigned int __user *)addr);
++
+ 		*word = data;
+ 		return ret;
+ 	}
+@@ -26,62 +37,147 @@ get_user_word(unsigned long *word, unsigned long base, int off, unsigned int ws)
+ 	return get_user(*word, addr);
+ }
+ 
++/**
++ * unwind_user_next_common() - Apply an evaluated &struct unwind_user_frame rule
++ * @state: Current user unwind state to advance to the caller frame.
++ * @frame: Frame CFA, SP, RA, and FP recovery rule.
++ * @signal: True if @frame unwinds a signal trampoline (allowing bounded stack
++ *          switching across alternate signal stacks).
++ *
++ * Computes the caller's CFA, validates alignment and monotonic stack progress,
++ * reads and strips PAC bits from the return address, optionally recovers the
++ * saved frame pointer and stack pointer, and updates @state.
++ *
++ * Return: 0 on success, -ENOENT if the recovered return address is 0 (marking
++ * @state->done), or -EINVAL on invalid alignment, stack regression, or fault.
++ */
+ static int unwind_user_next_common(struct unwind_user_state *state,
+-				   const struct unwind_user_frame *frame)
++				   const struct unwind_user_frame *frame,
++				   bool signal)
+ {
+-	unsigned long cfa, fp, ra;
++	unsigned long old_sp = state->sp;
++	unsigned long cfa, new_sp, fp, ra;
++
++	if (signal && state->nr_signals >= UNWIND_USER_MAX_SIGNALS)
++		return -EINVAL;
+ 
+ 	/* Get the Canonical Frame Address (CFA) */
+ 	if (frame->use_fp) {
+-		if (state->fp < state->sp)
++		if (!signal && state->fp < state->sp)
+ 			return -EINVAL;
+ 		cfa = state->fp;
+ 	} else {
++		if (!state->sp_valid)
++			return -EINVAL;
+ 		cfa = state->sp;
+ 	}
+ 	cfa += frame->cfa_off;
++	if (frame->cfa_indirect && get_user_word(&cfa, cfa, /*off=*/0, state->ws))
++		return -EINVAL;
+ 
+ 	/* Make sure that stack is not going in wrong direction */
+-	if (cfa <= state->sp)
++	if (frame->ra_from_reg) {
++		if (!state->ra_valid || (!signal && cfa < state->sp))
++			return -EINVAL;
++	} else if (!signal && cfa <= state->sp) {
+ 		return -EINVAL;
++	}
+ 
+ 	/* Make sure that the address is word aligned */
+ 	if (cfa & (state->ws - 1))
+ 		return -EINVAL;
+ 
+ 	/* Get the Return Address (RA) */
+-	if (get_user_word(&ra, cfa, frame->ra_off, state->ws))
++	if (frame->ra_from_reg) {
++		ra = state->ra;
++	} else if (get_user_word(&ra, frame->ra_from_sp ? old_sp : cfa,
++				 frame->ra_off, state->ws)) {
+ 		return -EINVAL;
++	}
++	ra = unwind_user_strip_pac(ra, frame->ra_signed);
++	if (!ra) {
++		state->done = true;
++		return -ENOENT;
++	}
+ 
+ 	/* Get the Frame Pointer (FP) */
+-	if (frame->fp_off && get_user_word(&fp, cfa, frame->fp_off, state->ws))
+-		return -EINVAL;
++	if (frame->fp_from_fp) {
++		if (get_user_word(&fp, state->fp, frame->fp_off, state->ws))
++			return -EINVAL;
++	} else if (frame->fp_from_sp) {
++		if (get_user_word(&fp, old_sp, frame->fp_off, state->ws))
++			return -EINVAL;
++	} else if (frame->fp_off) {
++		if (get_user_word(&fp, cfa, frame->fp_off, state->ws))
++			return -EINVAL;
++	}
++
++	if (frame->sp_from_cfa) {
++		if (get_user_word(&new_sp, cfa, frame->sp_off, state->ws))
++			return -EINVAL;
++		if (!signal && new_sp <= state->sp)
++			return -EINVAL;
++	} else {
++		new_sp = cfa;
++	}
+ 
+ 	state->ip = ra;
+-	state->sp = cfa;
+-	if (frame->fp_off)
++	state->sp = new_sp;
++	if (frame->fp_from_fp || frame->fp_from_sp || frame->fp_off)
+ 		state->fp = fp;
++	if (signal)
++		state->nr_signals++;
++	state->signal = signal;
++	state->ra_valid = false;
+ 	state->topmost = false;
+ 	return 0;
+ }
+ 
++/**
++ * unwind_user_next_fp() - Step one user frame using architectural frame records
++ * @state: Current user unwind state.
++ *
++ * Return: 0 on success, or a negative errno from unwind_user_next_common().
++ */
+ static int unwind_user_next_fp(struct unwind_user_state *state)
+ {
+ 	struct pt_regs *regs = task_pt_regs(current);
++	int ret;
+ 
+ 	if (state->topmost && unwind_user_at_function_start(regs)) {
+ 		const struct unwind_user_frame fp_entry_frame = {
+ 			ARCH_INIT_USER_FP_ENTRY_FRAME(state->ws)
+ 		};
+-		return unwind_user_next_common(state, &fp_entry_frame);
++
++		ret = unwind_user_next_common(state, &fp_entry_frame,
++					      /*signal=*/false);
++		if (!ret)
++			state->sp_valid = true;
++		return ret;
+ 	}
+ 
+ 	const struct unwind_user_frame fp_frame = {
+ 		ARCH_INIT_USER_FP_FRAME(state->ws)
+ 	};
+-	return unwind_user_next_common(state, &fp_frame);
++
++	ret = unwind_user_next_common(state, &fp_frame, /*signal=*/false);
++	if (!ret)
++		state->sp_valid = unwind_user_fp_sets_sp();
++	return ret;
+ }
+ 
++/**
++ * unwind_user_next() - Advance @state to the next outer user-space stack frame
++ * @state: Current user unwind state.
++ *
++ * Checks architectural signal-trampoline unwinding first, then attempts each
++ * enabled method in @state->available_types in priority order (Minimal DWARF
++ * CFI first, falling back per frame to frame pointers when an executable
++ * mapping such as JIT code lacks .eh_frame_hdr).
++ *
++ * Return: 0 on success, or -EINVAL when no unwind method succeeds or the walk
++ * has reached the bottom of the stack (setting @state->done).
++ */
+ static int unwind_user_next(struct unwind_user_state *state)
+ {
+ 	unsigned long iter_mask = state->available_types;
+@@ -90,11 +186,31 @@ static int unwind_user_next(struct unwind_user_state *state)
+ 	if (state->done)
+ 		return -EINVAL;
+ 
++	if (state->nr_signals < UNWIND_USER_MAX_SIGNALS &&
++	    unwind_user_sigreturn(state)) {
++		state->sp_valid = true;
++		state->nr_signals++;
++		return 0;
++	}
++
+ 	for_each_set_bit(bit, &iter_mask, NR_UNWIND_USER_TYPE_BITS) {
+ 		enum unwind_user_type type = BIT(bit);
+ 
+ 		state->current_type = type;
+ 		switch (type) {
++		case UNWIND_USER_TYPE_CFI: {
++			struct unwind_user_frame frame;
++			bool signal = false;
++
++			if (!unwind_user_next_cfi(state, &frame, &signal) &&
++			    !unwind_user_next_common(state, &frame, signal)) {
++				state->sp_valid = true;
++				return 0;
++			}
++			if (state->done)
++				break;
++			continue;
++		}
+ 		case UNWIND_USER_TYPE_FP:
+ 			if (!unwind_user_next_fp(state))
+ 				return 0;
+@@ -112,6 +228,16 @@ static int unwind_user_next(struct unwind_user_state *state)
+ 	return -EINVAL;
+ }
+ 
++/**
++ * unwind_user_start() - Initialize user-space stack unwinding from current task
++ * @state: Unwind state structure to initialize.
++ *
++ * Populates @state from task_pt_regs(current) if the current task is a user
++ * task with valid user-mode registers.
++ *
++ * Return: 0 on success, or -EINVAL if current is a kernel thread, not in user
++ * mode, or running in an unsupported execution mode (e.g. x86 VM86).
++ */
+ static int unwind_user_start(struct unwind_user_state *state)
+ {
+ 	struct pt_regs *regs = task_pt_regs(current);
+@@ -123,22 +249,37 @@ static int unwind_user_start(struct unwind_user_state *state)
+ 		return -EINVAL;
+ 	}
+ 
++	if (IS_ENABLED(CONFIG_HAVE_UNWIND_USER_CFI))
++		state->available_types |= UNWIND_USER_TYPE_CFI;
+ 	if (IS_ENABLED(CONFIG_HAVE_UNWIND_USER_FP))
+ 		state->available_types |= UNWIND_USER_TYPE_FP;
+ 
+ 	state->ip = instruction_pointer(regs);
+ 	state->sp = user_stack_pointer(regs);
+-	state->fp = frame_pointer(regs);
++	state->fp = unwind_user_frame_pointer(regs);
++	state->ra_valid = unwind_user_link_register(regs, &state->ra);
+ 	state->ws = unwind_user_word_size(regs);
+ 	if (!state->ws) {
+ 		state->done = true;
+ 		return -EINVAL;
+ 	}
++	state->sp_valid = true;
+ 	state->topmost = true;
+ 
+ 	return 0;
+ }
+ 
++/**
++ * unwind_user() - Capture a user-space stack trace for the current task
++ * @trace: Output stack trace descriptor with caller-allocated @trace->entries.
++ * @max_entries: Maximum number of instruction pointers to store in @trace.
++ *
++ * Must be called in sleepable task context (e.g. syscall return / task_work
++ * deferred unwinding) because user stack and ELF .eh_frame_hdr reads may fault.
++ *
++ * Return: 0 on success (including 0 entries for kernel threads), or -EINVAL if
++ * @max_entries is 0.
++ */
+ int unwind_user(struct unwind_stacktrace *trace, unsigned int max_entries)
+ {
+ 	struct unwind_user_state state;
+diff --git a/kernel/unwind/user_cfi.c b/kernel/unwind/user_cfi.c
+new file mode 100644
+index 000000000000..e1727b07ce72
+--- /dev/null
++++ b/kernel/unwind/user_cfi.c
+@@ -0,0 +1,392 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * User-space Minimal DWARF CFI unwinding via ELF PT_GNU_EH_FRAME.
++ */
++
++#include <linux/elf.h>
++#include <linux/errno.h>
++#include <linux/kernel.h>
++#include <linux/mm.h>
++#include <linux/mmap_lock.h>
++#include <linux/sched.h>
++#include <linux/uaccess.h>
++#include <linux/unwind_dwarf_cfi.h>
++#include <linux/unwind_user.h>
++
++#define USER_CFI_MAX_PHDRS	64U
++#define USER_CFI_MAX_VMA_STEPS	8U
++
++/**
++ * parse_user_elf64_eh_hdr() - Locate PT_GNU_EH_FRAME in a 64-bit user ELF image
++ * @elf_base: User virtual address of the mapped ELF64 header (file offset 0).
++ * @hdr_uaddr: Output user virtual address of the PT_GNU_EH_FRAME segment.
++ * @hdr_size: Output size in bytes of the PT_GNU_EH_FRAME segment.
++ *
++ * Reads the 64-bit ELF header and up to %USER_CFI_MAX_PHDRS program headers
++ * from user memory, computes the mapping load bias from the file-offset-0
++ * PT_LOAD segment, and resolves the runtime address of PT_GNU_EH_FRAME.
++ * Must be called without holding mmap_lock because copy_from_user() may fault.
++ *
++ * Return: 0 on success, -ENOENT if no non-empty PT_GNU_EH_FRAME or base
++ * PT_LOAD segment exists, -EINVAL if the ELF header is invalid, or -EFAULT on
++ * an unmapped user read.
++ */
++static int parse_user_elf64_eh_hdr(unsigned long elf_base,
++				   unsigned long *hdr_uaddr, size_t *hdr_size)
++{
++	struct elf64_hdr ehdr;
++	unsigned long load_bias = 0;
++	bool have_load0 = false, have_eh = false;
++	u64 eh_vaddr = 0;
++	u64 eh_memsz = 0;
++	unsigned int i;
++
++	if (copy_from_user(&ehdr, (const void __user *)elf_base, sizeof(ehdr)))
++		return -EFAULT;
++
++	if (memcmp(ehdr.e_ident, ELFMAG, SELFMAG) != 0 ||
++	    ehdr.e_ident[EI_CLASS] != ELFCLASS64 ||
++	    ehdr.e_phentsize != sizeof(struct elf64_phdr) ||
++	    !ehdr.e_phnum || ehdr.e_phnum > USER_CFI_MAX_PHDRS)
++		return -EINVAL;
++
++	for (i = 0; i < ehdr.e_phnum; i++) {
++		struct elf64_phdr phdr;
++		unsigned long p_addr = elf_base + ehdr.e_phoff +
++				       (size_t)i * sizeof(phdr);
++
++		if (copy_from_user(&phdr, (const void __user *)p_addr, sizeof(phdr)))
++			return -EFAULT;
++
++		if (phdr.p_type == PT_LOAD && !have_load0 && phdr.p_offset == 0) {
++			load_bias = elf_base - ALIGN_DOWN(phdr.p_vaddr, PAGE_SIZE);
++			have_load0 = true;
++		} else if (phdr.p_type == PT_GNU_EH_FRAME) {
++			eh_vaddr = phdr.p_vaddr;
++			eh_memsz = phdr.p_memsz;
++			have_eh = true;
++		}
++	}
++
++	if (!have_load0 || !have_eh || !eh_memsz)
++		return -ENOENT;
++
++	*hdr_uaddr = load_bias + eh_vaddr;
++	*hdr_size = (size_t)eh_memsz;
++	return 0;
++}
++
++/**
++ * parse_user_elf32_eh_hdr() - Locate PT_GNU_EH_FRAME in a 32-bit user ELF image
++ * @elf_base: User virtual address of the mapped ELF32 header (file offset 0).
++ * @hdr_uaddr: Output user virtual address of the PT_GNU_EH_FRAME segment.
++ * @hdr_size: Output size in bytes of the PT_GNU_EH_FRAME segment.
++ *
++ * 32-bit compat counterpart to parse_user_elf64_eh_hdr(). Must be called
++ * without holding mmap_lock.
++ *
++ * Return: 0 on success, -ENOENT if no non-empty PT_GNU_EH_FRAME or base
++ * PT_LOAD segment exists, -EINVAL if the ELF header is invalid, or -EFAULT on
++ * an unmapped user read.
++ */
++static int parse_user_elf32_eh_hdr(unsigned long elf_base,
++				   unsigned long *hdr_uaddr, size_t *hdr_size)
++{
++	struct elf32_hdr ehdr;
++	unsigned long load_bias = 0;
++	bool have_load0 = false, have_eh = false;
++	u32 eh_vaddr = 0;
++	u32 eh_memsz = 0;
++	unsigned int i;
++
++	if (copy_from_user(&ehdr, (const void __user *)elf_base, sizeof(ehdr)))
++		return -EFAULT;
++
++	if (memcmp(ehdr.e_ident, ELFMAG, SELFMAG) != 0 ||
++	    ehdr.e_ident[EI_CLASS] != ELFCLASS32 ||
++	    ehdr.e_phentsize != sizeof(struct elf32_phdr) ||
++	    !ehdr.e_phnum || ehdr.e_phnum > USER_CFI_MAX_PHDRS)
++		return -EINVAL;
++
++	for (i = 0; i < ehdr.e_phnum; i++) {
++		struct elf32_phdr phdr;
++		unsigned long p_addr = elf_base + ehdr.e_phoff +
++				       (size_t)i * sizeof(phdr);
++
++		if (copy_from_user(&phdr, (const void __user *)p_addr, sizeof(phdr)))
++			return -EFAULT;
++
++		if (phdr.p_type == PT_LOAD && !have_load0 && phdr.p_offset == 0) {
++			load_bias = elf_base - ALIGN_DOWN((unsigned long)phdr.p_vaddr,
++							  PAGE_SIZE);
++			have_load0 = true;
++		} else if (phdr.p_type == PT_GNU_EH_FRAME) {
++			eh_vaddr = phdr.p_vaddr;
++			eh_memsz = phdr.p_memsz;
++			have_eh = true;
++		}
++	}
++
++	if (!have_load0 || !have_eh || !eh_memsz)
++		return -ENOENT;
++
++	*hdr_uaddr = load_bias + eh_vaddr;
++	*hdr_size = (size_t)eh_memsz;
++	return 0;
++}
++
++/**
++ * lookup_vma_elf_base_locked() - Find the ELF base mapping for an executable IP
++ * @mm: Address space of the current user task (mmap_lock held for read).
++ * @ip: User instruction pointer to resolve.
++ * @vma_start: Output start address of the executable VMA containing @ip.
++ * @vma_end: Output end address of the executable VMA containing @ip (left
++ *           unchanged if @ip does not lie in an executable VMA).
++ * @elf_base: Output start address of the file-offset-0 ELF header mapping.
++ *
++ * Modern linkers (-z separate-code) often place the ELF header in a preceding
++ * read-only VMA at vm_pgoff == 0 while mapping .text into a separate VM_EXEC
++ * VMA with vm_pgoff > 0. Walk up to %USER_CFI_MAX_VMA_STEPS preceding VMAs
++ * backed by the same file to locate the vm_pgoff == 0 mapping, while also
++ * supporting single-VMA binaries and special mappings such as [vdso].
++ *
++ * Return: true if an ELF base mapping was found and stored in *@elf_base,
++ * false otherwise.
++ */
++static bool lookup_vma_elf_base_locked(struct mm_struct *mm, unsigned long ip,
++				       unsigned long *vma_start,
++				       unsigned long *vma_end,
++				       unsigned long *elf_base)
++{
++	struct vm_area_struct *vma = vma_lookup(mm, ip);
++	struct vm_area_struct *prev;
++	struct file *target_file;
++	unsigned int steps = 0;
++
++	if (!vma || !(vma->vm_flags & VM_EXEC))
++		return false;
++
++	*vma_start = vma->vm_start;
++	*vma_end = vma->vm_end;
++
++	if (vma_is_anonymous(vma) || !vma->vm_file) {
++		if (vma->vm_pgoff == 0) {
++			/* Special mappings such as [vdso] */
++			*elf_base = vma->vm_start;
++			return true;
++		}
++		return false;
++	}
++
++	if (vma->vm_pgoff == 0) {
++		*elf_base = vma->vm_start;
++		return true;
++	}
++
++	target_file = vma->vm_file;
++	{
++		VMA_ITERATOR(vmi, mm, vma->vm_start);
++
++		while (steps++ < USER_CFI_MAX_VMA_STEPS &&
++		       (prev = vma_prev(&vmi)) != NULL) {
++			if (vma_is_anonymous(prev) || prev->vm_file != target_file)
++				break;
++			if (prev->vm_pgoff == 0) {
++				*elf_base = prev->vm_start;
++				return true;
++			}
++		}
++	}
++
++	return false;
++}
++
++/**
++ * find_user_eh_frame_hdr() - Resolve PT_GNU_EH_FRAME for a user IP with caching
++ * @state: User unwind walk state holding the per-walk VMA cache.
++ * @ip: Lookup instruction pointer in current->mm.
++ * @out_hdr_uaddr: Output user virtual address of .eh_frame_hdr.
++ * @out_hdr_size: Output size in bytes of .eh_frame_hdr.
++ *
++ * Consults @state->cfi_cache before taking mmap_read_lock_killable(). Negative
++ * lookups for executable VMAs lacking ELF headers or PT_GNU_EH_FRAME (such as
++ * JIT regions) are also cached with eh_hdr_uaddr == 0 to avoid repeated lock
++ * acquisitions during a stack walk.
++ *
++ * Return: 0 on success, -ENOENT if no PT_GNU_EH_FRAME covers @ip's VMA
++ * (including cached negative entries for non-ELF/JIT VMAs), -EINTR if killed
++ * while waiting for mmap_lock, -EFAULT on user copy fault, or -EINVAL if
++ * current->mm is absent, @state->ws is unsupported, or the mapped ELF header
++ * is malformed.
++ */
++static int find_user_eh_frame_hdr(struct unwind_user_state *state,
++				  unsigned long ip,
++				  unsigned long *out_hdr_uaddr,
++				  size_t *out_hdr_size)
++{
++	struct mm_struct *mm = current->mm;
++	unsigned long vma_start = 0, vma_end = 0, elf_base = 0;
++	bool found_base;
++	unsigned int i, slot;
++	int err;
++
++	if (!mm)
++		return -EINVAL;
++
++	/* Check per-walk VMA cache first */
++	for (i = 0; i < ARRAY_SIZE(state->cfi_cache); i++) {
++		const struct unwind_user_cfi_cache *c = &state->cfi_cache[i];
++
++		if (c->valid && ip >= c->vma_start && ip < c->vma_end) {
++			if (!c->eh_hdr_uaddr)
++				return -ENOENT;
++			*out_hdr_uaddr = c->eh_hdr_uaddr;
++			*out_hdr_size = c->eh_hdr_size;
++			return 0;
++		}
++	}
++
++	/*
++	 * Resolve the executable VMA and its base ELF mapping (pgoff == 0)
++	 * under mmap_read_lock, then drop mmap_read_lock BEFORE any faultable
++	 * copy_from_user() calls.
++	 */
++	if (mmap_read_lock_killable(mm))
++		return -EINTR;
++
++	found_base = lookup_vma_elf_base_locked(mm, ip, &vma_start, &vma_end,
++						&elf_base);
++	mmap_read_unlock(mm);
++
++	if (!vma_end)
++		return -ENOENT;
++
++	slot = state->cfi_cache_next++ % ARRAY_SIZE(state->cfi_cache);
++	state->cfi_cache[slot].vma_start = vma_start;
++	state->cfi_cache[slot].vma_end = vma_end;
++	state->cfi_cache[slot].eh_hdr_uaddr = 0;
++	state->cfi_cache[slot].eh_hdr_size = 0;
++	state->cfi_cache[slot].valid = true;
++
++	if (!found_base)
++		return -ENOENT;
++
++	if (state->ws == 8)
++		err = parse_user_elf64_eh_hdr(elf_base, out_hdr_uaddr, out_hdr_size);
++	else if (state->ws == 4)
++		err = parse_user_elf32_eh_hdr(elf_base, out_hdr_uaddr, out_hdr_size);
++	else
++		return -EINVAL;
++
++	if (err)
++		return err;
++
++	state->cfi_cache[slot].eh_hdr_uaddr = *out_hdr_uaddr;
++	state->cfi_cache[slot].eh_hdr_size = *out_hdr_size;
++	return 0;
++}
++
++/**
++ * unwind_user_next_cfi() - Compute the Minimal DWARF CFI frame rule for @state
++ * @state: Current user-space unwind state (may set @state->done on bottom).
++ * @out_frame: Output frame recovery rule for unwind_user_next_common().
++ * @out_signal: Set to true if the evaluated FDE represents a signal frame.
++ *
++ * Looks up the user binary's PT_GNU_EH_FRAME table, evaluates the Minimal
++ * DWARF CFI bytecode at @state->ip (or @state->ip - 1 for normal call return
++ * addresses), and translates the resulting &struct dwarf_cfi_row into a
++ * &struct unwind_user_frame.
++ *
++ * Return: 0 on success, -ENOENT if no FDE covers @state->ip or if
++ * DW_CFA_undefined marks the bottom of the stack (setting @state->done), or a
++ * negative errno (-EINVAL, -EFAULT, -EOVERFLOW, -EINTR) on failure.
++ */
++int unwind_user_next_cfi(struct unwind_user_state *state,
++			 struct unwind_user_frame *out_frame, bool *out_signal)
++{
++	struct dwarf_cfi_arch arch;
++	struct dwarf_cfi_row row;
++	unsigned long lookup_ip, hdr_uaddr;
++	size_t hdr_size;
++	int err;
++
++	if (!unwind_user_cfi_arch(state->ws, &arch))
++		return -EINVAL;
++
++	lookup_ip = (state->topmost || state->signal) ? state->ip : state->ip - 1;
++
++	err = find_user_eh_frame_hdr(state, lookup_ip, &hdr_uaddr, &hdr_size);
++	if (!err)
++		err = dwarf_cfi_unwind_user_eh_frame_hdr(hdr_uaddr, hdr_size,
++							 lookup_ip, &arch, &row);
++	if (err == -ENOENT && lookup_ip != state->ip) {
++		/*
++		 * A signal trampoline without a leading NOP has state->ip at
++		 * the exact start of its FDE, where state->ip - 1 misses.
++		 */
++		err = find_user_eh_frame_hdr(state, state->ip, &hdr_uaddr,
++					     &hdr_size);
++		if (!err)
++			err = dwarf_cfi_unwind_user_eh_frame_hdr(hdr_uaddr,
++								 hdr_size,
++								 state->ip,
++								 &arch, &row);
++		if (!err && !row.signal)
++			err = -ENOENT;
++	}
++	if (err)
++		return err;
++
++	/* Explicit DW_CFA_undefined on RA marks bottom of stack (_start/clone) */
++	if (row.ra_rule == DWARF_CFI_RULE_UNDEFINED) {
++		state->done = true;
++		return -ENOENT;
++	}
++
++	if (row.cfa_base != DWARF_CFI_BASE_SP &&
++	    row.cfa_base != DWARF_CFI_BASE_FP &&
++	    row.cfa_base != DWARF_CFI_BASE_FP_INDIRECT &&
++	    row.cfa_base != DWARF_CFI_BASE_SP_INDIRECT)
++		return -EINVAL;
++	if (!state->sp_valid &&
++	    (row.cfa_base == DWARF_CFI_BASE_SP ||
++	     row.cfa_base == DWARF_CFI_BASE_SP_INDIRECT ||
++	     row.ra_rule == DWARF_CFI_RULE_SP_OFFSET ||
++	     row.fp_rule == DWARF_CFI_RULE_SP_OFFSET))
++		return -EINVAL;
++	if (row.ra_rule == DWARF_CFI_RULE_SAME) {
++		if (!state->ra_valid)
++			return -EINVAL;
++	} else if (row.ra_rule != DWARF_CFI_RULE_OFFSET &&
++		   row.ra_rule != DWARF_CFI_RULE_SP_OFFSET) {
++		return -EINVAL;
++	}
++
++	memset(out_frame, 0, sizeof(*out_frame));
++	if (row.sp_rule == DWARF_CFI_RULE_OFFSET) {
++		out_frame->sp_from_cfa = true;
++		out_frame->sp_off = row.sp_off;
++	} else if (row.sp_rule != DWARF_CFI_RULE_SAME) {
++		return -EINVAL;
++	}
++	out_frame->use_fp = (row.cfa_base == DWARF_CFI_BASE_FP ||
++			     row.cfa_base == DWARF_CFI_BASE_FP_INDIRECT);
++	out_frame->cfa_indirect = (row.cfa_base == DWARF_CFI_BASE_FP_INDIRECT ||
++				   row.cfa_base == DWARF_CFI_BASE_SP_INDIRECT);
++	out_frame->cfa_off = row.cfa_off;
++	out_frame->ra_from_reg = (row.ra_rule == DWARF_CFI_RULE_SAME);
++	out_frame->ra_from_sp = (row.ra_rule == DWARF_CFI_RULE_SP_OFFSET);
++	out_frame->ra_signed = row.ra_signed;
++	out_frame->ra_off = row.ra_off;
++	if (row.fp_rule == DWARF_CFI_RULE_OFFSET) {
++		out_frame->fp_off = row.fp_off;
++	} else if (row.fp_rule == DWARF_CFI_RULE_FP_OFFSET) {
++		out_frame->fp_from_fp = true;
++		out_frame->fp_off = row.fp_off;
++	} else if (row.fp_rule == DWARF_CFI_RULE_SP_OFFSET) {
++		out_frame->fp_from_sp = true;
++		out_frame->fp_off = row.fp_off;
++	}
++	*out_signal = row.signal;
++	return 0;
++}
 -- 
 2.56.1.831.g720f3f5937-goog
 
