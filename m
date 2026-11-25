@@ -1,62 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.203
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795616844;
-	b=WGMJCZPeZQWq9GiNnj8A/MkR5vr6LXsBRbJIsvAU4AHaS25savaMvZ3QBjvhQZcrWdpn
-	 It3n4hEHNiqdaIPNOjwepAPGI4RR8aXKb5lnq32l0a29TW/2LwuzZHUVWLwe/9hyrW6ad
-	 CmeeybtwrmDYLtYw2gSQ+i6rIZ8YyT40lWV5j7b8zWpuBwtCQ1HUOKCrindLp0itzdWGB
-	 tVflCF1/XpA11I8G/5THiuY4ZkAm6W4q2ROsq45PGRQbE3vMubcvzPPs0jIrOx67e3Gvq
-	 HtNgPJg3EUJQIBkOqrCZqgnh+s73gktD6DL7f83044fBv5yqIEcZv40kPUDV+qMSARw==
+	t=1795616996;
+	b=0zvgsEMQqpfLDrF3PCYdAMJWbEkEOM49hdtbg7HMUHGmhUSRyC9VhO/4xqmxbTVMDqjE
+	 eU1AOJb4cqzXmcl/OLVcBSvZdd0eDtRq2cNysamg+gNtdzQO+C7DQSUN9y1I1guGM5+Sv
+	 3/G+3oezF4V2ZFQA6dOBqevYRgdrNZVnVGIbK5iUxHCfiJUlFksMByBDjajaxRhnaZh0S
+	 V4Gpq5tPcO5iFFJFqlIECU9JgUKKV2MqhYbGF7uLokuoOBlR4ngBTvjKWvh7Mw08Ke+oK
+	 pkVVxkVPJtf6YPIYEf0B0eVaopV02lD5bkNt8oXEKKi4HP8uV8oPF0ipmDKpMCPYifQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795616844;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=mZc2jCgr+ZEG71mhrtI7bu0QzE46TwhUiStHpCur4nU=;
-	b=XGRkI9IYz/8V4tzFJm/S6lAo+k4TGPJlW8rnKs6189utORL/66Gcv6pm4KXSocB3VDEQ
-	 Wn3Y7QSZivgtN1/dyqXdQ3mnrV5nR9wjqGwJdhc9iNCFJmVEwdrRwSW+XA03iCqMWzL1V
-	 pJi3Ew1SYCFCh3sTOsy5N3upsW3w1bJHydlntXZRXA6F0vzueAyIHbAkgbZJIrzzMzk+S
-	 jHxZnsS/U+vf8dYNuivrriYY6MFGMvnbpnVRX7G6OB6L8s06AzQQxDPP1DFky8zJ54hPR
-	 J4gNvzZDsUHOFpno7x7O9wah82j/R3of0cKf7D4x3yMB0o34CJ9JPCinqj156BkCeAA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795616996;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=yzob3IjNhlkrELuFZotbKtg9maqB1cC/YQY8iPS0b0o=;
+	b=UzkhN2HGcpaHopkXIqENBE0bj8B2Dd6VltMi+zvFDjvWN5qcjGK58v7oSymTqdpB1OxV
+	 0ory4W57H82Y/rSp1HEpBAOh800wyl+AZhvAq72pKMFBq57viTfa1VTSufRqqlDby+c7l
+	 W6hYKCMA1ipYCr9eiWz+TK80cPM1SqcTBo63eVQxtibV00tyNHgGr9UMYX9V6RP2uZQw+
+	 gvy0TKQ/2OPJYj1EyyF2VyMc5Rtc670bedjpvJz8ubPXIQJACIxnC7q90crTA0S6ODGuN
+	 c1nJaKjHvynDTBZsMHvWa9OSoNdGLVezOD+ZKQeMMFlLqLtW0XRsyuliHrLXzDkQXgQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=auEWpafx;
-	arc=none smtp.remote-ip=91.218.175.203
-Received: from mta0.migadu.com (out-203.mta0.migadu.com [91.218.175.203])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A1F606A321
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 14:27:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 96A1F606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=btDetiEW;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A24606A323
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 14:29:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 95A24606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=auEWpafx
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=mZc2jCgr+ZEG71mhrtI7bu0QzE46TwhUiStHpCur4nU=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795616841; v=1; x=1796221641;
- b=auEWpafxO5FC+N+IWoifGbM9SehItG+Z6S+6/YE/iLY6kN8nvAGhZGwh2h+vw/aJTHnApfU8
- XnNjcl1SnhqgTMKW5F4/okMoSfE3SutzqfqX2XrEkXjE93XhhbPApcYyRGFOGNPo34i30u1pTv9
- Rdj6/txOJ72bH2QiXYfXyFkM=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id d6e7e1e82acdb99c;
-	Wed, 25 Nov 2026 14:27:21 +0000
-X-Mizu-Trace-ID: d6e7e1e82acdb99c
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5c14bc5a743so35952e87.0
-        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:27:20 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErGi/UncaEWCasaCjeL3K/EpiGRQwJwi14+Fw7AuhMfEieJYYY4uySav6ybEHlYMIBF1nfEd5rU=@lists.linux.dev
-X-Gm-Message-State: APuU4Z87ElttR8l43af3EO+4PFR9ia1ftdpMx449tDQTq+q+xrVkNWeN
-	kL/t2dVEQdVTfOTGT2BG/ENQZC6TVasn4Imd+fPzBMqpyaDkNPVOcgIqqnJearULfWAV8Dw/X9E
-	zdd0cZZrAwOssOyCTHZPgG281nljm/TNgLRVkeX3M
-X-Received: by 2002:a05:6512:3ca7:b0:5bf:f060:c0f3 with SMTP id
- 2adb3069b0e04-5c21a26fab2mr555752e87.12.1795616839635; Wed, 25 Nov 2026
- 06:27:19 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=btDetiEW
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA6FD2F;
+	Wed, 25 Nov 2026 06:29:51 -0800 (PST)
+Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF7893F763;
+	Wed, 25 Nov 2026 06:29:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795616994; bh=irJ+SLW2diU+AhutWrsQkPmnPIapmN0EHmgj2AIri5o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=btDetiEW6iagg1Fl4BzF0k9NBnwE7C9i2RYKjvc2M9/Nkk1H4Od9YD9FWkoDGmaKS
+	 2otJ3Vv1HcTLqwGA2kG3AzVGZ3yVGdT+UFEXcIh5+Hs/D7v4Z6f04gjeE61UswGTcQ
+	 Y4zU6Yjv/ZMaIHmSEfJY21N/cuT66qe2B3dQbn3o=
+Date: Wed, 25 Nov 2026 14:29:48 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Andreas Grapentin <gra@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Friedrich Welter <fritz@linux.ibm.com>,
+	Gautam Gala <ggala@linux.ibm.com>,
+	Hariharan Mari <hari55@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 02/23] KVM: arm64: Extract number of sys_reg_desc into
+ a constant
+Message-ID: <awbw3NyDifa0WjhZ@e143914.arm.com>
+References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
+ <20261106-sysreg-v3-2-75e95980fb10@linux.ibm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,32 +84,149 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261104140612.137869-1-vdonnefort@google.com>
-In-Reply-To: <20261104140612.137869-1-vdonnefort@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 25 Nov 2026 14:26:43 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTy=DTmPBQd1tiM2Qo9CN=wRJT_S+7fX5u+gwUTWXK9+Rw@mail.gmail.com>
-X-Gm-Features: Aa3M54pbT2MD_xSnGtMFqbfMy5Tkwgi8UvFa3y0WAMmC7PRuqL5G_h-h3jfQvGU
-Message-ID: <CA+EHjTy=DTmPBQd1tiM2Qo9CN=wRJT_S+7fX5u+gwUTWXK9+Rw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/5] KVM: arm64: pkvm: Extend hypervisor entering
- tracing reasons
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
-	qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261106-sysreg-v3-2-75e95980fb10@linux.ibm.com>
 
-Hi Vincent,
+On Fri, Nov 06, 2026 at 05:07:35PM +0100, Steffen Eiden wrote:
+> Define the constant `num_sys_reg_descs` which stores the number of
+> elements in the sys_reg_descs array. Replace all occurrences of
+> ARRAY_SIZE(sys_reg_descs) with the new constant.
+> 
+> This refactoring eases the integration of handling system registers for
+> arm on s390. s390 needs code from the shared code to define the
+> sys_reg_descs. But also the shared code needs the definition of the
+> sys_reg_array and we cannot forward declare arrays and use their size
+> before it is properly defined. This patch solves this chicken or egg
+> problem. For the time being s390 cannot process the full arm64 defined
+> sys_reg_descs array.
+> 
+> No functional changes.
+> 
+> Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
+> Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 
-For the series:
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+I see later in the series, the include of sys_regs.c into s390 is done
+before the s390 sys_reg_descs array is defined.
 
-Tested on QEMU with the hypervisor trace enabled, running protected
-and non-protected guests in pKVM and a non-protected guest in nVHE.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+Thanks,
+Joey
 
-Cheers,
-/fuad
+> ---
+>  arch/arm64/kvm/sys_regs.c | 26 ++++++++++++++------------
+>  1 file changed, 14 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 0f0b0495b710..2b28b929f9f3 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3976,6 +3976,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+>  };
+>  
+> +static const size_t num_sys_reg_descs = ARRAY_SIZE(sys_reg_descs);
+> +
+>  static bool handle_at_s1e01(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  			    const struct sys_reg_desc *r)
+>  {
+> @@ -5187,7 +5189,7 @@ static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
+>  {
+>  	const struct sys_reg_desc *r;
+>  
+> -	r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+> +	r = find_reg(params, sys_reg_descs, num_sys_reg_descs);
+>  	if (likely(r)) {
+>  		perform_access(vcpu, params, r);
+>  		return true;
+> @@ -5205,7 +5207,7 @@ static const struct sys_reg_desc *idregs_debug_find(struct kvm *kvm, loff_t pos)
+>  {
+>  	unsigned long i, idreg_idx = 0;
+>  
+> -	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
+> +	for (i = 0; i < num_sys_reg_descs; i++) {
+>  		const struct sys_reg_desc *r = &sys_reg_descs[i];
+>  
+>  		if (!is_vm_ftr_id_reg(reg_to_encoding(r)))
+> @@ -5268,7 +5270,7 @@ static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, loff_t pos)
+>  {
+>  	unsigned long i, sr_idx = 0;
+>  
+> -	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
+> +	for (i = 0; i < num_sys_reg_descs; i++) {
+>  		const struct sys_reg_desc *r = &sys_reg_descs[i];
+>  
+>  		if (r->reg < __SANITISED_REG_START__)
+> @@ -5370,7 +5372,7 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+>  	struct kvm *kvm = vcpu->kvm;
+>  	unsigned long i;
+>  
+> -	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
+> +	for (i = 0; i < num_sys_reg_descs; i++) {
+>  		const struct sys_reg_desc *r = &sys_reg_descs[i];
+>  
+>  		if (!r->reset)
+> @@ -5594,8 +5596,8 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+>  	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
+>  		return demux_c15_get(vcpu, reg->id, uaddr);
+>  
+> -	return kvm_sys_reg_get_user(vcpu, reg,
+> -				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+> +	return kvm_sys_reg_get_user(vcpu, reg, sys_reg_descs,
+> +				    num_sys_reg_descs);
+>  }
+>  
+>  int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+> @@ -5634,8 +5636,8 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+>  	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
+>  		return demux_c15_set(vcpu, reg->id, uaddr);
+>  
+> -	return kvm_sys_reg_set_user(vcpu, reg,
+> -				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+> +	return kvm_sys_reg_set_user(vcpu, reg, sys_reg_descs,
+> +				    num_sys_reg_descs);
+>  }
+>  
+>  static unsigned int num_demux_regs(void)
+> @@ -5723,7 +5725,7 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+>  	int err;
+>  
+>  	i2 = sys_reg_descs;
+> -	end2 = sys_reg_descs + ARRAY_SIZE(sys_reg_descs);
+> +	end2 = sys_reg_descs + num_sys_reg_descs;
+>  
+>  	while (i2 != end2) {
+>  		err = walk_one_sys_reg(vcpu, i2++, &uind, &total);
+> @@ -5772,7 +5774,7 @@ int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm, struct reg_mask_range *
+>  	if (clear_user(masks, KVM_ARM_FEATURE_ID_RANGE_SIZE * sizeof(__u64)))
+>  		return -EFAULT;
+>  
+> -	for (int i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
+> +	for (int i = 0; i < num_sys_reg_descs; i++) {
+>  		const struct sys_reg_desc *reg = &sys_reg_descs[i];
+>  		u32 encoding = reg_to_encoding(reg);
+>  		u64 val;
+> @@ -5957,7 +5959,7 @@ int __init kvm_sys_reg_table_init(void)
+>  	int ret = 0;
+>  
+>  	/* Make sure tables are unique and in order. */
+> -	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), true);
+> +	valid &= check_sysreg_table(sys_reg_descs, num_sys_reg_descs, true);
+>  	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), false);
+>  	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), false);
+>  	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), false);
+> @@ -5980,7 +5982,7 @@ int __init kvm_sys_reg_table_init(void)
+>  
+>  	check_feature_map();
+>  
+> -	for (i = 0; !ret && i < ARRAY_SIZE(sys_reg_descs); i++)
+> +	for (i = 0; !ret && i < num_sys_reg_descs; i++)
+>  		ret = populate_sysreg_config(sys_reg_descs + i, i);
+>  
+>  	for (i = 0; !ret && i < ARRAY_SIZE(sys_insn_descs); i++)
+> 
+> -- 
+> 2.56.0
+> 
