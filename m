@@ -1,58 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795590947;
-	b=YfoNDfQt3SjR7/S0qz9S7xkSlC5h2p4ZkNdhkKHiAzPpTXsaeBT/srIDD4skeZsWArw+
-	 soerEpGb9y/DIs3gjtOAQgf61Hm6W1tH7rccoT+YWSRmwTYb3RjGZ9ucCxOm5koCLBVw0
-	 23mobCxBZ49pqvq11NTC3aleDW/9tknhHbubJMP+dn8lvDRTsWwLxWiCWUs01WJANuJTV
-	 BlLKCxE+pUdwT/STtTJWoJiEnaPCAhQ4x7+s8UCmwWJbo5YO4fDDY4zVG8G7ao96nCrqP
-	 QLvXnktbiRDeh2/AQPnBV1/4s8GMxcAvoECatjZkxGSNWRMWw8TONuX11CBd0MFO3gw==
+	t=1795591479;
+	b=zp3FQtlHrUQLxV6LsohCZ7TCzuUEvL6cG6MAz6glg6m0M5G5IWWaZQWNFU6pl7xPuIPQ
+	 BYs7L3Hu3ZmGAlHQXk5vlLyOXer6uPKlRBaEKTum1u7hIuLuE5VvPTmkE3CezRW9vhN98
+	 6vMJPSDELzI+vsdqxPV+W9jokvMdzz2kkYK36ScAhJI1A3ulJv4Z1kXPbnnwb5L3Jo27c
+	 WrzTCiKZNLGMWJXPCc8RYp6W7ETeuVlS7C2yTNk6YDhcxwf9+BeGh/BlmzI+cVklDrKbc
+	 7OOjqHJlTalEcnKTvQnU1uZtT8WWYpu8jP/YtUxNLX5KRdD4G0U5VzotEzB4fMkMimw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795590947;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795591479;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=Qr1WkdD7lUjHmLYrbbgORpljbdFmct9M7d97UJO6688=;
-	b=SXMuj1MlhM1x0Xu20fujfFhYI2pKsUdz84grVNr5cI1pEg2zVmeAzzbT9rj+NxrV6f6P
-	 uEkCZiVM40QNtA568X/JOoIkqQ6t2d+Y92Po7BCRAbMO3JSB/jqexF2KqvxLtv88PDV56
-	 M0A/UqcSX21W/j+M6ly1lcpej+RfesBrhPNk/GhFTvrkzBJs/BJ4h/KoK88ktReA7C6/5
-	 vnqcKGtd2WpHUjEhDp6NZ9qvOPGMQ1LEwb47CgVqAA05nQAKnzcCwE/JB249fmYZVZorN
-	 +GsFm0jcd8XPMlMEJpfWPkh5M5lQc69tW5+px2eAVIyJ/Yf6GgqAY7PWSsf+7PY36Mw==
+	bh=+l93dXtHRQW0EV58b/3nKh4/KSBiO7DJ6aZmG48jBL8=;
+	b=A5sh4YDKYXTn2hP6how7pirnXXaIqnqf++EyT03GyPMsHztqEW80FVZ1bOTWAvfNI3pt
+	 JT5esQHg+W3jjl6j7uMKRnCNBScNlRW9c+gPCRsT/bL3cUBhUKEBv9F32NZ4AKV0lxxju
+	 KQbvQiJrrNjr11buKgZnu2lGlIINHFylNnfGmQF631s9W/WMktttqci5nEKi1mLGfy69R
+	 n9EBcYt4U9na+shfHjGZhF0GAdaCmfwu1oA7g7ij0VGvNOEQ2sDsSVQJGAwETCckA42Mr
+	 InVqM0VSLgIXw/e7MycDhiruRnKuHSoiHHd3lBmbC9ZTb/t+a/0k26oSZUASCjF1ykg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bCAyis22;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=loeKHpXa;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484A2606A69C;
-	Wed, 25 Nov 2026 07:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26D5606A321;
+	Wed, 25 Nov 2026 07:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bCAyis22
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 955DE1F000C0;
-	Wed, 25 Nov 2026 07:15:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=loeKHpXa
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C43C1F000C6;
+	Wed, 25 Nov 2026 07:24:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795590946;
-	bh=Qr1WkdD7lUjHmLYrbbgORpljbdFmct9M7d97UJO6688=;
+	s=k20260515; t=1795591479;
+	bh=+l93dXtHRQW0EV58b/3nKh4/KSBiO7DJ6aZmG48jBL8=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=bCAyis22aCFZbDn2UL9udyWVE+FoHVvkvGRLkvreaQECV5zd46cvS+2V6+B7HE40C
-	 ulTO3+PjmJNxDClYZ00Z6gM4fXnxJOJLXImKCKF+B0oJ7Q1mjwyiACzfov+th5MyZo
-	 3N8x3VcDajLReFkmw9oIy0Bpa/vsniGjRnAWI86UeM/AQfbmmmdd+G0YusURcdNGwo
-	 iLvVOvTC/ZlcMZF+PMk9dtU0FUgKxO1Lls8U2mE4miIg1/z7VMuIrB8D00KSLOBssK
-	 VM7h+pVSUOLRA37CFsHhxhOmBgvUTUJZgqjhZ/9ogaqhZTeJvdB4uXuowbZLYtL+xQ
-	 0qCUzWP71bYyw==
-Message-ID: <sashiko-outbox-232760@kernel.org>
+	b=loeKHpXaBC9FrNf66nSNMrP9Axjcq9SJIDc5wrvXJgRG/vfAoOI3DI0Wv4zSWAbb7
+	 ZNbGCJGZzOZCJGQcdoSvVxSZIx/AqIuKtHInsbChPb4Rjn5r5eegCXwOTt1SUhmFY/
+	 lLsrUwRJo0qNDGT7ht72vkgms8Sw6eyHAsUFEn4yuD+0yRJPpXCMpxlcpeiMiETtbS
+	 AbZTAdXEnd3AYqHnoXk9Cryi3KjUte8jI4rPRzEGHwhcYOJIayjbFM0COMkHzyljQy
+	 UaaFQwdK1w5AA9aEA/h88YBPzp/h2rflaQHM7gueiZETbKxuLmG6iHjOwlG7T2MH8e
+	 hQCqgoJziUalg==
+Message-ID: <sashiko-outbox-232776@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 2/8] KVM: arm64: Reset SP_EL1, ELR_EL1 and SPSR_EL1
- when resetting a vcpu
+Subject: Re: [PATCH v2 6/8] KVM: arm64: nv: Don't deliver a pending SError
+ to the wrong guest
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Dan Carpenter" <dan@pereq.eu>
 Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
  Zyngier" <maz@kernel.org>
-In-Reply-To: <20261125-double_exception-v2-2-224689d8a764@pereq.eu>
+In-Reply-To: <20261125-double_exception-v2-6-224689d8a764@pereq.eu>
 References: <20261125-double_exception-v2-0-224689d8a764@pereq.eu>
- <20261125-double_exception-v2-2-224689d8a764@pereq.eu>
+ <20261125-double_exception-v2-6-224689d8a764@pereq.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Nov 2026 07:15:46 +0000
+Date: Wed, 25 Nov 2026 07:24:38 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -64,59 +64,79 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 1 potential
 issue to consider:
-- [Medium] KVM: arm64: SP_EL1, ELR_EL1, and SPSR_EL1 unreset in
-  pkvm_reset_vcpu() and core
+- [High] KVM: arm64: nv: sleeping in atomic context via
+  kvm_nested_flush_hwstate()
 --
 
-commit d315f26d12c1dd260ed62612065ad5e34b6f9f03
+commit 81f527c7f211ae919b4cadce520f83a546cfd38d
 Author: Dan Carpenter <dan@pereq.eu>
 
-KVM: arm64: Reset SP_EL1, ELR_EL1 and SPSR_EL1 when resetting a vcpu
+KVM: arm64: nv: Don't deliver a pending SError to the wrong guest
 
-This commit zeroes SP_EL1, ELR_EL1, and SPSR_EL1 in kvm_reset_vcpu() when
-resetting a vCPU.
+This commit stashes a pending HCR_EL2.VSE bit into NESTED_SERROR_PENDING
+when switching between L1 and L2 so that kvm_nested_flush_hwstate()
+re-evaluates SError routing in the new context.
 
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 26081d2734087..9c1b42890c966 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -199,6 +199,9 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
+ted.c
+> index 39136a89d74bb..cccaf02610e87 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2792,6 +2792,18 @@ static u64 kvm_check_illegal_exception_return(stru=
+ct kvm_vcpu *vcpu, u64 spsr)
+>  	return spsr;
+>  }
 > =20
->  	/* Reset core registers */
->  	kvm_reset_vcpu_core(vcpu);
-> +	__vcpu_assign_sys_reg(vcpu, SP_EL1, 0);
-> +	__vcpu_assign_sys_reg(vcpu, ELR_EL1, 0);
-> +	__vcpu_assign_sys_reg(vcpu, SPSR_EL1, 0);
->  	vcpu->mmio_needed =3D false;
-> =20
->  	/* Reset system registers */
+> +/*
+> + * HCR_EL2.VSE was set for the context we are leaving.  Store the SError
+> + * instead, so that kvm_nested_flush_hwstate() routes it in the new cont=
+ext.
+> + */
+> +static void kvm_nested_stash_serror(struct kvm_vcpu *vcpu)
+> +{
+> +	if (*vcpu_hcr(vcpu) & HCR_EL2_VSE) {
+> +		*vcpu_hcr(vcpu) &=3D ~HCR_EL2_VSE;
+> +		vcpu_set_flag(vcpu, NESTED_SERROR_PENDING);
+> +	}
+> +}
+> +
+>  void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 spsr, elr, esr;
+> @@ -2823,6 +2835,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+>  	preempt_disable();
+>  	vcpu_set_flag(vcpu, IN_NESTED_ERET);
+>  	kvm_arch_vcpu_put(vcpu);
+> +	kvm_nested_stash_serror(vcpu);
 
-[Severity: Medium]
-Should SP_EL1, ELR_EL1, and SPSR_EL1 be reset in the shared helpers instead
-of only in host kvm_reset_vcpu()?
+[Severity: High]
+Can stashing NESTED_SERROR_PENDING here cause sleeping in atomic context
+on the next guest entry when a virtual PMU counter is active?
 
-For pKVM protected VMs, flush_hyp_vcpu() does not copy host_vcpu->arch.ctxt
-into hyp_vcpu->vcpu.arch.ctxt.  Instead, on PSCI CPU_ON,
-handle___kvm_vcpu_run() calls pkvm_reset_vcpu() at EL2:
+When L1 has a masked pending SError in HCR_EL2_VSE with HCR_EL2.AMO set
+and executes ERET into L2, setting NESTED_SERROR_PENDING causes the next
+iteration of kvm_arch_vcpu_ioctl_run() to re-inject the SError back to
+vEL2 while preemption is disabled:
 
-arch/arm64/kvm/hyp/nvhe/pkvm.c:pkvm_reset_vcpu() {
-	...
-	kvm_reset_vcpu_core(&hyp_vcpu->vcpu);
-	kvm_reset_pvm_sys_regs(&hyp_vcpu->vcpu);
+  kvm_arch_vcpu_ioctl_run()
+    preempt_disable()
+    kvm_nested_flush_hwstate()
+      kvm_inject_serror_esr()
+        kvm_inject_nested_serror()
+          kvm_inject_nested()
+            preempt_disable()
+            ...
+            preempt_enable()
+            kvm_pmu_nested_transition()
+              kvm_pmu_create_perf_event()
 
-	/* Must be done after resetting sys registers. */
-	kvm_reset_vcpu_psci(&hyp_vcpu->vcpu, reset_state);
-	...
-}
-
-Because neither kvm_reset_vcpu_core() nor pvm_sys_reg_reset_vals[] resets
-SP_EL1, ELR_EL1, or SPSR_EL1, a protected vCPU that cycles through PSCI
-CPU_OFF and CPU_ON re-enters in PSR_MODE_EL1h with stale SP_EL1, ELR_EL1,
-and SPSR_EL1 values.  Resetting *vcpu_sp_el1(vcpu) =3D 0 in
-kvm_reset_vcpu_core() (which also covers arch/s390/kvm/arm64/reset.c) and
-ensuring ELR_EL1 and SPSR_EL1 are reset for pvm_sys_reg_reset_vals[] as
-well would keep all vCPU reset paths consistent.
+Because kvm_inject_nested() only balances its own inner preempt_disable(),
+the outer preempt_disable() from kvm_arch_vcpu_ioctl_run() is still in
+effect when kvm_pmu_nested_transition() recreates perf events for counters
+whose EL1 and EL2 filters differ.  kvm_pmu_create_perf_event() then calls
+perf_event_release_kernel() and perf_event_create_kernel_counter(), which
+acquire sleeping mutexes and allocate with GFP_KERNEL while atomic.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125-double_exc=
-eption-v2-0-224689d8a764@pereq.eu?part=3D2
+eption-v2-0-224689d8a764@pereq.eu?part=3D6
