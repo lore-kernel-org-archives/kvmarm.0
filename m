@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.199
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.197
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795587414;
-	b=0kiVfj8Am1Hnk159NtDaH/deHAX0IBVKu+pYb7OcosLnaiQEvT1Rq32/Fl4yDaP5WE+i
-	 Ln4zesmLrZ+t+pp0HuAhRBR7YQpr1q0J4hjBy0KlQZGbKAns1CU7eyUPkDNbVDJmux6iy
-	 ibefyai+kJZ3EcCAf80HHx5UNrrySi5EYBT3QAGM268oc+wt6gXernmcrImPo8P4axQru
-	 FK8z+hhpDai2HH4ED+xk+7iFCs9erDsHSfyv/w5/6//sQO8JMmCAwI0wE0tyGoRp2kKzS
-	 dQRUqjuLoTyriK6XhbCaa18/2HSFYDQIgAOYZJTrn5nW9LNfWkd0ZWNk1XTo2n4uyNQ==
+	t=1795587416;
+	b=oq9qUjLSyY3DLLkbczMWhNz0jd6sbmPeV8gHR1/pGoMahbJgn4O13VYpUSzSYC5JJl6w
+	 sNqPfsoCEuJEW9T0fgTzl1V7rT1RtRLlmdaMb8MaCY0gdfRj45GIkESaWw9pDpmUQMYYO
+	 Yh8SvX+hjefRqWOAaX/Gk7+jPOf41wzY9/VMAByZxaW45Gp0R/i6eWu9xTgfTWMmOfRJl
+	 5a3I5ZvKZf2HOvQQDpNJ+jnVWnGnuNtpjLEj5GN9hfcRX24rQ6iWyTQkmrxNfnsaUplcz
+	 6rxWL7qtS0Shn5mQUks0VAxZYuKAmRlrte7Ic3TTeTgZN8Sf8xVVaBDGZrbV4D+fLjQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795587414;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795587416;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=aK4o1KtNSct914ybInt90HQJKGGS9p5ZPE/6mzCvfcY=;
-	b=SZK8N0i24M86aFpW1P4Tppk8Z7/DqwqdQNl8n1KRqVPeC7ithySTvWV4jbNmZWBAf8Sy
-	 Sek/mJpCiM6kPMXFX/7cB57ErcTutfMBPy7EHgTs3mCUSkvA1YmGQJHA3A8UDDfYsFOLh
-	 n18fszx2UuIe6MFcMKnYtIkaNs1hOg9LZrwRJR0kiTap/FuZ1B8sF2L+37bOZ1alK3Auk
-	 JJMEvT9PcMi4InVVbWHHO/IzcnducIbcWP0Ga7NhDY/+IFwe3VKT3vWsIcly3k5aDTWIF
-	 Wz9MkpjRhCf0wrach8Cxlu5Ke/ZMFKWKbArPDxlkN7/fJ+besMllh0tsGi9qJ9gla2Q==
+	bh=jFmNLdaybvaWIRtLdTiBMi3UUKe/rujAV3S2k7ZenzI=;
+	b=ZVni2P5AXqX1gGES71zA9CHaQhPIe7v68rca0+tS9P0eknZJUfKMfNqA5eqO3A1Eo//H
+	 CgDb9hp9ygp9RBCUm2rA9huykoshQXIaiAUs8JKVNoYc6XY+9bVglOQpGLCNjL9LYuBKc
+	 0x0f0byDTCKTB/afmvCEK1olelQlEpPGrnXYLlXdqU8OLKwH58G4PtErEuIzAb8JnkS/i
+	 QlcRc8WJBewlSVJtr2W43r/9QX3a2AtWZI/Qr9Oi6vwnkgaV7eQL9kTB8ys8MWaY4+A1S
+	 ETmunXP95uNVJD3CuvQwYt5bKMK2i8QKFm9x5Xpa1gOgwCdeG5wtbVdXOAr2FG17Q1A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--irogers.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=EfeJAhT1;
-	arc=none smtp.remote-ip=74.125.82.199
-Received: from mail-dy1-f199.google.com (mail-dy1-f199.google.com [74.125.82.199])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="Qva/x0dK";
+	arc=none smtp.remote-ip=74.125.82.197
+Received: from mail-dy1-f197.google.com (mail-dy1-f197.google.com [74.125.82.197])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A55606BD2B
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 49A55606BD2B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2E9606DE78
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CF2E9606DE78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=EfeJAhT1
-Received: by mail-dy1-f199.google.com with SMTP id 5a478bee46e88-341eff9e381so8414912eec.1
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Qva/x0dK
+Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-386177b0516so13944536eec.1
+        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795587412; x=1796192212; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1795587414; x=1796192214; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=aK4o1KtNSct914ybInt90HQJKGGS9p5ZPE/6mzCvfcY=;
-        b=EfeJAhT14sCENWUCLFpHcF29GnF4A+UfakrD/PTHQAHEGdyNRp0Fta9FGozzKZbs7f
-         ADgp5C4azI1lX7TLRDsTglfigciLaHH6jQpMASZiID4wuWbkXLabnzSKQcrk6JhyQaMg
-         eDDWodWate5BLjfhoH/EkD8cmgBVYLlIp6Wd4rF4aK6YSfh8/DpoxLaBK7KxB19EOS2L
-         VFghItuCdTEsbCCmawQgdf4TSYMCS9+0zlqABfpIQFQfIkfDiNfpSlEtLSDmJFS372b0
-         i0AMd7dolDCgEjYXZ14OWi/6nqMXqVJ9QjZHqsf3HDTGFMWbQXU0LvIjWuC5tQTM1cWD
-         MR7A==
+        bh=jFmNLdaybvaWIRtLdTiBMi3UUKe/rujAV3S2k7ZenzI=;
+        b=Qva/x0dKctygc+AcoTKNii3DphnbsC4aiFIBGZ+pv4CmAaJxmAVVPod6qyLmYarMe+
+         CrD0rn6kuzBIFnL/34vMJ2ZSvwricwCx5GOQAKgym+ZKvAe6Zk154rK8jyB3vb1e61wX
+         B/Wj3R5zU/VhZcHTUNuqZhguGZyaPdWWiZ0NndM0CcwkDYUSFmkPlke1WqEyyPAndSkJ
+         tWzmGb43+3MnClYviqrQaaCe4TnZnBpTBYe7VXcV1HIMERZmS8bGs/vwyqQckhU/HSqb
+         qYrzabFyro3Mmb0KdCKBpjoSzmIMmymgU0ArNcpUXr5k/AvaoKtYt7rJzZwj2lBkQUB9
+         XuvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795587412; x=1796192212;
+        d=1e100.net; s=20260707; t=1795587414; x=1796192214;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=aK4o1KtNSct914ybInt90HQJKGGS9p5ZPE/6mzCvfcY=;
-        b=RKqb1vW8yZvnrtTp065Manf56H8ad5tIytY0Y4++zz/TQuT6fw7Q6Whw7cfxLFC1pS
-         xXATSl6uW/1EECJXElq9aMYHkcVP6kzCjFPx3d6BGxTE9y8ttbQPhE4Ptb8mvBatz9gF
-         0JBnWgCevWGzSCINdX5cfuJEDsNwkj/cRpnF1BN6jM+ynlO8A6SIVREGz7iiP1ioxls+
-         uRKQhpA0QPi2QsKONccxn09VuerKID5YUFBcJw0iy0y3LTrqusnNYGxyxsmYlNa8khMh
-         TEJnXUQplddVyPkJkd6kiWrz0pC9xgDm/jMTPSeeJ/+u0v2wVpV32Qwsi+C7sRZKiv0S
-         YI2A==
-X-Forwarded-Encrypted: i=1; AL+hErEks3hYOcuzgObKwK2JlmtjdcAFFOqwyzGzwiwOMTU97dt6F8T+B9bwrItWGAsIHrOT5ytwkT4=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+iw9NCDvGrtIchRy+fZTcU2z2OPc1k5ID3WMub7xKTCXndWAbl
-	obF7hTB9QeGoyL5hvqippbLVlOkl05eij+aUNMsC0ZaxBHkbv4HVn99VVMoKCZ8Cba9Jkib5aQj
-	mhJtcBu/llA==
-X-Received: from dldz9-n2.prod.google.com ([2002:a05:701b:4189:20b0:1b5:9ce:e6d5])
- (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:ea26:b0:1b5:58e:b547
- with SMTP id a92af1059eb24-1b5568aa9admr19561132c88.22.1795587411607; Tue, 24
- Nov 2026 22:16:51 -0800 (PST)
-Date: Tue, 24 Nov 2026 22:15:20 -0800
+        bh=jFmNLdaybvaWIRtLdTiBMi3UUKe/rujAV3S2k7ZenzI=;
+        b=fv/w429/mSsmGaXZZ5rXrWGJmrjmgQH6u4gOnZyw0YkwAUB0meNGrLzMiymigmQzTs
+         pME7ylcYJBmiScehqfrxsHnLkcxlOQfMvuRyzPsk5eN3GbDTTwYcxIJNWegRcGZ95mnA
+         COYPeSr61GIuegnuXcMCEt3dFuBG+v5BNUudPU/qyA25Ac4UqqqsoDZDXrHndh53KnUM
+         E35KRZb/PBMGjSgG0c4ZgZOruhR2ZOHbFF94RyJbtQlHIE/LnsxG3BMQzf25X1Iwg5sq
+         7L9nas+fqZdIolFfk/STTZB34TuBzFJ9J7I0IktleD75fBISarfryTX6zYDxX8EGFTXv
+         roEg==
+X-Forwarded-Encrypted: i=1; AL+hErHKQsQslErEqEwzGHHn9LSlc6QqWeiM+OSflJ3JeFxUMrG8FZorb4FLbyrcKfKc+tO3QpCndGw=@lists.linux.dev
+X-Gm-Message-State: APuU4Z9JBHEQHEBLei1X4BPKxJy4+joKZJH5K5TEa7XtIjLN4PBdUpg6
+	+LbYqM6kSltZ5VHm2K7u9LOC8AF9bYlJUU1KfKGkn62rQrFuqaakY6x3ZGcQIVvBTgcbaaIU0O1
+	AokkaUwFaLg==
+X-Received: from dybpk12.prod.google.com ([2002:a05:7301:428c:b0:377:a5e3:b669])
+ (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7300:108:b0:375:50d9:474e
+ with SMTP id 5a478bee46e88-3856c0d0bb4mr22379541eec.4.1795587413560; Tue, 24
+ Nov 2026 22:16:53 -0800 (PST)
+Date: Tue, 24 Nov 2026 22:15:21 -0800
 In-Reply-To: <20261125061523.1540234-1-irogers@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,9 +81,9 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261125061523.1540234-1-irogers@google.com>
 X-Mailer: git-send-email 2.56.1.831.g720f3f5937-goog
-Message-ID: <20261125061523.1540234-28-irogers@google.com>
-Subject: [RFC PATCH v2 27/30] tools/unwind: Add multi-arch symbolic
- instruction lifters for verify_cfi
+Message-ID: <20261125061523.1540234-29-irogers@google.com>
+Subject: [RFC PATCH v2 28/30] tools/unwind: Add CFG instruction abstract
+ execution oracle to verify_cfi
 From: Ian Rogers <irogers@google.com>
 To: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
 	linux-arch@vger.kernel.org
@@ -103,906 +103,407 @@ Cc: jpoimboe@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
 	wnliu@google.com, dylanbhatch@google.com, Ian Rogers <irogers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add the symbolic stack/register abstract domain (verify_insn.hpp),
-per-architecture Tier-2 instruction lifters (stepInstructionX86(),
-stepInstructionArm64(), stepInstructionRiscv(), and
-normalizeRiscvControlFlow()), and the conservative Tier-1 MCInstrDesc /
-MCRegisterInfo register-def clobber fallback (clobberGenericDefs()) in
-verify_insn_arch.cpp.
+Add verifyOracle2Instructions() in tools/unwind/verify_insn.cpp and
+enable -DHAVE_VERIFY_INSN in tools/unwind/Makefile, propagating symbolic
+register and stack state over per-function basic-block CFGs across
+x86_64, arm64, and riscv64 and verifying at every reachable instruction
+that Minimal DWARF CFI recovers the caller's exact CFA, RA (including
+AArch64 PAC sign state), and FP.
 
 Signed-off-by: Ian Rogers <irogers@google.com>
 ---
- tools/unwind/Makefile             |   3 +-
- tools/unwind/verify_insn.hpp      | 103 ++++
- tools/unwind/verify_insn_arch.cpp | 757 ++++++++++++++++++++++++++++++
- 3 files changed, 862 insertions(+), 1 deletion(-)
- create mode 100644 tools/unwind/verify_insn.hpp
- create mode 100644 tools/unwind/verify_insn_arch.cpp
+ tools/unwind/Makefile        |   5 +-
+ tools/unwind/verify_insn.cpp | 360 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 363 insertions(+), 2 deletions(-)
+ create mode 100644 tools/unwind/verify_insn.cpp
 
 diff --git a/tools/unwind/Makefile b/tools/unwind/Makefile
-index ca6b84dbd31a..90c4b47ae851 100644
+index 90c4b47ae851..c0a8d477dc13 100644
 --- a/tools/unwind/Makefile
 +++ b/tools/unwind/Makefile
-@@ -87,7 +87,8 @@ KERNEL_CFI_DEPS := $(srctree)/kernel/unwind/dwarf_cfi.c \
- 		   $(srctree)/tools/include/linux/unwind_dwarf_cfi.h
+@@ -79,7 +79,7 @@ TOOLS_INCLUDES := -I$(srctree)/tools/include -I$(srctree)/tools/include/uapi \
+ SHIM_CFLAGS := -O2 -g -Wall -Wextra -Wno-unused-parameter -Wno-maybe-uninitialized \
+ 	$(TOOLS_INCLUDES)
+ 
+-VERIFY_CXXFLAGS := -O2 -g -Wall -Wextra -std=gnu++20 $(LLVM_CXXFLAGS) \
++VERIFY_CXXFLAGS := -O2 -g -Wall -Wextra -std=gnu++20 $(LLVM_CXXFLAGS) -DHAVE_VERIFY_INSN \
+ 	-I$(CURDIR) $(TOOLS_INCLUDES) $(CXXFLAGS)
+ VERIFY_LDFLAGS  := $(LLVM_LDFLAGS) $(LDFLAGS)
+ 
+@@ -88,7 +88,8 @@ KERNEL_CFI_DEPS := $(srctree)/kernel/unwind/dwarf_cfi.c \
  
  VERIFY_OBJS := $(OUTPUT)dwarf_cfi_host.o \
--		 $(OUTPUT)verify_cfi.o
-+		 $(OUTPUT)verify_cfi.o \
-+		 $(OUTPUT)verify_insn_arch.o
+ 		 $(OUTPUT)verify_cfi.o \
+-		 $(OUTPUT)verify_insn_arch.o
++		 $(OUTPUT)verify_insn_arch.o \
++		 $(OUTPUT)verify_insn.o
  
  ifeq ($(HAS_LIBLLVM),1)
  all: $(OUTPUT)verify_cfi
-diff --git a/tools/unwind/verify_insn.hpp b/tools/unwind/verify_insn.hpp
+diff --git a/tools/unwind/verify_insn.cpp b/tools/unwind/verify_insn.cpp
 new file mode 100644
-index 000000000000..c0d2711b716e
+index 000000000000..45dbd9a94764
 --- /dev/null
-+++ b/tools/unwind/verify_insn.hpp
-@@ -0,0 +1,103 @@
-+/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
-+#ifndef _TOOLS_UNWIND_VERIFY_INSN_H
-+#define _TOOLS_UNWIND_VERIFY_INSN_H
-+
-+#include "verify_cfi.hpp"
-+
-+/**
-+ * enum ValKind - Symbolic lattice value kinds tracked in registers and stack
-+ * @VK_UNKNOWN: Clobbered, runtime-dependent, or unmodeled value.
-+ * @VK_ENTRY_SP: Value equal to function-entry SP + @off.
-+ * @VK_ALIGNED_SP: Post-realignment SP + @off (after `and $-align, sp` DRAP).
-+ * @VK_CALLER_FP: Preserved caller frame pointer value at function entry.
-+ * @VK_CALLER_RA: Preserved caller return address (@off == 1 when PAC-signed).
-+ * @VK_CONST: Known 64-bit integer constant (e.g. >4KB frame size setup).
-+ */
-+enum ValKind : uint8_t {
-+	VK_UNKNOWN = 0,
-+	VK_ENTRY_SP,
-+	VK_ALIGNED_SP,
-+	VK_CALLER_FP,
-+	VK_CALLER_RA,
-+	VK_CONST,
-+};
-+
-+struct SymVal {
-+	ValKind kind = VK_UNKNOWN;
-+	int64_t off = 0;
-+
-+	bool operator==(const SymVal &o) const
-+	{
-+		return kind == o.kind && (kind == VK_UNKNOWN || off == o.off);
-+	}
-+	bool operator!=(const SymVal &o) const { return !(*this == o); }
-+};
-+
-+struct StackKey {
-+	uint8_t base; // VK_ENTRY_SP or VK_ALIGNED_SP
-+	int64_t off;
-+	bool operator<(const StackKey &o) const
-+	{
-+		return base != o.base ? base < o.base : off < o.off;
-+	}
-+	bool operator==(const StackKey &o) const
-+	{
-+		return base == o.base && off == o.off;
-+	}
-+};
-+
-+/**
-+ * struct AbsState - Per-PC abstract machine state during CFG symbolic execution
-+ * @regs: Symbolic values of DWARF registers 0..31.
-+ * @stack: Sparse symbolic stack slots keyed by (ENTRY_SP | ALIGNED_SP) + offset.
-+ */
-+struct AbsState {
-+	SymVal regs[32];
-+	std::map<StackKey, SymVal> stack;
-+
-+	SymVal load(const SymVal &addr) const
-+	{
-+		if (addr.kind != VK_ENTRY_SP && addr.kind != VK_ALIGNED_SP)
-+			return {VK_UNKNOWN, 0};
-+		auto it = stack.find({(uint8_t)addr.kind, addr.off});
-+		if (it == stack.end())
-+			return {VK_UNKNOWN, 0};
-+		return it->second;
-+	}
-+
-+	void store(const SymVal &addr, const SymVal &val)
-+	{
-+		if (addr.kind != VK_ENTRY_SP && addr.kind != VK_ALIGNED_SP)
-+			return;
-+		StackKey k{(uint8_t)addr.kind, addr.off};
-+		if (val.kind == VK_UNKNOWN)
-+			stack.erase(k);
-+		else
-+			stack[k] = val;
-+	}
-+};
-+
-+int mcRegToDwarf32(const llvm::MCRegisterInfo &MCRI, llvm::MCRegister Reg,
-+		   llvm::Triple::ArchType Arch);
-+
-+SymVal addSymImm(SymVal base, int64_t delta);
-+SymVal addSymVals(SymVal a, SymVal b);
-+SymVal subSymVals(SymVal a, SymVal b);
-+
-+void clobberGenericDefs(AbsState &st, const llvm::MCInst &MI,
-+			const llvm::MCInstrDesc &Desc,
-+			const llvm::MCRegisterInfo &MCRI,
-+			const ArchSpec &AS);
-+
-+bool stepInstruction(AbsState &st, const llvm::MCInst &MI,
-+		     llvm::StringRef OpName, const llvm::MCInstrDesc &Desc,
-+		     const llvm::MCRegisterInfo &MCRI, const ArchSpec &AS,
-+		     uint64_t NextPC, const llvm::MCInstrAnalysis *MIA,
-+		     uint64_t CurPC, uint64_t InsnSize);
-+
-+void normalizeRiscvControlFlow(const llvm::MCInst &MI, llvm::StringRef OpName,
-+			       const llvm::MCRegisterInfo &MCRI,
-+			       bool &is_ret_or_ind_jump, bool &is_uncond_branch,
-+			       bool &is_call);
-+
-+#endif /* _TOOLS_UNWIND_VERIFY_INSN_H */
-diff --git a/tools/unwind/verify_insn_arch.cpp b/tools/unwind/verify_insn_arch.cpp
-new file mode 100644
-index 000000000000..3005c8a9d9bd
---- /dev/null
-+++ b/tools/unwind/verify_insn_arch.cpp
-@@ -0,0 +1,757 @@
++++ b/tools/unwind/verify_insn.cpp
+@@ -0,0 +1,360 @@
 +// SPDX-License-Identifier: GPL-2.0-only OR MIT
 +/*
-+ * Per-architecture Tier-2 symbolic instruction lifters (x86_64, arm64, riscv64)
-+ * and Tier-1 generic MCInstrDesc register-def clobber fallback for verify_cfi.
++ * Oracle 2: Multi-architecture basic-block CFG abstract execution & soundness
++ * verification against kernel/unwind/dwarf_cfi.c.
 + */
 +
 +#include "verify_insn.hpp"
 +
++#include <algorithm>
++#include <cinttypes>
++#include <cstdio>
++#include <queue>
++#include <unordered_map>
++
 +using namespace llvm;
 +
 +/**
-+ * mcRegToDwarf32() - Map an LLVM physical MCRegister to DWARF reg 0..31
-+ * @MCRI: Target MCRegisterInfo table.
-+ * @Reg: Physical register operand from an MCInst.
-+ * @Arch: Target architecture type.
++ * isKnownNoreturnName() - Check if a symbol name is a non-returning callee
++ * @Name: ELF symbol name of a direct call target.
 + *
-+ * Resolves both full-width registers and sub-registers (e.g. %eax -> %rax on
-+ * x86_64, w29 -> x29 on AArch64) via super-register traversal. On AArch64,
-+ * LLVM's getDwarfRegNum() maps both XZR/WZR (zero sink) and SP/WSP to DWARF
-+ * number 31 because they share architectural 5-bit encoding 31 in different
-+ * instruction classes; XZR and WZR are explicitly filtered out so flag-setting
-+ * compares (`cmp` -> `SUBS XZR, ...`) never clobber the stack pointer.
-+ *
-+ * Return: DWARF register number in [0, 31], or -1 if unmapped / zero sink.
++ * Return: true if calls to @Name never return to the fallthrough instruction.
 + */
-+int mcRegToDwarf32(const MCRegisterInfo &MCRI, MCRegister Reg,
-+		   Triple::ArchType Arch)
++bool isKnownNoreturnName(StringRef Name)
 +{
-+	if (!Reg.isValid() || Reg.id() == 0)
-+		return -1;
-+	if (Arch == Triple::aarch64) {
-+		StringRef N = MCRI.getName(Reg);
-+		if (N == "XZR" || N == "WZR")
-+			return -1;
++	static const char *const Exact[] = {
++		"panic", "do_exit", "make_task_dead", "__stack_chk_fail",
++		"__stack_chk_fail_local", "fortify_panic", "usercopy_abort",
++		"__bug", "bug_at", "do_group_exit", "complete_and_exit",
++		"kthread_exit", "cpu_bringup_and_idle", "cpu_startup_entry",
++		"abort", "_exit", "_Exit", "exit", "__assert_fail",
++		"__assert_perror_fail", "__cxa_throw", "__cxa_rethrow",
++		"__cxa_bad_cast", "__cxa_bad_typeid", "_Unwind_Resume",
++		"_ZSt9terminatev", "_ZSt20__throw_length_errorPKc",
++		"_ZSt17__throw_bad_allocv", "_ZSt20__throw_out_of_rangePKc",
++		"_ZSt24__throw_out_of_range_fmtPKcz", "_ZSt19__throw_logic_errorPKc",
++		"__libc_fatal", "__chk_fail", "pthread_exit", "__longjmp_chk",
++		"longjmp", "_longjmp", "siglongjmp", "verr", "verrx", "err", "errx",
++	};
++	for (const char *s : Exact) {
++		if (Name == s)
++			return true;
 +	}
-+	int64_t d = MCRI.getDwarfRegNum(Reg, /*isEH=*/true);
-+	if (d >= 0 && d < 32)
-+		return (int)d;
-+	for (MCPhysReg Super : MCRI.superregs(Reg)) {
-+		if (Arch == Triple::aarch64) {
-+			StringRef SN = MCRI.getName(Super);
-+			if (SN == "XZR" || SN == "WZR")
++	if (Name.starts_with("__throw_") || Name.starts_with("_ZSt7__throw") ||
++	    Name.starts_with("_ZSt9__throw") || Name.contains("panicking") ||
++	    Name.starts_with("rust_begin_unwind") || Name.contains("noreturn") ||
++	    Name.starts_with("__bad_"))
++		return true;
++	return false;
++}
++
++/**
++ * evalRowAgainstAbs() - Check Minimal DWARF unwind row against abstract state
++ * @st: Symbolic register/stack state reaching the current instruction PC.
++ * @row: Unwind row returned by kernel/unwind/dwarf_cfi.c at the same PC.
++ * @AS: Target architecture parameters.
++ * @err_kind: Populated with a short category tag on mismatch.
++ * @err_detail: Populated with diagnostic state details on mismatch.
++ *
++ * Return: true if CFA, RA (including AArch64 PAC sign state), and FP all
++ * recover the exact caller entry state; false on any discrepancy.
++ */
++static bool evalRowAgainstAbs(const AbsState &st, const dwarf_cfi_row &row,
++			      const ArchSpec &AS, std::string &err_kind,
++			      std::string &err_detail)
++{
++	SymVal cfa{VK_UNKNOWN, 0};
++	if (row.cfa_base == DWARF_CFI_BASE_SP)
++		cfa = addSymImm(st.regs[AS.karch.sp_reg], row.cfa_off);
++	else if (row.cfa_base == DWARF_CFI_BASE_FP)
++		cfa = addSymImm(st.regs[AS.karch.fp_reg], row.cfa_off);
++	else if (row.cfa_base == DWARF_CFI_BASE_REG && row.cfa_reg < 32)
++		cfa = addSymImm(st.regs[row.cfa_reg], row.cfa_off);
++	else if (row.cfa_base == DWARF_CFI_BASE_FP_INDIRECT)
++		cfa = st.load(addSymImm(st.regs[AS.karch.fp_reg], row.cfa_off));
++	else if (row.cfa_base == DWARF_CFI_BASE_SP_INDIRECT)
++		cfa = st.load(addSymImm(st.regs[AS.karch.sp_reg], row.cfa_off));
++
++	SymVal expected_cfa{VK_ENTRY_SP, AS.entry_cfa_off};
++	if (cfa != expected_cfa) {
++		err_kind = (cfa.kind == VK_UNKNOWN) ? "cfa_clobbered_or_opaque"
++						    : "cfa_offset_mismatch";
++		char buf[160];
++		snprintf(buf, sizeof(buf),
++			 "CFI cfa_base=%u off=%d evaluated to kind=%u off=%" PRId64
++			 ", expected ENTRY_SP+%d",
++			 row.cfa_base, row.cfa_off, cfa.kind, cfa.off,
++			 AS.entry_cfa_off);
++		err_detail = buf;
++		return false;
++	}
++
++	if (row.ra_rule != DWARF_CFI_RULE_UNDEFINED) {
++		SymVal ra{VK_UNKNOWN, 0};
++		if (row.ra_rule == DWARF_CFI_RULE_SAME) {
++			if (AS.karch.ra_reg < 32)
++				ra = st.regs[AS.karch.ra_reg];
++		} else if (row.ra_rule == DWARF_CFI_RULE_OFFSET) {
++			ra = st.load(addSymImm(cfa, row.ra_off));
++		} else if (row.ra_rule == DWARF_CFI_RULE_SP_OFFSET) {
++			ra = st.load(addSymImm(st.regs[AS.karch.sp_reg],
++					       row.ra_off));
++		}
++		int64_t exp_signed =
++			(AS.llvm_arch == Triple::aarch64 && row.ra_signed) ? 1 : 0;
++		if (ra.kind != VK_CALLER_RA ||
++		    (AS.llvm_arch == Triple::aarch64 && ra.off != exp_signed)) {
++			err_kind = "ra_recovery_mismatch";
++			char buf[160];
++			snprintf(buf, sizeof(buf),
++				 "CFI ra_rule=%u off=%d signed=%d evaluated to kind=%u off=%" PRId64,
++				 row.ra_rule, row.ra_off, (int)row.ra_signed,
++				 ra.kind, ra.off);
++			err_detail = buf;
++			return false;
++		}
++	}
++
++	if (row.fp_rule != DWARF_CFI_RULE_UNDEFINED) {
++		SymVal fp{VK_UNKNOWN, 0};
++		if (row.fp_rule == DWARF_CFI_RULE_SAME)
++			fp = st.regs[AS.karch.fp_reg];
++		else if (row.fp_rule == DWARF_CFI_RULE_OFFSET)
++			fp = st.load(addSymImm(cfa, row.fp_off));
++		else if (row.fp_rule == DWARF_CFI_RULE_FP_OFFSET)
++			fp = st.load(addSymImm(st.regs[AS.karch.fp_reg],
++					       row.fp_off));
++		else if (row.fp_rule == DWARF_CFI_RULE_SP_OFFSET)
++			fp = st.load(addSymImm(st.regs[AS.karch.sp_reg],
++					       row.fp_off));
++		if (fp.kind != VK_CALLER_FP) {
++			err_kind = "fp_recovery_mismatch";
++			char buf[160];
++			snprintf(buf, sizeof(buf),
++				 "CFI fp_rule=%u off=%d evaluated to kind=%u off=%" PRId64,
++				 row.fp_rule, row.fp_off, fp.kind, fp.off);
++			err_detail = buf;
++			return false;
++		}
++	}
++
++	return true;
++}
++
++/**
++ * verifyOracle2Instructions() - Verify CFI rows via CFG symbolic execution
++ */
++void verifyOracle2Instructions(
++	const ArchSpec &AS, uint64_t eh_hdr_vma, StringRef eh_hdr_bytes,
++	const std::vector<ExecSec> &exec_secs,
++	const std::vector<FuncSym> &func_syms,
++	const std::unordered_set<uint64_t> &noreturn_addrs,
++	const std::vector<FDERange> &fde_ranges, const MCDisassembler &Disasm,
++	const MCInstrInfo &MCII, const MCRegisterInfo &MCRI,
++	const MCInstrAnalysis *MIA, const VerifyOptions &opts, VerifyStats &st)
++{
++	st.has_insn_oracle = true;
++
++	auto findFDE = [&](uint64_t pc) -> const FDERange * {
++		auto it = std::upper_bound(
++			fde_ranges.begin(), fde_ranges.end(), pc,
++			[](uint64_t val, const FDERange &r) {
++				return val < r.start;
++			});
++		if (it == fde_ranges.begin())
++			return nullptr;
++		--it;
++		if (pc >= it->start && pc < it->end)
++			return &*it;
++		return nullptr;
++	};
++
++	for (const FuncSym &fn : func_syms) {
++		st.funcs_total++;
++		const FDERange *fr = findFDE(fn.addr);
++		if (!fr || !fr->supported) {
++			st.funcs_no_fde++;
++			continue;
++		}
++		if (fr->signal)
++			continue;
++
++		dwarf_cfi_row entry_row{};
++		if (dwarf_cfi_unwind_user_eh_frame_hdr(
++			    (unsigned long)eh_hdr_vma, eh_hdr_bytes.size(),
++			    (unsigned long)fn.addr, &AS.karch, &entry_row) != 0) {
++			st.funcs_no_fde++;
++			continue;
++		}
++		if (fn.addr != fr->start ||
++		    entry_row.cfa_base != DWARF_CFI_BASE_SP ||
++		    entry_row.cfa_off != AS.entry_cfa_off ||
++		    entry_row.fp_rule != DWARF_CFI_RULE_SAME ||
++		    (AS.ra_on_entry_stack
++			 ? (entry_row.ra_rule != DWARF_CFI_RULE_OFFSET ||
++			    entry_row.ra_off != -8)
++			 : (entry_row.ra_rule != DWARF_CFI_RULE_SAME))) {
++			st.funcs_mid_frame_split++;
++			continue;
++		}
++
++		uint64_t range_end =
++			fn.size ? std::min(fr->end, fn.addr + fn.size) : fr->end;
++		if (range_end <= fn.addr)
++			continue;
++		ArrayRef<uint8_t> code =
++			findExecBytes(exec_secs, fn.addr, range_end - fn.addr);
++		if (code.empty())
++			continue;
++
++		st.funcs_verified++;
++
++		AbsState init_st;
++		init_st.regs[AS.karch.sp_reg] = {VK_ENTRY_SP, 0};
++		init_st.regs[AS.karch.fp_reg] = {VK_CALLER_FP, 0};
++		if (AS.ra_on_entry_stack)
++			init_st.store({VK_ENTRY_SP, 0}, {VK_CALLER_RA, 0});
++		else
++			init_st.regs[AS.karch.ra_reg] = {VK_CALLER_RA, 0};
++
++		std::unordered_map<uint64_t, AbsState> visited;
++		std::queue<uint64_t> worklist;
++		visited[fn.addr] = init_st;
++		worklist.push(fn.addr);
++
++		bool func_ok = true;
++		unsigned steps = 0;
++		while (!worklist.empty() && steps < 4096) {
++			uint64_t pc = worklist.front();
++			worklist.pop();
++			steps++;
++
++			if (pc < fn.addr || pc >= range_end)
 +				continue;
-+		}
-+		int64_t sd = MCRI.getDwarfRegNum(Super, /*isEH=*/true);
-+		if (sd >= 0 && sd < 32)
-+			return (int)sd;
-+	}
-+	return -1;
-+}
 +
-+SymVal addSymImm(SymVal base, int64_t delta)
-+{
-+	if (base.kind == VK_ENTRY_SP || base.kind == VK_ALIGNED_SP ||
-+	    base.kind == VK_CONST)
-+		return {base.kind, (int64_t)((uint64_t)base.off + (uint64_t)delta)};
-+	return {VK_UNKNOWN, 0};
-+}
++			const AbsState cur = visited[pc];
 +
-+SymVal addSymVals(SymVal a, SymVal b)
-+{
-+	if (a.kind == VK_CONST && b.kind == VK_CONST)
-+		return {VK_CONST, (int64_t)((uint64_t)a.off + (uint64_t)b.off)};
-+	if ((a.kind == VK_ENTRY_SP || a.kind == VK_ALIGNED_SP) &&
-+	    b.kind == VK_CONST)
-+		return {a.kind, (int64_t)((uint64_t)a.off + (uint64_t)b.off)};
-+	if (a.kind == VK_CONST &&
-+	    (b.kind == VK_ENTRY_SP || b.kind == VK_ALIGNED_SP))
-+		return {b.kind, (int64_t)((uint64_t)b.off + (uint64_t)a.off)};
-+	return {VK_UNKNOWN, 0};
-+}
-+
-+SymVal subSymVals(SymVal a, SymVal b)
-+{
-+	if (b.kind == VK_CONST)
-+		return addSymVals(a, {VK_CONST, (int64_t)(-(uint64_t)b.off)});
-+	return {VK_UNKNOWN, 0};
-+}
-+
-+/**
-+ * clobberGenericDefs() - Tier-1 conservative register-def clobber fallback
-+ * @st: Abstract state updated in place.
-+ * @MI: Decoded LLVM MCInst.
-+ * @Desc: Instruction descriptor providing explicit/implicit register defs.
-+ * @MCRI: Target register alias hierarchy.
-+ * @AS: Target architecture specification.
-+ *
-+ * Marks every architectural DWARF register (0..31) modified by @MI (explicit
-+ * def operands, implicit defs, and sub-/super-register aliases) as VK_UNKNOWN,
-+ * and clobbers ABI caller-saved registers across call instructions.
-+ */
-+void clobberGenericDefs(AbsState &st, const MCInst &MI, const MCInstrDesc &Desc,
-+			const MCRegisterInfo &MCRI, const ArchSpec &AS)
-+{
-+	auto clobberPhys = [&](MCRegister R) {
-+		if (!R.isValid() || R.id() == 0)
-+			return;
-+		if (AS.llvm_arch == Triple::aarch64) {
-+			StringRef RN = MCRI.getName(R);
-+			if (RN == "XZR" || RN == "WZR")
-+				return;
-+		}
-+		for (MCPhysReg Alias : MCRI.sub_and_superregs_inclusive(R)) {
-+			if (AS.llvm_arch == Triple::aarch64) {
-+				StringRef AN = MCRI.getName(Alias);
-+				if (AN == "XZR" || AN == "WZR")
-+					continue;
++			dwarf_cfi_row row{};
++			int kerr = dwarf_cfi_unwind_user_eh_frame_hdr(
++				(unsigned long)eh_hdr_vma, eh_hdr_bytes.size(),
++				(unsigned long)pc, &AS.karch, &row);
++			if (kerr != 0) {
++				func_ok = false;
++				recordIssue(st, opts, "fde_eval_error", fn.name);
++				break;
 +			}
-+			int64_t d = MCRI.getDwarfRegNum(Alias, /*isEH=*/true);
-+			if (d >= 0 && d < 32) {
-+				if (AS.llvm_arch == Triple::riscv64 && d == 0)
++
++			st.insns_verified++;
++			std::string ekind, edetail;
++			if (!evalRowAgainstAbs(cur, row, AS, ekind, edetail)) {
++				func_ok = false;
++				if (ekind.starts_with("cfa"))
++					st.insns_cfa_mismatch++;
++				else if (ekind.starts_with("ra"))
++					st.insns_ra_mismatch++;
++				else
++					st.insns_fp_mismatch++;
++
++				char loc_buf[128];
++				snprintf(loc_buf, sizeof(loc_buf),
++					 "%s+0x%" PRIx64 " (0x%" PRIx64 "): ",
++					 fn.name.c_str(), pc - fn.addr, pc);
++				recordIssue(st, opts, ekind,
++					    std::string(loc_buf) + edetail);
++				break;
++			}
++
++			MCInst MI;
++			uint64_t InsnSize = 0;
++			ArrayRef<uint8_t> slice = code.slice(pc - fn.addr);
++			auto DStat = Disasm.getInstruction(MI, InsnSize, slice,
++							   pc, nulls());
++			if (DStat != MCDisassembler::Success || InsnSize == 0)
++				continue;
++
++			const MCInstrDesc &Desc = MCII.get(MI.getOpcode());
++			StringRef OpName = MCII.getName(MI.getOpcode());
++
++			bool is_ret_or_ind_jump =
++				Desc.isReturn() || Desc.isIndirectBranch();
++			bool is_uncond_branch = Desc.isUnconditionalBranch();
++			bool is_cond_branch = Desc.isConditionalBranch();
++			bool is_call = Desc.isCall();
++			if (AS.llvm_arch == Triple::riscv64)
++				normalizeRiscvControlFlow(MI, OpName, MCRI,
++							  is_ret_or_ind_jump,
++							  is_uncond_branch,
++							  is_call);
++
++			if (is_ret_or_ind_jump || Desc.isTrap() ||
++			    OpName == "UD2" || OpName == "BRK" ||
++			    OpName == "EBREAK" || OpName == "C_EBREAK" ||
++			    OpName == "SVC" || OpName == "ECALL" ||
++			    OpName == "SYSCALL" || OpName == "IRET64" ||
++			    OpName == "SYSRET64" || OpName == "ERET" ||
++			    OpName == "SRET" || OpName == "MRET")
++				continue;
++
++			uint64_t next_pc = pc + InsnSize;
++
++			if (is_call) {
++				uint64_t CallTarget = 0;
++				bool has_target = MIA &&
++						  MIA->evaluateBranch(MI, pc,
++								      InsnSize,
++								      CallTarget);
++				if (has_target &&
++				    noreturn_addrs.count(CallTarget))
 +					continue;
-+				st.regs[d] = {VK_UNKNOWN, 0};
++				if (next_pc < range_end &&
++				    (!has_target || CallTarget != next_pc)) {
++					dwarf_cfi_row next_row{};
++					if (dwarf_cfi_unwind_user_eh_frame_hdr(
++						    (unsigned long)eh_hdr_vma,
++						    eh_hdr_bytes.size(),
++						    (unsigned long)next_pc,
++						    &AS.karch, &next_row) == 0 &&
++					    !rowsEqual(row, next_row))
++						continue;
++				}
++			}
++
++			AbsState next_st = cur;
++			if (AS.llvm_arch == Triple::riscv64 && is_call) {
++				for (int d = 1; d < 32; d++) {
++					if (d == 2 || d == 3 || d == 4 ||
++					    d == 8 || d == 9 ||
++					    (d >= 18 && d <= 27))
++						continue;
++					next_st.regs[d] = {VK_UNKNOWN, 0};
++				}
++			} else {
++				stepInstruction(next_st, MI, OpName, Desc, MCRI,
++						AS, next_pc, MIA, pc, InsnSize);
++			}
++
++			auto enqueue = [&](uint64_t target) {
++				if (target < fn.addr || target >= range_end)
++					return;
++				if (!visited.count(target)) {
++					visited[target] = next_st;
++					worklist.push(target);
++				}
++			};
++
++			if (is_uncond_branch || is_cond_branch) {
++				uint64_t BranchTarget = 0;
++				if (MIA && MIA->evaluateBranch(MI, pc, InsnSize,
++							       BranchTarget))
++					enqueue(BranchTarget);
++				if (is_cond_branch)
++					enqueue(next_pc);
++			} else if (!Desc.isBarrier()) {
++				enqueue(next_pc);
 +			}
 +		}
-+	};
 +
-+	unsigned numDefs = Desc.getNumDefs();
-+	for (unsigned i = 0; i < numDefs && i < MI.getNumOperands(); i++) {
-+		if (MI.getOperand(i).isReg())
-+			clobberPhys(MI.getOperand(i).getReg());
-+	}
-+	for (MCPhysReg Imp : Desc.implicit_defs())
-+		clobberPhys(Imp);
-+
-+	if (Desc.isCall()) {
-+		for (int d = 0; d < 32; d++) {
-+			if (AS.llvm_arch == Triple::x86_64) {
-+				if (d == 3 || d == 6 || d == 7 ||
-+				    (d >= 12 && d <= 15))
-+					continue;
-+				st.regs[d] = {VK_UNKNOWN, 0};
-+			} else if (AS.llvm_arch == Triple::aarch64) {
-+				if ((d >= 19 && d <= 29) || d == 31)
-+					continue;
-+				st.regs[d] = {VK_UNKNOWN, 0};
-+			} else if (AS.llvm_arch == Triple::riscv64) {
-+				if (d == 0 || d == 2 || d == 3 || d == 4 ||
-+				    d == 8 || d == 9 || (d >= 18 && d <= 27))
-+					continue;
-+				st.regs[d] = {VK_UNKNOWN, 0};
-+			}
-+		}
-+	}
-+}
-+
-+struct InsnStepCtx {
-+	const MCInst &MI;
-+	const MCRegisterInfo &MCRI;
-+	const ArchSpec &AS;
-+	const MCInstrAnalysis *MIA;
-+	uint64_t CurPC;
-+	uint64_t NextPC;
-+	uint64_t InsnSize;
-+
-+	int regD(unsigned idx) const
-+	{
-+		if (idx >= MI.getNumOperands() || !MI.getOperand(idx).isReg())
-+			return -1;
-+		return mcRegToDwarf32(MCRI, MI.getOperand(idx).getReg(),
-+				      AS.llvm_arch);
-+	}
-+
-+	SymVal getRegVal(const AbsState &st, int d) const
-+	{
-+		if (d < 0 || d >= 32)
-+			return {VK_UNKNOWN, 0};
-+		if (AS.llvm_arch == Triple::riscv64 && d == 0)
-+			return {VK_CONST, 0};
-+		return st.regs[d];
-+	}
-+
-+	void setRegVal(AbsState &st, int d, SymVal v) const
-+	{
-+		if (d < 0 || d >= 32)
-+			return;
-+		if (AS.llvm_arch == Triple::riscv64 && d == 0)
-+			return;
-+		st.regs[d] = v;
-+	}
-+};
-+
-+/**
-+ * stepInstructionX86() - Tier-2 symbolic lifter for x86-64 frame instructions
-+ * @st: Abstract register/stack state updated in place.
-+ * @OpName: LLVM MC opcode name (e.g. "PUSH64r", "SUB64ri8", "LEA64r").
-+ * @Desc: Instruction descriptor.
-+ * @ctx: Disassembled instruction context.
-+ *
-+ * Models x86-64 prologue, epilogue, DRAP (`lea 8(%rsp), %r10; and $-64, %rsp;
-+ * pushq -8(%r10)`), frame-pointer (`push %rbp; mov %rsp, %rbp; leave`), and
-+ * PIC `call next_pc` stack effects.
-+ *
-+ * Return: true if @OpName was modeled; false to trigger generic clobbering.
-+ */
-+static bool stepInstructionX86(AbsState &st, StringRef OpName,
-+			       const MCInstrDesc &Desc, const InsnStepCtx &ctx)
-+{
-+	const MCInst &MI = ctx.MI;
-+
-+	if (Desc.isCall()) {
-+		uint64_t Target = 0;
-+		if (ctx.MIA &&
-+		    ctx.MIA->evaluateBranch(MI, ctx.CurPC, ctx.InsnSize,
-+					    Target) &&
-+		    Target == ctx.NextPC) {
-+			st.regs[7] = addSymImm(st.regs[7], -8);
-+			st.store(st.regs[7], {VK_UNKNOWN, 0});
-+			return true;
-+		}
-+		clobberGenericDefs(st, MI, Desc, ctx.MCRI, ctx.AS);
-+		return true;
-+	}
-+	if (OpName.starts_with("PUSH64r")) {
-+		int src = ctx.regD(0);
-+		st.regs[7] = addSymImm(st.regs[7], -8);
-+		st.store(st.regs[7], ctx.getRegVal(st, src));
-+		return true;
-+	}
-+	if (OpName == "PUSHF64" || OpName.starts_with("PUSH64i") ||
-+	    OpName == "PUSH64rmm" || OpName == "PUSH64rmr") {
-+		st.regs[7] = addSymImm(st.regs[7], -8);
-+		st.store(st.regs[7], {VK_UNKNOWN, 0});
-+		return true;
-+	}
-+	if (OpName.starts_with("POP64r")) {
-+		int dst = ctx.regD(0);
-+		SymVal loaded = st.load(st.regs[7]);
-+		st.regs[7] = addSymImm(st.regs[7], 8);
-+		if (dst != 7)
-+			ctx.setRegVal(st, dst, loaded);
-+		return true;
-+	}
-+	if (OpName == "POPF64" || OpName == "POP64rmm") {
-+		st.regs[7] = addSymImm(st.regs[7], 8);
-+		return true;
-+	}
-+	if (OpName == "LEAVE64") {
-+		st.regs[7] = st.regs[6];
-+		st.regs[6] = st.load(st.regs[7]);
-+		st.regs[7] = addSymImm(st.regs[7], 8);
-+		return true;
-+	}
-+	if (OpName == "MOV64rr" || OpName == "MOV64rr_REV") {
-+		ctx.setRegVal(st, ctx.regD(0), ctx.getRegVal(st, ctx.regD(1)));
-+		return true;
-+	}
-+	if (OpName == "MOV32ri" || OpName == "MOV64ri" ||
-+	    OpName == "MOV64ri32") {
-+		int dst = ctx.regD(0);
-+		if (MI.getNumOperands() >= 2 && MI.getOperand(1).isImm()) {
-+			int64_t imm = MI.getOperand(1).getImm();
-+			if (OpName == "MOV32ri")
-+				imm = (uint32_t)imm;
-+			ctx.setRegVal(st, dst, {VK_CONST, imm});
-+			return true;
-+		}
-+	}
-+	if (OpName == "XOR32rr" || OpName == "XOR64rr") {
-+		int dst = ctx.regD(0), s1 = ctx.regD(1), s2 = ctx.regD(2);
-+		if (s1 >= 0 && s1 == s2) {
-+			ctx.setRegVal(st, dst, {VK_CONST, 0});
-+			return true;
-+		}
-+	}
-+	if ((OpName == "ADD64ri8" || OpName == "ADD64ri32" ||
-+	     OpName == "SUB64ri8" || OpName == "SUB64ri32") &&
-+	    MI.getNumOperands() >= 3 && MI.getOperand(2).isImm()) {
-+		int dst = ctx.regD(0), src = ctx.regD(1);
-+		int64_t imm = MI.getOperand(2).getImm();
-+		if (OpName.starts_with("SUB"))
-+			imm = (int64_t)(-(uint64_t)imm);
-+		ctx.setRegVal(st, dst, addSymImm(ctx.getRegVal(st, src), imm));
-+		return true;
-+	}
-+	if (OpName == "ADD64rr" || OpName == "SUB64rr") {
-+		int dst = ctx.regD(0), s1 = ctx.regD(1), s2 = ctx.regD(2);
-+		ctx.setRegVal(st, dst,
-+			      OpName == "ADD64rr"
-+				  ? addSymVals(ctx.getRegVal(st, s1),
-+					       ctx.getRegVal(st, s2))
-+				  : subSymVals(ctx.getRegVal(st, s1),
-+					       ctx.getRegVal(st, s2)));
-+		return true;
-+	}
-+	if ((OpName == "AND64ri8" || OpName == "AND64ri32") &&
-+	    MI.getNumOperands() >= 3 && MI.getOperand(2).isImm()) {
-+		int dst = ctx.regD(0), src = ctx.regD(1);
-+		int64_t mask = MI.getOperand(2).getImm();
-+		if (dst == 7 && src == 7 && mask < 0 && (mask & 0x7) == 0) {
-+			st.regs[7] = {VK_ALIGNED_SP, 0};
-+			return true;
-+		}
-+	}
-+	if (OpName == "LEA64r" && MI.getNumOperands() >= 6) {
-+		int dst = ctx.regD(0), base = ctx.regD(1), idx = ctx.regD(3);
-+		if (base >= 0 && MI.getOperand(2).isImm() &&
-+		    MI.getOperand(2).getImm() == 1 && idx < 0 &&
-+		    MI.getOperand(4).isImm()) {
-+			ctx.setRegVal(st, dst,
-+				      addSymImm(ctx.getRegVal(st, base),
-+						MI.getOperand(4).getImm()));
-+			return true;
-+		}
-+	}
-+	if (OpName == "MOV64mr" && MI.getNumOperands() >= 6) {
-+		int base = ctx.regD(0), idx = ctx.regD(2), src = ctx.regD(5);
-+		if (base >= 0 && MI.getOperand(1).isImm() &&
-+		    MI.getOperand(1).getImm() == 1 && idx < 0 &&
-+		    MI.getOperand(3).isImm()) {
-+			st.store(addSymImm(ctx.getRegVal(st, base),
-+					   MI.getOperand(3).getImm()),
-+				 ctx.getRegVal(st, src));
-+			return true;
-+		}
-+	}
-+	if (OpName == "MOV64rm" && MI.getNumOperands() >= 6) {
-+		int dst = ctx.regD(0), base = ctx.regD(1), idx = ctx.regD(3);
-+		if (base >= 0 && MI.getOperand(2).isImm() &&
-+		    MI.getOperand(2).getImm() == 1 && idx < 0 &&
-+		    MI.getOperand(4).isImm()) {
-+			ctx.setRegVal(st, dst,
-+				      st.load(addSymImm(ctx.getRegVal(st, base),
-+							MI.getOperand(4).getImm())));
-+			return true;
-+		}
-+	}
-+	return false;
-+}
-+
-+/**
-+ * stepInstructionArm64() - Tier-2 symbolic lifter for AArch64 instructions
-+ * @st: Abstract register/stack state updated in place.
-+ * @OpName: LLVM MC opcode name (e.g. "STPXpre", "LDPXi", "PACIASP").
-+ * @ctx: Disassembled instruction context.
-+ *
-+ * Models AAPCS64 frame setup and teardown including Pointer Authentication
-+ * (`paciasp`/`autiasp`), >4KB stack-frame constant materialization, and paired
-+ * or single stack spills/reloads.
-+ *
-+ * Return: true if @OpName was modeled; false to trigger generic clobbering.
-+ */
-+static bool stepInstructionArm64(AbsState &st, StringRef OpName,
-+				 const InsnStepCtx &ctx)
-+{
-+	const MCInst &MI = ctx.MI;
-+
-+	if (OpName == "PACIASP" || OpName == "PACIBSP" ||
-+	    OpName == "AUTIASP" || OpName == "AUTIBSP") {
-+		if (st.regs[30].kind == VK_CALLER_RA)
-+			st.regs[30].off ^= 1;
-+		return true;
-+	}
-+	if (OpName == "HINT" && MI.getNumOperands() >= 1 &&
-+	    MI.getOperand(0).isImm()) {
-+		int64_t h = MI.getOperand(0).getImm();
-+		if (h == 25 || h == 27 || h == 29 || h == 31) {
-+			if (st.regs[30].kind == VK_CALLER_RA)
-+				st.regs[30].off ^= 1;
-+			return true;
-+		}
-+	}
-+	if ((OpName == "ADDXri" || OpName == "SUBXri") &&
-+	    MI.getNumOperands() >= 4 && MI.getOperand(2).isImm() &&
-+	    MI.getOperand(3).isImm()) {
-+		int dst = ctx.regD(0), src = ctx.regD(1);
-+		unsigned sh = (unsigned)MI.getOperand(3).getImm() & 0x3f;
-+		int64_t imm = (int64_t)((uint64_t)MI.getOperand(2).getImm() << sh);
-+		if (OpName == "SUBXri")
-+			imm = (int64_t)(-(uint64_t)imm);
-+		ctx.setRegVal(st, dst, addSymImm(ctx.getRegVal(st, src), imm));
-+		return true;
-+	}
-+	if (OpName == "ORRXrs" && MI.getNumOperands() >= 4 &&
-+	    MI.getOperand(3).isImm() && MI.getOperand(3).getImm() == 0) {
-+		if (MI.getOperand(1).isReg() &&
-+		    StringRef(ctx.MCRI.getName(MI.getOperand(1).getReg())) == "XZR") {
-+			ctx.setRegVal(st, ctx.regD(0),
-+				      ctx.getRegVal(st, ctx.regD(2)));
-+			return true;
-+		}
-+	}
-+	if (OpName == "MOVZXi" && MI.getNumOperands() >= 3 &&
-+	    MI.getOperand(1).isImm() && MI.getOperand(2).isImm()) {
-+		unsigned sh = (unsigned)MI.getOperand(2).getImm() & 0x3f;
-+		uint64_t v = ((uint64_t)MI.getOperand(1).getImm()) << sh;
-+		ctx.setRegVal(st, ctx.regD(0), {VK_CONST, (int64_t)v});
-+		return true;
-+	}
-+	if (OpName == "MOVNXi" && MI.getNumOperands() >= 3 &&
-+	    MI.getOperand(1).isImm() && MI.getOperand(2).isImm()) {
-+		unsigned sh = (unsigned)MI.getOperand(2).getImm() & 0x3f;
-+		uint64_t v = ~(((uint64_t)MI.getOperand(1).getImm()) << sh);
-+		ctx.setRegVal(st, ctx.regD(0), {VK_CONST, (int64_t)v});
-+		return true;
-+	}
-+	if (OpName == "MOVKXi" && MI.getNumOperands() >= 4 &&
-+	    MI.getOperand(2).isImm() && MI.getOperand(3).isImm()) {
-+		SymVal cur = ctx.getRegVal(st, ctx.regD(1));
-+		if (cur.kind == VK_CONST) {
-+			unsigned sh = (unsigned)MI.getOperand(3).getImm() & 0x3f;
-+			uint64_t u = ((uint64_t)cur.off & ~(0xffffULL << sh)) |
-+				     (((uint64_t)MI.getOperand(2).getImm() &
-+				       0xffffULL) << sh);
-+			ctx.setRegVal(st, ctx.regD(0), {VK_CONST, (int64_t)u});
-+			return true;
-+		}
-+	}
-+	if ((OpName == "ADDXrs" || OpName == "SUBXrs" ||
-+	     OpName == "ADDXrx" || OpName == "SUBXrx") &&
-+	    MI.getNumOperands() >= 4 && MI.getOperand(3).isImm()) {
-+		int dst = ctx.regD(0), s1 = ctx.regD(1), s2 = ctx.regD(2);
-+		SymVal v2 = ctx.getRegVal(st, s2);
-+		int64_t imm_arg = MI.getOperand(3).getImm();
-+		bool ok_shift = false;
-+		if (OpName.ends_with("rs") && (imm_arg & ~0x3f) == 0) {
-+			if (v2.kind == VK_CONST)
-+				v2.off = (int64_t)((uint64_t)v2.off << imm_arg);
-+			ok_shift = (imm_arg == 0 || v2.kind == VK_CONST);
-+		} else if (OpName.ends_with("rx") &&
-+			   ((imm_arg >> 3) == 3 || (imm_arg >> 3) == 7) &&
-+			   (imm_arg & 7) == 0) {
-+			ok_shift = true;
-+		}
-+		if (ok_shift) {
-+			ctx.setRegVal(st, dst,
-+				      OpName.starts_with("ADD")
-+					  ? addSymVals(ctx.getRegVal(st, s1), v2)
-+					  : subSymVals(ctx.getRegVal(st, s1), v2));
-+			return true;
-+		}
-+	}
-+	if (OpName == "ANDXri" && ctx.regD(0) == 31) {
-+		st.regs[31] = {VK_ALIGNED_SP, 0};
-+		return true;
-+	}
-+
-+	auto scaleOf = [](StringRef N) -> int64_t {
-+		if (N.contains("Q"))
-+			return 16;
-+		if (N.contains("X") || N.contains("D"))
-+			return 8;
-+		if (N.contains("W") || N.contains("S"))
-+			return 4;
-+		if (N.contains("H"))
-+			return 2;
-+		return 1;
-+	};
-+
-+	if ((OpName == "STPXpre" || OpName == "STPWpre" ||
-+	     OpName == "STPDpre" || OpName == "STPQpre") &&
-+	    MI.getNumOperands() >= 5 && MI.getOperand(4).isImm()) {
-+		int wb = ctx.regD(0), r1 = ctx.regD(1), r2 = ctx.regD(2);
-+		int base = ctx.regD(3);
-+		SymVal addr = addSymImm(ctx.getRegVal(st, base),
-+					MI.getOperand(4).getImm() * scaleOf(OpName));
-+		ctx.setRegVal(st, wb, addr);
-+		if (OpName == "STPXpre") {
-+			st.store(addr, ctx.getRegVal(st, r1));
-+			st.store(addSymImm(addr, 8), ctx.getRegVal(st, r2));
-+		}
-+		return true;
-+	}
-+	if ((OpName == "STPXpost" || OpName == "STPWpost" ||
-+	     OpName == "STPDpost" || OpName == "STPQpost") &&
-+	    MI.getNumOperands() >= 5 && MI.getOperand(4).isImm()) {
-+		int wb = ctx.regD(0), r1 = ctx.regD(1), r2 = ctx.regD(2);
-+		int base = ctx.regD(3);
-+		SymVal addr = ctx.getRegVal(st, base);
-+		if (OpName == "STPXpost") {
-+			st.store(addr, ctx.getRegVal(st, r1));
-+			st.store(addSymImm(addr, 8), ctx.getRegVal(st, r2));
-+		}
-+		ctx.setRegVal(st, wb,
-+			      addSymImm(addr,
-+					MI.getOperand(4).getImm() * scaleOf(OpName)));
-+		return true;
-+	}
-+	if (OpName == "STPXi" && MI.getNumOperands() >= 4 &&
-+	    MI.getOperand(3).isImm()) {
-+		int r1 = ctx.regD(0), r2 = ctx.regD(1), base = ctx.regD(2);
-+		SymVal addr = addSymImm(ctx.getRegVal(st, base),
-+					MI.getOperand(3).getImm() * 8);
-+		st.store(addr, ctx.getRegVal(st, r1));
-+		st.store(addSymImm(addr, 8), ctx.getRegVal(st, r2));
-+		return true;
-+	}
-+	if ((OpName == "LDPXpost" || OpName == "LDPWpost" ||
-+	     OpName == "LDPDpost" || OpName == "LDPQpost") &&
-+	    MI.getNumOperands() >= 5 && MI.getOperand(4).isImm()) {
-+		int wb = ctx.regD(0), r1 = ctx.regD(1), r2 = ctx.regD(2);
-+		int base = ctx.regD(3);
-+		SymVal addr = ctx.getRegVal(st, base);
-+		SymVal v1 = st.load(addr), v2 = st.load(addSymImm(addr, 8));
-+		ctx.setRegVal(st, wb,
-+			      addSymImm(addr,
-+					MI.getOperand(4).getImm() * scaleOf(OpName)));
-+		if (OpName == "LDPXpost") {
-+			ctx.setRegVal(st, r1, v1);
-+			ctx.setRegVal(st, r2, v2);
-+		} else {
-+			if (r1 >= 0)
-+				ctx.setRegVal(st, r1, {VK_UNKNOWN, 0});
-+			if (r2 >= 0)
-+				ctx.setRegVal(st, r2, {VK_UNKNOWN, 0});
-+		}
-+		return true;
-+	}
-+	if ((OpName == "LDPXpre" || OpName == "LDPWpre" ||
-+	     OpName == "LDPDpre" || OpName == "LDPQpre") &&
-+	    MI.getNumOperands() >= 5 && MI.getOperand(4).isImm()) {
-+		int wb = ctx.regD(0), r1 = ctx.regD(1), r2 = ctx.regD(2);
-+		int base = ctx.regD(3);
-+		SymVal addr = addSymImm(ctx.getRegVal(st, base),
-+					MI.getOperand(4).getImm() * scaleOf(OpName));
-+		ctx.setRegVal(st, wb, addr);
-+		if (OpName == "LDPXpre") {
-+			ctx.setRegVal(st, r1, st.load(addr));
-+			ctx.setRegVal(st, r2, st.load(addSymImm(addr, 8)));
-+		} else {
-+			if (r1 >= 0)
-+				ctx.setRegVal(st, r1, {VK_UNKNOWN, 0});
-+			if (r2 >= 0)
-+				ctx.setRegVal(st, r2, {VK_UNKNOWN, 0});
-+		}
-+		return true;
-+	}
-+	if (OpName == "LDPXi" && MI.getNumOperands() >= 4 &&
-+	    MI.getOperand(3).isImm()) {
-+		int r1 = ctx.regD(0), r2 = ctx.regD(1), base = ctx.regD(2);
-+		SymVal addr = addSymImm(ctx.getRegVal(st, base),
-+					MI.getOperand(3).getImm() * 8);
-+		SymVal v1 = st.load(addr), v2 = st.load(addSymImm(addr, 8));
-+		ctx.setRegVal(st, r1, v1);
-+		ctx.setRegVal(st, r2, v2);
-+		return true;
-+	}
-+	if ((OpName == "STRXpre" || OpName == "STRWpre" ||
-+	     OpName == "STRQpre" || OpName == "STRDpre" ||
-+	     OpName == "STRBpre" || OpName == "STRHpre") &&
-+	    MI.getNumOperands() >= 4 && MI.getOperand(3).isImm()) {
-+		int wb = ctx.regD(0), rt = ctx.regD(1), base = ctx.regD(2);
-+		SymVal addr = addSymImm(ctx.getRegVal(st, base),
-+					MI.getOperand(3).getImm());
-+		ctx.setRegVal(st, wb, addr);
-+		if (OpName == "STRXpre")
-+			st.store(addr, ctx.getRegVal(st, rt));
-+		return true;
-+	}
-+	if ((OpName == "STRXpost" || OpName == "STRWpost" ||
-+	     OpName == "STRQpost" || OpName == "STRDpost" ||
-+	     OpName == "STRBpost" || OpName == "STRHpost") &&
-+	    MI.getNumOperands() >= 4 && MI.getOperand(3).isImm()) {
-+		int wb = ctx.regD(0), rt = ctx.regD(1), base = ctx.regD(2);
-+		SymVal addr = ctx.getRegVal(st, base);
-+		if (OpName == "STRXpost")
-+			st.store(addr, ctx.getRegVal(st, rt));
-+		ctx.setRegVal(st, wb,
-+			      addSymImm(addr, MI.getOperand(3).getImm()));
-+		return true;
-+	}
-+	if ((OpName == "LDRXpost" || OpName == "LDRWpost" ||
-+	     OpName == "LDRQpost" || OpName == "LDRDpost" ||
-+	     OpName == "LDRBpost" || OpName == "LDRHpost") &&
-+	    MI.getNumOperands() >= 4 && MI.getOperand(3).isImm()) {
-+		int wb = ctx.regD(0), rt = ctx.regD(1), base = ctx.regD(2);
-+		SymVal addr = ctx.getRegVal(st, base);
-+		SymVal v = (OpName == "LDRXpost") ? st.load(addr)
-+						  : SymVal{VK_UNKNOWN, 0};
-+		ctx.setRegVal(st, wb,
-+			      addSymImm(addr, MI.getOperand(3).getImm()));
-+		if (rt >= 0)
-+			ctx.setRegVal(st, rt, v);
-+		return true;
-+	}
-+	if ((OpName == "LDRXpre" || OpName == "LDRWpre" ||
-+	     OpName == "LDRQpre" || OpName == "LDRDpre") &&
-+	    MI.getNumOperands() >= 4 && MI.getOperand(3).isImm()) {
-+		int wb = ctx.regD(0), rt = ctx.regD(1), base = ctx.regD(2);
-+		SymVal addr = addSymImm(ctx.getRegVal(st, base),
-+					MI.getOperand(3).getImm());
-+		ctx.setRegVal(st, wb, addr);
-+		if (rt >= 0)
-+			ctx.setRegVal(st, rt,
-+				      OpName == "LDRXpre"
-+					  ? st.load(addr)
-+					  : SymVal{VK_UNKNOWN, 0});
-+		return true;
-+	}
-+	if (OpName == "STRXui" && MI.getNumOperands() >= 3 &&
-+	    MI.getOperand(2).isImm()) {
-+		st.store(addSymImm(ctx.getRegVal(st, ctx.regD(1)),
-+				   MI.getOperand(2).getImm() * 8),
-+			 ctx.getRegVal(st, ctx.regD(0)));
-+		return true;
-+	}
-+	if (OpName == "STURXi" && MI.getNumOperands() >= 3 &&
-+	    MI.getOperand(2).isImm()) {
-+		st.store(addSymImm(ctx.getRegVal(st, ctx.regD(1)),
-+				   MI.getOperand(2).getImm()),
-+			 ctx.getRegVal(st, ctx.regD(0)));
-+		return true;
-+	}
-+	if (OpName == "LDRXui" && MI.getNumOperands() >= 3 &&
-+	    MI.getOperand(2).isImm()) {
-+		ctx.setRegVal(st, ctx.regD(0),
-+			      st.load(addSymImm(ctx.getRegVal(st, ctx.regD(1)),
-+						MI.getOperand(2).getImm() * 8)));
-+		return true;
-+	}
-+	if (OpName == "LDURXi" && MI.getNumOperands() >= 3 &&
-+	    MI.getOperand(2).isImm()) {
-+		ctx.setRegVal(st, ctx.regD(0),
-+			      st.load(addSymImm(ctx.getRegVal(st, ctx.regD(1)),
-+						MI.getOperand(2).getImm())));
-+		return true;
-+	}
-+	return false;
-+}
-+
-+/**
-+ * stepInstructionRiscv() - Tier-2 symbolic lifter for RISC-V (RV64GC)
-+ * @st: Abstract register/stack state updated in place.
-+ * @OpName: LLVM MC opcode name (e.g. "C_ADDI16SP", "C_SDSP", "LUI").
-+ * @ctx: Disassembled instruction context.
-+ *
-+ * Models standard and RVC compressed RISC-V prologue/epilogue sequences.
-+ *
-+ * Return: true if @OpName was modeled; false to trigger generic clobbering.
-+ */
-+static bool stepInstructionRiscv(AbsState &st, StringRef OpName,
-+				 const InsnStepCtx &ctx)
-+{
-+	const MCInst &MI = ctx.MI;
-+
-+	if ((OpName == "ADDI" || OpName == "C_ADDI" || OpName == "C_ADDI16SP" ||
-+	     OpName == "C_ADDI4SPN" || OpName == "ADDIW" ||
-+	     OpName == "C_ADDIW") &&
-+	    MI.getNumOperands() >= 3 && MI.getOperand(2).isImm()) {
-+		int dst = ctx.regD(0), src = ctx.regD(1);
-+		SymVal v = addSymImm(ctx.getRegVal(st, src),
-+				     MI.getOperand(2).getImm());
-+		if ((OpName == "ADDIW" || OpName == "C_ADDIW") &&
-+		    v.kind == VK_CONST)
-+			v.off = (int32_t)v.off;
-+		ctx.setRegVal(st, dst, v);
-+		return true;
-+	}
-+	if ((OpName == "LUI" || OpName == "C_LUI") &&
-+	    MI.getNumOperands() >= 2 && MI.getOperand(1).isImm()) {
-+		int dst = ctx.regD(0);
-+		int32_t s32 = (int32_t)((uint32_t)MI.getOperand(1).getImm() << 12);
-+		ctx.setRegVal(st, dst, {VK_CONST, (int64_t)s32});
-+		return true;
-+	}
-+	if (OpName == "C_LI" && MI.getNumOperands() >= 2 &&
-+	    MI.getOperand(1).isImm()) {
-+		ctx.setRegVal(st, ctx.regD(0),
-+			      {VK_CONST, MI.getOperand(1).getImm()});
-+		return true;
-+	}
-+	if (OpName == "C_MV" && MI.getNumOperands() >= 2) {
-+		ctx.setRegVal(st, ctx.regD(0), ctx.getRegVal(st, ctx.regD(1)));
-+		return true;
-+	}
-+	if ((OpName == "ADD" || OpName == "C_ADD" || OpName == "SUB" ||
-+	     OpName == "C_SUB") &&
-+	    MI.getNumOperands() >= 3) {
-+		int dst = ctx.regD(0), s1 = ctx.regD(1), s2 = ctx.regD(2);
-+		ctx.setRegVal(st, dst,
-+			      OpName.contains("ADD")
-+				  ? addSymVals(ctx.getRegVal(st, s1),
-+					       ctx.getRegVal(st, s2))
-+				  : subSymVals(ctx.getRegVal(st, s1),
-+					       ctx.getRegVal(st, s2)));
-+		return true;
-+	}
-+	if (OpName == "ANDI" && ctx.regD(0) == 2 && ctx.regD(1) == 2) {
-+		st.regs[2] = {VK_ALIGNED_SP, 0};
-+		return true;
-+	}
-+	if ((OpName == "SD" || OpName == "C_SDSP") &&
-+	    MI.getNumOperands() >= 3 && MI.getOperand(2).isImm()) {
-+		int src = ctx.regD(0), base = ctx.regD(1);
-+		st.store(addSymImm(ctx.getRegVal(st, base),
-+				   MI.getOperand(2).getImm()),
-+			 ctx.getRegVal(st, src));
-+		return true;
-+	}
-+	if ((OpName == "LD" || OpName == "C_LDSP") &&
-+	    MI.getNumOperands() >= 3 && MI.getOperand(2).isImm()) {
-+		int dst = ctx.regD(0), base = ctx.regD(1);
-+		ctx.setRegVal(st, dst,
-+			      st.load(addSymImm(ctx.getRegVal(st, base),
-+						MI.getOperand(2).getImm())));
-+		return true;
-+	}
-+	return false;
-+}
-+
-+bool stepInstruction(AbsState &st, const MCInst &MI, StringRef OpName,
-+		     const MCInstrDesc &Desc, const MCRegisterInfo &MCRI,
-+		     const ArchSpec &AS, uint64_t NextPC,
-+		     const MCInstrAnalysis *MIA, uint64_t CurPC,
-+		     uint64_t InsnSize)
-+{
-+	InsnStepCtx ctx{MI, MCRI, AS, MIA, CurPC, NextPC, InsnSize};
-+	bool handled = false;
-+
-+	if (AS.llvm_arch == Triple::x86_64)
-+		handled = stepInstructionX86(st, OpName, Desc, ctx);
-+	else if (AS.llvm_arch == Triple::aarch64)
-+		handled = stepInstructionArm64(st, OpName, ctx);
-+	else if (AS.llvm_arch == Triple::riscv64)
-+		handled = stepInstructionRiscv(st, OpName, ctx);
-+
-+	if (!handled)
-+		clobberGenericDefs(st, MI, Desc, MCRI, AS);
-+	return handled;
-+}
-+
-+/**
-+ * normalizeRiscvControlFlow() - Classify RISC-V JAL/JALR control-flow roles
-+ */
-+void normalizeRiscvControlFlow(const MCInst &MI, StringRef OpName,
-+			       const MCRegisterInfo &MCRI,
-+			       bool &is_ret_or_ind_jump, bool &is_uncond_branch,
-+			       bool &is_call)
-+{
-+	int rd = (MI.getNumOperands() >= 1 && MI.getOperand(0).isReg())
-+		     ? mcRegToDwarf32(MCRI, MI.getOperand(0).getReg(),
-+				      Triple::riscv64)
-+		     : -1;
-+	if (OpName == "JAL") {
-+		if (rd == 0) {
-+			is_uncond_branch = true;
-+			is_call = false;
-+		} else {
-+			is_call = true;
-+		}
-+	} else if (OpName == "C_J") {
-+		is_uncond_branch = true;
-+		is_call = false;
-+	} else if (OpName == "JALR") {
-+		if (rd == 0) {
-+			is_ret_or_ind_jump = true;
-+			is_call = false;
-+		} else {
-+			is_call = true;
-+		}
-+	} else if (OpName == "C_JR") {
-+		is_ret_or_ind_jump = true;
-+		is_call = false;
-+	} else if (OpName == "C_JALR") {
-+		is_call = true;
++		if (func_ok)
++			st.funcs_clean++;
 +	}
 +}
 -- 
