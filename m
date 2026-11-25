@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.199
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.197
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795587418;
-	b=kSkvGmt8k4QlWHWwTvwiWgZ88MVOxZpiaI9WRvqXi9sJnzbQVI7ALigCBaXZbgOMKndK
-	 zQ+cQyZuJAjN606JTbMKoaHKlPGAok07VYXVHX4ErBlIQPRtSWrB1NQq0qAgi+jm00I+o
-	 y6IHcRPBbpxU7X6iBUuH+jOK0q/z62mh8DcCrpovh0+64TwZQZm0Q6cPbRSK2h8h5DvZq
-	 k+N3JmaL9qFVxwsLEiD1+j4vtlzdCw0ISvx+810AcsrT5f6QRHcMzh8L28KhpPB4LF3Mk
-	 zfiySMowYWhMxkVym+ovnjkFeCD7xnbhGj5HPks+WkihooSGdthcWny4ANC/yiizhAA==
+	t=1795587402;
+	b=whfMW/kyynF/igbmJ36Xopwz31DrmLkUumanJRghW+1/G6smA9VRkcwkVin6ZNu/Nyhq
+	 SAF3KGb9wmwC16f3mU7+/SSeYkGUn5+4wcbL6zCSWbZkWM27NM/U0JFxDzYCNspTDvmJE
+	 B4NSEmUSVaXjlCiPSem6MCeT26/IjutkKaVXWELnZz58kpWUiwCBeaa6gwIRDAbFgRjas
+	 bAcEiYwmoip4DnXiByrrC/8zhdAbONu5pMc39xvqF2sEzh86Yd+1YRYzIHPKp/FL+M8L4
+	 QqiZZm0nDcQxpjR80o24V9SSFzk4d/naWAj0HZdEYI3fJ4TWjXPJ++Xea1MlXsJ2I+g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795587418;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795587402;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=B0szZcyaY7NP1HowgKnJWSVhbM1uN8jco8rE2rfxzUA=;
-	b=qN3XG22u2G1OS3Bp+7VFuo0BAeD1gVdIE7MoaDUmS5OERzJ9CLisj+gMGFgX342EbLYw
-	 sjtkg7jzaQpVkEtoFyWdeUsgS+kH+8dJxLpBv0kc3wRtiDPOgxW2MCnGdahztiKtr5QaX
-	 cDFvTt8zs79KSq99WNkjKKYyzcczPkUrwqQXf+2usJpi4YTQqV7mzVprU4Y2NXBjCRMV9
-	 wHSJr+y0YJUVRQBuGYR4//tMZsf2yqjtagPetVR19IdTpoJdaJcfHYgnPNwnLH5nZ6XbT
-	 dEdZP9zvU9V78yRPkD398wYgvnvJcvz9sobu5ICNLSM+8Fe9YKc/ba50Ref3kzKMy3g==
+	bh=WUUeXjjWyK6qjX9x82xlteWuEad8XsxvDUnphU7EmH0=;
+	b=hAa9265VLuvNP1jiMyWH4zJuWD7YOJb9M7dziBJDFJ+/aR89ul9RlGjIE1NSPdsfX0XV
+	 0pyc/YvOrplpfcVTVfTr5TCtTkaHmYi3jiyZDzA/e331uqkkiyyUTVH6ildSQJNwkJVxj
+	 o2TF5WiqBdxAEADgqih/hh76lM9oxkLC8siozvjP5gaEfZtO5T8DreLDsJjUzwE6Q93XJ
+	 XU/AlQ7wjgxWGCzntKcDkTu3CQqr8hk2D+mNM+421wLhREYkIaKw4EDq9wHVAt/y3cLLP
+	 RodcA8RvE9d/yKAnIYDWNAxB1jQbOeQQekdff0UFAMx9eOhUTRWIHEiEHV5drvQxsuA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--irogers.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=OYtSOtL4;
-	arc=none smtp.remote-ip=209.85.210.199
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=M6o93t4K;
+	arc=none smtp.remote-ip=74.125.82.197
+Received: from mail-dy1-f197.google.com (mail-dy1-f197.google.com [74.125.82.197])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A675606DE7D
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A675606DE7D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CCD66077BD6
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1CCD66077BD6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=OYtSOtL4
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-8a0619b1fe5so4489390b3a.3
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=M6o93t4K
+Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-386c3309469so1560288eec.0
+        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795587418; x=1796192218; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1795587401; x=1796192201; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=B0szZcyaY7NP1HowgKnJWSVhbM1uN8jco8rE2rfxzUA=;
-        b=OYtSOtL429vx8h9e8KmJ/oGhT4gkjeQ021DBdoDdRU0/PX54D7Rsp3lWJGAXyRL5mc
-         bxCKAhao6ehgV/HDPNQ6tilImjkNYbBPOQ+CWdUdZgyOlaPtyLoKZZjAMSrmjVbdpBfi
-         y6hrj6DUVXDXqpxh43Byxt5zWGMDLraUXXpyNClQC1ZM520uXfAdqLfry5TISAOxZiw5
-         LKi1JFdlFSTj279EPNDz3stCVUDCoKhxstL4+T3Er9Nc31JKpdTMHQBfx4q85PlFf4ul
-         fuOrvHqUZTJEP77DP5QY8LfmCtQBEGpg3gpMYg7eVHD8zJ0jdYCDA/nYS387hEjaN9EC
-         uLHg==
+        bh=WUUeXjjWyK6qjX9x82xlteWuEad8XsxvDUnphU7EmH0=;
+        b=M6o93t4KOifseEwnN/d9LNvy5ODOoXHpgZ/FroQMv5DRLFRM8pPvTG8rQZwfY4sG2/
+         qE8Yn/ykPdZ3Ct3e88voHMKmyHHiX5jL/TNxj580e4kfgB3nRPcTErkudtaBjNPYlVXF
+         3/QEgrv9P0yre5uGatCN9v9se+oEJvXH1PzLxmpNkwUby4wm/zLcw/pqVrHal98PGtSq
+         ZKjAN+WQx0cOoTit7GVwOKznD7YQwXBtOVX+8zfdIHofiRfJJbVIEBJbqoC21myLnCTI
+         eDTEyClRyoPS9gTgSckPUOQf/FeJ/r7qVNfQTVMpeQFQ8p14bTWct3wi5kUvck1AcyMF
+         y3Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795587418; x=1796192218;
+        d=1e100.net; s=20260707; t=1795587401; x=1796192201;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=B0szZcyaY7NP1HowgKnJWSVhbM1uN8jco8rE2rfxzUA=;
-        b=ms/FNa4LtBxWAqpaYuAEY/arbAEEmuxr+5mligO7I7zIHyib1LBQXlJRO25gOt0DU1
-         j35Nn4VOiuw5pi3UPaDpGtYotxUr5OzdzVqxWLz5YW55U77qV/6RSFzyyUcb7kms7kjk
-         vwX21giR7K3a6iypS9p/EMzbaEWUEXJiPy7Dvsse4HapAXe6MIrI9EpmNcGLOOervWiJ
-         eON/BosG8fGJbre+Puauulw9G9IFz9VVwqa1evwKfLHyNjQPA9m3pTfS4MrodGQebh91
-         JITKDRSBakyO25mtpuNjJ7thbD325oivuMILLq1+rbF/ZNBu76Ja7drNSntKV2V5JLVK
-         H8dg==
-X-Forwarded-Encrypted: i=1; AL+hErF86BIv2wHS++2upoFehemFgmfqIWWvevQicItbztGgeuwpTUdkjv8YdxKSiEVoeMMsemyVC3c=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/XtUQnB5sgm1IM1J1EsjPuUZEMI3w28BiN6ZJMRtvHs1X3HgOg
-	HefCjSxJ7xkvMn5KC+8kkjsxT5PxDdI9AetfFQMOr8ehsjjKTZoa2ekt/jLdOCtr9HI7cgYsuLk
-	NK9lX+6nWCA==
-X-Received: from pgin21-n1.prod.google.com ([2002:a05:6a02:8795:10b0:cdb:932c:948b])
- (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6300:8095:b0:3dd:85a8:cac8
- with SMTP id adf61e73a8af0-4014c949c92mr14160775637.31.1795587417428; Tue, 24
- Nov 2026 22:16:57 -0800 (PST)
-Date: Tue, 24 Nov 2026 22:15:23 -0800
+        bh=WUUeXjjWyK6qjX9x82xlteWuEad8XsxvDUnphU7EmH0=;
+        b=SH0ResmT7z4DqtR1fnlP4yFRjGHD3hUjns/U+0/8/UrhiGlLjdGiqVl8jUfxmqksWd
+         CK9/nwJV3I71r4uAH9iz3zjveicT0r1O3R7IuVmDOG2a4c8k53eBdYYYueKe/r1eCDBh
+         mNjaBK3v3L03jhRDm8U9uVIB6j3gdlN79ZHSiJgo5VbY32iZ/1rcV8xUPkglTdTMkRET
+         D4gxXHfjCbdS9fnTFCFtD5DWTkRi0lX6IPTecEQyKVNGJ37zmISiQyOAKp8Hk9Id0AS8
+         wRK0HAQd3q7V6nTVdpnkZ0PsPBRHIGgXO5YfBvESuDn1TWK4lV/k4mFX1HiSGSfaxFSI
+         e1AQ==
+X-Forwarded-Encrypted: i=1; AL+hErE+q4UI27guTJPkZ57k0fUFigxIkeyfYc0ivNr9Iey0trBHYd5zRmgPn60uz0CkWvENUBkIYNI=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+WwvxSNSZaxlMJ0f9hM3iElKU58eRqYgUBU/bMbzLt+WJIrEeT
+	n4riZZG9YwfKLQJChDE5kuUQfOoo52m4mT4eTex9vvheHJEUWnbatoyPTEmdN6WAswS1j/nNTvm
+	oVdgeg8Nu/g==
+X-Received: from dycnn7.prod.google.com ([2002:a05:7301:1407:b0:384:71f1:1227])
+ (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7301:5093:b0:36a:31b2:8643
+ with SMTP id 5a478bee46e88-386992b3f3bmr14119799eec.38.1795587400863; Tue, 24
+ Nov 2026 22:16:40 -0800 (PST)
+Date: Tue, 24 Nov 2026 22:15:15 -0800
 In-Reply-To: <20261125061523.1540234-1-irogers@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,8 +81,9 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261125061523.1540234-1-irogers@google.com>
 X-Mailer: git-send-email 2.56.1.831.g720f3f5937-goog
-Message-ID: <20261125061523.1540234-31-irogers@google.com>
-Subject: [RFC PATCH v2 30/30] MAINTAINERS: Add DWARF CFI stack unwinding entry
+Message-ID: <20261125061523.1540234-23-irogers@google.com>
+Subject: [RFC PATCH v2 22/30] tools headers: Add linux/kmsan-checks.h copy
+ from the kernel sources
 From: Ian Rogers <irogers@google.com>
 To: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
 	linux-arch@vger.kernel.org
@@ -102,56 +103,134 @@ Cc: jpoimboe@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
 	wnliu@google.com, dylanbhatch@google.com, Ian Rogers <irogers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a MAINTAINERS entry for Minimal DWARF CFI stack unwinding covering
-the core .eh_frame / .eh_frame_hdr bytecode interpreter and KUnit tests,
-the user-space PT_GNU_EH_FRAME VMA unwinder, the x86-64 DWARF CFI kernel
-unwinder, the build-time .eh_frame minifier and analyzer scripts, the
-standalone tools/unwind/ CFI verifier, and the deferred user-space CFI
-kselftest.
-
-Also add arch/*/include/asm/unwind_user*.h to USERSPACE STACK UNWINDING
-so architectural unwind_user headers on x86, arm64, riscv, and future
-ports are routed to the user-space unwinding maintainers.
+Copy include/linux/kmsan-checks.h to tools/include/linux/kmsan-checks.h
+so host tools in tools/ can compile kernel sources using
+kmsan_unpoison_memory() without referencing ../../include/linux
+directly, and register it in tools/perf/check-headers.sh.
 
 Signed-off-by: Ian Rogers <irogers@google.com>
 ---
- MAINTAINERS | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ tools/include/linux/kmsan-checks.h | 98 ++++++++++++++++++++++++++++++
+ tools/perf/check-headers.sh        |  1 +
+ 2 files changed, 99 insertions(+)
+ create mode 100644 tools/include/linux/kmsan-checks.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 44540a1eb2b8..0584279d745e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9496,6 +9496,21 @@ Q:	http://patchwork.linuxtv.org/project/linux-media/list/
- F:	drivers/media/usb/dvb-usb-v2/dvb_usb*
- F:	drivers/media/usb/dvb-usb-v2/usb_urb.c
- 
-+DWARF CFI STACK UNWINDING
-+M:	Ian Rogers <irogers@google.com>
-+L:	linux-trace-kernel@vger.kernel.org
-+L:	linux-kernel@vger.kernel.org
-+S:	Maintained
-+F:	arch/x86/kernel/unwind_dwarf.c
-+F:	include/linux/unwind_dwarf_cfi.h
-+F:	kernel/unwind/dwarf_cfi*.c
-+F:	kernel/unwind/user_cfi.c
-+F:	scripts/eh_frame_min.py
-+F:	scripts/min_eh_frame.c
-+F:	tools/include/linux/unwind_dwarf_cfi.h
-+F:	tools/testing/selftests/perf_events/unwind_user_cfi.c
-+F:	tools/unwind/
+diff --git a/tools/include/linux/kmsan-checks.h b/tools/include/linux/kmsan-checks.h
+new file mode 100644
+index 000000000000..e1082dc40abc
+--- /dev/null
++++ b/tools/include/linux/kmsan-checks.h
+@@ -0,0 +1,98 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * KMSAN checks to be used for one-off annotations in subsystems.
++ *
++ * Copyright (C) 2017-2022 Google LLC
++ * Author: Alexander Potapenko <glider@google.com>
++ *
++ */
 +
- DYNAMIC DEBUG
- M:	Jason Baron <jbaron@akamai.com>
- M:	Jim Cromie <jim.cromie@gmail.com>
-@@ -29300,6 +29315,7 @@ USERSPACE STACK UNWINDING
- M:	Josh Poimboeuf <jpoimboe@kernel.org>
- M:	Steven Rostedt <rostedt@goodmis.org>
- S:	Maintained
-+F:	arch/*/include/asm/unwind_user*.h
- F:	include/linux/unwind*.h
- F:	kernel/unwind/
- 
++#ifndef _LINUX_KMSAN_CHECKS_H
++#define _LINUX_KMSAN_CHECKS_H
++
++#include <linux/types.h>
++
++#ifdef CONFIG_KMSAN
++
++/**
++ * kmsan_poison_memory() - Mark the memory range as uninitialized.
++ * @address: address to start with.
++ * @size:    size of buffer to poison.
++ * @flags:   GFP flags for allocations done by this function.
++ *
++ * Until other data is written to this range, KMSAN will treat it as
++ * uninitialized. Error reports for this memory will reference the call site of
++ * kmsan_poison_memory() as origin.
++ */
++void kmsan_poison_memory(const void *address, size_t size, gfp_t flags);
++
++/**
++ * kmsan_unpoison_memory() -  Mark the memory range as initialized.
++ * @address: address to start with.
++ * @size:    size of buffer to unpoison.
++ *
++ * Until other data is written to this range, KMSAN will treat it as
++ * initialized.
++ */
++void kmsan_unpoison_memory(const void *address, size_t size);
++
++/**
++ * kmsan_check_memory() - Check the memory range for being initialized.
++ * @address: address to start with.
++ * @size:    size of buffer to check.
++ *
++ * If any piece of the given range is marked as uninitialized, KMSAN will report
++ * an error.
++ */
++void kmsan_check_memory(const void *address, size_t size);
++
++/**
++ * kmsan_copy_to_user() - Notify KMSAN about a data transfer to userspace.
++ * @to:      destination address in the userspace.
++ * @from:    source address in the kernel.
++ * @to_copy: number of bytes to copy.
++ * @left:    number of bytes not copied.
++ *
++ * If this is a real userspace data transfer, KMSAN checks the bytes that were
++ * actually copied to ensure there was no information leak. If @to belongs to
++ * the kernel space (which is possible for compat syscalls), KMSAN just copies
++ * the metadata.
++ */
++void kmsan_copy_to_user(void __user *to, const void *from, size_t to_copy,
++			size_t left);
++
++/**
++ * kmsan_memmove() - Notify KMSAN about a data copy within kernel.
++ * @to:   destination address in the kernel.
++ * @from: source address in the kernel.
++ * @size: number of bytes to copy.
++ *
++ * Invoked after non-instrumented version (e.g. implemented using assembly
++ * code) of memmove()/memcpy() is called, in order to copy KMSAN's metadata.
++ */
++void kmsan_memmove(void *to, const void *from, size_t to_copy);
++
++#else
++
++static inline void kmsan_poison_memory(const void *address, size_t size,
++				       gfp_t flags)
++{
++}
++static inline void kmsan_unpoison_memory(const void *address, size_t size)
++{
++}
++static inline void kmsan_check_memory(const void *address, size_t size)
++{
++}
++static inline void kmsan_copy_to_user(void __user *to, const void *from,
++				      size_t to_copy, size_t left)
++{
++}
++
++static inline void kmsan_memmove(void *to, const void *from, size_t to_copy)
++{
++}
++
++#endif
++
++#endif /* _LINUX_KMSAN_CHECKS_H */
+diff --git a/tools/perf/check-headers.sh b/tools/perf/check-headers.sh
+index 531c0e0e84df..76fc6e20096c 100755
+--- a/tools/perf/check-headers.sh
++++ b/tools/perf/check-headers.sh
+@@ -28,6 +28,7 @@ declare -a FILES=(
+   "include/vdso/unaligned.h"
+   "include/linux/gfp_types.h"
+   "include/linux/hash.h"
++  "include/linux/kmsan-checks.h"
+   "include/linux/list-sort.h"
+   "include/uapi/linux/hw_breakpoint.h"
+   "arch/x86/include/asm/cpufeatures.h"
 -- 
 2.56.1.831.g720f3f5937-goog
 
