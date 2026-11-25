@@ -1,45 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795589282;
-	b=mV3NAxv74YpI6wJb/8Wwo86IchkrmkRqo/kU2Ix8vlIPySX0bJMMBKza2IzlHDZSWpHH
-	 gQGk7sbfy3geNdvjN9eb7hc4PP7epRRA30qW4PozjZ80n+RRneWt15MpPTQyA3uGgFUZk
-	 X5B7j7zZ0/YUhUjkzrLb9su77QTXu1d77MTtDulrMnq1pDF4M9r9Fpc1HDN26XGG9JHXO
-	 PkyiXL4KkvWgD+IX1Tq5F5gtgAdMKi/IeGhl5bL9pAgxACxFcUdoVCefhS0BJQLtokKbr
-	 Ed/D65mrnKKMONvPnm3pZDY2Hnbq73qCHDJGt93zYCv9WLb33e/Q4vFSsPLd5NnZgYA==
+	t=1795589796;
+	b=AEGdsALzcXvmNdkJ8PTEiGQYH6roOqgPYO8nAz0C8NLRg7A5Q+Bc1ABfnwV/ow0W+MPC
+	 fQHbEiR5jh1AbHhDhcn4cJCu+E5QVybHzilkPXN28pz9HyGWFCzT5qn4Dp7EvWVlXbZ42
+	 d1bE/VWNqZ6QgVqyS9xchIZJbotE7G69OlHRl6yIr6LNg9G+h5ekfY59lS3UQ5X2MEgGP
+	 4XcfAgDg6lTsLQjEpZBY1eh052MFJxH3rd12pV+3H3fjVYKcypkMZxF4Q3MsvQqa7Tk8M
+	 AKNvofrtfbNfgOR5VdrnSKsmUKhfk/juVn5cgZ/6Q4aEJweSHQUB6BIK9oo7p3UzxRg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795589282;
-	h=Received:DKIM-Signature:Content-Type:MIME-Version:Message-Id:
-	 In-Reply-To:References:Subject:From:To:Cc:Date;
-	bh=w/FTXqrH5AIrzUuo8YH2Y9Z6F/zJk24rjcjm0U0HEHw=;
-	b=edsYtGe5z5tQmonDDCzzZn5mW0lSxZl/dbCJ/NFXH7AWIzNPveHxnH5GfMfRmUuNbmef
-	 ro97UQ40v+eaIcHTsEl8wXtnBRKU2q+2kGYih9Xk0qfDXSyJVPKI1fVLWvmVQTVBXbFk3
-	 WF+dYJuGY8+9ojoJLojb5h9u3eL0M+potjLeDRsRDLjjW387XG5/63aoKRVicVFi1zjOX
-	 yPY0CubV5daVSoSKaD4kGm3zASCdKnB+4j3OJR1YMksXLtkW55Hx4VpJJlaEAWKhS8A1H
-	 SGVCac6dzUHvc5PpVerOfSCfd/zt1iHbrdtz9cCbFUsE0wJQixwwbdEWQHmGP3MTLng==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795589796;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer;
+	bh=WQnd85yPB60bhdolGWcMJlVAtTrb9nbyVFLWQL59DRE=;
+	b=KMuRKSV2m2YQCaVy4t59vocrGX3IR+b0Z2Yju09eQpTBJn9HSlfcIAXVHHSzN1gMPJkd
+	 usL7QpCXVi9AZUMXbdVRzYI1jmRYlqhrS/xx9TWMmhe4PjZfs+NS5SAjGWWZE8sVLVg1A
+	 SFvLMMNgNaPVW9Y0jAg8Z2zmuWarJZCv5VQvmhCYqakW0OdWsDeXuub3ST8QcWPdpvx6r
+	 Y4kanK/02Wn2uCZrGnWdFDOKQaqmbBMiVga2U+7arGK1vQ7MOHum8PqUlKrtISMWwZSXO
+	 o+PSskaTT8xa4KtUPm3yiePfFqQHAsIwf9u9/a7A+oXaDoHyDowWgXy3APyh0ShoGJw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=fail reason="signature verification failed" header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RGD2OyfZ;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=pereq.eu;
+	spf=pass smtp.mailfrom=cryspen.com;
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b="Hgem9/rw";
+	arc=none smtp.remote-ip=209.85.128.54
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D892606A31E;
-	Wed, 25 Nov 2026 06:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E403C606A321
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:56:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E403C606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RGD2OyfZ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B72A1F000C6;
-	Wed, 25 Nov 2026 06:47:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795589281;
-	bh=w/FTXqrH5AIrzUuo8YH2Y9Z6F/zJk24rjcjm0U0HEHw=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=RGD2OyfZOoXrJx6S4zQf9OrP6dpeguJeek9JYgL019ncKwNu3vVCRtpWDD1PVCyjH
-	 XGIiho4GvZQoNZDuGevBp+EdPfLyYnYBKxPYhI3VwGdOgdK+bWzvAHSM/CNeK406f7
-	 TmzV2LP8jrZy6nkvCbZuAwuWLkM7SYmVX6wmIu5tPdC2MBLMxztD5HB/cEmVBcFq9j
-	 QGm0OEgsUIqrWfLnEgHSGubLihKCRqAMN8vwCGfz5tjr+LPwWp0T2a6x/X04cNqxDv
-	 UVjUV9xvfT8hCmcg64r+XQoR+0gazgtCATLmvOzMBF+K6Igq+1vn67kLjJGMdMv5X4
-	 dj1EETaUgvHPQ==
-Content-Type: multipart/mixed; boundary="===============6730931518485205145=="
+	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=Hgem9/rw
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4a35ac4475dso39514625e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:56:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pereq.eu; s=google; t=1795589794; x=1796194594; darn=lists.linux.dev;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=WQnd85yPB60bhdolGWcMJlVAtTrb9nbyVFLWQL59DRE=;
+        b=Hgem9/rwJpx8GRO6yILitxzq85gE1GEYkJ7YroXbLsDCKk1/JFM00Yj/p2NYFkPdmP
+         qvtDIj6XnmgnUiwoy2nukOgpjqVF0lF4PUHnplzgdmww9Z2ONHzJGvlqNbCu2nj85bH1
+         qjlu6EP8fr99qtjh10KbwXIO+fAfxeWU9wfIcEsZif7+/+OWBkZSd4nehkL7TIUGeiib
+         XgtGC7/wSskBU4XxIE5/Z8Oap0BTVhJ4Jvsv4G30ETwFZFFyATzpwydEypI5N5cgFPa/
+         KF7z7umwB30rLJES+XumghxKPPe1Sm1onl0ntSZhWWcg74GBfjy+KRtkPHIyFiXnZNo8
+         wUIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795589794; x=1796194594;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=WQnd85yPB60bhdolGWcMJlVAtTrb9nbyVFLWQL59DRE=;
+        b=VwiBlP9t8SOi1S7Nv03HvfpH1hefNsYxfgDnACBdqzKuJv1G6rAgBjZjtsQHLXjJZh
+         cHQQzXnjFvc2LcBDkC5m3vfmX4mGn28wQJcskV5tA1zjXb4x3u9CUOirjA/9EE8bPk3A
+         Af9KK3S3QbepZRe1ZFhGG5aWpCPAvMU0qTIMTUwJZHpc7z9qdxyzzu+Ac/8XgSQmP1Yf
+         hLDYeAgHea++4Cm4YmM8IYV1jSHdv4ipNfnxVJKsbxIoosQp01X7v2WZPS1pf4P9dPEo
+         GMu5IhacXln4yDXLfUpIBoarRgkBhLwy16ObtclRr5UmbXzdAWrC7+T5Kv2iq9TyHRhK
+         AC3w==
+X-Forwarded-Encrypted: i=1; AL+hErGohfOKfMCGo0ZAxIEmtAql+OeJEXm4r2Jp48sJJLpRK0cXjE9GcCVTB/09zZFiN6j0xqNSqW0=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/WRPT4OC1Og6H5Yw0F4f5kWU5/1LvvX+iOV2Wmd/CEcXpo+rm6
+	n+KTNADAP9Xiat+9ZxthYnUDu1zYKBoNmewwiHxGdfIZcxncgg6m7MpewLhBrDMFoO4=
+X-Gm-Gg: AZFdTZcchzD7gPnAwH9G/gYlJrm3yBj/T8liBH2YkkmQQXa/ROfW2cdyd97mqsAywjz
+	xPycTI70UKZi/6oMEu2bp5rVTkgnOm+M18Ix8yHCE/7ME6J5iID55ruBtGwLsJIUkjcxWSDwid7
+	PIwVCuVpt+QgHwttMiim1y5nBxja0CTdDv6KwbjdQ9FMLZCZlilm1kia/3ntKG5NqqQ9ZB0cs7p
+	mYFANoFHbV0ch56vdDu50L6NWcuPP/GZpny4fcDqiz4eu6VA41sebYCoXH4q2kXYKcFmUOIzHKb
+	RmGNwjchKyHGisX2MU2F3CWJMefvX1vh6slotAZzz0K3+JbA+yxAFeTc7jkHzFHeCdX+2qlDdj2
+	32m0Y44Uz30HwhDW0N9AqFeYWubx/yFDWl2ZvQsBPQdPUOLab7nhQy4SBB5tKBICkpN3qbewfL2
+	5glVPI61fmOMx8ICF0i5/9fowdlEijEwH97Bj7Oqq38X/bGxEeWMP4mOmvEd/ayL1HIZRaxqqtu
+	5dXOLDnjELkxHl69cJt2kts1gETpiN5KKo6r/Hyelx3Z3spS6Y2w2TVlTXkGD70wsL7N/ubsNNL
+	kPGHY4czD6TxosHrnGe7
+X-Received: by 2002:a05:600c:530e:b0:4ba:eb:eb9b with SMTP id 5b1f17b1804b1-4bb8880aba2mr330852995e9.8.1795589793909;
+        Tue, 24 Nov 2026 22:56:33 -0800 (PST)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb884b8429sm777474785e9.14.2026.11.24.22.56.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Nov 2026 22:56:33 -0800 (PST)
+From: Dan Carpenter <dan@pereq.eu>
+Subject: [PATCH v2 0/8] KVM: arm64: Fix kvm_reset_vcpu() and SError
+ handling for nested virt
+Date: Wed, 25 Nov 2026 09:56:15 +0300
+Message-Id: <20261125-double_exception-v2-0-224689d8a764@pereq.eu>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -49,72 +92,101 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Message-Id: <c5a12d8c446ae04259b5ff4edbcccd0326d5476575d18cdaa5050d57a50b9c51@mail.kernel.org>
-In-Reply-To: <20261125061523.1540234-5-irogers@google.com>
-References: <20261125061523.1540234-5-irogers@google.com>
-Subject: Re: [RFC PATCH v2 04/30] x86: unwind_user: Support Minimal DWARF CFI user unwinding
-From: bot+bpf-ci@kernel.org
-To: irogers@google.com,linux-kernel@vger.kernel.org,linux-trace-kernel@vger.kernel.org,linux-arch@vger.kernel.org
-Cc: jpoimboe@kernel.org,rostedt@goodmis.org,peterz@infradead.org,mingo@redhat.com,tglx@kernel.org,bp@alien8.de,dave.hansen@linux.intel.com,x86@kernel.org,catalin.marinas@arm.com,will@kernel.org,mark.rutland@arm.com,linux-arm-kernel@lists.infradead.org,pjw@kernel.org,palmer@dabbelt.com,aou@eecs.berkeley.edu,alex@ghiti.fr,linux-riscv@lists.infradead.org,acme@kernel.org,namhyung@kernel.org,linux-perf-users@vger.kernel.org,mhiramat@kernel.org,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,bpf@vger.kernel.org,nathan@kernel.org,llvm@lists.linux.dev,nsc@kernel.org,linux-kbuild@vger.kernel.org,ojeda@kernel.org,rust-for-linux@vger.kernel.org,ardb@kernel.org,linux-efi@vger.kernel.org,maz@kernel.org,oupton@kernel.org,kvmarm@lists.linux.dev,shuah@kernel.org,linux-kselftest@vger.kernel.org,indu.bhagat@oracle.com,jremus@linux.ibm.com,wnliu@google.com,dylanbhatch@google.com,irogers@google.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yongho
- ng.song@linux.dev,mason@kernel.org,ihor.solodrai@linux.dev
-Date: Wed, 25 Nov 2026 06:47:56 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/2WOQQ6CMBBFr0K6toYZxKAr72GIaaej1BiKLRAM4
+ e62GFcs/8z7L38Wgb3lIM7ZLDyPNljXxoC7TFCj2gdLa2IWmOMRAHNp3KBffOOJuOsjLFVxMEQ
+ lAkAlYq3zfLfTqrzWvxwG/WTqkycRWgWW2quWmnTaGNM/cY0NvfOfddsIyfefUWxnjCBBkqlQl
+ yeFBZpLx57fex5EvSzLFySRl6jpAAAA
+X-Change-ID: 20261120-double_exception-a34dcc521118
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+ Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Mark Rutland <mark.rutland@arm.com>, 
+ Christoffer Dall <c.dall@virtualopensystems.com>, 
+ Rusty Russell <rusty@rustcorp.com.au>, 
+ Marcelo Tosatti <mtosatti@redhat.com>, Sebastian Ott <sebott@redhat.com>, 
+ Eric Auger <eric.auger@redhat.com>, James Morse <james.morse@arm.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, 
+ Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>
+Cc: Karthik Bhargavan <karthik@pereq.eu>, 
+ =?utf-8?q?Cl=C3=A9ment_Blaudeau?= <clement@cryspen.com>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ Dan Carpenter <dan@pereq.eu>, linux-kernel@vger.kernel.org, 
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ stable@vger.kernel.org, Sashiko <sashiko-bot@kernel.org>
+X-Mailer: b4 0.16.0
 
---===============6730931518485205145==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Our formal proof work at Pereq found a way to trigger a WARN() by
+injecting two SErrors.  Then Sashiko found several related bugs
+and testing uncovered a few more.   The original patch is the same,
+it's just that I have added others as well.
 
-> x86: unwind_user: Support Minimal DWARF CFI user unwinding
+I have included a selftest for kvm_reset_vcpu().  I have a selftest
+for SError as well but I have a question about that so I'm going to
+send it seperately later.
 
-TL;DR: Nit only: unrelated comment additions in this x86 CFI patch aren't in
-the changelog; suggests moving them to a separate documentation patch.
+Signed-off-by: Dan Carpenter <dan@pereq.eu>
+---
+Changes in v2:
+- All the patches before [PATCH 7/8] are new to fix other related bugs
+- Link to v1: https://patch.msgid.link/20261123-double_exception-v1-1-cd82b59a232d@pereq.eu
 
-> diff --git a/arch/x86/include/asm/unwind_user.h b/arch/x86/include/asm/unwind_user.h
-> --- a/arch/x86/include/asm/unwind_user.h
-> +++ b/arch/x86/include/asm/unwind_user.h
-
-[ ... ]
-
-> +/**
-> + * unwind_user_word_size() - Return the user-space word size in bytes on x86
-> + * @regs: User-mode register state.
-> + *
-> + * Return: 8 for 64-bit user mode, 4 for 32-bit IA-32/compat mode, or 0 for
-> + * VM86 mode stacks which cannot be unwound.
-> + */
->  static inline int unwind_user_word_size(struct pt_regs *regs)
-
-[ ... ]
-
-> +/* Standard x86 frame record: {saved_bp, ret_addr} at [bp, bp + 2 * ws). */
->  #define ARCH_INIT_USER_FP_FRAME(ws)			\
-
-[ ... ]
-
-> +/* At function entry before push %rbp: return address is at [sp, sp + ws). */
->  #define ARCH_INIT_USER_FP_ENTRY_FRAME(ws)		\
-
-[ ... ]
-
-> +/**
-> + * unwind_user_at_function_start() - Check if @regs is at a function entry point
-> + * @regs: User-mode register state.
-> + *
-> + * Return: true if stopped on an entry uprobe before the frame prologue ran.
-> + */
->  static inline bool unwind_user_at_function_start(struct pt_regs *regs)
-
-This isn't a bug, but the new comments on unwind_user_word_size(), the
-ARCH_INIT_USER_FP_* macros and unwind_user_at_function_start() don't look
-related to adding CFI support, and the changelog doesn't mention them.
-
-Would they fit better in a separate documentation patch, so this one only
-carries the x86 CFI register mapping and the Kconfig select?
-
+To: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+To: Joey Gouly <joey.gouly@arm.com>
+To: Steffen Eiden <seiden@linux.ibm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: Zenghui Yu <yuzenghui@huawei.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+To: Will Deacon <will@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+To: Christoffer Dall <c.dall@virtualopensystems.com>
+To: Rusty Russell <rusty@rustcorp.com.au>
+To: Marcelo Tosatti <mtosatti@redhat.com>
+To: Sebastian Ott <sebott@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+To: James Morse <james.morse@arm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+To: Shuah Khan <shuah@kernel.org>
+Cc: Karthik Bhargavan <karthik@pereq.eu>
+Cc: Clément Blaudeau <clement@cryspen.com>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
 
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+Dan Carpenter (8):
+      KVM: arm64: Drop an incomplete MMIO access when resetting a vcpu
+      KVM: arm64: Reset SP_EL1, ELR_EL1 and SPSR_EL1 when resetting a vcpu
+      KVM: arm64: Discard a pending SError when resetting a vcpu
+      KVM: arm64: nv: Discard nested SError in kvm_reset_vcpu()
+      KVM: arm64: nv: Replace a pending SError when injecting a new one
+      KVM: arm64: nv: Don't deliver a pending SError to the wrong guest
+      KVM: arm64: nv: Re-inject a stored SError after the exit is handled
+      KVM: arm64: selftests: Test that a vcpu reset clears the vcpu's state
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/45561209846
---===============6730931518485205145==--
+ arch/arm64/include/asm/kvm_emulate.h           |   1 +
+ arch/arm64/kvm/arm.c                           |   1 +
+ arch/arm64/kvm/emulate-nested.c                |  14 ++
+ arch/arm64/kvm/inject_fault.c                  |  10 ++
+ arch/arm64/kvm/nested.c                        |  16 +-
+ arch/arm64/kvm/reset.c                         |   8 +
+ tools/testing/selftests/kvm/Makefile.kvm       |   1 +
+ tools/testing/selftests/kvm/arm64/vcpu_reset.c | 210 +++++++++++++++++++++++++
+ 8 files changed, 251 insertions(+), 10 deletions(-)
+---
+base-commit: adcad7f4e6332cff3d6d7165f41584899f598534
+change-id: 20261120-double_exception-a34dcc521118
+
+Best regards,
+--  
+Dan Carpenter <dan@pereq.eu>
+
