@@ -1,111 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795620760;
-	b=fC3iNA8LSgrml/bNMfFEtpEfdeanYdPOBQxOmD1TlseFi84OJEGJVHA/FsrULx08G8DI
-	 oUvaH+gco81xKNSJ5SyP0KYExDKxpahJWCbyH4xwGfl/ng0TkmiyMagwJIMFjWPI91brW
-	 kaQlRTqIaiUzDSdoF3i/1ZJGpmrR2rYidF72H09nEzJZX2MxMfjhfcX4bUr0SNJ9UJy/T
-	 LKMMYqx2XfSQ6cVEGDIjRLEO81lSY9asDgACrEs2luvF80TrenK9qT6M4y0mTYPlja7H0
-	 FOYyaHgHkrjcJFpGvWovs7iKjo5ZH1joBrcU/OZOa7VbIj6LuiPmLQmmTb+y9DPoz/g==
+	t=1795620982;
+	b=nCYL5yjTEyH4hOpJN7kdawiqfuryu4O17bcR6c/dwXSvaU3jMHR9r/YrWcYy9C9/B6gS
+	 9EVClOowPCe2+HdkVg+sOzSdFSF0+UzpRzEXtHLj7sD5W+qoJnmexC8Acw54fP8FGM6mV
+	 wxe2KZwr+zs0W2y2VCZdMKP6Qr7IAvEPviyC9j9jO20itV3ldUN7wHTgenhC3s8WM7aWM
+	 SiW/s3u+Uol4bnDzuQglxN+HRRvs6Cy+p9vEzFlyHgKM6MP0cO46EmSHlxypolchPWHVM
+	 568o/D65B68PGdmZ8dC3MI8aMH0UUggCMJJrpOQeXs4q+bZXO0YQNN7ITfXzJ0l0FGw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795620760;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received:Received:Received:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To:X-TM-AS-GCONF:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:X-Authority-Analysis:
-	 X-Proofpoint-GUID:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=4pcbxCQpHnjfej2Pb47u9IiTlMLuBD74I8/PGaiLL2I=;
-	b=KgcwmDlUMa60m8qfGXJySgKHWijwvxh74qLM8Bg1AEWGbI0/kcTgszBlanKkZivewX+5
-	 gWzozv3pyB+27Q5gvJNosvUWBS5u3wRplQlpIfFv4dmn15BkQh+CIY/yzChPEt16Z7EWh
-	 CcQ006z78obZRRcIQgUo3chTZiNPwErziG1BQQUm1AOf7u7z9g0ju6Qdb8V6WofWaa7fv
-	 2SsmDMwXAAg/5+lO6j4nnz7iW7ts1lhOjFoyQWMZyhrbO6wPHrX2uUDxprac4QXG+dMHg
-	 3oU7sPABrLr/frIUlIgocnPLCKsAtheF7Krg/Q5t1agLBtAr0bjZoHiFMG/MVKwMQFw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795620982;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer;
+	bh=kdXtsK5oiGz6RmA/ZpSIqAQiVji6Qb7T5uYbNNT0Kak=;
+	b=G5QM5ZOTRB07x3SNDg4Z98LyQLspHoImrj0k+bBBK4lO7T/UBe+2lirIeexzIp/+EUgG
+	 PG/BsKK1WujpXgpaRJHMpAL6f3BSozF9UnDitG0QELcSb/jsdA77s9TKFgTSD5H+yprCI
+	 HrsNfg6snfxN3zuL3Y1+rSaZQRtkZQ/rMXHQ1JSaZHHm0k+781D5V6AmAcQSBiBC5bF1B
+	 cnZjj0C9TmlShineUw0wdIQ01BbryZ+MTaTyyQaYQTQhF9rhAbQQFD0qtUiFIVRbMMPoO
+	 oOSszql1dkEpaGIRPurCBJ6Wqmt90OCyyB/FiytLaMW7t8asIUGhjqe714GseS9daMg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.ibm.com;
-	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=CK972qqv;
-	arc=none smtp.remote-ip=148.163.156.1
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linaro.org;
+	spf=pass smtp.mailfrom=linaro.org;
+	dkim=pass header.d=linaro.org header.i=@linaro.org header.a=rsa-sha256 header.s=google header.b=AdXHw1wu;
+	arc=none smtp.remote-ip=209.85.221.45
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1CE606A326
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:32:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1E1CE606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E969606A69B
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:36:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0E969606A69B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=CK972qqv
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6APEYlFA1602794;
-	Wed, 25 Nov 2026 15:32:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=4pcbxCQpHnjfej2Pb47u9IiTlMLuBD
-	74I8/PGaiLL2I=; b=CK972qqvhHaY9mSoR1fN6G12TGcYlVYcYEqAT1Aq/e3IWS
-	ynI51DF7ld+ExOkn3RxrUa3gwcTO/KPC+LvPA6JpviEQonFriIk6eUoJMLb1drBM
-	ulMi25ezUrAp5fgiIe7fY8jfUDx7jyzgHAkPro0eAR+DO/Eo/oWnj3xvAE6A21uq
-	sYsUZjJHvCyoJrFHVqjWue1xS7jDF2z08QQc4+2LKY4rwvI+ebxCTvS9156cZhCg
-	cfABEgBfK8vjmHfhYx2gSHmz4R5Fbs42JXlbRBIgeev8obpElC8/7WTgdqnxvcpg
-	IODY/dyS0kiO2FeMY/kd7yZZJsXQKgeToTdmjONQ==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4j34fkn59d-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 25 Nov 2026 15:32:08 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6APEKXYX918513;
-	Wed, 25 Nov 2026 15:32:07 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4j5dcuuv8c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Nov 2026 15:32:07 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6APFW3SR47251732
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Nov 2026 15:32:03 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ABE732004B;
-	Wed, 25 Nov 2026 15:32:03 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5167D20043;
-	Wed, 25 Nov 2026 15:32:03 +0000 (GMT)
-Received: from osiris (unknown [9.68.29.29])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 25 Nov 2026 15:32:03 +0000 (GMT)
-Date: Wed, 25 Nov 2026 16:32:02 +0100
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-        Fuad Tabba <fuad.tabba@linux.dev>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Friedrich Welter <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 03/23] arm64: sysreg: Convert OSLSR to automatic
- register generation
-Message-ID: <20261125153202.117976-B-seiden@linux.ibm.com>
-References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
- <20261106-sysreg-v3-3-75e95980fb10@linux.ibm.com>
- <awbuY0mETtZ_mQh3@e143914.arm.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.a=rsa-sha256 header.s=google header.b=AdXHw1wu
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-48e3b22e971so3133494f8f.0
+        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 07:36:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1795620980; x=1796225780; darn=lists.linux.dev;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=kdXtsK5oiGz6RmA/ZpSIqAQiVji6Qb7T5uYbNNT0Kak=;
+        b=AdXHw1wubZWrkqODQX2WsG53QVUXsrOGMqTtve9pjt7sEHyRp5gQeyFU/rKQNAHFUJ
+         UmhvLD4jl+uBEcRNre/h1lkVdUMhEz2MX2jeM3ynku/B5I60LckqX3bXaJwuBiLPjZpE
+         1OOw/vtsDyj8dbQHQiNB2vt1majMWTKMsJ9M7OSAA1xizaG345SchilBA2KpdW3PP9zv
+         S8jeJge5Ig0F/s63X6T+hha9v5356mAPk3oiu7ke49Ivdi99Oxhbyfw9mPWmfq38uGKQ
+         6yy/s2mIRCMDgjn1fq/5BTWQxFYwUFkquxdrIwTBZqzoiU4HsWYtfYGhD17alLjzv9nN
+         oCbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795620980; x=1796225780;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=kdXtsK5oiGz6RmA/ZpSIqAQiVji6Qb7T5uYbNNT0Kak=;
+        b=dZ2u1S6iIHaU5Hmg07uey4cQa5RDdtYkHmy9577spJZhwU5B88PHUMj1IpkSRrXqlm
+         4eU46tDZzI/zLgnUigleJVmXXnDdvfxiXmFp1gTZk0uj51rldP6LyawsgakDBi+QPGS4
+         ezYrgXI90TZq52D86hPB5V3hX+db5AQR7gaqxBR4J0Z/dOrhrBnqaHDXLOmH8pnW75Y5
+         4+6sdz9VYdGhiaW1cFaKmSqIDpJK59oqUplj5jyE8ptH+ZQXg27kwaPMm36WDcViAo6w
+         fsuLU1QStthRylfUwH1rSRMSvt7QENIHjegQFNy2Mha2eiNZ6bqE+obt5FTrykRjpIO9
+         DIFw==
+X-Forwarded-Encrypted: i=1; AL+hErGUrFDR3FA+hjV7epp51h0VEArdVAeX1MhxdzxwRsDv60lcMRUtAJxJdjs+ni4qTeXGhawO1wQ=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/YrU57D+odwTR9qfdnQP6ERp1ug4++8vX3r0f+AhXVSRfEPA2k
+	aubOExuCKM0m/i27n+Q6VUl1yMvn5QrPlh1ovk1m7e2HZ9QLb7eNMsATA8FvQpKemSo=
+X-Gm-Gg: AZFdTZfbANCUD9/hfpgrjd76zR0bdrHGJcFR7nnd+CdN4TTGnKdAwMyGgimm+aWihgU
+	LxNSlR7w2Ox9gGVJs0kpMOQ9BigDKakkzJtspZ26PIiq+61CaLNNOCwjR1hJwd7HppfN0oltpRY
+	ttbnKAoziu7MYSoQrQOLAEDGNa1ZExENOxHRzfW670TipAp4bU3G3zRZw4qOGjg78F+oqk6d1Hv
+	KIEyvFT1+ucW7qgQcBOujj+674pNk4QuN1Uh13jY7s1XRqn4Xo78b8FEHgBmwJ0yDSpKYSgrSlG
+	bhXmURWo2rtoYLrfZYFcjQfnb8Va3CQxnjvWpDo+JO9e0YlVhS4MfOampK6dSp2DTw7NHQUA/OO
+	HJhmlz+8fbiWp+s7IaH/ctM4b/PzmTrYTJEAyhFqPGbcdqxfwHlR1sHx+WrINqvwyxDZxDWmkBq
+	/TwhiK+IvS6BJtxAdQDQaV1r8vG0TwLtsumtptL1m283KsFjkeVS9ZbbWGaqkdBLUfCjhEjsBFd
+	H4GC/6aJr4XiU24AD8f3oq73858vvnzaIwHX/aWyODOSTWr8KhQ9I7a/+EnXDxd9IMRPhiHpxaD
+	JvXK/Tyl561Jcf2XGOvfGVYMSJV3LI5BYNh3qoeS67sBVGkx25Jgkw==
+X-Received: by 2002:a5d:5849:0:b0:4a4:4229:c3a2 with SMTP id ffacd0b85a97d-4abaf7401bbmr39868108f8f.11.1795620980437;
+        Wed, 25 Nov 2026 07:36:20 -0800 (PST)
+Received: from pop-os.local ([37.18.141.193])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4b8e564e39asm5382635f8f.57.2026.11.25.07.36.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Nov 2026 07:36:20 -0800 (PST)
+From: James Clark <james.clark@linaro.org>
+Date: Wed, 25 Nov 2026 15:36:03 +0000
+Subject: [PATCH] KVM: arm64: selftests: Pin vpmu_counter_access to one CPU
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -115,67 +90,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <awbuY0mETtZ_mQh3@e143914.arm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI1MDA2MCBTYWx0ZWRfX/NUMUPbHtYAt
- SBqPklk9AkJR3xQscWUb+f0DjxT6kV/kKyzTYS5sjH9ZUCJKAnevQu5lvkNmNh+mx00OUGUbkWv
- jjuibY0pkEKt11siKIMCPZBdMM7+kh87ZffPZTmOE+1PW1vJEFHSe9Pfr75pGwpU7SnJXK5D/fu
- Q6+6mflTmzly5fnjhelCX+ItgipPuvYH3MQVR9zJSeHPDz1rYtwO//md7N1hUElXhKmJmIImyKv
- hu7y/Qi6rk11KeIp3TsafWBK7TS1cItcezbca1z1MtwFvcu3WAKG1zGdSyB9uAC+ztihTfPcNeN
- Qmiiz5zhivgKFBWqy+ulxfuQ6SGFfRMPScr37x6z+08KJYZjxqxdCYnPFnTi4zUHCIf7Hluzgdz
- vseauTpOvxUOR56QY+uk4nNORRVOu97Z5QLioztStQoE+elhWx2xPbXw/pcIxQsZWLYTMitYBaH
- QVyQsynlLGhvzytPSIw==
-X-Proofpoint-ORIG-GUID: CDsbJr9gK51GZkzZX73S5vFuDg4Ga37W
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI1MDA2MCBTYWx0ZWRfX5OJB27YFMq71
- CL5nVKK5wn9aXa8dxUuOKVGJmZI2slPpKyMf+o5SEBSifgf+gSzy0to5MSBMpx3qm0etWUh0Tj6
- 4U3lgNkIfqMEYbQ1Ic+dIShZjB1aEQU=
-X-Authority-Analysis: v=2.4 cv=A9z5rKWG c=1 sm=1 tr=0 ts=6b06ff78 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=kj9zAlcOel0A:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8
- a=7CQSdrXTAAAA:8 a=kDbVKrEIACoO4ZT2jxoA:9 a=CjuIK1q_8ugA:10
- a=a-qgeE7W1pNrGK8U0ZQC:22
-X-Proofpoint-GUID: CDsbJr9gK51GZkzZX73S5vFuDg4Ga37W
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-25_04,2026-11-23_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 adultscore=0 phishscore=0 priorityscore=1501 impostorscore=0
- bulkscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611250060
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261125-james-kvm-pin-pmu-test-v1-1-c3ce989233fb@linaro.org>
+X-B4-Tracking: v=1; b=H4sIAGIAB2sC/yXMTQ6CMBBA4auQWTNJW1B+rmJcIIwykJamU4gJ4
+ e4UXX6L93YQCkwCbbZDoI2FF5eg8wz6sXMfQh6SwShz19rccOosCc6bRc8OvV0xkkSsjCqaoqm
+ VKktIsQ/05u9v/Hj+Letroj5eNziOExjFhCt6AAAA
+X-Change-ID: 20261125-james-kvm-pin-pmu-test-720393980044
+To: Leo Yan <leo.yan@arm.com>, Marc Zyngier <maz@kernel.org>, 
+ Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+ Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+ Colton Lewis <coltonlewis@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ James Clark <james.clark@linaro.org>
+X-Mailer: b4 0.15.2
 
-On Wed, Nov 25, 2026 at 02:19:15PM +0000, Joey Gouly wrote:
-> Hi,
-> 
-> On Fri, Nov 06, 2026 at 05:07:36PM +0100, Steffen Eiden wrote:
-> > Convert OSLSR to automatic register generation as per DDI0601. As
-> > OSLSR_OLSM is a composite field using bit 0 and bit 3 the combined
-> > values are still defined manually. While at it rename
-> > OSLSR_EL1_OSLM_IMPLEMENTED to OSLSR_EL1_OSLM_IMP to be consistent with
-> > the rest of the system register values.
-> > 
-> > No functional changes.
-> > 
-> > Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
-> > Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
-> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> 
-> Need to do the Sashiko suggestion, it does fail to build.
->
+The vpmu_counter_access test reads the maximum PMCR_EL0.N from one VM
+and then creates new VMs for each number of counters up to that limit.
+If the test migrates between CPU types the limit may not be valid for
+the new VM which causes:
 
-Will do. I'll update the tools copy as well. Thanks for the reminder.
+  ==== Test Assertion Failure ====
+    arm64/vpmu_counter_access.c:483: !ret
+    pid=9165 tid=9165 errno=22 - Invalid argument
+  ...
+    KVM_SET_DEVICE_ATTR failed, rc: -1 errno: 22 (Invalid argument)
 
+For example on a Radxa Orion O6 with 20 counters on the big cores and 6
+on the little cores, this happens on most runs.
 
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-> 
-> Thanks,
-> Joey
+Fix it by pinning the test to the CPU that it starts on before any VMs
+are created.
 
+Signed-off-by: James Clark <james.clark@linaro.org>
+---
+Assisted by Claude Opus 5.5.
+---
+ tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Thank you, 
+diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+index 22223395969e..e7eac736260e 100644
+--- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
++++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+@@ -626,6 +626,9 @@ int main(void)
+ {
+ 	u64 i, pmcr_n;
+ 
++	/* get_pmcr_n_limit() can be different across CPUs, so pin */
++	pin_self_to_any_cpu();
++
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
+ 	TEST_REQUIRE(kvm_supports_vgic_v3());
+ 	TEST_REQUIRE(kvm_supports_nr_counters_attr());
 
-	Steffen
+---
+base-commit: 5715eba4f80a7655d85581c6c951b71d2abbd725
+change-id: 20261125-james-kvm-pin-pmu-test-720393980044
+
+Best regards,
+--  
+James Clark <james.clark@linaro.org>
 
