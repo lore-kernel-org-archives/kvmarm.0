@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.167
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.185
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795621230;
-	b=a50I9PBnY8Pv4DMNRZyLXNOWTfHo3baQDgK7K1J33FvQzBanpgx7Y78UxT1ZprA8x4Fl
-	 QfF7/zPbNbvoynYwtsHHHGG+Lj1r2g1HiIaA5DpMQ+pg5iMQnPoGaYBG/LrniJvKdkFyM
-	 ddtJmA+vn3l/pcs/YZ3vRb0WQiaMa9ZjcRo7hTmrHP15xpWHLonbKz38EadozofAfPTNq
-	 I2zAh/PpTMdFiPH0r1SUkEeWMxDhbrc0feuDplidzcd/L4A3pvd5mAJga0Ru07G+216ze
-	 252Lwy66hK6imL2SRyllWJhjEkbwpcX2+mVCwAHkU7hhEX+LNiUWIhlWbeEjb4RNKdg==
+	t=1795621249;
+	b=pThceAo70RWe7jzt8FPgeKo8Qyxtz6MJKbMhG6lcdx1Htc6vZ6+33MqfMIqUvSlTY5vy
+	 5eJHrY9WXshyrQRN/uDL/FA1g9hkp2YTpDgkNMbYDUeWSrliDrMAIB2PPJ9t3AAiegZaE
+	 AmGehiTZZYekrTOb6yg5ThHlGY3xtYkHrKWDC9Yb3J0Mw4UTjnEwJtch/dBc+n0UhTuCx
+	 LtmguTFmpgGmEE+9BdlJeVaQz7xt0yygQlK/ER1RaS+ZjqWlGGELOuSF8ii+hWakgZFXK
+	 6A7k9MSQUS6tMC/+Ztf2Gd48bEaQyFS/J6QHksYgZvQGe+tp5PwSAdJsLucLCt0yXTw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795621230;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795621249;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=4KD70GwKCbIo3iYnYiAxROa7nQMR8jUs46uCrYPzsEc=;
-	b=vghdLSMK2bLDWHZoibhOWBxcW2R74XBIx9B6xrz0krF0lFgAFL0kLT8ebuoSuoR0HLN/
-	 lMHZ6BIE+y4f7zmjBxde6BdLtVNMFH1s5DslQAbMV1xvjUpiAb46hddP5G8r2qPb90a1l
-	 uzZxipu9v6FFGAwpb0lBWZgVv70QolqJQ5yw7zsokffjQn5xguFCfhekAxB9X0/JSh+YR
-	 SO3fad6/Tk5Al1NW+NJ6rzhrZiXdnkG3Y7qbEuKduxe+KKvSHj70QD1kLo8ew2cJWkIwl
-	 qSVb7GEcSQrqslgJLIRX5ZNvhUhkSJ0svovsr3tO1zZGDoo8V7VXtIAZq3JcrIfkHzw==
+	bh=oJyjfOujmSBUsGvM1/SgdU/YJl1D0UryFNbGYP9HTmI=;
+	b=RTd8O+ngAxHuLBkIU1jR86OCViVs8xaTmSbEM2hLWD0DfElw4T3MFbPu7GmOJh4yZm58
+	 bF8H+1gqTITLwEa65z8OC6VtONG6b4ZpSmPwptsFpBgbEGNNy8FoFhLp9DbFur+HuLaV3
+	 OK9079niF7x0LnSHNI7bSLnjShMp2waka9pASG5B/4rH5P33xPU7zR9ClktJ92yQFzB2v
+	 LuzBRyGN9NvL4nJtSXRQ4/Ah17BOd/BcLLpXkPotiYQOLfkLAofeE+5Zmb6xFuwTtVLLQ
+	 RTfe8o2U3jcNHPAtKPyIK7eilZD3/W0xnNYbLrd/Rh+Vdnfx/BcGIT8d6fuLwKIROrw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=BLj1maW0;
-	arc=none smtp.remote-ip=95.215.58.167
-Received: from mta1.migadu.com (out-167.mta1.migadu.com [95.215.58.167])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=eUgwIOwS;
+	arc=none smtp.remote-ip=95.215.58.185
+Received: from mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E6C606B39B
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:40:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 57E6C606B39B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A27606A31E
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:40:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 54A27606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=BLj1maW0
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=eUgwIOwS
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=Ru4wsoPUBX8BwclDhrROzB4V6cI3IIahsVXty7NCsP0=;
+DKIM-Signature: a=rsa-sha256; bh=j1+9jq4DNPjKmn/CiJVqGm6EPhi92kwiCRK4Zpjn4qM=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795621227; v=1; x=1796226027;
- b=BLj1maW0hYMd/HYCkSc3lu+HHxonpoaNiLJZLmrKqhCi9qn6NhsVPJykaJt33Jf1J2knwXEo
- 30h+lCggdkjlCskmEPkG+/6t9KdoJapuVRsOuB4CcmJ8T66xFtSLnomVuLM24962y0uJhVgRQfj
- kMzaheiPRrj8BSRXil3bEFr4=
+ t=1795621246; v=1; x=1796226046;
+ b=eUgwIOwSzGaFhcaIJZSM7Euvac94ds6Ysz3w/lx8J7YPL/F4o0sqSk7dY8xOc1wHMwQcE3yC
+ nv/ZiPHxv67bKxJDKhw1ZkBF2cClRdY02mCYlG5GglB7J3vtk5hwjDSrMhDubNJBDdXNGiGCLzT
+ I8hFqIYYyfeRh1Lcthe+j3Ug=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 16cf6cf1af7bb7dd;
-	Wed, 25 Nov 2026 15:40:26 +0000
-X-Mizu-Trace-ID: 16cf6cf1af7bb7dd
+Received: by smtp.migadu.com with ESMTPS id c6dde43742fe7882;
+	Wed, 25 Nov 2026 15:40:45 +0000
+X-Mizu-Trace-ID: c6dde43742fe7882
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -63,9 +63,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 14/20] KVM: arm64: Advertise FPMR to protected VMs
-Date: Wed, 25 Nov 2026 15:39:05 +0000
-Message-ID: <20261125153911.106793-15-fuad.tabba@linux.dev>
+Subject: [PATCH v2 15/20] KVM: arm64: Advertise HBC, CLRBHB, RPRFM, CSSC and LUT to protected VMs
+Date: Wed, 25 Nov 2026 15:39:06 +0000
+Message-ID: <20261125153911.106793-16-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261125153911.106793-1-fuad.tabba@linux.dev>
 References: <20261125153911.106793-1-fuad.tabba@linux.dev>
@@ -80,36 +80,31 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Advertise FEAT_FPMR to protected VMs, and reset FPMR to 0 as KVM does
-for a non-protected vCPU. With the field set, vcpu_set_hcrx() sets
-HCRX_EL2.EnFPM for them, and FPMR is switched with the rest of the FP
-state.
+Advertise FEAT_HBC, FEAT_CLRBHB, FEAT_RPRFM, FEAT_CSSC and FEAT_LUT to
+protected VMs, with CSSC up to CMPBR and LUT up to LUT6, as for a
+non-protected VM.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index acba7489809f3..4ba947bd3d125 100644
+index 4ba947bd3d125..2c22317a76a5e 100644
 --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
 +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -127,6 +127,7 @@ static const struct pvm_ftr_bits pvmid_aa64pfr1[] = {
- 
- static const struct pvm_ftr_bits pvmid_aa64pfr2[] = {
- 	MAX_FEAT(ID_AA64PFR2_EL1, GCIE, NI),
-+	MAX_FEAT(ID_AA64PFR2_EL1, FPMR, IMP),
+@@ -213,6 +213,11 @@ static const struct pvm_ftr_bits pvmid_aa64isar2[] = {
+ 	MAX_FEAT_FUNC(ID_AA64ISAR2_EL1, GPA3, IMP, vm_has_ptrauth),
+ 	MAX_FEAT_FUNC(ID_AA64ISAR2_EL1, APA3, PAuth, vm_has_ptrauth),
+ 	MAX_FEAT(ID_AA64ISAR2_EL1, MOPS, IMP),
++	MAX_FEAT(ID_AA64ISAR2_EL1, BC, IMP),
++	MAX_FEAT(ID_AA64ISAR2_EL1, CLRBHB, IMP),
++	MAX_FEAT(ID_AA64ISAR2_EL1, RPRFM, IMP),
++	MAX_FEAT(ID_AA64ISAR2_EL1, CSSC, CMPBR),
++	MAX_FEAT(ID_AA64ISAR2_EL1, LUT, LUT6),
+ 	MAX_FEAT(ID_AA64ISAR2_EL1, ATS1A, IMP),
  	FEAT_END
  };
- 
-@@ -828,6 +829,7 @@ static const struct sys_reg_desc_reset pvm_sys_reg_reset_vals[] = {
- 	RESET_UNKNOWN(TTBR1_EL1),
- 	RESET_UNKNOWN(FAR_EL1),
- 	RESET_VAL(VBAR_EL1, 0x1de7ec7edbadc000ULL),
-+	RESET_ZERO(FPMR),
- };
- 
- void kvm_reset_pvm_sys_regs(struct kvm_vcpu *vcpu)
 -- 
 2.47.3
 
