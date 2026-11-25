@@ -1,57 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.198
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795622137;
-	b=LaD5S16PQWGxMLLkx1Bkkn1a3rGGgDrvPTRAxBDZzfM/XASdOiuQL01N8/Y9H9vMCLQu
-	 2wrOn1QUoEM6cnGh399ig/qX5H5D66C5kSIDzqKMalv0y9HQd/6IKK3tx06IgIxiEOuGR
-	 vZ2sVeNxQBobo/FmhOFOYqbbO+xZStQL19JmsNGcMzT9cPJxjGOw3fllMnYm6UV1uR+Cg
-	 QCdm5vs3kju5EIPjMCaMI9KRMmNQoj1UlTRGZzf9PRxl3O6f4UV+a1ACRtbEAkF8MWl6R
-	 tt3Fww4/5pcwkFiyqFgAcC/1GymaIQFeKvnbzk2nGfISLzOw7UWp4He786Mzg7kOhew==
+	t=1795622358;
+	b=UbDzQiiaS5foiKZZyuWv7QVnDudumyYJQWukxCZaqWgBoaE+uQU8JYBeP73ABELq/CFw
+	 6QewEK4sURI+SkNxb+hhfWRs8CjORLVVK/UsFu3hCNuLPHN1ZfJ73ZDnodDlA8ehoyw9c
+	 9vASBIPI8BbdlvcPQ9gmNhLOXgJzpiFWOY+hO5JwUi0i6F+pxkurTJrfmVXDaUZfcxwvL
+	 Pvan7kkADDTDkKwsv4OivSwrsxRkLN901sT7TCCwKMzsIH4EwSMbnyL49QnHUTVuqtx6Y
+	 x6S0gOryArWjrK6945R7MvDH+s0698MitzgmjduveF8Hh74iQ3R9aM1S0UxwyCHf3+Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795622137;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=r62sQwX3TtcfdrrxWd6LqSL929Twi5LmE8HULa72YDc=;
-	b=Npbrk6L+OFz6mf4KOZjQVCv+XdGNbjs61F39F0bC9DH6IlZ9R0hEirif+0FciInUUXYO
-	 QbkcS5uCeSOhgTaY4/q7K+vH8gbmaY9qy2II/EpbkezbKoHAFkAZRELO98MPNl02q8qpe
-	 zm2KHh//82QF4LQeQoEpFTyE4vxRfVQ++1KNcubYqqbSARADVTflzxJicqR/dTVUVOu5+
-	 Z4sH4vHdqBl9tQF/f5BK8ToSMjUtMjL8llteJuAPvo5vZ6HLYZhfqPsBT4Jn2I81aW1sB
-	 C/wewZ7bWSRYuq9hiK9nGM+X4SzYh9YVcvJGZO1WYiLGdi00y0jl+iee+RaOYE5ynPg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795622358;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Gm-Message-State:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:
+	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type;
+	bh=cvTi/nNYHR2TYIOUf2vi5rClYm97tIxKBSXMmmYFqlY=;
+	b=bQK8HJIZB6657UUzNMrUmsSSLrzrlgoyzpXLNfWiEp0vVdcdBQlLMcNhWp5ZO9Zo4EZD
+	 j3nyx3yy96GgNTHnAx0cDXviSLW+xUWlfdHEY+2cnp9WfK2fVAJYDnDv5u4uytvWSgdM4
+	 R67lR4V5oUG2oBCTEBUbEBwgDVVyRMZoekQL82Xf/0AcsOFSzzOQihf9C1v87BaNND/tf
+	 3sE9lDj1r/tZCOzLg8VhIaTCavUgDiLG7BnUIhlxaBuGhgMnhmK5VZRpup6k3jzi/QNO+
+	 UNLkK31yXw1wpECJaOwDgrKfDAHozSpo767DEeChK0CXrGqWklCDM0Scmh04gI+ICRA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZKlIM7vN;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QFCsyik4;
+	arc=none smtp.remote-ip=95.215.58.198
+Received: from mta1.migadu.com (out-198.mta1.migadu.com [95.215.58.198])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C35606A326;
-	Wed, 25 Nov 2026 15:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67429606A323
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:59:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 67429606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZKlIM7vN
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A9751F000CA;
-	Wed, 25 Nov 2026 15:55:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795622136;
-	bh=r62sQwX3TtcfdrrxWd6LqSL929Twi5LmE8HULa72YDc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=ZKlIM7vNwIpCl1UegKviBWyp+pnWJx00PHAa5vOAvg4/NyNqRyVfmIAFF0Ybnsn6H
-	 ovw6nAOquYWofqx8nfCB1Winns9lTvIJly67urBVR7OweOjM1EfU6KSw0dYVrPsIbu
-	 K/w/xHFbG3ySdRIscgeSsM3SMx3FrxEcZ3bmpyT8/NpVcPzLC3Fu9db6HhWgLJw7+q
-	 oUdF3UDPrPOrUHa6B10eONpjxK0Mp80TumXwHmh2CnhxXdWRtTytoCN5MS0iK6C8Sl
-	 sCaRPbiuPaecvk8Fb07W7Bv1guNxtlt9D+1putLiQ4ou77NTOQnGsU3bFsOwvVm7w0
-	 T+abkQ2jFb49g==
-Message-ID: <sashiko-outbox-233684@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 09/20] KVM: arm64: Report an incomplete feature map
- with WARN_ON()
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261125153911.106793-10-fuad.tabba@linux.dev>
-References: <20261125153911.106793-1-fuad.tabba@linux.dev>
- <20261125153911.106793-10-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Nov 2026 15:55:36 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QFCsyik4
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=/XkNz3r9eFnmSbOvrGYUn0rZ+WAp3AeHIjYmS1q0RGE=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795622355; v=1; x=1796227155;
+ b=QFCsyik4SJM73hazO05b1WJ43qtd7xIBn14gV99k3gh4uk8shf/78xdUd7cAjveEI2WMpAyP
+ svGUpdbe+ayPLHbVVP1haWfg+3zmIPyU3xBy9rt01oY03/qC0VOdCqqlYTGRtsyGazDuFQQeb8Z
+ eZ2qf1bujZ+WxAcl7BG1CyRs=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id a8a5ba318e6399da;
+	Wed, 25 Nov 2026 15:59:15 +0000
+X-Mizu-Trace-ID: a8a5ba318e6399da
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5c14bc5a743so37299e87.0
+        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 07:59:14 -0800 (PST)
+X-Gm-Message-State: APuU4Z/N+NFY4v0rlKmp9WaJX598Vk7C9rPaj8EoFISCl3EUeS5GV2VP
+	5+3+/+7VYssQXz0/Ih9YMDwPulZC7V9v5m0LhLY8PxijKlplTZdNhSKNxeS9XZWnh3ppXK0hD5m
+	6LK41kkC3aSVKzz+8wYhP4zA69327QbctE+9LjVag
+X-Received: by 2002:a05:6512:10c7:b0:5bf:f84f:1d74 with SMTP id
+ 2adb3069b0e04-5c21a27810amr593536e87.13.1795622354030; Wed, 25 Nov 2026
+ 07:59:14 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,53 +64,39 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+References: <20261125153911.106793-1-fuad.tabba@linux.dev> <20261125153911.106793-10-fuad.tabba@linux.dev>
+ <sashiko-outbox-233684@kernel.org>
+In-Reply-To: <sashiko-outbox-233684@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 25 Nov 2026 15:58:37 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTz1SuYC9GnMRH2Fe71jxKm1QvoE5tEopBe6k_gFNdbwHQ@mail.gmail.com>
+X-Gm-Features: Aa3M54qU1hrnXAD2dBM1Uj3GqNjkJxsnaGRBLC-c83EOnBK74LQNPnC0lvVf4bs
+Message-ID: <CA+EHjTz1SuYC9GnMRH2Fe71jxKm1QvoE5tEopBe6k_gFNdbwHQ@mail.gmail.com>
+Subject: Re: [PATCH v2 09/20] KVM: arm64: Report an incomplete feature map
+ with WARN_ON()
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Low] KVM: arm64: unused str parameter and name field in
-  check_feat_map()
---
+On Wed, 25 Nov 2026 at 15:55, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 1 potential
+> issue to consider:
+> - [Low] KVM: arm64: unused str parameter and name field in
+>   check_feat_map()
+[...]
+> [Severity: Low]
+> Does replacing kvm_err() with WARN_ON() leave the str parameter of
+> check_feat_map() and struct reg_feat_map_desc::name unused?
 
-commit ef16fb792e699aa85734a7167ff79fe6521ee780
-Author: Fuad Tabba <fuad.tabba@linux.dev>
 
-KVM: arm64: Report an incomplete feature map with WARN_ON()
+Deliberate. The #ifdef was removed at Oliver's request [1], and the
+warning doesn't print the register's name or the bits, as discussed
+there. The str parameter and the name field are kept so that this
+patch only changes how the check reports an incomplete feature map.
 
-This commit replaces the kvm_err() call in check_feat_map() with WARN_ON()
-so that arch/arm64/kvm/config.c can be built into the nVHE hypervisor
-without depending on printk().
+/fuad
 
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index c65cf1dd27330..eef5ca50fc382 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-> @@ -1409,9 +1409,7 @@ static void __init check_feat_map(const struct reg_=
-bits_to_feat_map *map,
->  		if (!((map[i].flags & FORCE_RESx) && (map[i].bits & resx)))
->  			mask |=3D map[i].bits;
-> =20
-> -	if (mask !=3D ~resx)
-> -		kvm_err("Undefined %s behaviour, bits %016llx\n",
-> -			str, mask ^ ~resx);
-> +	WARN_ON(mask !=3D ~resx);
->  }
-
-[Severity: Low]
-Does replacing kvm_err() with WARN_ON() leave the str parameter of
-check_feat_map() and struct reg_feat_map_desc::name unused?
-
-check_reg_desc() passing r->name to check_feat_map() was the only reader
-of struct reg_feat_map_desc::name.  Leaving str and name in place triggers
-an unused-parameter warning under W=3D3 and, once config.c is built into
-nVHE hyp, keeps unused string literals and relocation entries in
-.hyp.rodata and .hyp.reloc, while the bare WARN_ON() across the 23
-check_reg_desc() calls in check_feature_map() no longer reports which
-register or bits failed.  Either str and struct reg_feat_map_desc::name
-should be removed, or check_feat_map(), check_reg_desc() and
-check_feature_map() could be guarded with #ifndef __KVM_NVHE_HYPERVISOR__
-so the host init check keeps logging the register name and mismatched
-bits.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125153911.1067=
-93-1-fuad.tabba@linux.dev?part=3D9
+[1] https://lore.kernel.org/all/avyZH2g3rrIVm-Fl@kernel.org/
