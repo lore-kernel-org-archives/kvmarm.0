@@ -1,74 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.215
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795621280;
-	b=GQFMfqjB2Ic/wC6r8GVDOqPqwFaoZNyG8YFPxjM+tlGqzOWgZDTpQSspTnOqmV8uuTur
-	 j1nBV5wEgNqh29WmLG076vJ4ULHMgGriK5h22Ls3QxfRdJB+iAIU4U7/H/vJYCWKlWFmw
-	 ercLhk68RjQYHVVvNJsYNEe9T3aCtxrmgRkfFKcRkyrKxh0ouTgMNCyCjGeSb/aR2VHGz
-	 fPjOsSCknxTw+P72noYDlZCKuMPz6xF3Ze+K8rDViDAT8tMco7SmmBQwtsvDJMgb0f0J7
-	 rFIt1QGCuoK10Og0pg8zO4m3KesoGzSom2UJJB33VDmNSM8jvt91PLJdUFHj2HZqUzg==
+	t=1795621323;
+	b=n1/1fvkeB2GQkXCuGvZXqCVB7bl8QL0Tuw7LfhzSduuf+HB+KxLSEl8WKx1oyCIvnNZb
+	 cJ9mb9x78t62EHeKnyOniWnd+7UqEjT6EIyyzHiQHGFm+5SzjrCUG7yBca+SjS0i3qoqZ
+	 yZxAFrBT0ba107ajrgmpW7NidpK/YXkuMN8pIDhAGpNLPvLUf6oaJUP03Svn8prg3WAqa
+	 IRAPUtHaGGE+mRCoikuNqA3nASSJJmb3OqfIcHUQ9WFSrctZ5GRgqioiIooPaFpwvApY9
+	 0h0dh2VE108X34eVKy9f3qgGOcEjZCKg3Ly/joPdoZzz30oOW/xCBveduSd0oKNUc5A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795621280;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=GUOCNiu7cFer54u4izVvBECwy8EsL27hiy9L0uTDTa8=;
-	b=EZqX15xdDUTZo2Ef2NPpXzpR0IaHmyloM5n8yzigc1Tx6xP7VI/BlpY/SZOjyLPcXKke
-	 9S/V8CyK+vohF2E9yJRvgkoqhbKl34n9ArGrUA4fo/7znoMRFOUpSiYelPEsAPTIuSJi2
-	 /4oIlJQQZeFLhOVqiIFhVCk4T/f2vGI2xL8a5pF5+HB7hAmM1vCsVBXUQwggvVnl2Vq7v
-	 TzHsxWmsS0EQU959jKWUz2uW9jd81qnkBriz3YUffzVnIcqsKVzeZkDi6xtGbN0BKuS7U
-	 DAw/fZ6jjj1DqxNMCXbKj7ZXnMadtfY/ivKJkXPmXB02deQ0oO/fhgjUQP3HfAPVyKg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795621323;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=EQZSFzWaxf/IxwfImonvvEBds2UHS4e60bC/g5jvdw0=;
+	b=DvgUw/e62iIvJvG3U2lw4KI2TQd6gbvGJqnduvcVX07NOUdCnbErWraF1oI8ltk0WxFW
+	 JsU9/Eh7yNZJHdS9avPYHRg+4FrxXg9d3/oBH4vUbE34/4csTVRofKausLaA3J29591ir
+	 BQeH9uURAIrrugBXSL8HrwatsmamPX+d+HdyrSGfQz3v8dKlopKdXjWTVEcCY4K4wZsn6
+	 2pBS/eJKQ/ptvtYPX/1vF2XSUsro+sCF3IgQJnK1ETuOa0bXaRfWK8/cZ9tuTWliVA+bf
+	 wVV4XDCu8dfuu8JFoG0S7pik/MJvkNelj8U5tB2tV9kpul/sLYJUAdxLxXkgGl3npBA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=wBn2T8vC;
-	arc=none smtp.remote-ip=91.218.175.215
-Received: from mta0.migadu.com (out-215.mta0.migadu.com [91.218.175.215])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iANgKMkr;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413DA60A2612
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:41:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 413DA60A2612
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D581606A6A8;
+	Wed, 25 Nov 2026 15:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=wBn2T8vC
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=WX5/WDt3Ch560GkYrbupqthKzPK+92bD6UTcsA1auYw=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795621278; v=1; x=1796226078;
- b=wBn2T8vCn7idCne3+4wyIid6/RU+zbRpwGwDEy1df6X3t8KSyqU27AYgoQ+8+jWreSvevA9J
- thpHHoBIi78XLJ1EUh6e/q+GUPRhqfZf1KXY2v4CZZfnbUlwKwS0FYe7M9Ei6dmu9XvGMXGM1sa
- eIzD5XEfkyQcgB83osrjw7eQ=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 496adf252b9d071e;
-	Wed, 25 Nov 2026 15:41:18 +0000
-X-Mizu-Trace-ID: 496adf252b9d071e
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 20/20] KVM: arm64: Advertise ECV, HAFT and ETS3 to protected VMs
-Date: Wed, 25 Nov 2026 15:39:11 +0000
-Message-ID: <20261125153911.106793-21-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261125153911.106793-1-fuad.tabba@linux.dev>
-References: <20261125153911.106793-1-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iANgKMkr
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A98D81F000D8;
+	Wed, 25 Nov 2026 15:42:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795621322;
+	bh=EQZSFzWaxf/IxwfImonvvEBds2UHS4e60bC/g5jvdw0=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=iANgKMkrhZSX680WviP1Xhu6wPpl6YOkE7+s59+P8k7B0CMY+lpv/RHOXU2Y8Yea0
+	 5WyvYXbed8nEWVkpe3YDlPsBiVr4QgLlIWHkdTG+TpnSwvKCCAsglayu+WfQR63k5Z
+	 ISzFBBCbQW6taOK7IhLSFF+ShIPqlTENTk252v/AEwcXwo8UVa0W/n4bOubfjlnwVI
+	 otK4aodMdfImU0N+jxWTWCEKff0H9DPeyRK/u73/fmglrcXSp0wv4A7iOyRawKPOGI
+	 VKNuEBryrYfJYLVsehICA9pE8dOudobO5or4JZpQpa7PNm6HRajdXAeWo0TFi6kcJn
+	 D4RJFNk5+Ew1Q==
+Message-ID: <sashiko-outbox-233667@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] KVM: arm64: selftests: Pin vpmu_counter_access to one
+ CPU
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "James Clark" <james.clark@linaro.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20261125-james-kvm-pin-pmu-test-v1-1-c3ce989233fb@linaro.org>
+References: <20261125-james-kvm-pin-pmu-test-v1-1-c3ce989233fb@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Nov 2026 15:42:02 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -77,44 +60,44 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Advertise FEAT_ECV, FEAT_HAFT and FEAT_ETS3 to protected VMs, with ECV
-capped at IMP and HAFDBS at HAFT, since CNTPOFF and HDBSS only add EL2
-and EL3 controls. ECV's self-synchronised counter views trap under the
-same controls as CNTPCT_EL0 and CNTVCT_EL0, which kvm_handle_cntxct()
-emulates.
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Low] KVM: arm64: selftests: missing Fixes trailer for
+  vpmu_counter_access
+--
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+commit 743d06a69fdece62aa16db9a505ef5da1403cfd6
+Author: James Clark <james.clark@linaro.org>
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 4b95128663aa8..770ba0bb0a400 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -172,16 +172,17 @@ static const struct pvm_ftr_bits pvmid_aa64mmfr0[] = {
- 	MAX_FEAT(ID_AA64MMFR0_EL1, TGRAN4, IMP),
- 	MAX_FEAT(ID_AA64MMFR0_EL1, TGRAN16, IMP),
- 	MAX_FEAT(ID_AA64MMFR0_EL1, TGRAN64, IMP),
-+	MAX_FEAT(ID_AA64MMFR0_EL1, ECV, IMP),
- 	FEAT_END
- };
- 
- static const struct pvm_ftr_bits pvmid_aa64mmfr1[] = {
--	MAX_FEAT(ID_AA64MMFR1_EL1, HAFDBS, DBM),
-+	MAX_FEAT(ID_AA64MMFR1_EL1, HAFDBS, HAFT),
- 	MAX_FEAT_ENUM(ID_AA64MMFR1_EL1, VMIDBits, 16),
- 	MAX_FEAT(ID_AA64MMFR1_EL1, HPDS, HPDS2),
- 	MAX_FEAT(ID_AA64MMFR1_EL1, PAN, PAN3),
- 	MAX_FEAT(ID_AA64MMFR1_EL1, SpecSEI, IMP),
--	MAX_FEAT(ID_AA64MMFR1_EL1, ETS, IMP),
-+	MAX_FEAT(ID_AA64MMFR1_EL1, ETS, ETS3),
- 	MAX_FEAT(ID_AA64MMFR1_EL1, AFP, IMP),
- 	MAX_FEAT(ID_AA64MMFR1_EL1, TIDCP1, IMP),
- 	MAX_FEAT(ID_AA64MMFR1_EL1, CMOW, IMP),
--- 
-2.47.3
+> KVM: arm64: selftests: Pin vpmu_counter_access to one CPU
+>
+> The vpmu_counter_access test reads the maximum PMCR_EL0.N from one VM
+> and then creates new VMs for each number of counters up to that limit.
+> If the test migrates between CPU types the limit may not be valid for
+> the new VM which causes:
+>
+>   =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
+>     arm64/vpmu_counter_access.c:483: !ret
+>     pid=3D9165 tid=3D9165 errno=3D22 - Invalid argument
+>   ...
+>     KVM_SET_DEVICE_ATTR failed, rc: -1 errno: 22 (Invalid argument)
+>
+> For example on a Radxa Orion O6 with 20 counters on the big cores and 6
+> on the little cores, this happens on most runs.
+>
+> Fix it by pinning the test to the CPU that it starts on before any VMs
+> are created.
+>
+> Signed-off-by: James Clark <james.clark@linaro.org>
 
+[Severity: Low]
+This fixes a bug present since the test was introduced.  Should this
+include:
+
+  Fixes: 8d0aebe1ca2b ("KVM: selftests: aarch64: Introduce vpmu_counter_acc=
+ess test")
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125-james-kvm-=
+pin-pmu-test-v1-1-c3ce989233fb@linaro.org?part=3D1
