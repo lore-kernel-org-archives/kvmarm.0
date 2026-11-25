@@ -1,80 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795616996;
-	b=0zvgsEMQqpfLDrF3PCYdAMJWbEkEOM49hdtbg7HMUHGmhUSRyC9VhO/4xqmxbTVMDqjE
-	 eU1AOJb4cqzXmcl/OLVcBSvZdd0eDtRq2cNysamg+gNtdzQO+C7DQSUN9y1I1guGM5+Sv
-	 3/G+3oezF4V2ZFQA6dOBqevYRgdrNZVnVGIbK5iUxHCfiJUlFksMByBDjajaxRhnaZh0S
-	 V4Gpq5tPcO5iFFJFqlIECU9JgUKKV2MqhYbGF7uLokuoOBlR4ngBTvjKWvh7Mw08Ke+oK
-	 pkVVxkVPJtf6YPIYEf0B0eVaopV02lD5bkNt8oXEKKi4HP8uV8oPF0ipmDKpMCPYifQ==
+	t=1795617835;
+	b=iUE9sZwZujJP/wLrAZuyHNMhTSoGBlIyKUD57GNOs5lU58N84WmT6GQFLt94rvjAvCrB
+	 ou4h1d9IFrRhFXw3yOS1fuRaOqhfV2yY7ph9Pkxq3F/tNxdnlOfeLR4I3FtHHUR0iU1eB
+	 D9LtCZ4o1f1Z79Yo4VtcPG/oFDH5tonzV7vSfIiCS/4ac5lbAdumNRFbO8XLIk2ceJdmP
+	 yLwcj353Panulh3AVZUXciPV27EBj6TsialZ/DHVqU/wtSlL8xFe6eGVQ1bhYeqPiA4rx
+	 zx0EM1kfEf/s9Kziegb/s/6SRE9KDWgByxpOiQbRNHd2b82ouoLiYtiaIBEDH1WnWkw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795616996;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=yzob3IjNhlkrELuFZotbKtg9maqB1cC/YQY8iPS0b0o=;
-	b=UzkhN2HGcpaHopkXIqENBE0bj8B2Dd6VltMi+zvFDjvWN5qcjGK58v7oSymTqdpB1OxV
-	 0ory4W57H82Y/rSp1HEpBAOh800wyl+AZhvAq72pKMFBq57viTfa1VTSufRqqlDby+c7l
-	 W6hYKCMA1ipYCr9eiWz+TK80cPM1SqcTBo63eVQxtibV00tyNHgGr9UMYX9V6RP2uZQw+
-	 gvy0TKQ/2OPJYj1EyyF2VyMc5Rtc670bedjpvJz8ubPXIQJACIxnC7q90crTA0S6ODGuN
-	 c1nJaKjHvynDTBZsMHvWa9OSoNdGLVezOD+ZKQeMMFlLqLtW0XRsyuliHrLXzDkQXgQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795617835;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:In-Reply-To:References:
+	 Date:Message-ID:User-Agent:MIME-Version:Content-Type;
+	bh=DSDBbrxDF7QE7mJ7cGh5psk8NDNsiMzdc0pE9t4TEt8=;
+	b=OQhaYXsn9hxEJUWc0bWcvtHM9hvQLmvtT90tnVIVVKsIvOPqhy4c55HrIsUGndsucUau
+	 hnjjA9/zGcfyqOrFJI/2cqglg1h4ETIoCqJHG8Vg42a3VopZ+WPiOjsdBvJKDKTKBUK7a
+	 HLnRqxCbfz8WpkzRlh9NbylGQ4FuNjRihumGX5BPrJ/AthTaxxjK5zlrJZKsGXToJts7Y
+	 I7QKxub1PUPwU3SfF58T/k4HEugKhKGs6oxLTexqsNc3W5qksRcY9T7RvTKbNOxliFqKw
+	 8Zttpr4PEqWtAvLHVH05MC99TgW8hQEeAcqO1j+Rdi7jNmSo1eGR72E4eE/VdTWSugA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=btDetiEW;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A24606A323
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 14:29:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 95A24606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IaxxUP7L;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C32B606A326;
+	Wed, 25 Nov 2026 14:43:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=btDetiEW
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA6FD2F;
-	Wed, 25 Nov 2026 06:29:51 -0800 (PST)
-Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF7893F763;
-	Wed, 25 Nov 2026 06:29:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795616994; bh=irJ+SLW2diU+AhutWrsQkPmnPIapmN0EHmgj2AIri5o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=btDetiEW6iagg1Fl4BzF0k9NBnwE7C9i2RYKjvc2M9/Nkk1H4Od9YD9FWkoDGmaKS
-	 2otJ3Vv1HcTLqwGA2kG3AzVGZ3yVGdT+UFEXcIh5+Hs/D7v4Z6f04gjeE61UswGTcQ
-	 Y4zU6Yjv/ZMaIHmSEfJY21N/cuT66qe2B3dQbn3o=
-Date: Wed, 25 Nov 2026 14:29:48 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 02/23] KVM: arm64: Extract number of sys_reg_desc into
- a constant
-Message-ID: <awbw3NyDifa0WjhZ@e143914.arm.com>
-References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
- <20261106-sysreg-v3-2-75e95980fb10@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IaxxUP7L
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F3521F000C6;
+	Wed, 25 Nov 2026 14:43:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795617835;
+	bh=DSDBbrxDF7QE7mJ7cGh5psk8NDNsiMzdc0pE9t4TEt8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=IaxxUP7LRnqywT22he7m+Fp7ezJgAfkpHSw5REph0tRYPRC/9tQDBnxNGaqFCUe0P
+	 HC4OCPR1FvefXZR0jreOarx1/ItxF0Kd5XwRm18+njWXI6kfrP7K+QHWF1l9XvxXHk
+	 Wb3T7KBp5sU8Uq3JjMSsDtDz2cQ1vDbxW6cRqzm0jkDQjr5S84bbH7Zbc/9r5XtFga
+	 tXPaD+SS8GZvYPYpD187DBOSIhZ28zt4gF80M0lT+Uc0vOeuoEM5ntTj2myprO+Uo6
+	 0KAYN/vccLRY3U4aBHQmotXHdObAadnDVOITnax/jMq8UASOsc7R09dQV9GiPujVaw
+	 zu/OOYjuPVOYA==
+From: Pratyush Yadav <pratyush@kernel.org>
+To: "David Matlack" <dmatlack@google.com>
+Cc: "Pratyush Yadav" <pratyush@kernel.org>,  "Tarun Sahu"
+ <tarunsahu@google.com>,  "Pasha Tatashin" <pasha.tatashin@soleen.com>,
+  "Mike Rapoport" <rppt@kernel.org>,  <robin.murphy@arm.com>,
+  <maz@kernel.org>,  <will@kernel.org>,  "Alexander Graf"
+ <graf@amazon.com>,  <seanjc@google.com>,  <jgg@nvidia.com>,
+  <loganodell@google.com>,  <arnd@arndb.de>,  <dwmw2@infradead.org>,
+  <baolu.lu@linux.intel.com>,  "Bjorn Helgaas" <bhelgaas@google.com>,
+  <oupton@kernel.org>,  <alex@shazbot.org>,  <gle.com@google.com>,
+  <pbonzini@redhat.com>,  "Andrew Morton" <akpm@linux-foundation.org>,
+  <kevin.tian@intel.com>,  <joro@8bytes.org>,  <kvmarm@lists.linux.dev>,
+  <linux-pci@vger.kernel.org>,  <kexec@lists.infradead.org>,
+  <kvm@vger.kernel.org>,  <iommu@lists.linux.dev>,
+  <linux-arm-kernel@lists.infradead.org>,  <skhawaja@google.com>,
+  <sagis@google.com>,  <linux-arch@vger.kernel.org>,  <linux-mm@kvack.org>,
+  <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 03/19] kho, memfd_luo: Reference struct kho_vmalloc
+ via serialized pointer
+In-Reply-To: <DN3VG4JCILOO.YN40XHHSWRPH@google.com> (David Matlack's message
+	of "Tue, 24 Nov 2026 16:39:52 -0800")
+References: <20261110050202.529473-1-tarunsahu@google.com>
+	<20261110050202.529473-4-tarunsahu@google.com>
+	<2vxz4idb1i2w.fsf@kernel.org> <DN3VG4JCILOO.YN40XHHSWRPH@google.com>
+Date: Wed, 25 Nov 2026 14:43:47 +0000
+Message-ID: <2vxzld6hx97g.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -84,149 +75,80 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261106-sysreg-v3-2-75e95980fb10@linux.ibm.com>
+Content-Type: text/plain
 
-On Fri, Nov 06, 2026 at 05:07:35PM +0100, Steffen Eiden wrote:
-> Define the constant `num_sys_reg_descs` which stores the number of
-> elements in the sys_reg_descs array. Replace all occurrences of
-> ARRAY_SIZE(sys_reg_descs) with the new constant.
-> 
-> This refactoring eases the integration of handling system registers for
-> arm on s390. s390 needs code from the shared code to define the
-> sys_reg_descs. But also the shared code needs the definition of the
-> sys_reg_array and we cannot forward declare arrays and use their size
-> before it is properly defined. This patch solves this chicken or egg
-> problem. For the time being s390 cannot process the full arm64 defined
-> sys_reg_descs array.
-> 
-> No functional changes.
-> 
-> Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
-> Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+On Tue, Nov 24 2026, David Matlack wrote:
 
-I see later in the series, the include of sys_regs.c into s390 is done
-before the s390 sys_reg_descs array is defined.
+> On Fri Nov 20, 2026 at 10:19 AM PST, Pratyush Yadav wrote:
+> [...]
+>
+>>> +static size_t memfd_luo_ser_size(void)
+>>> +{
+>>> +	return sizeof(struct memfd_luo_ser) + sizeof(struct kho_vmalloc);
+>>> +}
+>>> +
+>>> +static struct memfd_luo_ser *memfd_luo_ser_init(void *mem)
+>>> +{
+>>> +	struct kho_vmalloc *kho_vmalloc = mem + sizeof(struct memfd_luo_ser);
+>>> +	struct memfd_luo_ser *ser = mem;
+>>> +
+>>> +	KHOSER_STORE_PTR(ser->folios, kho_vmalloc);
+>>> +	return ser;
+>>> +}
+>>> +
+>>
+>> Hmm, I am not a huge fan of this. This makes doing such allocations
+>> quite annoying, and I reckon we will be seeing a fair bit of them in
+>> many places.
+>>
+>> The key observation here is that most file handlers need to allocate a
+>> bunch of preserved memory, but they usually can free it all at once. So
+>> we can get away with a very simple allocator that hands out memory
+>> linearly.
+>>
+>> I have sketched out some code for this, take a look at the patch below.
+>> Note that it is only compile tested.
+>>
+>> Perhaps give it a try and see if it does the job better.
+>
+> I agree the manual packing in memfd_luo_ser_init() isn't great, but I'm
+> not sure we need an arena. This seems like something KHO slab support
+> will solve properly, and since kho_alloc_preserve() already takes a
+> size, KHO slab can be dropped in underneath it later without changing
+> any callers.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+While it would be nice to have, I peeked at what we need for slab
+support and it sounds overkill. For one, a slab cache is for fixed size
+objects. So you'd need a bucket of slabs for different sizes, similar to
+what kmalloc() does. You probably don't want to preserve objects spread
+around in kmalloc's buckets, so you would need a set of buckets
+dedicated for LUO/KHO.
 
-Thanks,
-Joey
+For another, slab cache is great when you are allocating and freeing a
+bunch of objects of varying sizes. But that isn't really the workload
+preservation has. Each preservation hook needs to allocate a handful of
+objects, and then hold them until unpreserve. This arena style allocator
+does the job pretty well.
 
-> ---
->  arch/arm64/kvm/sys_regs.c | 26 ++++++++++++++------------
->  1 file changed, 14 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 0f0b0495b710..2b28b929f9f3 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3976,6 +3976,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
->  };
->  
-> +static const size_t num_sys_reg_descs = ARRAY_SIZE(sys_reg_descs);
-> +
->  static bool handle_at_s1e01(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  			    const struct sys_reg_desc *r)
->  {
-> @@ -5187,7 +5189,7 @@ static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
->  {
->  	const struct sys_reg_desc *r;
->  
-> -	r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-> +	r = find_reg(params, sys_reg_descs, num_sys_reg_descs);
->  	if (likely(r)) {
->  		perform_access(vcpu, params, r);
->  		return true;
-> @@ -5205,7 +5207,7 @@ static const struct sys_reg_desc *idregs_debug_find(struct kvm *kvm, loff_t pos)
->  {
->  	unsigned long i, idreg_idx = 0;
->  
-> -	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> +	for (i = 0; i < num_sys_reg_descs; i++) {
->  		const struct sys_reg_desc *r = &sys_reg_descs[i];
->  
->  		if (!is_vm_ftr_id_reg(reg_to_encoding(r)))
-> @@ -5268,7 +5270,7 @@ static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, loff_t pos)
->  {
->  	unsigned long i, sr_idx = 0;
->  
-> -	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> +	for (i = 0; i < num_sys_reg_descs; i++) {
->  		const struct sys_reg_desc *r = &sys_reg_descs[i];
->  
->  		if (r->reg < __SANITISED_REG_START__)
-> @@ -5370,7 +5372,7 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
->  	struct kvm *kvm = vcpu->kvm;
->  	unsigned long i;
->  
-> -	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> +	for (i = 0; i < num_sys_reg_descs; i++) {
->  		const struct sys_reg_desc *r = &sys_reg_descs[i];
->  
->  		if (!r->reset)
-> @@ -5594,8 +5596,8 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
->  	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
->  		return demux_c15_get(vcpu, reg->id, uaddr);
->  
-> -	return kvm_sys_reg_get_user(vcpu, reg,
-> -				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-> +	return kvm_sys_reg_get_user(vcpu, reg, sys_reg_descs,
-> +				    num_sys_reg_descs);
->  }
->  
->  int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
-> @@ -5634,8 +5636,8 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
->  	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
->  		return demux_c15_set(vcpu, reg->id, uaddr);
->  
-> -	return kvm_sys_reg_set_user(vcpu, reg,
-> -				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-> +	return kvm_sys_reg_set_user(vcpu, reg, sys_reg_descs,
-> +				    num_sys_reg_descs);
->  }
->  
->  static unsigned int num_demux_regs(void)
-> @@ -5723,7 +5725,7 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
->  	int err;
->  
->  	i2 = sys_reg_descs;
-> -	end2 = sys_reg_descs + ARRAY_SIZE(sys_reg_descs);
-> +	end2 = sys_reg_descs + num_sys_reg_descs;
->  
->  	while (i2 != end2) {
->  		err = walk_one_sys_reg(vcpu, i2++, &uind, &total);
-> @@ -5772,7 +5774,7 @@ int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm, struct reg_mask_range *
->  	if (clear_user(masks, KVM_ARM_FEATURE_ID_RANGE_SIZE * sizeof(__u64)))
->  		return -EFAULT;
->  
-> -	for (int i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> +	for (int i = 0; i < num_sys_reg_descs; i++) {
->  		const struct sys_reg_desc *reg = &sys_reg_descs[i];
->  		u32 encoding = reg_to_encoding(reg);
->  		u64 val;
-> @@ -5957,7 +5959,7 @@ int __init kvm_sys_reg_table_init(void)
->  	int ret = 0;
->  
->  	/* Make sure tables are unique and in order. */
-> -	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), true);
-> +	valid &= check_sysreg_table(sys_reg_descs, num_sys_reg_descs, true);
->  	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), false);
->  	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), false);
->  	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), false);
-> @@ -5980,7 +5982,7 @@ int __init kvm_sys_reg_table_init(void)
->  
->  	check_feature_map();
->  
-> -	for (i = 0; !ret && i < ARRAY_SIZE(sys_reg_descs); i++)
-> +	for (i = 0; !ret && i < num_sys_reg_descs; i++)
->  		ret = populate_sysreg_config(sys_reg_descs + i, i);
->  
->  	for (i = 0; !ret && i < ARRAY_SIZE(sys_insn_descs); i++)
-> 
-> -- 
-> 2.56.0
-> 
+And finally, the object layout within a page/slab of the cache can
+change based on configs or kernel versions. See SLAB_RED_ZONE or KASAN
+for example. We would need to standardize the layout without
+compromising the non-KHO slab users. We can probably solve these
+problems, but I don't expect it to be easy.
+
+So I wouldn't want to support slab until we have file handlers that
+churn through a lot of preserved objects.
+
+>
+> Until then, maybe we should just allocate struct kho_vmalloc separately
+> with kho_alloc_preserve() and accept wasting a folio per object. For
+> memfd that's one extra page per preserved file.
+
+Yeah, that is fine too I suppose, at least until we start to run into
+problems with the memory overhead. I think the arena style allocator is
+fairly straightforward and makes the memory savings easy so to me it
+sounds promising.
+
+-- 
+Regards,
+Pratyush Yadav
