@@ -1,70 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795618059;
-	b=bnSyMGRKhqZ0IUryx8DHqIh07vwmmXBszmfmvErd6X2YuyXYqw70mApEdCiPBKn9xyx3
-	 EbRNVKSZWH8Z4/cWo6SbdOjnUC87fAPdsOE4ldHN0iTOksFT67BYrHmJqN3oGr++06bm3
-	 x/FUBg/uhOakilMiMNiBnMOFJdQwp/zYMmmuHHP2MUVYjKwhgnuX71ffEGdcT6hSQegnH
-	 o5iWI1d7v3WEjjF+2oJo4FJbF/PWX9JB9U5emflRexUuezB0ttFl6WxrzS8sB5HEtu8QI
-	 4KrqqDVyBEPJYiF54urW2KlDFDh9ic+oCapyw6vtDxJjWuB9MCM9tXX27N4ylQ+S65Q==
+	t=1795618717;
+	b=h+nUdR1KbpBrUqFdtsSIdyH/OS2CWuSyNSyCHS628weOLtLXEzBg3piMHrDNSJkaf7Md
+	 gVykTj5uM582M5L+q8/PhomcA9ssTvZR6Ym+tZQEfrdXq739NgMSmUGTA8SPny8Zo+X3K
+	 qvn29jcYrdRJzmfU2Aaf+nnFL6kmdoVr6/4zNbGQrUGF8+gP65nDCNmAgkw2eG2rE/OXr
+	 KRh5Y5RFv2UWfJ4/IGxnpvpLUrA5TL7GUmP4KpxVhQLTtNtJ7Z/Ut58HRObQOnGdTWfbW
+	 srNj2bRJiMYm73qe549jk54HEXJ9tncPja3/Vccu4U+5q9pomrgR2OAhgw3qN2Tg5ZQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795618059;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=DY8aia7YapKCOdz5WJ2jQHRD2zmcS7bABOsyFFtx64c=;
-	b=rVJ5BacKds4W1Ahve+E2IvZcb79k7f1uENjl7MoFLYzZVP9lpFZLdbLLTWV81qQCjyJV
-	 e19uR+nj94cOiu5fYevNLnqui6l4vUlQvcvb1vfqCvcM5pitItN/1DdwN9XVGcmg0klkQ
-	 M1DQdm/3aWT73voPO7badyDgjoxkIajtCr58xD1997z4ovdzdSO/sW639MfF634igfQ0Y
-	 jMxDMFK+lFyJbUio0P01xF4x9e7gibEQWZbnU5Er9BN9RTdj02je1Tap2Vxv1OOrQWgLy
-	 e9h1UFby4bORZY7c8TgdZdZ8Z0u7afATk8lbdqQEb3thwdMFhuLgmKHWVDRiiNENj9w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795618717;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=X3zNXgFcgKkRvrebQOQS0iqgUmCxBf+Rl6iIn0IF0a4=;
+	b=UNorMIIaElp417Yyn7OuNR/bfrFNopZ0QknMDJu8he+NgfYS7a7HVgtza0PonltL93wP
+	 NQzuHf4Pw/9+DggFtiKzSU+BfyaPlXwAk44oyN8oLZNAHUIygWeHXjQmuMlyeT5D7zjk/
+	 0yLVhFT+uMFeLpv4ImbIOy4oWMmh2jBpNCocEQjLhaMhpakZdGB28TP79OqTxxDaw32Om
+	 CJ4Dt80goYzHXNvkHKhtmc31DJMxT7zrd6bJ8q3M9aVmbGv9oun06YqKdQs+vWcwc4dDZ
+	 aeNQCLBdb1EKjiO1IVZvZlGBWO4N0hq6Rke8WWE+kJ6bgk4LeuL30GmBh8ejDmMdfwA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="l2OM/H/5";
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ZoJs1Pdu;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88A4606A323
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 14:47:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B88A4606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353E1606A326;
+	Wed, 25 Nov 2026 14:58:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 353E1606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=l2OM/H/5
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ZoJs1Pdu
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D0F42F;
-	Wed, 25 Nov 2026 06:47:35 -0800 (PST)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DF1A03F632;
-	Wed, 25 Nov 2026 06:47:35 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8E0592F;
+	Wed, 25 Nov 2026 06:58:33 -0800 (PST)
+Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2ECBB3F632;
+	Wed, 25 Nov 2026 06:58:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795618058; bh=l1JhVNA+zt4be9zTzbvNbG+uFwpdbDUm3ObDUX3MzXg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=l2OM/H/5dfYUvk5Kf64CY6foGK+MBpOmJLMtgDjS8++vXtlWTqexr1WTiNtVFVF90
-	 V/HoDVXCtSg1kxgnOdId8X/plBcaaAcOu45K3QEX8YnADJU7BFl6MG97cjx1DHKNmA
-	 L7vI7p47l0lY3sbJYwhCdNwfi6NZHHKk/2Cw58N4=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Tian Zheng <zhengtian10@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v2 0/3] Set DBM bit on writable pages
-Date: Wed, 25 Nov 2026 14:47:27 +0000
-Message-ID: <awb0_2zqPUQYdrTZ@LeoBrasDK>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <auONmOc-nYsQwCnG@LeoBrasDK>
-References: <20261026144413.441566-1-leo.bras@arm.com> <at-lSy7H-K60LhCB@kernel.org> <auCOj9dgk42AE1WX@LeoBrasDK> <auExh5laWQbUKmUY@kernel.org> <auONmOc-nYsQwCnG@LeoBrasDK>
+	t=1795618716; bh=D/n+P8rGctWCPmcRxey9aK7QCr6PlKd7Fo3q+ESxtX8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZoJs1PduoU0ULUyP6YVRCRXGnlHrzR4tGX0ZOcuxgF6JCfnSb+OxspbajzsG32Dkt
+	 1Z730FRcVZHXhbCFzLBFONsxqLNfCmyWjC9hIcdqTHJqPbmaKso6xMf1aEIsjGw9Wq
+	 eAw3xOv2uegtqNUIFjfCGzV9mXZb+s9Cr4kaU0jc=
+Message-ID: <e4108d4f-e84c-444c-aa7a-18e823816eae@arm.com>
+Date: Wed, 25 Nov 2026 14:58:31 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -74,133 +53,229 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 09/11] KVM: arm64: CCA: Prevent memslot modifications
+ after Realm creation
+To: Ackerley Tng <ackerleytng@google.com>, Steven Price
+ <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Kohei Enju <enju.kohei@fujitsu.com>
+References: <20261123104233.95710-1-steven.price@arm.com>
+ <20261123104233.95710-10-steven.price@arm.com>
+ <CAEvNRgFQ5BXqU3KfPFT8bfZTW=RyvBw25z3GZtr3JA=Wv3Yqfw@mail.gmail.com>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <CAEvNRgFQ5BXqU3KfPFT8bfZTW=RyvBw25z3GZtr3JA=Wv3Yqfw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 29, 2026 at 06:20:05PM +0000, Leonardo Bras wrote:
-> On Tue, Oct 27, 2026 at 04:19:35PM -0700, Oliver Upton wrote:
-> > On Tue, Oct 27, 2026 at 11:44:15AM +0000, Leonardo Bras wrote:
-> > > > I'm pretty sure I shared this feedback before, but patches that enable
-> > > > DBM do not make sense in isolation. We need a single series that
-> > > > contains the DBM enablement as well as the corresponding HDBSS support.
-> > > >
-> > > 
-> > > Right, 
-> > > My reasoning is that we can discuss this new version, and make the needed 
-> > > changes, so Tian could pick this for his own patch series for the next 
-> > > version. I do not intend to get this merged by itself.
-> > > 
-> > > Next time I will make sure to state this in the cover letter so it's clear.
-> > 
-> > Can you just work this out off-list? Let's keep the on-list dialogue
-> > consolidated to a single series to review.
-> 
-> Sure, will try to reduce this noise in kvmarm.
-> 
-> > 
-> > > > The abstract permission flags need to have a WRITE an DIRTY state, which
-> > > > we then map to hardware based on the capabilities of the system.
-> > > > 
-> > > > !FEAT_HAFDBS:
-> > > > 
-> > > > 	DIRTY	=> S2AP[1]
-> > > > 	WRITE	=> S2AP[1]
-> > > > 
-> > > > FEAT_HAFDBS:
-> > > > 
-> > > > 	DIRTY	=> S2AP[1]
-> > > > 	WRITE	=> DBM
-> > > > 
-> > > 
-> > > I agree that it could work, and my first version was based on that.
-> > > 
-> > > But looks weird to me that we have to decide the writable bit based on 
-> > > having a feature enabled.
-> > > 
-> > > Take in account that we can only have DBM being the writable bit while 
-> > > HAFDBS is enabled (not only present), and that it is just enabled during 
-> > > dirty-tracking. 
-> > > 
-> > > It means we would need to convert the whole pagetable between DIRTY=S2AP[1] 
-> > > and DIRTY=DBM every time we enable or disable dirty-tracking.
-> > > 
-> > > My suggestion with this series is to have WRITE=DIRTY=S2AP[1] at all 
-> > > times, and have DBM to act as a "can be promoted to writable on write" bit.
-> > > This way we don't actually need to convert between encodings, and it still 
-> > > works and complies with the architecture.
-> > 
-> > There's no such "can be promoted to writable on write" in the indirect
-> > permission model.
-> 
-> Well, IIUC it's kind of the default behavior, right?
-> Direct - DBM means HW can promote that page RO->RW, with HAFDBS=on
-> S2PIE  - All pages can be promoted RO->RW, as long as HAFDBS=on
-> 
-> > This is why I'm suggesting that we align the abstract
-> > permission bits (i.e. KVM_PGTABLE_PROT_*) with the architecture's own
-> > abstracted permissions (e.g. uX, pX, RO, RW).
-> > 
-> 
-> I think the approach you suggest makes sense, and it makes it simpler to 
-> deal with permission indirection in the future. In order to do like that, 
-> while keeping a single encoding for direct permission, I suggest we have:
-> 
-> -	KVM_PGTABLE_PROT_W			= BIT(2),
-> +	KVM_PGTABLE_PROT_DIRTY			= BIT(2),
-> ...
-> +	KVM_PGTABLE_PROT_DBM			= BIT(6),
-> ...
-> 
-> +#define KVM_PGTABLE_PROT_W	(KVM_PGTABLE_PROT_DBM | 
-> +				 KVM_PGTABLE_PROT_DIRTY)
-> 
-> (Rationale is: it's writable if it's either dirty, or can be made dirty by 
-> hardware on a write)
-> 
-> And then replacing by PROT_DIRTY the uses of PROT_W which were only 
-> tracking the fact it's dirty. I tracked just a couple of those.
-> 
-> When detecting the PROT_* based in PTE encoding, we track PROT_DIRTY, and 
-> PROT_DBM individually. The same can be done in nested, as we can just 
-> ignore the PROT_DBM for shadow pagetables, given we want, IIUC, to fault 
-> and update the original pagetables.
-> 
-> That would avoid switching between encodings while toggling HACDBS, and 
-> while making use of the DBM without directly associating it with the write 
-> permission.
-> 
-> What do you think?
-> 
-> > That composes nicely with nested virt as it is unambiguous what
-> > permissions we're trying to represent in a shadow stage-2. And in the
-> > non-nested case you can just lay down writable-dirty translations for
-> > most things and use writable-clean when necessary for HDBSS.
-> > 
-> > > > Beyond making the whole HAFDBS easy to reason about, I want this for
-> > > > FEAT_S2PIE which reimagines bit 7 as a literal dirty bit that can be
-> > > > managed by software or hardware.
-> > > 
-> > > Humm, and would not that work with the above suggested approach?
-> > > I mean, bit 7 (Dirty, S2AP[1]) will both mean WRITE/DIRTY, but it will be 
-> > > able to get promoted (nonW->W, or clean->dirty) based on the indirect 
-> > > permissions.
-> > 
-> > There's a bit more though. We need to have an entry in S2PIR_EL2 that
-> > encodes write permission and select that with PIIndex. So then we wind
-> > up mapping the abstract WRITE permission bit to two fields into the
-> > descriptor rather than 1.
-> 
-> Makes sense to me now.
-> 
-> Sorry I took long to reply your message, I was reading the docs for S2PIE 
-> and thinking on a solution that would make sense for it in the future as 
-> well.
-> 
-> I hope it's enough, but if it's not, let me know of any suggestions or 
-> requisites.
-> 
+Hi Ackerley
 
-Friendly ping :)
+On 25/11/2026 00:09, Ackerley Tng wrote:
+> Steven Price <steven.price@arm.com> writes:
+> 
+>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>
+>> Once the Realm is created, prevent changes to guest_memfd backed
+>> memslots, which can provide private memory. Validate these changes
+>> before KVM invalidates the old memslot, so a rejected deletion leaves
+>> its stage-2 mappings intact. Realm stage-2 faults will also validate
+>> the private memory backing in a later commit.
+>>
+>> Require Realm memslots to lie in the lower half of the IPA space, as the
+>> upper, shared half aliases the lower, protected half.
+>>
+>> Define kvm_arch_has_private_mem() so generic KVM recognizes Realm VMs
+>> as supporting private memory. Defining the macro also makes
+>> gmem_in_place_conversion true for every arm64 VM, so guest_memfd
+>> memslots are marked gmem-only even for non-Realm VMs. A well-formed
+>> KVM_SET_MEMORY_ATTRIBUTES2 request on a non-Realm guest_memfd now
+>> reaches the VM check and returns -EINVAL instead of -ENOTTY.
+>>
+>> Additionally, similar to pKVM, do not support dirty logging or
+>> read-only memslots.
+>>
+> 
+> Imo this could be split into a few patches
+> 
+> 1. Add the constraints wrt realm memslots and being in the lower half of
+>     the IPA space
+> 2. Defining arm's support for private mem
+> 3. Imposing rules on memslot changes
+> 4. Maybe some others, maybe I'm misunderstanding the patch
 
+Agree
+
+
+> 
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>
+>> ---
+>> Changes since v3:
+>> - Explain the arm64-wide in-place conversion effect and keep the
+>>    general IPA limit comment.
+>>
+>> Changes since v1:
+>> - Preserve private mappings if KVM invalidates a Realm guest_memfd
+>>    slot before the prepare hook rejects its deletion.
+>> ---
+>>   arch/arm64/include/asm/kvm_host.h |  2 ++
+>>   arch/arm64/kvm/mmu.c              | 37 ++++++++++++++++++++++++-------
+>>   2 files changed, 31 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 3ddeddfacd06..55673d08e3eb 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -1607,6 +1607,8 @@ struct kvm *kvm_arch_alloc_vm(void);
+>>
+>>   #define kvm_vm_is_realm(kvm)		((kvm)->arch.vm_flavor == VM_REALM)
+>>
+>> +#define kvm_arch_has_private_mem(kvm) kvm_vm_is_realm(kvm)
+>> +
+>>   #define kvm_has_mte(kvm)					\
+>>   	(system_supports_mte() &&				\
+>>   	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 800333a345cd..9af5fe6d87f0 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -2861,17 +2861,32 @@ int kvm_arch_validate_memory_region(struct kvm *kvm,
+>>   {
+>>   	lockdep_assert_held(&kvm->slots_lock);
+>>
+>> -	if (kvm_vm_is_protected(kvm)) {
+>> +	if (kvm_vm_is_protected(kvm) && new &&
+>> +	    (new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)))
+>> +		return -EPERM;
+> 
+> gmem is already generically mutually exclusive with
+> KVM_MEM_LOG_DIRTY_PAGES and KVM_MEM_READONLY, so before this change,
+> pKVM is saying no to KVM_MEM_LOG_DIRTY_PAGES and KVM_MEM_READONLY for
+> all memslots, gmem or not, so this check makes sense.
+> 
+>> +
+>> +	switch (kvm->arch.vm_flavor) {
+>> +	case VM_PROTECTED_PKVM:
+>>   		/* Cannot modify memslots once a pVM has run. */
+>>   		if (pkvm_hyp_vm_is_created(kvm) &&
+>> -		    (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
+>> +		    (change == KVM_MR_DELETE || change == KVM_MR_MOVE))
+>>   			return -EPERM;
+>> -		}
+>> +		break;
+> 
+> Not sure why pKVM doesn't allow deleting a memslot after the vm is
+> created, but this is no change from before this patch, the removal of {}
+> here is mixed in with the other changes in this patch.
+
+IIRC, pKVM relies on pinning the stage2 until the teardown ?
+ed
+from the Stage2 unless we d
+
+> 
+>> +	case VM_REALM:
+>> +		/*
+>> +		 * Once the Realm is created, we cannot modify any slots that
+>> +		 * could be providing private memory. i.e., guest_memfd backed
+>> +		 * slots.
+>> +		 * TODO: Handle trusted device private memory slots
+>> +		 */
+>> +		if (!kvm_realm_is_created(kvm))
+>> +			break;
+>>
+>> -		if (new &&
+>> -		    new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)) {
+>> +		if (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new))
+>>   			return -EPERM;
+>> -		}
+>> +		break;
+> 
+> Imo this should be written the same way as the pKVM branch for clarity,
+> like
+> 
+> if (kvm_realm_is_created() &&
+>      (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new)))
+>          return -EPERM;
+> 
+> but that aside,
+> 
+> 1. Why block creating memslots after realm is created?
+> 
+> Does ARM CCA have no way to add pages after a VM starts? This isn't
+> blocked for TDX and SNP so I think this constraint seems unnecessary.
+
+This and (2) was triggered by the following thread, raised by Catalin.
+
+https://lore.kernel.org/all/aqrGPK0lFBFXL2qY@arm.com
+
+But having said that, since then, we now have :
+
+1) All private faults must be serviced by realm_gmem_abort(), which 
+mandates Guest memfd slot. (See Patch 11, realm_mem_abort())
+
+2) realm_gmem_abort() matches the "private" attribute for a "protected"
+fault, failing which causes a memory fault exit.
+
+So I think we can remove these memslot restrictions.
+
+> 
+> 2. Why block deleting memslots after realm is created?
+> 
+> This also seems like an artificial constraint, and it constrains the way
+> the userspace VMM operates when stopping a VM, like the memslots can't
+> be removed ever, the VM just has to be closed? (something like that)
+
+As mentioned above, I think we are good to remove the restrictions.
+
+Suzuki
+
+
+> 
+>> +	default:
+>> +		break;
+>>   	}
+>>
+>>   	return 0;
+>> @@ -2883,6 +2898,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>   				   enum kvm_mr_change change)
+>>   {
+>>   	hva_t hva, reg_end;
+>> +	gfn_t ipa_limit;
+>>   	int ret = 0;
+>>
+>>   	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
+>> @@ -2891,9 +2907,14 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>
+>>   	/*
+>>   	 * Prevent userspace from creating a memory region outside of the IPA
+>> -	 * space addressable by the KVM guest IPA space.
+>> +	 * space addressable by the KVM guest IPA space. Realm shared IPAs alias
+>> +	 * the corresponding private IPAs, so Realm memslots must reside entirely
+>> +	 * in the lower half of that space.
+>>   	 */
+>> -	if ((new->base_gfn + new->npages) > (kvm_phys_size(&kvm->arch.mmu) >> PAGE_SHIFT))
+>> +	ipa_limit = kvm_phys_size(&kvm->arch.mmu) >> PAGE_SHIFT;
+>> +	if (kvm_vm_is_realm(kvm))
+>> +		ipa_limit >>= 1;
+>> +	if (new->base_gfn + new->npages > ipa_limit)
+>>   		return -EFAULT;
+>>
+>>   	/*
+>> --
+>> 2.43.0
 
