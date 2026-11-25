@@ -1,61 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.198
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795622358;
-	b=UbDzQiiaS5foiKZZyuWv7QVnDudumyYJQWukxCZaqWgBoaE+uQU8JYBeP73ABELq/CFw
-	 6QewEK4sURI+SkNxb+hhfWRs8CjORLVVK/UsFu3hCNuLPHN1ZfJ73ZDnodDlA8ehoyw9c
-	 9vASBIPI8BbdlvcPQ9gmNhLOXgJzpiFWOY+hO5JwUi0i6F+pxkurTJrfmVXDaUZfcxwvL
-	 Pvan7kkADDTDkKwsv4OivSwrsxRkLN901sT7TCCwKMzsIH4EwSMbnyL49QnHUTVuqtx6Y
-	 x6S0gOryArWjrK6945R7MvDH+s0698MitzgmjduveF8Hh74iQ3R9aM1S0UxwyCHf3+Q==
+	t=1795622967;
+	b=g7L0aXAFHqQVYJgMKsmfDw5ilr7M57uL7Zm93OcqZp+LB/7q7EBSyEzcVmTlfNxKkxCv
+	 sjbBBIHp85x0pHQUfCI5zM2zqPIBSrCQBYo90iNp4VLGqjY5vXRmATFqM49YotNjd10Fv
+	 Tb6VJKatFWbwvRCeAP+mz65U2HZPKEAS3dmARKNVpwD0CIMJeiThDQXP0MHZ72zWvOuVs
+	 7orCkLm856GW0kCeT0Z8PmNiKChoIZm87t9I59X6uNi5tF9Ui5K639BufpKI/AGdOSX2V
+	 3oh2ssEP2GQB6rnfOiRytv5TwdeATBXY+h9BoBfegx4l0AtMo2NMc64mrU1JfmphKag==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795622358;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Gm-Message-State:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:
-	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type;
-	bh=cvTi/nNYHR2TYIOUf2vi5rClYm97tIxKBSXMmmYFqlY=;
-	b=bQK8HJIZB6657UUzNMrUmsSSLrzrlgoyzpXLNfWiEp0vVdcdBQlLMcNhWp5ZO9Zo4EZD
-	 j3nyx3yy96GgNTHnAx0cDXviSLW+xUWlfdHEY+2cnp9WfK2fVAJYDnDv5u4uytvWSgdM4
-	 R67lR4V5oUG2oBCTEBUbEBwgDVVyRMZoekQL82Xf/0AcsOFSzzOQihf9C1v87BaNND/tf
-	 3sE9lDj1r/tZCOzLg8VhIaTCavUgDiLG7BnUIhlxaBuGhgMnhmK5VZRpup6k3jzi/QNO+
-	 UNLkK31yXw1wpECJaOwDgrKfDAHozSpo767DEeChK0CXrGqWklCDM0Scmh04gI+ICRA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795622967;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=m4Yp4IxJA/le+pDF2kSogMu2zN1ZLWPtlg+fAsmxQNI=;
+	b=WIdb8a96GsfD6Jmp6Cy8InjIio98lnrhswBDSy3lEtWlRCizy5NQr1Aq4p4OnBRsObua
+	 O0uIje6Z1+TufpdE7y13jeXVlX89eTj4ZS1dz5bL01QQMUJiSCQY9ccAlHm50FkF9kTCY
+	 LLFfAnZFLRDvweFlAlshagi5MGX4pue6y9gLWYkrkYdPDhHb7Pkfvq9+LseeUauL4X048
+	 sJeiR96TBLZ4GE5TJ16OK8pim3vEAosyG5dkD8TiogpxhD52XGFBlf7ComlrbqQ2Ho+i0
+	 XVavNSvkd73n3WHfQL+mm2wOSwyCaN8UFAsZZYmaBvit67SXkJ2foSZN2r7Ix9R7j8Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QFCsyik4;
-	arc=none smtp.remote-ip=95.215.58.198
-Received: from mta1.migadu.com (out-198.mta1.migadu.com [95.215.58.198])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H4CoiERx;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67429606A323
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 15:59:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 67429606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA71606A31E;
+	Wed, 25 Nov 2026 16:09:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QFCsyik4
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=/XkNz3r9eFnmSbOvrGYUn0rZ+WAp3AeHIjYmS1q0RGE=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795622355; v=1; x=1796227155;
- b=QFCsyik4SJM73hazO05b1WJ43qtd7xIBn14gV99k3gh4uk8shf/78xdUd7cAjveEI2WMpAyP
- svGUpdbe+ayPLHbVVP1haWfg+3zmIPyU3xBy9rt01oY03/qC0VOdCqqlYTGRtsyGazDuFQQeb8Z
- eZ2qf1bujZ+WxAcl7BG1CyRs=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id a8a5ba318e6399da;
-	Wed, 25 Nov 2026 15:59:15 +0000
-X-Mizu-Trace-ID: a8a5ba318e6399da
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5c14bc5a743so37299e87.0
-        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 07:59:14 -0800 (PST)
-X-Gm-Message-State: APuU4Z/N+NFY4v0rlKmp9WaJX598Vk7C9rPaj8EoFISCl3EUeS5GV2VP
-	5+3+/+7VYssQXz0/Ih9YMDwPulZC7V9v5m0LhLY8PxijKlplTZdNhSKNxeS9XZWnh3ppXK0hD5m
-	6LK41kkC3aSVKzz+8wYhP4zA69327QbctE+9LjVag
-X-Received: by 2002:a05:6512:10c7:b0:5bf:f84f:1d74 with SMTP id
- 2adb3069b0e04-5c21a27810amr593536e87.13.1795622354030; Wed, 25 Nov 2026
- 07:59:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H4CoiERx
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31ABE1F000C0;
+	Wed, 25 Nov 2026 16:09:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795622967;
+	bh=m4Yp4IxJA/le+pDF2kSogMu2zN1ZLWPtlg+fAsmxQNI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=H4CoiERxacphyOls6ERGCiGjYP9E1IIW+Jbo732vu7w2x5SnEzDciW05VGYWnEjp5
+	 2BF4eGp7SE0d0nU3wOyp91MHId3yGOtTaSO0WvtdE1Zn6xV3YSLLJJHQGtgcH2GZu0
+	 7feJbSTvvGOni9dYbEZski+RWycNJ93vw6s+38TiKku/SEU/GTRi0+dVsRRSh+hjFl
+	 bloFduCD99aPMu3zcTk43druIyi/UyAA2e+ogmSlkE7wAAr5kf9c1iTUu62CrIAcJ/
+	 kTwMAb2RuRPhq9rIcBG+iqW4HbneP83xl2aK93HOyDW64rx0Adx4HPiy3bPSWmbfqg
+	 lASMxjPh4cZhw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xWFYi-00000003Dwj-2Q23;
+	Wed, 25 Nov 2026 16:09:24 +0000
+Date: Wed, 25 Nov 2026 16:09:23 +0000
+Message-ID: <86zeuwyjt8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: Colton Lewis <coltonlewis@google.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Dan Carpenter <dan@pereq.eu>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: arm64: nv: Discard undersized TTL hints in compute_tlb_inval_range()
+In-Reply-To: <n4ii5ih6szqxjklqxbqzun3bjd4saku3aqqvhq4wf4kq3dipoo@3r2j3exwocw5>
+References: <20261123232647.3733149-1-coltonlewis@google.com>
+	<20261123232647.3733149-2-coltonlewis@google.com>
+	<867bi2z87n.wl-maz@kernel.org>
+	<20261124202215.3731849-1-coltonlewis@google.com>
+	<87a4my7yhg.wl-maz@kernel.org>
+	<20261124221616.4155034-1-coltonlewis@google.com>
+	<n4ii5ih6szqxjklqxbqzun3bjd4saku3aqqvhq4wf4kq3dipoo@3r2j3exwocw5>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -64,39 +86,35 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <20261125153911.106793-1-fuad.tabba@linux.dev> <20261125153911.106793-10-fuad.tabba@linux.dev>
- <sashiko-outbox-233684@kernel.org>
-In-Reply-To: <sashiko-outbox-233684@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 25 Nov 2026 15:58:37 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTz1SuYC9GnMRH2Fe71jxKm1QvoE5tEopBe6k_gFNdbwHQ@mail.gmail.com>
-X-Gm-Features: Aa3M54qU1hrnXAD2dBM1Uj3GqNjkJxsnaGRBLC-c83EOnBK74LQNPnC0lvVf4bs
-Message-ID: <CA+EHjTz1SuYC9GnMRH2Fe71jxKm1QvoE5tEopBe6k_gFNdbwHQ@mail.gmail.com>
-Subject: Re: [PATCH v2 09/20] KVM: arm64: Report an incomplete feature map
- with WARN_ON()
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, coltonlewis@google.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, fuad.tabba@linux.dev, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, dan@pereq.eu, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 25 Nov 2026 at 15:55, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 1 potential
-> issue to consider:
-> - [Low] KVM: arm64: unused str parameter and name field in
->   check_feat_map()
-[...]
-> [Severity: Low]
-> Does replacing kvm_err() with WARN_ON() leave the str parameter of
-> check_feat_map() and struct reg_feat_map_desc::name unused?
+On Wed, 25 Nov 2026 09:56:18 +0000,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
+> 
+> On Tue, Nov 24, 2026 at 10:16:16PM +0000, Colton Lewis wrote:
+> > On Tue, 24 Nov 2026 20:42:19 +0000, Marc Zyngier <maz@kernel.org> wrote:
+> > > On Tue, 24 Nov 2026 20:22:15 +0000,
+> > > Colton Lewis <coltonlewis@google.com> wrote:
+> > > > [1] only catches TTL hints smaller than host PAGE_SIZE. It does not
+> > > > catch a hint that is >= PAGE_SIZE but smaller than the mapped block,
+> > > > such as a 4kB L3 hint on a 2MB block on a 4kB host.
+> > >
+> > > Why do you think this makes *any* difference? The hint passed by the
+> > > guest is utter bollocks, and the best thing would be to not invalidate
+> > > anything. It's just too invasive to do elegantly.
+> > 
+> > Architecturally [1] is fine for the TLB, and before guest_s2_mappings
+> > landed in v7.4-rc1 clearing the block was harmless. The problem with [1]
+> > is a host memory leak in kvm_pgtable_stage2_unmap_tracked():
 
+Then fix the tracking.
 
-Deliberate. The #ifdef was removed at Oliver's request [1], and the
-warning doesn't print the register's name or the bits, as discussed
-there. The str parameter and the name field are kept so that this
-patch only changes how the check reports an incomplete feature map.
+	M.
 
-/fuad
-
-[1] https://lore.kernel.org/all/avyZH2g3rrIVm-Fl@kernel.org/
+-- 
+Without deviation from the norm, progress is not possible.
