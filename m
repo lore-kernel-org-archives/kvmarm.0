@@ -1,55 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795593865;
-	b=Yx+5oDu+e2o1A6irI162NxBWlJE8bZ2a39DkWNtdl3w9slrdD//6p28cjKecxU222OG/
-	 7y2XBoHZZVkxoX9gqAgzrCyNF8Rcf0+cN44abSTpSkNWaDJzuphQd5oQTqfth2QyFJrO4
-	 F1eGcqJIhNvLVMTSm9mDOv1pXNKejZb9GPX85U+V/oQjqWCqyT55VTX5oOZyNByxpk/7M
-	 vbyGcyhlGAX7PE5131xAYyfV1du3wZCPAyYc5G+ZTGsIHI7RPA6qEP531Mtq+ev49P3VR
-	 gL9ZfK/homSnRrLE8XKv8+M0wp2YyvRE1gWcnPGYIKL/sUjv4Ex74GXQgTFzD9jZJ/w==
+	t=1795597723;
+	b=WOFFbvoemrquI9/GrDB55WoglP5L6PhcI4HIbfooGCx43lYTD3Z6L+FEzecvvWL7usmx
+	 I01D/MokdWvL6/gZWylHPb2t8wvDJ9taBru6RpCPo6lMu7RYjExA9Zdd6HUPwTsP62RfD
+	 W7YW5RRTSgn18TyqE3spJ05QaFbh6XTAOZE+qt3/pAPS6n5vteBslDnUnBlmB3/BtlIv5
+	 iH0M6YOHTZzcv5U0ZdRkhGu6bLl76yADTKx23FdwjbLZ4pMkiAsP649Ki+70sfyKGlCIF
+	 3srwdmK2oA4uUyQ8CBao89muvjcc/cAxNaKoStDxySZYIwfUxaPv+lD/XZip2+se4RQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795593865;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=/1qjbzhxlB1Ss6WAwvDVAp8mW+VQV6QUtd1PRvHad3I=;
-	b=eoZEH/5OxTo50Cu2Xx++xtRgdxchVnWfRDyBMkEOSNoVjVpJ2lp1Vgdaq81hVQVuchqf
-	 Ybe3ojdvcs9NhEak3cpwd6IH50OW4gKYPsEZXyXLgZJBMYO8GZbU0Xdy3dL5DoCzbmrmc
-	 dOvrbY1Q1eYIoHdmsv4n5L3DE5g+cGKvOSIxrKpJ7tH6e/t/8ddZxdakWD41jkUP/1nKg
-	 ZGgQ8rgh6TfGesbIhybU53shAt+AWyFHz1q0gjy2j59Oqs8DxKHK3W/7VfNuzLyUWVz6m
-	 koEX6RC+nEk/FjTIUwlPZM/BHYhzd8urWnFC6bYwBP2VycpAkPdwA9FnNwSbQNDzKTQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795597723;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=QVie/z0J40GiWaXqHRXPvG+NrtU10m0jzVDp6bMnZM8=;
+	b=3gLg9TtJiE+CHahP45DdHi/OuY15bWAc43BemOxCA9krckT35jjGSu4xAovYmYOVtQNX
+	 p3DygrXMRkSKMfnkb80qsUBHg8sCyg95JefOlDWsf7/YcffvSODdcOmEtU6C0rXRQZdfq
+	 D4sPjhs+xej8JvO1o60IOJk2Sihcs6yJc0oM1PJGlpBL0/zxOnx9AHHufM/Wyk2qncdYw
+	 o9t4/oSgi8ymqNPmWHBpft+3WIHsWWrvpnNoeTSsOk/iBPa3Rw+f9HAQCrGhrrjA/XPHr
+	 ljdEyuZikVaohCif3+2ZG8+7qMPd1d8jc3nMPFoI9ok1g+7RFPlcMlsfrXsJ4vVfsdg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d6wllsET;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7717F606A31E;
-	Wed, 25 Nov 2026 08:04:25 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dcAnQhGt;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E42606A331
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 09:08:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 18E42606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d6wllsET
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3FC21F000D0;
-	Wed, 25 Nov 2026 08:04:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795593864;
-	bh=/1qjbzhxlB1Ss6WAwvDVAp8mW+VQV6QUtd1PRvHad3I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=d6wllsETRQP8h4zX2i/eR/EItnbHEhz7gMP/JF2w0ohJu45ENWnKOJy1CSZpRLI5t
-	 ooBoLu/B95QAx++71XcXUMXyQiiZYtvSxe+m/uMLAm7pMxRJ4VHY+1YWEeRqjbXcQK
-	 1QKj2ynw/a9vjqPE4zX2KzqF2RKR8u/ei5RKJgpIBjH0cCCh2rENOAO/tgjCV6lo5g
-	 k5y3NSh1F1ovlc2NH2w8sELuot0zH7nHNkLj/QSYlSAFQyKqv4oqGbfhM0vLxIBT2Y
-	 8o/4cArVVES1311yPmDhFPgSEcNBqmaAX5KIIUjXKUouK+drghxHfAJ/RueMoiHtjJ
-	 QkWsVUP2ShFFA==
-Date: Wed, 25 Nov 2026 00:04:23 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: Dan Carpenter <dan@pereq.eu>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 6/8] KVM: arm64: nv: Don't deliver a pending SError to
- the wrong guest
-Message-ID: <awaWhy3IywYrP2JZ@kernel.org>
-References: <20261125-double_exception-v2-0-224689d8a764@pereq.eu>
- <20261125-double_exception-v2-6-224689d8a764@pereq.eu>
- <sashiko-outbox-232776@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dcAnQhGt
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9198E339;
+	Wed, 25 Nov 2026 01:08:38 -0800 (PST)
+Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 475643F86F;
+	Wed, 25 Nov 2026 01:08:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795597721; bh=pmOn0GAQ/bIzl3yEFkQbNwWqfmhqh+tr+9j74hBF0n8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dcAnQhGtPKyESIvNebDMGfL2TrSqBtOSKEzh2om+0KBX3wkCehatasRziYTiTReSc
+	 p/UUMgQHC6adqOhdOTayYPC49JWou0HCkpkyxeUkQrtwhFWHqMDagQJqtyaF2HHbmz
+	 KlGBHPKyMdilzcBf8Nwd5t0/GuII1ev/VeEvtsPg=
+Message-ID: <0c7c59df-69cd-40fe-830f-60c0f3cedafa@arm.com>
+Date: Wed, 25 Nov 2026 09:08:36 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,77 +53,79 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <sashiko-outbox-232776@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/8] KVM: arm64: Reset SP_EL1, ELR_EL1 and SPSR_EL1
+ when resetting a vcpu
+To: Dan Carpenter <dan@pereq.eu>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Christoffer Dall <c.dall@virtualopensystems.com>,
+ Rusty Russell <rusty@rustcorp.com.au>, Marcelo Tosatti
+ <mtosatti@redhat.com>, Sebastian Ott <sebott@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, James Morse <james.morse@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+ <seanjc@google.com>, Shuah Khan <shuah@kernel.org>
+Cc: Karthik Bhargavan <karthik@pereq.eu>,
+ =?UTF-8?Q?Cl=C3=A9ment_Blaudeau?= <clement@cryspen.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, stable@vger.kernel.org
+References: <20261125-double_exception-v2-0-224689d8a764@pereq.eu>
+ <20261125-double_exception-v2-2-224689d8a764@pereq.eu>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20261125-double_exception-v2-2-224689d8a764@pereq.eu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 25, 2026 at 07:24:38AM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential
-> issue to consider:
-> - [High] KVM: arm64: nv: sleeping in atomic context via
->   kvm_nested_flush_hwstate()
-> --
+On 25/11/2026 06:56, Dan Carpenter wrote:
+> Resetting a vcpu keeps the old values of SP_EL1, ELR_EL1 and SPSR_EL1.
+> Commit e47c2055c68e ("KVM: arm64: Make struct kvm_regs userspace-only")
+> changed the reset to only clear the general purpose registers, SP, PC
+> and PSTATE, and later commits moved these three registers to the system
+> register array without a reset value.  Commit 85d703746154 ("KVM: arm64:
+> Fully zero the vcpu state on reset") fixed the FP registers and the
+> 32-bit SPSRs the same commit missed, but not these three.
 > 
-> commit 81f527c7f211ae919b4cadce520f83a546cfd38d
-> Author: Dan Carpenter <dan@pereq.eu>
+> The impact is that the guest that boots next can read the previous
+> kernel's stack pointer and exception return address.  KVM_GET_ONE_REG
+> also returns the old values to userspace, and a rebooted VM doesn't
+> start in the same state as a new one.
 > 
-> KVM: arm64: nv: Don't deliver a pending SError to the wrong guest
+> Zero them in kvm_reset_vcpu().
 > 
-> This commit stashes a pending HCR_EL2.VSE bit into NESTED_SERROR_PENDING
-> when switching between L1 and L2 so that kvm_nested_flush_hwstate()
-> re-evaluates SError routing in the new context.
+> Fixes: e47c2055c68e ("KVM: arm64: Make struct kvm_regs userspace-only")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Dan Carpenter <dan@pereq.eu>
+> ---
+>   arch/arm64/kvm/reset.c | 3 +++
+>   1 file changed, 3 insertions(+)
 > 
-> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > index 39136a89d74bb..cccaf02610e87 100644
-> > --- a/arch/arm64/kvm/emulate-nested.c
-> > +++ b/arch/arm64/kvm/emulate-nested.c
-> > @@ -2792,6 +2792,18 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
-> >  	return spsr;
-> >  }
-> >  
-> > +/*
-> > + * HCR_EL2.VSE was set for the context we are leaving.  Store the SError
-> > + * instead, so that kvm_nested_flush_hwstate() routes it in the new context.
-> > + */
-> > +static void kvm_nested_stash_serror(struct kvm_vcpu *vcpu)
-> > +{
-> > +	if (*vcpu_hcr(vcpu) & HCR_EL2_VSE) {
-> > +		*vcpu_hcr(vcpu) &= ~HCR_EL2_VSE;
-> > +		vcpu_set_flag(vcpu, NESTED_SERROR_PENDING);
-> > +	}
-> > +}
-> > +
-> >  void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
-> >  {
-> >  	u64 spsr, elr, esr;
-> > @@ -2823,6 +2835,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
-> >  	preempt_disable();
-> >  	vcpu_set_flag(vcpu, IN_NESTED_ERET);
-> >  	kvm_arch_vcpu_put(vcpu);
-> > +	kvm_nested_stash_serror(vcpu);
-> 
-> [Severity: High]
-> Can stashing NESTED_SERROR_PENDING here cause sleeping in atomic context
-> on the next guest entry when a virtual PMU counter is active?
-> 
-> When L1 has a masked pending SError in HCR_EL2_VSE with HCR_EL2.AMO set
-> and executes ERET into L2, setting NESTED_SERROR_PENDING causes the next
-> iteration of kvm_arch_vcpu_ioctl_run() to re-inject the SError back to
-> vEL2 while preemption is disabled:
-> 
->   kvm_arch_vcpu_ioctl_run()
->     preempt_disable()
->     kvm_nested_flush_hwstate()
->       kvm_inject_serror_esr()
->         kvm_inject_nested_serror()
->           kvm_inject_nested()
->             preempt_disable()
->             ...
->             preempt_enable()
->             kvm_pmu_nested_transition()
->               kvm_pmu_create_perf_event()
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 26081d273408..9c1b42890c96 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -199,6 +199,9 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>   
+>   	/* Reset core registers */
+>   	kvm_reset_vcpu_core(vcpu);
+> +	__vcpu_assign_sys_reg(vcpu, SP_EL1, 0);
+> +	__vcpu_assign_sys_reg(vcpu, ELR_EL1, 0);
+> +	__vcpu_assign_sys_reg(vcpu, SPSR_EL1, 0);
 
-The PMU crap should probably go in a vCPU request to avoid this.
+nit: Please could we move these into kvm_reset_vcpu_core() where we
+reset other registers ?
 
-Thanks,
-Oliver
+With that:
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
+
+>   	vcpu->mmio_needed = false;
+>   
+>   	/* Reset system registers */
+> 
+
