@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.199
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.200
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795587392;
-	b=HmG4TE3j0IuIOgyp8jjPIzU9hVM4fbri1N6lz3SBvdBDR8BQDSDwVkgHhuLJS3gtM+Iw
-	 U9XVgMIShj3AVo5wufJ7HGG5WZXLtCvwmzxwbYGPRacDVChUTcLi6C96zRkh26T06bMC+
-	 eG7haMcKDPs6ITgH97dCoVIy3g+EqcJl8fGKI5B4lMU5XETm88foJvYZaJFddRPurXQno
-	 1UNlB6DLcS3adQAlEaJzI6vTAA0ZJoHrBTTI4vhzZVyS3wRAdkcLlQVZbY/BR8BxJQSIk
-	 ZJTIrjzHiv5SAlxZrlkHwu6wmPquF6yzbAT1XMlnipi3AicCg5sEhIT9v1K89D3rqwA==
+	t=1795587394;
+	b=Eov9YJ6lnL9DHCZ/HmWpkWvF/97JAG5AMAkUFUhpq0nA/4RbvlJeKf9AbVkhUdbvpMZ4
+	 pvVZbVw61Q6lpIyk0ysSINsOqmC6YNuUjHbmJZjZ/zm6djR5Pkjm7jw9cXF+/7Rm4lFsY
+	 Xg9BZOAxhcoOTXsi313WB0jctHDICAoE3OfONtbN7TC4EeBU+jOrs/F8ov99WaMYw5iAz
+	 7EH+53l4hXrDgJoS8fnz2dINMh1HLCBHgzKIsJHeFg3Xar1ioq9PihIipmFRy/XcCa2NX
+	 PX4DLhLthAYJJ14NTQH0d+ROh9qVqcmyY1t3Nv2cO3su1X9qSYbqdvs4+bv3Vgdy+AQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795587392;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795587394;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=ziD/5SVNpVvJrFTksFhEkRTwEv+vEsuDld5BMClPtX4=;
-	b=0G7RILPth6nrKrkxyjOZwH1pPCgadaWAn/VH57O6BUlSTI7gq0AtUJDPdTbDdiVxlOeD
-	 o8+Y1YFl2REFKuG3oE4XCpPrSbpNPGOyQOY6tmx5TGPGxHKwzvd2vFgvySDIrD7snkO6z
-	 SxUuGlmpqHS99r7RiZH9iArkQF9xWt5/ygRWFusdqhnPXzlBOHqSXJGQEcfjC24oouv6c
-	 Jj/2+mErifrxuTYfBBXEeA9JEEimgdf6xlr6mI6gR0AX7S005FG7JhshN0kCTaL5vEjAU
-	 JWdcbpZ/tP5cRXV11Z+fScFOBk1Pg51cbOBCVB2S2/6CRGRakNXBGKVTWgWb6NdRa6A==
+	bh=Gv563tOaT9t1DmnC0tzfAtnqlHlK2h3cFSfEVUiDT5g=;
+	b=K2XuK+kKElgZgZ0z/ijADpaZHnbwxitNwnMuTqYUQ98up5gTlcwACcfrmEZLOepRr5hL
+	 0TxLoCUSymkd65vI8OaEs7USFV7bWp12MMfHlAQBdv2/yuX0QiY1CqKXnscwmt40BSbrV
+	 IKbOa/4x/Gx7SiEZKhhFSZ7f2jHGCJhhegqhoRKpdHBaVa0eTz3xqRw8YFQoPUb4+5nWc
+	 7XXgMjx8NJsHG4t+T1aQFU05HPwKGiVJF3MVHBZ+EvoeBr/XACW9NDkqxy0y2Vvo2CsHD
+	 v5jr7CP8ViD6oyJOe/IJnM/GD3E4eg8iD63W1vfThySq6AsBHc6u9h/guI689mtqBkQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--irogers.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ovJeLJGK;
-	arc=none smtp.remote-ip=74.125.82.199
-Received: from mail-dy1-f199.google.com (mail-dy1-f199.google.com [74.125.82.199])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=nhcwp2jb;
+	arc=none smtp.remote-ip=74.125.82.200
+Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62863606A99B
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 62863606A99B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470B3606B3C4
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 06:16:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 470B3606B3C4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ovJeLJGK
-Received: by mail-dy1-f199.google.com with SMTP id 5a478bee46e88-384c78aa0dbso7370642eec.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=nhcwp2jb
+Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-384c78aa0dbso7370691eec.0
+        for <kvmarm@lists.linux.dev>; Tue, 24 Nov 2026 22:16:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795587392; x=1796192192; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1795587393; x=1796192193; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=ziD/5SVNpVvJrFTksFhEkRTwEv+vEsuDld5BMClPtX4=;
-        b=ovJeLJGKcYnMsR6gTSCzZT2POrQVq5kp4Rk6rQ7aVnNWOQTUOsY5q51QGjGYTxl9Qh
-         wHxDFmYPU4NFRMkBijEtTmtNGNb94UJWdBsq8NO6OhvZBrhzjhRmPvsvvRemubDzJcFW
-         kU318R0lfo0tSLMBVMjTrtmhB+Lq/blP8QqgL2jADZp6zmfHDYTZf0cKH/Iorb+mxhqD
-         IrAlmYnQ1FIxOXaP1uYEC2QT3/ApHpu+yu+Kc/BrYDRUHDzMOSgDkFZTUfctBMZZFOpb
-         fIwTj/dpRaNR8btbSikt+vZBgsFPmMtRH8qL143pfmdDukVMqX4Q/kSOhc1lvnA2iBmL
-         MpAg==
+        bh=Gv563tOaT9t1DmnC0tzfAtnqlHlK2h3cFSfEVUiDT5g=;
+        b=nhcwp2jbMqAwGlK4+ZjXrjMbizUnDM/oIwgicDBhj4RXQkocakXzchQYQZCN1Jf5aY
+         rOzRYcJmZogx/oFgWC5wCRBZlEajb7AOWmjGNOE3kcjyeNsGaAemDkq2BqQaMIf9Oylz
+         OmAfdwT24bDGwqTQ37+AvJDnUN6t77xgsnKAG4InsqjBOwUZ3vPxB9SLQSc/XNH2NwIi
+         XT52vXFQ85JmkYGahiBhHDiR8t3i60Jjh2DuRonD9xN9miaK1sFgZ77rt5FVjXWf98Zb
+         JqotQSqoIgXBsufhW2MJer5ILO9qcEI99Vs6ONVOVtbqUcoJ/zhMOaWz466co2Y0tvzL
+         lmyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795587392; x=1796192192;
+        d=1e100.net; s=20260707; t=1795587393; x=1796192193;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=ziD/5SVNpVvJrFTksFhEkRTwEv+vEsuDld5BMClPtX4=;
-        b=vU48m3rb0sDNkut05AqkLOUepLMBO8l9JKT0UNWRMskuwIX+K7/rVP9k0C91QI/3Hc
-         8tpOG1wKnjZhpd5GV1GBPg8ka8WxM4zAXQs1Ul9YU2hNumPbvN6Dnptr/0SoTsUO/GTK
-         Ic2SkNTNPp9ASZ9jE5gZoIZi7mrEHdBok63FIM2qf8NyxZ23jTCmUzdslntNSvibZaGP
-         qxHt3VRpq0V5hXICMaD894z9ftSXSXjiUHQ3xFmzyEo1f+5tPfWbvAbNZN1F0MmW/swg
-         17ANguTTim7eox96MGBi7ThOQgcBnWgdZvsg57Hpr71r6IwPKBcnj1pC0DERCpQv2DMe
-         tSPA==
-X-Forwarded-Encrypted: i=1; AL+hErHMk+RWjj3xLDSuN8cJ6L8SzY5KqqfbxFz6M1nAYJxwOpn1epzCWA06OhDOv3uMTdFppJ+7TgY=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+iyurPhlfetfKPn6HR5B+Ce+hWQSqX4pzOpnQIu35bFxiJ+nl0
-	WIhagpPSzlxRayYlwCVf/RdWrQiB0VTdeKepHN9ci3fOedySrHzABuXwH7SBwPQ/M6TbZDAMJLm
-	t1qUo0Uj0cQ==
-X-Received: from dyba2.prod.google.com ([2002:a05:693c:63c2:b0:386:9a0b:1f64])
- (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:693c:60d7:b0:386:a01f:a31e
- with SMTP id 5a478bee46e88-386a01fa8a5mr13485947eec.29.1795587391007; Tue, 24
- Nov 2026 22:16:31 -0800 (PST)
-Date: Tue, 24 Nov 2026 22:15:10 -0800
+        bh=Gv563tOaT9t1DmnC0tzfAtnqlHlK2h3cFSfEVUiDT5g=;
+        b=zT83Lr7zKkIs4QSiQnqE3KVX+9MD+eiVhIrtexc0SeDvFZHv/WXpVezgm8qPsrQM8N
+         0cu1ds3sUhms3RGozZaFJLUDIsJ+ufAiycL3FlbDMLDyETJYf9kUE32d31w0QCVgYPl/
+         7VYNA40pUZlwjIITvIVrXQqHR8HqVKXH2AyzMgePgFND+6wtaOlw+nmi54xkQJgNUMB8
+         fpVJGppVKuMg4KPJrKh53DTBMXeN5H7NEnLCDjeRSif7q/SZE6aAnquNzIf1rmuC9Mtw
+         Ku5JjhO+ZDVL6IYEiUKTju7x/SK+JADILWL2SaYt9WjbYi6XZYpe/IpvrQT7a3XC/Iy1
+         ksbQ==
+X-Forwarded-Encrypted: i=1; AL+hErFdunHaP9ML2ddQYRB6yQpJZXZO8EZWIqTA24ZIQW9FuD4NXrzSa9hOBdjbQpEA91623GPh37E=@lists.linux.dev
+X-Gm-Message-State: APuU4Z99hh1IrhW618kqIANb6plhCd7vZSz16Y8SkkTbCVzqcujqGKaC
+	kRs4XAUqlVnWDE6yUUr5zUCUxe27rNj402BH2zUOItTE9IGpolH/ZcjnHKBNTIxxaXlh5Dkevx4
+	WH4WrMvue/Q==
+X-Received: from dydz30.prod.google.com ([2002:a05:7300:22de:b0:382:e403:7217])
+ (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7300:c696:b0:386:c4bd:7ff0
+ with SMTP id 5a478bee46e88-386c4bd8670mr3588594eec.13.1795587393071; Tue, 24
+ Nov 2026 22:16:33 -0800 (PST)
+Date: Tue, 24 Nov 2026 22:15:11 -0800
 In-Reply-To: <20261125061523.1540234-1-irogers@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,9 +81,9 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261125061523.1540234-1-irogers@google.com>
 X-Mailer: git-send-email 2.56.1.831.g720f3f5937-goog
-Message-ID: <20261125061523.1540234-18-irogers@google.com>
-Subject: [RFC PATCH v2 17/30] riscv: unwind_user: Support Minimal DWARF CFI
- and FP user unwinding
+Message-ID: <20261125061523.1540234-19-irogers@google.com>
+Subject: [RFC PATCH v2 18/30] riscv: Add DWARF CFI annotations to entry,
+ ftrace, rethook, and BPF JIT
 From: Ian Rogers <irogers@google.com>
 To: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
 	linux-arch@vger.kernel.org
@@ -103,295 +103,272 @@ Cc: jpoimboe@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
 	wnliu@google.com, dylanbhatch@google.com, Ian Rogers <irogers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Wire up CONFIG_HAVE_UNWIND_USER_CFI and CONFIG_HAVE_UNWIND_USER_FP on
-MMU-enabled RISC-V kernels by adding arch/riscv/include/asm/unwind_user.h
-and unwind_user_sigreturn():
-
- - Define DWARF CFI register mappings for RV64 and RV32/compat user
-   tasks (sp=2, fp/s0=8, ra=1).
- - Provide unwind_user_link_register() reading regs->ra for leaf-frame
-   unwinding and ARCH_INIT_USER_FP_FRAME matching the RISC-V psABI
-   frame layout (CFA = s0, RA at s0 - ws, saved s0 at s0 - 2*ws).
- - Implement unwind_user_sigreturn() (and compat_unwind_user_sigreturn())
-   to recover pc, ra, sp, and s0 from rt_sigframe.uc.uc_mcontext.sc_regs
-   across __vdso_rt_sigreturn (whose vDSO FDE omits register rules so
-   libgcc takes its instruction-matching sigcontext fallback), supporting
-   interrupted leaf functions, -fomit-frame-pointer frames, and
-   SA_ONSTACK alternate signal stacks.
+Prepare RISC-V assembly, probe trampolines, and RV64 BPF JIT prologues
+for runtime Minimal DWARF CFI kernel unwinding:
+ - Export end labels for ret_from_fork_user_asm, call_on_irq_stack, and
+   ftrace_caller save/restore boundaries, and save s0 in ftrace_caller
+   under CONFIG_UNWINDER_DWARF_CFI.
+ - Annotate return_to_handler() and arch_rethook_trampoline() with
+   .cfi_* directives and key rethook shadow stacks on entry SP (CFA)
+   under CONFIG_UNWINDER_DWARF_CFI.
+ - Save RV_REG_RA unconditionally in RV64 BPF JIT prologues under
+   CONFIG_UNWINDER_DWARF_CFI so leaf BPF programs unwind into frameless C
+   callers.
 
 Signed-off-by: Ian Rogers <irogers@google.com>
 ---
- arch/riscv/Kconfig                   |  2 +
- arch/riscv/include/asm/signal32.h    |  9 +++
- arch/riscv/include/asm/unwind_user.h | 82 ++++++++++++++++++++++++++++
- arch/riscv/kernel/compat_signal.c    | 45 +++++++++++++++
- arch/riscv/kernel/signal.c           | 57 +++++++++++++++++++
- 5 files changed, 195 insertions(+)
- create mode 100644 arch/riscv/include/asm/unwind_user.h
+ arch/riscv/kernel/entry.S                     |  2 ++
+ arch/riscv/kernel/mcount-dyn.S                |  6 ++--
+ arch/riscv/kernel/mcount.S                    | 34 +++++++++++++++++--
+ arch/riscv/kernel/probes/rethook.c            | 13 +++++--
+ arch/riscv/kernel/probes/rethook_trampoline.S | 30 ++++++++++++++++
+ arch/riscv/net/bpf_jit_comp64.c               |  6 ++--
+ 6 files changed, 81 insertions(+), 10 deletions(-)
 
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index e7891a2a89da..84b61c755db3 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -202,6 +202,8 @@ config RISCV
- 	select HAVE_SAMPLE_FTRACE_DIRECT_MULTI
- 	select HAVE_STACKPROTECTOR
- 	select HAVE_SYSCALL_TRACEPOINTS
-+	select HAVE_UNWIND_USER_CFI if MMU
-+	select HAVE_UNWIND_USER_FP if MMU
- 	select HOTPLUG_PARALLEL if HOTPLUG_CPU
- 	select IRQ_DOMAIN
- 	select IRQ_FORCED_THREADING
-diff --git a/arch/riscv/include/asm/signal32.h b/arch/riscv/include/asm/signal32.h
-index 96dc56932e76..c1cbcb681aa7 100644
---- a/arch/riscv/include/asm/signal32.h
-+++ b/arch/riscv/include/asm/signal32.h
-@@ -3,9 +3,12 @@
- #ifndef __ASM_SIGNAL32_H
- #define __ASM_SIGNAL32_H
+diff --git a/arch/riscv/kernel/entry.S b/arch/riscv/kernel/entry.S
+index 61b7a7716697..0a37ac12128c 100644
+--- a/arch/riscv/kernel/entry.S
++++ b/arch/riscv/kernel/entry.S
+@@ -374,6 +374,7 @@ SYM_CODE_START(ret_from_fork_user_asm)
+ 	move a0, sp /* pt_regs */
+ 	call ret_from_fork_user
+ 	j ret_from_exception
++SYM_INNER_LABEL(ret_from_fork_asm_end, SYM_L_GLOBAL)
+ SYM_CODE_END(ret_from_fork_user_asm)
  
-+struct unwind_user_state;
-+
- #if IS_ENABLED(CONFIG_COMPAT)
- int compat_setup_rt_frame(struct ksignal *ksig, sigset_t *set,
- 			  struct pt_regs *regs);
-+bool compat_unwind_user_sigreturn(struct unwind_user_state *state);
- #else
- static inline
- int compat_setup_rt_frame(struct ksignal *ksig, sigset_t *set,
-@@ -13,6 +16,12 @@ int compat_setup_rt_frame(struct ksignal *ksig, sigset_t *set,
+ #ifdef CONFIG_IRQ_STACKS
+@@ -410,6 +411,7 @@ SYM_FUNC_START(call_on_irq_stack)
+ 	addi	sp, sp, STACKFRAME_SIZE_ON_STACK
+ 
+ 	ret
++SYM_INNER_LABEL(call_on_irq_stack_end, SYM_L_GLOBAL)
+ SYM_FUNC_END(call_on_irq_stack)
+ #endif /* CONFIG_IRQ_STACKS */
+ 
+diff --git a/arch/riscv/kernel/mcount-dyn.S b/arch/riscv/kernel/mcount-dyn.S
+index 082fe0b0e3c0..06c26725a830 100644
+--- a/arch/riscv/kernel/mcount-dyn.S
++++ b/arch/riscv/kernel/mcount-dyn.S
+@@ -85,7 +85,7 @@
+ 	addi	sp, sp, -FREGS_SIZE_ON_STACK
+ 	REG_S	t0,  FREGS_EPC(sp)
+ 	REG_S	x1,  FREGS_RA(sp)
+-#ifdef HAVE_FUNCTION_GRAPH_FP_TEST
++#if defined(HAVE_FUNCTION_GRAPH_FP_TEST) || defined(CONFIG_UNWINDER_DWARF_CFI)
+ 	REG_S	x8,  FREGS_S0(sp)
+ #endif
+ 	REG_S	x6,  FREGS_T1(sp)
+@@ -113,7 +113,7 @@
+ 	.macro RESTORE_ABI_REGS
+ 	REG_L	t0, FREGS_EPC(sp)
+ 	REG_L	x1, FREGS_RA(sp)
+-#ifdef HAVE_FUNCTION_GRAPH_FP_TEST
++#if defined(HAVE_FUNCTION_GRAPH_FP_TEST) || defined(CONFIG_UNWINDER_DWARF_CFI)
+ 	REG_L	x8, FREGS_S0(sp)
+ #endif
+ 	REG_L	x6,  FREGS_T1(sp)
+@@ -183,6 +183,7 @@ SYM_FUNC_START(ftrace_caller)
+ #endif
+ #endif
+ 	SAVE_ABI_REGS
++SYM_INNER_LABEL(ftrace_caller_saved, SYM_L_GLOBAL)
+ 	PREPARE_ARGS
+ 
+ #ifdef CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS
+@@ -193,6 +194,7 @@ SYM_INNER_LABEL(ftrace_call, SYM_L_GLOBAL)
+ 	jalr	ra, 0(ra)
+ #endif
+ 	RESTORE_ABI_REGS
++SYM_INNER_LABEL(ftrace_caller_restore, SYM_L_GLOBAL)
+ #ifdef CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS
+ 	bnez	t1, ftrace_caller_direct
+ #endif
+diff --git a/arch/riscv/kernel/mcount.S b/arch/riscv/kernel/mcount.S
+index da4a4000e57e..c13aa07cdb04 100644
+--- a/arch/riscv/kernel/mcount.S
++++ b/arch/riscv/kernel/mcount.S
+@@ -27,8 +27,17 @@
+ 	 */
+ 	.macro SAVE_RET_ABI_STATE
+ 	addi	sp, sp, -FREGS_SIZE_ON_STACK
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_def_cfa_offset FREGS_SIZE_ON_STACK
++#endif
+ 	REG_S	ra, FREGS_RA(sp)
+ 	REG_S	s0, FREGS_S0(sp)
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_offset s0, FREGS_S0 - FREGS_SIZE_ON_STACK
++	la	t0, return_to_handler
++	REG_S	t0, FREGS_EPC(sp)
++	.cfi_offset ra, FREGS_EPC - FREGS_SIZE_ON_STACK
++#endif
+ 	REG_S	a0, FREGS_A0(sp)
+ 	REG_S	a1, FREGS_A1(sp)
+ 	addi	s0, sp, FREGS_SIZE_ON_STACK
+@@ -41,11 +50,16 @@
+ 	.endm
+ 
+ 	.macro RESTORE_RET_ABI_STATE
+-	REG_L	ra, FREGS_RA(sp)
+ 	REG_L	s0, FREGS_S0(sp)
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_restore s0
++#endif
+ 	REG_L	a0, FREGS_A0(sp)
+ 	REG_L	a1, FREGS_A1(sp)
+ 	addi	sp, sp, FREGS_SIZE_ON_STACK
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_def_cfa_offset 0
++#endif
+ 	.endm
+ 
+ SYM_TYPED_FUNC_START(ftrace_stub)
+@@ -69,13 +83,27 @@ SYM_FUNC_START(return_to_handler)
+  *
+  * So alternatively we check the *old* frame pointer position, that is, the
+  * value stored in -16(s0) on entry, and the s0 on return.
++ *
++ * Under CONFIG_UNWINDER_DWARF_CFI, FREGS_EPC(sp) is seeded with
++ * &return_to_handler before ftrace_return_to_handler() overwrites fregs->epc
++ * with the popped caller PC, allowing walk_stackframe_cfi() to unwind cleanly
++ * both before and after current->curr_ret_stack is decremented.
+  */
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_startproc
++#endif
+ 	SAVE_RET_ABI_STATE
+ 	mv	a0, sp
+ 	call	ftrace_return_to_handler
+-	mv	a2, a0
++	mv	ra, a0
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_same_value ra
++#endif
+ 	RESTORE_RET_ABI_STATE
+-	jalr	a2
++	ret
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_endproc
++#endif
+ SYM_FUNC_END(return_to_handler)
+ #endif
+ 
+diff --git a/arch/riscv/kernel/probes/rethook.c b/arch/riscv/kernel/probes/rethook.c
+index 5c27c1f50989..1ae3faf48218 100644
+--- a/arch/riscv/kernel/probes/rethook.c
++++ b/arch/riscv/kernel/probes/rethook.c
+@@ -10,7 +10,10 @@
+ /* This is called from arch_rethook_trampoline() */
+ unsigned long __used arch_rethook_trampoline_callback(struct pt_regs *regs)
  {
- 	return -1;
+-	return rethook_trampoline_handler(regs, regs->s0);
++	unsigned long frame = IS_ENABLED(CONFIG_UNWINDER_DWARF_CFI) ?
++			      regs->sp : regs->s0;
++
++	return rethook_trampoline_handler(regs, frame);
  }
-+
-+static inline
-+bool compat_unwind_user_sigreturn(struct unwind_user_state *state)
-+{
-+	return false;
-+}
- #endif
  
- #endif
-diff --git a/arch/riscv/include/asm/unwind_user.h b/arch/riscv/include/asm/unwind_user.h
-new file mode 100644
-index 000000000000..d3c12a183ac9
---- /dev/null
-+++ b/arch/riscv/include/asm/unwind_user.h
-@@ -0,0 +1,82 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef _ASM_RISCV_UNWIND_USER_H
-+#define _ASM_RISCV_UNWIND_USER_H
-+
-+#ifdef CONFIG_UNWIND_USER
-+
-+#include <linux/compat.h>
-+#include <linux/unwind_dwarf_cfi.h>
-+#include <linux/unwind_user_types.h>
-+#include <asm/ptrace.h>
-+
-+/**
-+ * unwind_user_word_size() - Return the user-space word size in bytes on RISC-V
-+ * @regs: User-mode register state.
-+ *
-+ * Return: 4 for RV32 compat user tasks, or sizeof(unsigned long) otherwise.
-+ */
-+static inline int unwind_user_word_size(struct pt_regs *regs)
-+{
-+	if (IS_ENABLED(CONFIG_COMPAT) && is_compat_task())
-+		return 4;
-+	return sizeof(unsigned long);
-+}
-+
-+/**
-+ * unwind_user_link_register() - Fetch the user link register (ra/x1) from @regs
-+ * @regs: User-mode register state.
-+ * @ra: Output link register value.
-+ *
-+ * Return: Always true on RISC-V.
-+ */
-+static inline bool unwind_user_link_register(struct pt_regs *regs,
-+					     unsigned long *ra)
-+{
-+	*ra = regs->ra;
-+	return true;
-+}
-+
-+#define unwind_user_link_register unwind_user_link_register
-+
-+/**
-+ * unwind_user_cfi_arch() - Populate RISC-V DWARF register numbers
-+ * @ws: User word size in bytes (4 for RV32, 8 for RV64).
-+ * @arch: Output DWARF CFI architecture descriptor.
-+ *
-+ * Return: true if @ws is 4 or 8, false otherwise.
-+ */
-+static inline bool unwind_user_cfi_arch(unsigned int ws,
-+					struct dwarf_cfi_arch *arch)
-+{
-+	if (ws == 8 || ws == 4) {
-+		*arch = (struct dwarf_cfi_arch){
-+			.ws	= (u8)ws,
-+			.sp_reg	= 2,	/* sp (x2) */
-+			.fp_reg	= 8,	/* s0/fp (x8) */
-+			.ra_reg	= 1,	/* ra (x1) */
-+		};
-+		return true;
-+	}
-+	return false;
-+}
-+
-+bool unwind_user_sigreturn(struct unwind_user_state *state);
-+#define unwind_user_sigreturn unwind_user_sigreturn
-+
-+#endif /* CONFIG_UNWIND_USER */
-+
-+#ifdef CONFIG_HAVE_UNWIND_USER_FP
-+
+ NOKPROBE_SYMBOL(arch_rethook_trampoline_callback);
+@@ -18,7 +21,13 @@ NOKPROBE_SYMBOL(arch_rethook_trampoline_callback);
+ void arch_rethook_prepare(struct rethook_node *rhn, struct pt_regs *regs, bool mcount)
+ {
+ 	rhn->ret_addr = regs->ra;
+-	rhn->frame = regs->s0;
++	/*
++	 * With -fomit-frame-pointer under CONFIG_UNWINDER_DWARF_CFI, nested
++	 * functions share s0; key the rethook node on the function's entry SP
++	 * (its DWARF CFA), which matches regs->sp at arch_rethook_trampoline.
++	 */
++	rhn->frame = IS_ENABLED(CONFIG_UNWINDER_DWARF_CFI) ?
++		     regs->sp : regs->s0;
+ 
+ 	/* replace return addr with trampoline */
+ 	regs->ra = (unsigned long)arch_rethook_trampoline;
+diff --git a/arch/riscv/kernel/probes/rethook_trampoline.S b/arch/riscv/kernel/probes/rethook_trampoline.S
+index c3aa8d8cf5af..f632630846de 100644
+--- a/arch/riscv/kernel/probes/rethook_trampoline.S
++++ b/arch/riscv/kernel/probes/rethook_trampoline.S
+@@ -78,9 +78,27 @@
+ 	REG_L x31, PT_T6(sp)
+ 	.endm
+ 
 +/*
-+ * Standard RISC-V psABI frame record stores {saved_s0, saved_ra} at
-+ * [s0 - 2 * ws, s0), with s0 pointing to the caller's stack pointer (CFA).
++ * Under CONFIG_UNWINDER_DWARF_CFI, PT_EPC(sp) is seeded with
++ * &arch_rethook_trampoline before rethook_trampoline_handler() overwrites
++ * regs->epc with the restored caller PC prior to running rethook handlers,
++ * enabling reliable CFI unwinding across kretprobe return hooks.
 + */
-+#define ARCH_INIT_USER_FP_FRAME(ws)			\
-+	.cfa_off	=  0,				\
-+	.ra_off		= -1 * (ws),			\
-+	.fp_off		= -2 * (ws),			\
-+	.use_fp		= true,
-+
-+#endif /* CONFIG_HAVE_UNWIND_USER_FP */
-+
-+#endif /* _ASM_RISCV_UNWIND_USER_H */
-diff --git a/arch/riscv/kernel/compat_signal.c b/arch/riscv/kernel/compat_signal.c
-index cf3eb33a11e4..53b5be62e393 100644
---- a/arch/riscv/kernel/compat_signal.c
-+++ b/arch/riscv/kernel/compat_signal.c
-@@ -5,6 +5,7 @@
- #include <linux/uaccess.h>
- #include <linux/syscalls.h>
- #include <linux/linkage.h>
-+#include <linux/unwind_user.h>
- 
- #include <asm/csr.h>
- #include <asm/signal32.h>
-@@ -243,3 +244,47 @@ int compat_setup_rt_frame(struct ksignal *ksig, sigset_t *set,
- 
- 	return 0;
- }
-+
-+#ifdef CONFIG_UNWIND_USER
-+/**
-+ * compat_unwind_user_sigreturn() - Unwind an RV32 compat vDSO rt_sigreturn frame
-+ * @state: Current user unwind state.
-+ *
-+ * Return: true if @state was at the compat vDSO __vdso_rt_sigreturn trampoline
-+ * and advanced to the interrupted 32-bit user context, false otherwise.
-+ */
-+bool compat_unwind_user_sigreturn(struct unwind_user_state *state)
-+{
-+	struct mm_struct *mm = current->mm;
-+	struct compat_rt_sigframe __user *frame;
-+	struct compat_user_regs_struct cregs;
-+	unsigned long sigret;
-+
-+	if (!mm || !mm->context.vdso || (state->sp & 3UL))
-+		return false;
-+
-+	sigret = (unsigned long)COMPAT_VDSO_SYMBOL(mm->context.vdso,
-+						   rt_sigreturn);
-+	if (state->ip != sigret &&
-+	    !(state->topmost && state->ip == sigret + 4))
-+		return false;
-+
-+	frame = (struct compat_rt_sigframe __user *)state->sp;
-+	if (copy_from_user(&cregs, &frame->uc.uc_mcontext.sc_regs,
-+			   offsetofend(struct compat_user_regs_struct, s0)))
-+		return false;
-+
-+	if ((cregs.sp & 3U) || !cregs.pc)
-+		return false;
-+
-+	state->ip = cregs.pc;
-+	state->ra = cregs.ra;
-+	state->sp = cregs.sp;
-+	state->fp = cregs.s0;
-+	state->ra_valid = true;
-+	state->sp_valid = true;
-+	state->signal = true;
-+	state->topmost = false;
-+	return true;
-+}
+ SYM_CODE_START(arch_rethook_trampoline)
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_startproc
 +#endif
-diff --git a/arch/riscv/kernel/signal.c b/arch/riscv/kernel/signal.c
-index 59784dc117e4..c0d70220e4a4 100644
---- a/arch/riscv/kernel/signal.c
-+++ b/arch/riscv/kernel/signal.c
-@@ -13,6 +13,7 @@
- #include <linux/resume_user_mode.h>
- #include <linux/linkage.h>
- #include <linux/entry-common.h>
-+#include <linux/unwind_user.h>
- 
- #include <asm/ucontext.h>
- #include <asm/vdso.h>
-@@ -587,3 +588,59 @@ bool sigaltstack_size_valid(size_t ss_size)
- 	return ss_size > get_rt_frame_size(false);
- }
- #endif /* CONFIG_DYNAMIC_SIGFRAME */
-+
-+#ifdef CONFIG_UNWIND_USER
-+/**
-+ * unwind_user_sigreturn() - Unwind a RISC-V rt_sigreturn user signal frame
-+ * @state: Current user unwind state.
-+ *
-+ * __vdso_rt_sigreturn carries an empty .cfi_signal_frame FDE without register
-+ * rules so user-space unwinders such as libgcc take their instruction-matching
-+ * sigcontext fallback. Recover pc, ra, sp, and s0 directly from
-+ * &rt_sigframe.uc.uc_mcontext.sc_regs so interrupted leaf functions,
-+ * -fomit-frame-pointer code, and alternate signal stacks unwind cleanly.
-+ *
-+ * Return: true if @state was at the rt_sigreturn trampoline and advanced to
-+ * the interrupted user context, false otherwise.
-+ */
-+bool unwind_user_sigreturn(struct unwind_user_state *state)
-+{
-+	struct mm_struct *mm = current->mm;
-+	struct rt_sigframe __user *frame;
-+	struct user_regs_struct sc_regs;
-+	unsigned long sigret;
-+
-+	if (!mm)
-+		return false;
-+
-+	if (IS_ENABLED(CONFIG_COMPAT) && state->ws == 4)
-+		return compat_unwind_user_sigreturn(state);
-+
-+	if (state->ws != sizeof(unsigned long) || !mm->context.vdso ||
-+	    (state->sp & (sizeof(unsigned long) - 1)))
-+		return false;
-+
-+	frame = (struct rt_sigframe __user *)state->sp;
-+	sigret = (unsigned long)VDSO_SYMBOL(mm->context.vdso, rt_sigreturn);
-+	if (state->ip != sigret &&
-+	    !(state->topmost && state->ip == sigret + 4))
-+		return false;
-+
-+	if (copy_from_user(&sc_regs, &frame->uc.uc_mcontext.sc_regs,
-+			   offsetofend(struct user_regs_struct, s0)))
-+		return false;
-+
-+	if ((sc_regs.sp & (sizeof(unsigned long) - 1)) || !sc_regs.pc)
-+		return false;
-+
-+	state->ip = sc_regs.pc;
-+	state->ra = sc_regs.ra;
-+	state->sp = sc_regs.sp;
-+	state->fp = sc_regs.s0;
-+	state->ra_valid = true;
-+	state->sp_valid = true;
-+	state->signal = true;
-+	state->topmost = false;
-+	return true;
-+}
+ 	addi sp, sp, -(PT_SIZE_ON_STACK)
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_def_cfa_offset PT_SIZE_ON_STACK
 +#endif
+ 	save_all_base_regs
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_offset s0, PT_S0 - PT_SIZE_ON_STACK
++	la t0, arch_rethook_trampoline
++	REG_S t0, PT_EPC(sp)
++	.cfi_offset ra, PT_EPC - PT_SIZE_ON_STACK
++#endif
+ 
+ 	move a0, sp /* pt_regs */
+ 
+@@ -88,9 +106,21 @@ SYM_CODE_START(arch_rethook_trampoline)
+ 
+ 	/* use the result as the return-address */
+ 	move ra, a0
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_same_value ra
++#endif
+ 
+ 	restore_all_base_regs
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_restore s0
++#endif
+ 	addi sp, sp, PT_SIZE_ON_STACK
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_def_cfa_offset 0
++#endif
+ 
+ 	ret
++#ifdef CONFIG_UNWINDER_DWARF_CFI
++	.cfi_endproc
++#endif
+ SYM_CODE_END(arch_rethook_trampoline)
+diff --git a/arch/riscv/net/bpf_jit_comp64.c b/arch/riscv/net/bpf_jit_comp64.c
+index 788fcc21fd5b..fb8cc74cff11 100644
+--- a/arch/riscv/net/bpf_jit_comp64.c
++++ b/arch/riscv/net/bpf_jit_comp64.c
+@@ -201,7 +201,7 @@ static void __build_epilogue(bool is_tail_call, struct rv_jit_context *ctx)
+ {
+ 	int stack_adjust = ctx->stack_size, store_offset = stack_adjust - 8;
+ 
+-	if (seen_reg(RV_REG_RA, ctx)) {
++	if (seen_reg(RV_REG_RA, ctx) || IS_ENABLED(CONFIG_UNWINDER_DWARF_CFI)) {
+ 		emit_ld(RV_REG_RA, store_offset, RV_REG_SP, ctx);
+ 		store_offset -= 8;
+ 	}
+@@ -2130,7 +2130,7 @@ void bpf_jit_build_prologue(struct rv_jit_context *ctx, bool is_subprog)
+ 	if (bpf_stack_adjust)
+ 		mark_fp(ctx);
+ 
+-	if (seen_reg(RV_REG_RA, ctx))
++	if (seen_reg(RV_REG_RA, ctx) || IS_ENABLED(CONFIG_UNWINDER_DWARF_CFI))
+ 		stack_adjust += 8;
+ 	stack_adjust += 8; /* RV_REG_FP */
+ 	if (seen_reg(RV_REG_S1, ctx))
+@@ -2168,7 +2168,7 @@ void bpf_jit_build_prologue(struct rv_jit_context *ctx, bool is_subprog)
+ 
+ 	emit_addi(RV_REG_SP, RV_REG_SP, -stack_adjust, ctx);
+ 
+-	if (seen_reg(RV_REG_RA, ctx)) {
++	if (seen_reg(RV_REG_RA, ctx) || IS_ENABLED(CONFIG_UNWINDER_DWARF_CFI)) {
+ 		emit_sd(RV_REG_SP, store_offset, RV_REG_RA, ctx);
+ 		store_offset -= 8;
+ 	}
 -- 
 2.56.1.831.g720f3f5937-goog
 
