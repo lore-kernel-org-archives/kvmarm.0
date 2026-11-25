@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795601361;
-	b=RzwZVsgg/giUMWyBNC0whr1/8nIb2J5ZItJd9gPLcnQ6UlfDK9rR8EpHBSiLdX23WhpN
-	 OS0VzFyi812T+o9PgB9zWfIs+1j+wEEg0T25HXS+fyDKooM8EXXKAdJBqmRXzrZ4sBWrK
-	 TcTya6g4YQOl3c2TMnXPaaBnhzd3divFHljtT5/JwVT1LvJ457WqR9TqyJ237Yh8Z7/yn
-	 8P7cwUtiKXPUQ6TwW1OSdj24dw24eYVXm9ldaOkUyGEfsoDgufh7DBE58O/XnBpaz6tYK
-	 Z3//qPscIWfPM2ucaiJmOyGNSA1ysfs8cGphxKZAOX338nEEpqIOHZKfyL2V1MhCvXQ==
+	t=1795602420;
+	b=mTXFILYG8YAzeLgx+l8C5dodG3hH6iPo6PlfBrGL/ZKXdrKkaNTxlO86JPKRBg40EDy+
+	 Z0Zv/+/oOhxJvMj5b8CGR30ek4CPMyV1h42T08tHbsHrwksU/XFJ2f3W+MYHMRU8ZAYNW
+	 7AVDZI/x/Y1fI9BH6knIEogejBoRn8bkX7ypoZxgSvEu8ULhMDjWiKgnx5KhmnuCR7frk
+	 MfUDNzK6JZznUYN768v/f7Em0uSPGDwXePHDidQNeDTMtyHDWwDsXMLYC5uPeN4VWEVyC
+	 hVNtOPOzPMSJ5LOy5hk7IKMRovItvavagrvbGxc7F95/KzF3BE4O5KmhScv13vrePTw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795601361;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795602420;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=9Go3NrC6R1k3c+zu1uu0vGbFmy/uD6Bj5+pEG6pyJzc=;
-	b=AK06TQpt2f27bdFT2I/U94gpqBxWZgPOGG04lDH2ShiMTqt7FEOfOWMnEqL0SNSEjJPc
-	 Ts+QXGWqsSuCn0kJ8ymyPDcD6s8XssA2GAqSkifiqaZyNA+3F8C9HgrDCytKqdDMyicpC
-	 c7WZmmTHXFhxJj3G1Ex474ehbSgJfmt54sGMxX7WLs8hHFD83h77I4PzbYWKRxNoi89Ya
-	 FSHbjp4Is7HA45sAWGtQza8Wgz7+LQ8wPz4FLkdpUoBdWhwBAKipEfBGvJ/mI0ZqeaKBl
-	 DdGaipJ2jqdMOPSV8j8+zK54sUYp7E+1r4TTFi0LZAd5ussWam/83vYib2A2fEHqYHg==
+	 Subject:To:Cc:Content-Type;
+	bh=usb6Z06Hk8KYQV8odRZafo7lcqGHFhPDFCx6kFOexg8=;
+	b=jiQBm4bG+jZY++Qs+6QM9RdVRfkGcN/b6T6URTZ5wdRYcVWpjuN7CgIAJ4CaOUrt0+BO
+	 tetRdUIKxnH93VyGDZhz1JRN2q/bAW9bKsB4Up1awKtO9VTv2lEh34VGeSbIDELkL3ouh
+	 EWdOW8aNtltRmYfkQ1iGufE386ZLJegLVIXWCVk2rNnA/WKSd3YpSAJFCpsxY3VxEajzo
+	 G9VzmMgv1zCgw5UKk2W5D1U5BXzbZNb/qB/nX6cUW1h7CeB1yJn1aHVneRjiD+2nhnGNy
+	 T8b429ERhyoT8RTeFaVnaddbJcNbK439tAf0yIZAHOFK9eqpOt0AC7EeFmYdtHHqh7Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mLS1FZtl;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=O4uHgzXP;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77436606A329
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 10:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C7A606A323
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 10:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mLS1FZtl
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 097EA1F00A00
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 10:09:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=O4uHgzXP
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F36C61F000D4
+	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 10:26:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795601361;
-	bh=9Go3NrC6R1k3c+zu1uu0vGbFmy/uD6Bj5+pEG6pyJzc=;
+	s=k20260515; t=1795602420;
+	bh=usb6Z06Hk8KYQV8odRZafo7lcqGHFhPDFCx6kFOexg8=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=mLS1FZtlW/uBOd8uYBASLUw7dL8m9Cq3WOCGR+qLTLOINHxdiJqcVBElWNdcIZRFD
-	 +A4pF2DOHjjuyoVAtTmsc5CVWjpwsNNyDXTel3uWZktq8sv/WR0vKkYJYdbImYJdgk
-	 X9hbN4TaNJzdQGYcPQzLRKg3GKj3gUS1YfjD82L+62CJk27+ndu/jcm0xKxhSnoLA8
-	 mcW4TfWVXpXvUgwpsd8YqCHdKdRngXZ4sWikgqiBwjXCXPFykO3fVB/0/dOkJMVNDr
-	 S60jEr5lffFgJaeQPPD8R3xWy0rT4hePGqw/JcIqfSFURZYQuE4+ivClmJJVs3FNSq
-	 1yKmzXyQRPP/Q==
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-3ae1fd4252fso53725601fa.0
-        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 02:09:20 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErHU2OLB51C8+cAJmEYW3ZeKx0Lhk4Dy70THoHUoak7rpuWADi/ilBNVNwULa3xhmumcgFKLRZ0=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9KdFFRssg5cfFrSe1AXgy3a6UqlkplXcVr8oc0jarKUPEXruBq
-	LUF5GxohWJnJCIP+FtK9p3/eLF3PacxWhwRTOEwEpC90ehkeXUuLpLEkAT8Hw+Mm/7aswNH3fIk
-	2tv+tALopveIhzoyuZ8YyEotRy1VdlQA=
-X-Received: by 2002:a05:6512:3e1a:b0:5c1:4f34:922b with SMTP id
- 2adb3069b0e04-5c1bc8726b5mr4818493e87.54.1795601359755; Wed, 25 Nov 2026
- 02:09:19 -0800 (PST)
+	b=O4uHgzXPpddrs5gBqi8u9B2aC0SyE1KCf5EIAftXmQf0Yz2Bd+cgo1AM8A56/XQ9b
+	 QsOVezx8SE9qn+lvrJWJL1PlTp4gI/ODzeAfNUdCBjt4Yzly+8YEdh5lAto1BeiBtW
+	 /7CFZIny7BW8SPGrIJQECs6/L+Gmln25txeh1jerNuB2R5ZuT5WsODPt16jq9ZSXN1
+	 TAdyxky7rcl0q80azCDqg0LQDzoEB1/CSIuA4WL/UAjvZTNT3qWM2GLj5N0aZvZz1R
+	 L8ZFxRiK9+1MKiLQyRnSM6v7F5pPkCH2LHiOaGB1sMe/Gxk8SHMRpzsNCp05SnHtNB
+	 EfR1nLIQmF2Pg==
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5c14f3dab0cso3148444e87.1
+        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 02:26:59 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErGRtUWNClOom6pIvFADlPWuIigiHM03Ry7bOFBfspWRGyhlnkz0geL9MWCsD8r+XxFxDoXBlIM=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+7Ufl4r76c7SE2IeWv0aiyq4M4F+EZ7obSbATMRwt5Jub21G0q
+	q/hkX0azwTPUnH/5nErLkIKXIF7yVfCM+5EO473iZELw6B5Tu+Qo8oM0XAbw6pbIkEaWT4tasyq
+	fgaQae73gGyVs5jejCkveVBSyqMayqVE=
+X-Received: by 2002:a05:6512:104d:b0:5c1:5a83:2fd7 with SMTP id
+ 2adb3069b0e04-5c1bc907072mr5199313e87.66.1795602418769; Wed, 25 Nov 2026
+ 02:26:58 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,126 +59,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261015142552.4128028-1-ryan.roberts@arm.com> <20261015142552.4128028-15-ryan.roberts@arm.com>
-In-Reply-To: <20261015142552.4128028-15-ryan.roberts@arm.com>
+References: <20261015142552.4128028-1-ryan.roberts@arm.com>
+In-Reply-To: <20261015142552.4128028-1-ryan.roberts@arm.com>
 From: Linus Walleij <linusw@kernel.org>
-Date: Wed, 25 Nov 2026 11:09:07 +0100
-X-Gmail-Original-Message-ID: <CAD++jL=bXyBRP8oBr2xtzwkzbEPHXCKA0XPXRueY6pUSagbXtQ@mail.gmail.com>
-X-Gm-Features: Aa3M54rLQayJf3xCdY0Eq4zHAmpJ1R1cYyaDehvs8Q24SnEwz4VjC8tWxJP40dg
-Message-ID: <CAD++jL=bXyBRP8oBr2xtzwkzbEPHXCKA0XPXRueY6pUSagbXtQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 14/15] misc/arm-cla: Support exclusive context assignment
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@nvidia.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+Date: Wed, 25 Nov 2026 11:26:46 +0100
+X-Gmail-Original-Message-ID: <CAD++jLm6VvPYB5UQS8Zm73pYifr7Oi=xX3S4Wt5c3WE7uMv+fQ@mail.gmail.com>
+X-Gm-Features: Aa3M54rtYXT0tNMww-_rAs-DbnpD3x58pzG3L6crqferpf2a4MJ3rhFXSlspZ40
+Message-ID: <CAD++jLm6VvPYB5UQS8Zm73pYifr7Oi=xX3S4Wt5c3WE7uMv+fQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 00/15] Arm Core Local Accelerator Driver
+To: Ryan Roberts <ryan.roberts@arm.com>, Arnd Bergmann <arnd@arndb.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@nvidia.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
 	Jean-Philippe Brucker <jpb@kernel.org>, Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org, 
 	dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
 Hi Ryan, Jean-Philippe,
 
-On Thu, Oct 15, 2026 at 4:27=E2=80=AFPM Ryan Roberts <ryan.roberts@arm.com>=
- wrote:
+regarding this patch set I looked into historical precursors and
+ongoing developments that could benefit from the same infrastructure.
 
-> From: Jean-Philippe Brucker <jpb@kernel.org>
->
-> Introduce a nr_contexts members to cla_domain to count the mapped
-> contexts. At the moment PL0 contexts share the domain, while PL1
-> contexts require exclusive assignment, since there is no context
-> save/restore.
+1. Apple AMX: there is no ongoing effort for this accelerator but it
+exists in all Apple silicon. This accelerator appears to be synchronous
+using extended instructions and is just "some different SVE" and would
+be handled the same way as these.
 
-Do you mean to say there is no context save/restore for the
-virtualiuzed users? Because there seems to be for the ordinary
-(kernel arbitrated) ones.
+2. The PowerPC Cell SPU (Playstation 3)
 
-> A negative count indicates the domain is exclusive.
+This is more interesting: the Cell has accelerator cores that execute
+entire litte programs (shaders?) on behalf of the CPU. These are
+however not poilled like the CLA, but signal completion using a
+mailbox interrupt. The accelerators are
 
-Exclusive to what? Please be more specific.
+What is interesting with the SPU is that it communicates by creating
+a custom filesystem (spufs) mounted at /spu, so this is apparently
+another design venue to consider.
 
-> Signed-off-by: Jean-Philippe Brucker <jpb@kernel.org>
+I think Arnd Bergmann has worked extensively on the SPU so he will
+likely be able to provide input on lessons learned, do's and dont's
+when it comes to this and other accelerators.
 
-(...)
-
-> diff --git a/drivers/misc/arm-cla/arm-cla.h b/drivers/misc/arm-cla/arm-cl=
-a.h
-> index c9ecab5ab6bf..43a58a329525 100644
-> --- a/drivers/misc/arm-cla/arm-cla.h
-> +++ b/drivers/misc/arm-cla/arm-cla.h
-> @@ -105,6 +105,7 @@ struct cla_dev {
->   * @lock:              Protects the following members.
->   * @ctxs:              All live contexts, keyed on cla_ctx_key.
->   * @queued_ctxs:       Queue of contexts waiting for assignment.
-> + * @nr_ctxs:           Context count. Negative value for exclusive assig=
-nment.
-
-Describe here what it means if a context is excludive,
-
-> +static int cla_domain_get(struct cla_domain *domain, bool share)
-> +{
-> +       lockdep_assert_held(&domain->lock);
-> +
-> +       if (share) {
-> +               /* Time share the domain with other contexts. */
-> +               if (domain->nr_ctxs < 0)
-> +                       return -EBUSY;
-> +               domain->nr_ctxs++;
-> +               WARN_ON(domain->nr_ctxs < 0); /* LONG_MAX contexts?! */
-> +       } else {
-> +               /* Reserve the domain for exclusive assignment. */
-> +               if (domain->nr_ctxs !=3D 0)
-> +                       return -EBUSY;
-> +               domain->nr_ctxs--;
-
-Maybe:
-domain->nr_ctxs =3D -1;
-
-So it is clear what is going on?
-
-> +       }
-> +       return 0;
-> +}
-
-Notice that here the _get() semantics are reference counting as is
-proper, compared to the other _get() in the series that I complained about.
-
-> +/* Undo cla_domain_get() */
-> +static void cla_domain_put(struct cla_domain *domain)
-> +{
-> +       lockdep_assert_held(&domain->lock);
-> +
-> +       if (domain->nr_ctxs =3D=3D -1)
-> +               domain->nr_ctxs =3D 0;
-> +       else if (domain->nr_ctxs > 0)
-> +               domain->nr_ctxs--;nr_c
-> +       else
-> +               WARN(1, "invalid domain refcount %ld\n", domain->nr_ctxs)=
-;
-
-Looks good
-
-> @@ -53,7 +85,7 @@ struct cla_ctx *cla_ctx_create(struct cla_domain *domai=
-n,
->                                struct cla_ctx_key *key)
->  {
->         struct cla_ctx *ctx;
-> -       int ret =3D -ENOMEM;
-> +       int ret;
->
->         mutex_lock(&domain->lock);
->         ctx =3D cla_domain_lookup_ctx(domain, key);
-> @@ -68,9 +100,14 @@ struct cla_ctx *cla_ctx_create(struct cla_domain *dom=
-ain,
->                 goto err_unlock;
->         }
->
-> +       ret =3D cla_domain_get(domain, key->type =3D=3D CLA_CTX_PL0);
-
-Add a comment that we can share PL0 domains only.
+My superficial appraisal is that the CLA is probably executing smaller
+jobs, snippets of work rather than entire little programs/shaders like
+the SPU does, so it is conceptually different, but may provide
+additional ideas anyway. Arnd?
 
 Yours,
 Linus Walleij
