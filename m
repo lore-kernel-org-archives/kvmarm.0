@@ -1,100 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.178
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795668789;
-	b=AQBDetre2t+W0Uk7rRNlntdNWSVaOx4gD/IzYP/LReQ/1blK9RuVP22oUpCusep/3eOu
-	 HjWAUUrgNdHOVTwfoKcoXiYDoas6G3z5I2wNnWwJbHMxP8RNDx52CuwhvXMrDOHPlUiVp
-	 pbW0XjnXMDbxqJClWFHd95hgIGi9RD+YSUP7TNQ+bSJjg3laRdcFa7lVyugFOGTJ23J7W
-	 Xcrm3xImzoEW99S7Z/bGsQWdzhLM9DklJPFNrdWvg9NO2cOtHbx5bL73utNkX2kIgVm4b
-	 M/dgPnR17DzvFVbWGubdpF3sQIchuDkTQ8ZSvsJDkHK0DL0MsynMVNgjlV9PR6/3t+Q==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795668789;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=3Lt4WVagAGoPNQQ8sUuV+xbM6KmxoNVjHzW8jPpsfl4=;
-	b=4LIg5IcSOwx1kvDe9W5eM5bbcR8XwdWcLmv5XEpUPXqQCchaOgOMZOi/h+umiFJU9C9a
-	 i/eL3ZbROP3SrElBwKwmAnrGvYOA6XjScgdUWo6Jcqpn+30G/CpKnB6+a1HwYD59LMkiI
-	 2LWyOGooAA/KS4j474FDggzFKa41w+V4pkTg872XjiL2ngqPbEw8c3sPsCGkJPfd2QWZB
-	 cA4m8x+dSFzy3uo889PgMCOO6tIVixZPs2HFYZMBOLSE2e+y+ymZuKJ1Q94ismJSeKIm7
-	 HPQKcECGYQhRdgkjzCD01svFV5mv2j5lLGi6lDUZJ76eJQJraYcoYjQ6Oh3ueGVdytw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Wd+w00+j;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.178
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BC3606A32C
-	for <kvmarm@lists.linux.dev>; Thu, 26 Nov 2026 04:53:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 57BC3606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795677924;
+	b=4VmU7zRzLv6TkHf/hbrjQRCVHw3yRxkk7ogKGcRLv1R5OSlKXzR/177ieTWcwFND45lV
+	 tf08+7umFvGFvxSo6akxHLBcqowJxBIdTErJbKVROw008H4VmPDMUekrsM9R390BkJunO
+	 OIUyvYE9VurPNG5rFoBpSwRz6j8+K/Vsnla8E0pic5AEwzmxApd1XECY+0z5tvecrecvQ
+	 3RbCO6iCjSfPH50pu0SuE4XU9VYjm8SpJk+xJCGmLEdnHdC0FrAoaiUNJne7kzQgk3X0H
+	 PqwxmqdDt7X7CwQXUCfWiz2cijAbs+qTXpF+dL2gs0XQdaWWf283a5ms/nYIR1FW6YA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795677924;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=N3QVgukA5qJJPhjxPDWIGy+6WZwkUo9uICIUUy2pb5A=;
+	b=055XyrBtVEc9eCMsJ2sTc2P9haX3u6/nGiKWMq6w2J+r5oi9hZtIDumZBefZbGzk1ZFW
+	 Q0L7DEnId0zyj09/uWd4H4IMy5CW/GAqF3RZW1By3grvY/oKpLarhUMsH/puWlXo5gYDT
+	 PSrcywLNZ1KyJN+0mpjsxk8mDr8xcfkMkXzsgRZr/CjiCGNeImMUyn0bbjWxv7mCGUFw7
+	 zLr8ttNQjKra8WySiOKVwU6drYUFw/ZJbfd6ZEVC1Hadotk/A1EmJF6eQWbvYwqw9ehEU
+	 6E6e02rWEW2Yy7VKZWV1J9J1oopkETTX9R+BmIedp5vCzsbtlsFDsi7HZ+zKdGn3btg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="bV/nqyeX";
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF77606A31C
+	for <kvmarm@lists.linux.dev>; Thu, 26 Nov 2026 07:25:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2CF77606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Wd+w00+j
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-55c7445cf85so1381061cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 20:53:09 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795668788; cv=none;
-        d=google.com; s=arc-20260327;
-        b=jSPoY6Rozj+mUZc+WGe1DvWuhy4wYTStKe2hoTSZu1HZKKI+lDdmKKywkr+qkdVUvo
-         n+RuLB97iJfMOH7LBIc2MhyE3LSozGepvmQVmciA2OtNZ6ZJUZg9xtYFri/T8DOoyUDf
-         EDdywutU092ASXm6TLWr080zayKNU1Y/OLQ95QQcnLNr7Q9eJfwzqalOmOqAbN4qFgTI
-         2sm7Bs4Owf9AW862lsRONmSUC0aDcsMYw09kcw6eJGP0h+MgatZp5UkUxzhN0A1FlRJU
-         KqJ5VxEFPGtvnWcJLHLhogkTlQttsGK4kf6mMB6Q7rPFJ1xutgIzqbSnCJHSmdTkZyFS
-         RxRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3Lt4WVagAGoPNQQ8sUuV+xbM6KmxoNVjHzW8jPpsfl4=;
-        fh=peWThKuqxrCMK7lZ1XkW0UTGd3MxaraWIspQPHDJTXo=;
-        b=KNAiMWBI8kVsCgaWjFCifAQ0GAO+vNf3a6rcE2j2KPOslA1zUPksFaAqJXo+2r7DmN
-         X+pMmkeg4EZEg8WnhqJbncXauQ6/FPHIHeinEPlGZvr3WGUaIkWHlTR99pGY4qcbsVZe
-         IoY8wbLyFdMd6c62zUm2cOSdmwSLqBgqyEvPqX07vzmYynLZVJWhBRGLJs33oE1vx373
-         Z4xk4NFDnC0T95U2UixSu6X8kj5mFWQVQat2SloZ4/XDqupOuQ7xxu+ms4JZkcULyh7P
-         nsm/NTQLwVpTvjGqzHhlU4d0r7V2M482DL28yfV45l7P8EWq5GsSE8ZNuAnL47SbgfPe
-         7WUg==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795668788; x=1796273588; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=3Lt4WVagAGoPNQQ8sUuV+xbM6KmxoNVjHzW8jPpsfl4=;
-        b=Wd+w00+jwprH2Z7WaB0z9B+eXn8VFSBg9vXrPggY+8dvXkKNWOGXmmPPgXtKo2cs0b
-         1Nv6r3K5sy9ukrueHL7Qd1zX0NXV9GwTnkcV34yL+j5AzAfXphYvGjTiQOZKel26sS0O
-         RESaNfPrqDL3xjKl+UIAQ6h+6TKCeoZdfhY6ngrtyMs5l3QLeK+f4hwUCTTSC57hfcsx
-         SkNmH3CbqFox4LsvPxIcdRg98abwh0ObP/OSXed2HoTnMOAOfaT2jlHrXmEIlsp55aFf
-         gEQ3c2lOlTlHAblApePu2yA6ObqmDo42EdaxXuLX1Jxqqx9ZB1hLJqzbeUdRef9VS85k
-         0jXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795668788; x=1796273588;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=3Lt4WVagAGoPNQQ8sUuV+xbM6KmxoNVjHzW8jPpsfl4=;
-        b=gFUtAbrT0WeBD3Q5vQl7SSLmHYuWhrA+Ixn//BVZhEVJyE2ng0HSC7Lf72amAOnh8i
-         BpxErX3aeR/+Cm1qWc3NDwfQpgEf2iS30lXI+iLn3rrHCvxkoxfVsBCY/kxLvfJobSgk
-         4ufdFonhdzRp6iDLnGI19MJtWw+mQAWAvBxfeE643NRQVo7A62v2UcRh16vDqF5OKsAS
-         8lr5ext1x4lfD6Eupr+/JbtOlG7JxscXjpDsr2u5h/wc8BUNBowSx2WpSyrOJJJp8GIm
-         pngRAqwgbsXKMejTQNYZREeKIikthk5GzYUb14aY+SzyhjPbLulnG1gE9/p+BJwpXUH/
-         aKOg==
-X-Forwarded-Encrypted: i=1; AL+hErFB/TJlviIVGhtgJ63cqHxxHwyiZa67mrd7FJdGkfDdH293I/yuID5kDT9RGjkACh94IDXns3c=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/3h2uoEbXLAlVTnwFUojoGYkftgJfwq9YVRE1GmtyYPF/1q3Q2
-	UVFam0lw5KF8VS8rqIHecIVCSOrfSe8hETJp++OQQvgR5F+WGqLBR3K5U4QrRzBd7v1lpskKVfw
-	jKCbRPlsw7K1xhTFDVFyxCvXZ6kQW0VLz87e9QlGP
-X-Gm-Gg: AZFdTZeDF37hHbZfmvsr86wX8clDiztFH2fJySYBaoV+WLXlgGi36qIE0+Y7jIt/+R6
-	YmXLTQ94kp/XKwNpjbyxEPvZwBvTMsab5y97XYZ3tzIMkbz8UQMKgMdlhKZ4/zAEHvWlWM1RdtM
-	R59YKnesAz3x+UjBB263ggDuuBgN5Zc9pRHWc6L3GfVXYkqdejXyHawl2Ihm5NFNS6HcEObY80u
-	Q8m84DBJ3aohpjT3bnEX4LBVy1/Wh7cdyMTX8vkOq/qqiuWz00MQOSnFoBXyYWKqEBprtfy5Xrw
-	bZ55MYLjDVZgAZUs6luI5DttkWxEJF+jADJhUeFuH/I72VSu1Ybl06YMjPqak3zjQl01wchsdTp
-	pB9SOkGBOwbSR6abr7vh+unEwHCP2FWhDYgmNob/2G0O0L7LU+yQC9HTZ4Q==
-X-Received: by 2002:a05:622a:1e86:b0:536:3ee4:81cd with SMTP id
- d75a77b69052e-55d88127bafmr101738501cf.4.1795668787640; Wed, 25 Nov 2026
- 20:53:07 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=bV/nqyeX
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 20406339;
+	Wed, 25 Nov 2026 23:25:19 -0800 (PST)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 277EA3FA7A;
+	Wed, 25 Nov 2026 23:25:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795677922; bh=W8p9IFPoop55wdnARjeEf3Xh8Vk1OfULBvf4VJtucz8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bV/nqyeXXxc44EKXd7FYgJAAx/VLSTXikazIrO+oFBmosOUrdsSad1saMJJ2P4k7s
+	 JGIMTopBlXZvbvTd3Q0JC+vM4m86TVz72p40U0e4LjGpRx3UxLidvnS3TH+FFNLA3q
+	 7UfZ6pgrOGQPCRmlk7W7FyrySvr+CldXOwZvT/Iw=
+Date: Thu, 26 Nov 2026 07:25:05 +0000
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Aashish Sharma <aashish@aashishsharma.net>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Ricardo Koller <ricarkol@google.com>, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Do not free split_page_cache in
+ kvm_arch_flush_shadow_all()
+Message-ID: <b3qbghvxkqs5ntr6cptcbih2cocvnqyu5lousloeazdun4625s@thr2qxpszw2u>
+References: <20261124224959.685002-1-aashish@aashishsharma.net>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -104,56 +65,119 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261125061523.1540234-1-irogers@google.com> <DN4FM3TBOJ9T.2QOOL77P5HETO@garyguo.net>
- <20261125132225.00254c37@gandalf.local.home>
-In-Reply-To: <20261125132225.00254c37@gandalf.local.home>
-From: Ian Rogers <irogers@google.com>
-Date: Wed, 25 Nov 2026 20:52:56 -0800
-X-Gm-Features: Aa3M54pMQmXw5Cgtc0EakW9NOiIZs8STgUuBigJfJMSZlzejGTE6XZMetCnzc-8
-Message-ID: <CAP-5=fWkUW787c4dGx9rccucqD67dfRgwBB_SoCxFnfZXtXP-w@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/30] unwind: Minimal DWARF CFI unwinding for user
- and kernel space
-To: Steven Rostedt <rostedt@goodmis.org>, Gary Guo <gary@garyguo.net>
-Cc: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, jpoimboe@kernel.org, peterz@infradead.org, 
-	mingo@redhat.com, tglx@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, 
-	x86@kernel.org, catalin.marinas@arm.com, will@kernel.org, 
-	mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, pjw@kernel.org, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, 
-	linux-riscv@lists.infradead.org, acme@kernel.org, namhyung@kernel.org, 
-	linux-perf-users@vger.kernel.org, mhiramat@kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, bpf@vger.kernel.org, 
-	nathan@kernel.org, llvm@lists.linux.dev, nsc@kernel.org, 
-	linux-kbuild@vger.kernel.org, ojeda@kernel.org, 
-	rust-for-linux@vger.kernel.org, ardb@kernel.org, linux-efi@vger.kernel.org, 
-	maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, shuah@kernel.org, 
-	linux-kselftest@vger.kernel.org, indu.bhagat@oracle.com, jremus@linux.ibm.com, 
-	wnliu@google.com, dylanbhatch@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261124224959.685002-1-aashish@aashishsharma.net>
 
-On Wed, Nov 25, 2026 at 10:22=E2=80=AFAM Steven Rostedt <rostedt@goodmis.or=
-g> wrote:
->
-> On Wed, 25 Nov 2026 16:28:02 +0000
-> "Gary Guo" <gary@garyguo.net> wrote:
->
-> > A quick question: how do you plan to get this working on 32-bit ARM whi=
-ch has
-> > its own EHABI?
->
-> Do we care? Isn't ARM 32 mostly deprecated at this moment? Or at least no=
-t
-> adding new features.
+On Tue, Nov 24, 2026 at 02:49:59PM -0800, Aashish Sharma wrote:
+> kvm_arch_flush_shadow_all() is called from the MMU notifier ->release()
+> callback, which can run concurrently from __mmu_notifier_release() and
+> mmu_notifier_unregister(), as well as concurrently with VM ioctls
+> accessing split_page_cache under kvm->slots_lock. Calling
 
-There has been recent work on both MIPS and Alpha for perf events, so
-supporting ARM32 EHABI doesn't seem unreasonable. Devices like the
-Raspberry Pi Zero W/WH, which use a 32-bit CPU are end-of-life in 2030
-(according to https://endoflife.date/raspberry-pi ). It is
-out-of-scope here, but extending the kernel and verification
-infrastructure shouldn't be hard.
+I don't think VM ioctls can race against ->release(). VM ioctls keeps
+current->mm and KVM fd alive, so ->release() cannot be called.
+
+However ->release() can be called in parallel if the last mm and KVM fd
+reference gets dropped at the same time so there is still a race.
+
+> kvm_uninit_stage2_mmu() there invokes kvm_mmu_free_memory_cache()
+> without locking, which is not thread-safe and can double-free
+> split_page_cache.
+> 
+> Call kvm_free_stage2_pgd(&kvm->arch.mmu) directly instead.
+> kvm_arch_destroy_vm() already calls kvm_uninit_stage2_mmu() once after
+> mmu_notifier_unregister() completes and all VM references are gone
+> (see commit a3ca3bfd01b7 ("KVM: arm64: Destroy stage-2 page-table in
+> kvm_arch_destroy_vm()")).
+> 
+> Fixes: e7bf7a490c68 ("KVM: arm64: Split huge pages when dirty logging is enabled")
+> Cc: <stable@vger.kernel.org> # 6.6.x: a3ca3bfd01b7: KVM: arm64: Destroy stage-2 page-table in kvm_arch_destroy_vm()
+> Cc: <stable@vger.kernel.org> # 6.6.x
+> Signed-off-by: Aashish Sharma <aashish@aashishsharma.net>
+
+Can we just remove kvm_uninit_stage2_mmu()?
+That's one less function to keep in mind.
+(skip split_page_cache freeing in kvm_arch_init_vm because no one can
+use it yet, and keep kvm_free_stage2_pgd() in kvm_arch_destroy_vm()
+because of a3ca3bfd01b7)
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 21cd872ea394..6f04f21497d8 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -303,7 +303,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	return 0;
+ 
+ err_uninit_mmu:
+-	kvm_uninit_stage2_mmu(kvm);
++	kvm_free_stage2_pgd(&kvm->arch.mmu);
+ 	kvm_destroy_nested(kvm);
+ err_free_cpumask:
+ 	free_cpumask_var(kvm->arch.supported_cpus);
+@@ -354,7 +354,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 	if (is_protected_kvm_enabled())
+ 		pkvm_destroy_hyp_vm(kvm);
+ 
+-	kvm_uninit_stage2_mmu(kvm);
++	kvm_free_stage2_pgd(&kvm->arch.mmu);
++	kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+ 	kvm_destroy_mpidr_data(kvm);
+ 
+ 	kfree(kvm->arch.sysreg_masks);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index a0d4981ebb99..f3bfff15f193 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1117,12 +1117,6 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+ 	return err;
+ }
+ 
+-void kvm_uninit_stage2_mmu(struct kvm *kvm)
+-{
+-	kvm_free_stage2_pgd(&kvm->arch.mmu);
+-	kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+-}
+-
+ static void stage2_unmap_memslot(struct kvm *kvm,
+ 				 struct kvm_memory_slot *memslot)
+ {
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 78d5b18dbd2d..9b455533e128 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1480,7 +1480,7 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+ 		if (!WARN_ON(atomic_read(&mmu->refcnt)))
+ 			kvm_free_stage2_pgd(mmu);
+ 	}
+-	kvm_uninit_stage2_mmu(kvm);
++	kvm_free_stage2_pgd(&kvm->arch.mmu);
+ }
+ 
+ /*
 
 Thanks,
-Ian
+Wei-Lin Chang
 
-> -- Steve
+> ---
+>  arch/arm64/kvm/nested.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 4d83281a7a28..2440ad9fed87 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1472,7 +1472,7 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+>  		if (!WARN_ON(atomic_read(&mmu->refcnt)))
+>  			kvm_free_stage2_pgd(mmu);
+>  	}
+> -	kvm_uninit_stage2_mmu(kvm);
+> +	kvm_free_stage2_pgd(&kvm->arch.mmu);
+>  }
+>  
+>  /*
+> 
+> base-commit: b6a9fa34ce4187cb69d3c588a4bbffc31ce5db8f
+> -- 
+> 2.56.1.831.g720f3f5937-goog
+> 
