@@ -1,83 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795708694;
-	b=0T4HQW6cSs+jW0onj8cNGn37MkWUdQ52lMqwHDpN/KS5OKAlRg9FghJU9EJZwOeCjFhL
-	 UFay5FsjmyN/3JQL7N3dW77P9MxVplXj2Qtj+Qky+zk8++2YfE3doHKYK2a5YfGVonzko
-	 9SDIkCl3gzPmeFN6QOydrG3NXWDF9cBqMI1wz0oZK1ia8Uct/0njrkZPN7UB1jIwxD7jh
-	 q+xkiUWK1w7q/uFN4ZVJ1ULBGpFzZwMlpk5G+Zym1WqULd2Q49SsBSubYW3rRarUaoyZZ
-	 c8+rfBlbKBarJYcRU0TqOpJmmY/AKAWD+KTcpqUd6wUJ7I/VT9bw8Iq3jpHCRYRJvQg==
+	t=1795709338;
+	b=5eESC/GLso4ckKZ9rExk3QofaGCltFL4zp8k+SXU5UkERd0wVO/UZPulWxpi0vZM5e8a
+	 hBhu4j5QxPrwq835YYgwv14LP0LFaf//iShdt8fi+uLQcUigvq7tBF9GCPtlrQiMpjtk6
+	 AJpKUBkFs3pweB4/RPXf2mxOvxJs+WWL0wfIM7MRSVLrZPbG23kvNXALSsy2ucZcDBhz7
+	 8VoSfjChT73UR5chNxRnUtT8UxLFx3YsPq6LAOqjfSOxhxa/2GWWUPognC1O26G+TBu/U
+	 8SsDDxdIv5gGBbFBUbRWug1XOc01MPjsfTGwUGLGJTevGdmKwG2StFhOKS9hnVSIdlw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795708694;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=wTk/8x0Maq/XwIFmVoNU0U+Iy9cYA+BinE6p+h+LkZo=;
-	b=yfxmuOXHLnmLPRFoDL31HjvdZDdnWKagAS66Y8eVaBxgzHTXp6xJtjYt7/ytWAiH6YnY
-	 j0PPpHeyzTmFuYXq6WDtvcBUrxReMl7LfhWv6tvNhuVqXm4eMCZH9HcrXL8/bcS7rbL89
-	 PId/wJvgLNp/NBW2IC6CpqWW8h6guHtARJNqMAxsmX/H1WAGvZRFro59a2O3xVBVAvThb
-	 lRkxfMb6zexXgFc/GHTwbe0TznJF4ZZqW2KtwoREZfQj1+ux99bKCILBnbOiMGTvu7q52
-	 qW1Jj/nhxQqm+nNZXaDExLaEW18YsfkU6qClUBxofYArwzknHJ4Ak76geFtqpnaYe6Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795709338;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=DLjUQ0HLK8s6BPwACEgbTcL7p51N6h9aXcgetQhJ5wE=;
+	b=fysOSYWUPwqhDiRBLoeeL3zmuEX1zYwooqSW+ruFwz89vskfD09K7ILpH9fKmN9YSw7v
+	 PeV5SYDwyhQ/x9zx2dL0rl85RL2wEyfoLpnh942E7Axq+strGamYsJmQS/LJZ5sgCyEiA
+	 XiItFtaBfh9tWxhNOExQFb9HnpST73X6Yn+8NNbpV96ht9VuMLO78hlbjf0esoFP0o/pv
+	 tKea11GaSbqKWnJ+xpMN2lBQy80m3tFMpa7AVlDJVjIZWliBiVuuyTqiKpDTG5eepJS7I
+	 Npgtv3lWWUJp0rKlrnKeRx7xJPywww/UpWpmbcbA48GjgZNtRg7FuHgD6/vTnbTDAFA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="KTinv6/9";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YUMaSnJF;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7B4606A31C;
-	Thu, 26 Nov 2026 15:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FFD606A31E;
+	Thu, 26 Nov 2026 16:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KTinv6/9
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F1031F000C0;
-	Thu, 26 Nov 2026 15:58:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YUMaSnJF
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E32C91F000D0;
+	Thu, 26 Nov 2026 16:08:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795708694;
-	bh=wTk/8x0Maq/XwIFmVoNU0U+Iy9cYA+BinE6p+h+LkZo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=KTinv6/9XW8poNeJxb6crvd9x0P3Pt7/JXTjwWUmk7jdJhc+wCc3iSrzc+dTSIMo9
-	 EpxSDtM8kLQz724vqv3ed6peCv30TBNTHjEYAlG8zwwG8bx9i7rPFSYG1BReNVmAIR
-	 t8VCRseKp07XNkeFkm4v8PEZSZiQMpdI8A9g+VOHfwrYA/FwrghxQXROeukrrZMmtD
-	 mwwmhl8jyNgMXPkP1MccTfUtNxU2qZTTSW2iPeOhvAqolFa+KlZhSmpEUCf4RpqCeO
-	 P8Vb7Un+F3kEaKFlffed4haDnxDEwPVz6pOISdJ4lGOvkJiywUfkw5eO6EJV/KyW+X
-	 +ZRa/ZgSO+mQA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xWbrP-00000003iUw-3gu5;
-	Thu, 26 Nov 2026 15:58:12 +0000
-Date: Thu, 26 Nov 2026 15:58:11 +0000
-Message-ID: <86v75jy48c.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Usama Arif <usama.arif@linux.dev>
-Cc: oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	mark.rutland@arm.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	riel@surriel.com,
-	shakeel.butt@linux.dev,
-	kernel-team@meta.com,
-	rkeilty@meta.com,
-	atish.patra@linux.dev,
-	dgreid@meta.com,
-	Lorenzo Stoakes <ljs@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Reduce the stage-2 page cache on 64 KiB hosts
-In-Reply-To: <563d2406-dcfe-43b6-8f21-2a7694f1f266@linux.dev>
-References: <20261124152842.2634495-1-usama.arif@linux.dev>
-	<86wlpzycnn.wl-maz@kernel.org>
-	<563d2406-dcfe-43b6-8f21-2a7694f1f266@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1795709338;
+	bh=DLjUQ0HLK8s6BPwACEgbTcL7p51N6h9aXcgetQhJ5wE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=YUMaSnJFy3upxu2uKVvNyvyEmBNmdKR2s8a9SQfDsb/I6ad8vW98yuZSb/L9He+QC
+	 q0Loz9PWiYD2hI1+rgV/ar5z7B9qIXdayGw4WcvRijzEawQP6rhFdG7t1zDGsF7xGH
+	 A3HpC8dsS41P/xO5oVu3gHyQr7zh0HQz1LIoQCJuJbA6WK65rd06yGyxYtGigTmi5u
+	 RE6EcV3fmlScBlZCQkuWohiOQ5VC/Sxhf9rx7PdfVhDYSyh/TyigKOgtklp0s6yJuK
+	 OAmBU+1xn0FLaY+xIDsBbqYSj/S6sBAnjKeu3TjGmHjWjQIhjZj7FNh+mAmH66Kkjm
+	 ysTZImXrwDk7g==
+Date: Thu, 26 Nov 2026 16:08:51 +0000
+From: Will Deacon <will@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com,
+	alexandru.elisei@arm.com, andre.przywara@arm.com
+Subject: Re: [PATCH kvmtool] arm64: THPs for systems with pages bigger than 4K
+Message-ID: <awhZk3NrkqeGvQxC@willie-the-truck>
+References: <20261019145949.1922019-1-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -86,39 +57,33 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: usama.arif@linux.dev, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, riel@surriel.com, shakeel.butt@linux.dev, kernel-team@meta.com, rkeilty@meta.com, atish.patra@linux.dev, dgreid@meta.com, ljs@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261019145949.1922019-1-vdonnefort@google.com>
 
-On Thu, 26 Nov 2026 14:32:04 +0000,
-Usama Arif <usama.arif@linux.dev> wrote:
-
-[nonsense deleted]
-
-> > Now, to the patch itself: I see no reason to special-case this. If
-> > kvm_mmu_cache_min_pages() is an indication of what is needed, then
-> > this macro should be driven by it, or the whole allocator take it into
-> > account. And then you adjust it by whatever fudge factor seems
-> > appropriate.
-> > 
+On Mon, Oct 19, 2026 at 03:59:49PM +0100, Vincent Donnefort wrote:
+> The THP support imposes an alignment of the memslot userspace address to
+> the size of a THP (PMD_SIZE). To do so, kvmtool overallocates the RAM
+> size and aligns it. However it assumes PMD_SIZE is 2MiB, which is only
+> true on 4KiB page systems.
 > 
-> Completely agree! [1] does that: no page-size special case, and
-> a capacity of KVM_PGTABLE_LAST_LEVEL - KVM_PGTABLE_FIRST_LEVEL for every
-> page size.  It can't track kvm_mmu_cache_min_pages()
-> at runtime: the vCPU's cache is shared by the canonical and NV shadow
-> MMUs, and its capacity must stay fixed. So it has to cover the largest
-> minimum, which stage-2 caps at 3, and 4 is that plus one page of fudge.
+> Use a huge-page size, based on the system page size. This value can be
+> massive for a 64KiB page system, so skip the alignment if we couldn't
+> even install one THP.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> 
+> diff --git a/arm64/kvm.c b/arm64/kvm.c
+> index 36b3284e4a92..2c01dc32fa9a 100644
+> --- a/arm64/kvm.c
+> +++ b/arm64/kvm.c
+> @@ -18,6 +18,8 @@
+>  
+>  #include <asm/image.h>
+>  
+> +#define HUGEPAGE_SIZE (PAGE_SIZE * (PAGE_SIZE / 8UL))
 
-Of course it can. That's not exactly rock science to add, rather than
-relying on another set of bad heuristics. And this must cover more
-than a single mapping per top-up, because that has a ripple effect on
-the speed at which we can split large blocks (funnily enough, people
-care about that stuff).
+Does this invoke sysconf() twice per invocation?
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
