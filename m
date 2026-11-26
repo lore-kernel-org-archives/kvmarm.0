@@ -1,80 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795693855;
-	b=cHHmO1kpM9q+Ro9DyddiRXZgJ4n8outc4+sJj+SEjolPso5WNO/DsXy6vZx+tQ8JocMh
-	 GCbQT7ndNvwJqV+E/5Kv8EbQDYMVn8yi5ioPAQOLxsr05rTlQQ3R9vN6h8jRuUgN3S06+
-	 yf9W+jfCGHwN01b8jyDjIIB8rAUx4hM9vO132DQOHpGwL2BSfV5Jq1wbIeelrsI0+WBVH
-	 mrWuQMR7gkKia2y9Q2Ilex3UgWNWXxWsGedo3Gl5dm8nW5DARHr9r7iulXUmfDVBVcNui
-	 ABxypPnHEknPTW0ZxvN3gvRI2nLhH6OvJpGDg8UDhTNTv0ZRLAPGSu4tyZwnTLh/ZuQ==
+	t=1795694678;
+	b=oWc0/HJ+UMesAfGVxNOBd6Jy8eL7qyKYdFMQLillRJr2WDGlTlKJnIz+2HPOSOiGg8AZ
+	 8vAe5Ja9dU/VvNt0XoHr80aAKGz4VD9p6rML0ovjlTWt3EpkiWCOW01OoaEUvYU6zCySt
+	 8iWM2VJX7ZDQ5YIuJNtWqrpAHgiIwAF8nL0rOpKLzNb3WyhwdlLQbA/cS1BHqK0mfltfc
+	 no7MEpyuIad8vWHmNel1gBrWiwJ2/EOLK7ETGHfr3cC4gOVJ6JVXUaKznx58d3TZGK8sA
+	 X0Pp4hRSF8U+tRT8G/q1GwpmHq674uUocQey0w0f78xlt7StwYA4rKso6Aa8sFWrmxw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795693855;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=EL1rGzuTeW3MVgLe5/KZaT1wUaWiPydzOexl70Ne1SI=;
-	b=a6ogADunXCDjJ3NBsweT3U8fcFbF0UA76GvwQLbewgC4WyJhYh8zSa0xYqjJZswIffSb
-	 jltjiA6cq6Y/JdUtxbrxO2nf8mFVvy8xjt1RNzhuk0sOOXmV7pQ9SmuaryDN5sDiwe474
-	 9epEcc5tpfuqy5AP5KdisF7s/4c5BMN+7hJ70qoyPyf39+XnBj0EtK0mZuOWiZzulcUWD
-	 jDt0TnhYMt+ZjT21GqeSecA/wR/iq3n7ZbGMyrUt9d6UU74aO/UgtqxW/rbUT3RYGyECq
-	 MB4aV2rRniu3NGidZsfPdt2oF9iNpdvOoMko88S1aJHRzdicW8MD1SnyTOGz6ApsLMw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795694678;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=3dUYzLV/td3yOtQmZ0QB4MKkO835tg4L7TOKfdmw8Ow=;
+	b=JqPp7xluKGgkULJZC8HLELDM6TvgzHaAdkOcrd2xBKHPJa406N7BXmGRUF0dhCQYz/HL
+	 OWo2FY7gsXahs3P6g1mLu39BuMPnMMQRR87Qs2wGP5/UbLDjy/pgkB5HLYIusd/AFwxg2
+	 zOIGpTSRvuIjnk3O5mSA2rRFK/tD9J7at1CXLSqsFpl4k5MD3QOo6Iyx536LafwCLm1tJ
+	 c/FCVxDZD+edrYc0mnTzRCNokDtt39bwZRy3nFfi+/q0SFkR4qcwoDgOfBT4hhI67z+9h
+	 9hVZ4Rmb91WeXauJpmt3bM7DXK4sjH4F5tnbkod0QeH49iGQcfVL1mPd9Pj7ZOMPWGw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=sg+Hr6MK;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22C08606A326
-	for <kvmarm@lists.linux.dev>; Thu, 26 Nov 2026 11:50:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 22C08606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TlgeGOir;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F32606A31C;
+	Thu, 26 Nov 2026 12:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=sg+Hr6MK
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A47481CE2;
-	Thu, 26 Nov 2026 03:50:51 -0800 (PST)
-Received: from e142392.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CD8C3F632;
-	Thu, 26 Nov 2026 03:50:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795693854; bh=BAzpj4e1o9HZLbqYKvamfN3ccwawKGBx7s3KRS4gDEg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sg+Hr6MKDsS0eivBvx6N2sk0aF+F8MRF5M2sQFgSJRyQYHznSza1v9EhzYEBrS1hm
-	 8THRimgD3p1aIaCT8x2/7B5w/Z4ZUl7PhXeGdC3JTg0+QWuXeuq+QQgQNS7xSEbQiQ
-	 Rj18EDFHUSe3XyXJMIjdoqepJk8Oi5UuR8WstqJM=
-From: =?UTF-8?q?Kristina=20Mart=C5=A1enko?= <kristina.martsenko@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	linux-acpi@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-efi@vger.kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Linu Cherian <linu.cherian@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Hanjun Guo <guohanjun@huawei.com>,
-	Sudeep Holla <sudeep.holla@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jinqian Yang <yangjinqian1@huawei.com>,
-	Zi Yan <ziy@nvidia.com>
-Subject: [RFC v2 13/13] arm64: tlbid: Add documentation
-Date: Thu, 26 Nov 2026 11:49:36 +0000
-Message-ID: <20261126114936.864256-14-kristina.martsenko@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261126114936.864256-1-kristina.martsenko@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TlgeGOir
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B05BC1F000D1;
+	Thu, 26 Nov 2026 12:04:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795694677;
+	bh=3dUYzLV/td3yOtQmZ0QB4MKkO835tg4L7TOKfdmw8Ow=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=TlgeGOirwVIGCy+faEKzfzOtYCzU0Hcbc+IGO4+zce+NfiNtLjqkU1aQvo7aORyWM
+	 2f1pNlQOGkWu0l+TUWcv7Ah7CNFSHdxdZoIbulcEGwI5vJve/M89G8jN2NJO96BHXg
+	 31IRzV0ut0y77Q7sRDsipP99W6JMPJ5Ctsj9ZS2w+qwidHTcrGxyF0LUov3Dfm/MEk
+	 5vtp8F6aZ/F7DmH0Sodyf9Q8Cix3HrwoZlYeUGbUhOd7i6bDB/tLPZJg23ocdacasc
+	 paJ5jIpAQMgUJ0Jxlj3CNqvVW039zOyXCjHjxDoWyJj8swOb3uh94LvH5FpyV1oQA4
+	 2f8xtvWOwHe1Q==
+Message-ID: <sashiko-outbox-235472@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [RFC v2 07/13] ACPI: TLBI: Parse domains from table
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?S3Jpc3RpbmEgTWFydMWhZW5rbw==?= <kristina.martsenko@arm.com>, kvmarm@lists.linux.dev, linux-efi@vger.kernel.org
+Cc: "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>, "Mark
+ Rutland" <mark.rutland@arm.com>, "Ryan Roberts" <ryan.roberts@arm.com>, "David
+ Hildenbrand" <david@kernel.org>, "Lorenzo Stoakes" <ljs@kernel.org>, "Linu
+ Cherian" <linu.cherian@arm.com>, "Anshuman Khandual" <anshuman.khandual@arm.com>, "Lorenzo
+ Pieralisi" <lpieralisi@kernel.org>, "Hanjun Guo" <guohanjun@huawei.com>, "Sudeep
+ Holla" <sudeep.holla@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Oliver
+ Upton" <oupton@kernel.org>, "Fuad Tabba" <fuad.tabba@linux.dev>, "Joey
+ Gouly" <joey.gouly@arm.com>, "Steffen Eiden" <seiden@linux.ibm.com>, "Suzuki
+ K Poulose" <suzuki.poulose@arm.com>, "Zenghui Yu" <yuzenghui@huawei.com>, "Ard
+ Biesheuvel" <ardb@kernel.org>, "Ilias Apalodimas" <ilias.apalodimas@linaro.org>, "Jinqian
+ Yang" <yangjinqian1@huawei.com>, "Zi Yan" <ziy@nvidia.com>
+In-Reply-To: <20261126114936.864256-8-kristina.martsenko@arm.com>
 References: <20261126114936.864256-1-kristina.martsenko@arm.com>
+ <20261126114936.864256-8-kristina.martsenko@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Nov 2026 12:04:36 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -83,47 +69,66 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-Add documentation to describe how the kernel manages TLBI domains. The
-bitmap approach is based on ideas from Miko Lenczewski.
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Low] ACPI: TLBI: validate_tlbi_domains() allows zero NIS bits and
+  duplicate ID 0
+--
 
-Signed-off-by: Kristina Martšenko <kristina.martsenko@arm.com>
----
- arch/arm64/mm/tlbid.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+commit 16b5ea117539549acd04f827b44be9eb240e442f
+Author: Kristina Mart=C5=A1enko <kristina.martsenko@arm.com>
 
-diff --git a/arch/arm64/mm/tlbid.c b/arch/arm64/mm/tlbid.c
-index 2615ccb6bc56..85b6e33c82b9 100644
---- a/arch/arm64/mm/tlbid.c
-+++ b/arch/arm64/mm/tlbid.c
-@@ -19,6 +19,24 @@
- 
- #include <asm/mmu.h>
- 
-+/*
-+ * FEAT_TLBID enables a TLB invalidation to target a subset of CPUs instead of
-+ * the whole Inner Shareable domain. It can improve performance on systems with
-+ * many CPUs.
-+ *
-+ * A system with FEAT_TLBID contains a number of TLBI domains. Each domain
-+ * contains a number of CPUs. Domain 0 is always present and contains all CPUs.
-+ *
-+ * For each CPU we maintain a bitmap of domains that the CPU belongs to. For
-+ * each mm we maintain a bitmap of domains that contain all the CPUs that the
-+ * mm has been installed on. When an mm is installed on a new CPU we reduce its
-+ * bitmap to only include domains that include the new CPU.
-+ *
-+ * When issuing a TLBI we use the smallest domain for the mm instead of
-+ * broadcasting to all CPUs. The domain bitmap is ordered by size, with the
-+ * highest bit corresponding to the smallest domain.
-+ */
-+
- DEFINE_STATIC_KEY_FALSE(tlbid_enabled);
- 
- static u16 *domain_ids;
--- 
-2.43.0
+ACPI: TLBI: Parse domains from table
 
+This commit adds parsing for the Arm TLBI ACPI table to build and validate
+the list of TLBI domains and their CPU masks.
+
+> diff --git a/drivers/acpi/arm64/tlbi.c b/drivers/acpi/arm64/tlbi.c
+> new file mode 100644
+> index 0000000000000..1a4b591f8f706
+> --- /dev/null
+> +++ b/drivers/acpi/arm64/tlbi.c
+> @@ -0,0 +1,211 @@
+[ ... ]
+> +static int __init validate_tlbi_domains(void)
+> +{
+> +	u64 tlbididr =3D read_sanitised_ftr_reg(SYS_TLBIDIDR_EL1);
+> +	int domain_bits =3D FIELD_GET(TLBIDIDR_EL1_NIS, tlbididr);
+> +	int domain0_idx =3D -1;
+> +	int cpu;
+> +
+> +	if (domain_bits > 16)
+> +		return -EINVAL;
+> +
+> +	for (int i =3D 0; i < domain_count; i++) {
+> +		u16 max_domain_id =3D (1 << domain_bits) - 1;
+> +
+> +		if (domains[i].id > max_domain_id &&
+> +		    !cpumask_empty(domains[i].cpus))
+> +			return -EINVAL;
+> +
+> +		if (!domains[i].id)
+> +			domain0_idx =3D i;
+> +	}
+
+[Severity: Low]
+This rests on an architecture and specification detail that could not be
+confirmed from the kernel source alone: can a system with FEAT_TLBID and
+TLBIDIDR_EL1.NIS =3D=3D 0 validly present an ACPI TLBI table (for example,
+describing domain 0 alongside SMMU or Outer Shareable domains), and are
+TLBIP instructions permitted when NIS =3D=3D 0?
+
+__init_vtlbid_regs in arch/arm64/include/asm/el2_setup.h anticipates that
+TLBIDIDR_EL1.NIS can be 0 when ID_AA64MMFR4_EL1.TLBID is implemented.  If
+such a system presents a TLBI table, validate_tlbi_domains() only checks
+domain_bits > 16 and does not reject domain_bits =3D=3D 0, nor does it reje=
+ct
+domains[i].id > max_domain_id when cpumask_empty(domains[i].cpus) is true.
+In addition, duplicate id =3D=3D 0 entries are not rejected and overwrite
+domain0_idx, so an earlier id =3D=3D 0 entry covering only a subset of CPUs
+passes validation if the final id =3D=3D 0 entry covers all possible CPUs.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261126114936.8642=
+56-1-kristina.martsenko@arm.com?part=3D7
