@@ -1,80 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795697776;
-	b=A0zbZsy9NYaSNRxEpGSAXIdy94fHUROgsO+QU7SyzrMSSpfqbob1kSRDmjKo3iXzkJHJ
-	 wXrkRxdluiNQ3vlqlBz7Vg91ZQef1hbK+x43caYmqmSfI3Ym1GcfBV+mNIyVyuxuxVjRm
-	 xYL3D6cJvO1kq1xYnHDo9+K8F2/cWC1M/0HLaXMDSOl1U2bCpEXRAMgGjxRDRPqvL//fb
-	 qdm42fBD/PVXmcJQx84k5/0FQPLPBzCIB73sKCIPpLFr/gi0/qv6zj75N+t3PvT1O9Z2Y
-	 qUFSWVH9ke3xWuZ3BDRl7i8N5zK4QKg5u2v1/LfgKMpyYuWwhzbqrQUxBprcK9F4wfQ==
+	t=1795700282;
+	b=NRY+9EnjEyUtuL/mR1oIk5xukBfxvAkx2YGWwpGeRKkNL+MuggGQxZUhqH+aCCVulBTC
+	 5OSZ3xwNlcIwuooQciAHtgIHcSCGua0jgDdwzWRpBfdDBPN7F4oMmsK0wMENNxaeBAbs1
+	 +yW1yEcd37BtvAZp5fa9Ki7JTg0qOsUegFMcfrgTtsNjHrkY2adGvLXPwEhNMHLh00Cvt
+	 MWghsGESG6a48Ur7DxNB8yyuKW6OkqoOUidMExs+wqirJoG2pre5ILESn9U+Hif1WzElb
+	 IsXcxyiUBX4HTrUsgnaxU5kS5PT85mXxTXBjgnhEodiBPliWU9ZoESpasYz4iR/xZJw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795697776;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=qVr7AACT3RL5bvofLShn/Pbzkp0suXLu1heNlRCcBQQ=;
-	b=0CwV4fduOMZdhTKza1mPJAtvRE3RURUTc2UBKDA9eGsveE1EuFS7ooAHjRqFk6A2j9FW
-	 QBjYuanAQTSF5m2KnHy/CJR1EPpzqyLNT6fUNES5LErr+glcL9Co8LQuKrF6vbYAkewGo
-	 K3UxDm6fZFYjFREFR18qOJZ40hwcdUZDDiTrgeJKEzJ3e4gXFo9mX+kPDCQZabnkYRyvg
-	 zvhBcQyL3f6GvyX8mDLSPyJRfWtU9KhBVR7RgCPy8eob6/Ke754HiQlUKsBg+0CMrgHhl
-	 gTZWEwshWyksd2MKfBd8FHDLYup9JjhJRBTtQmt8sB6eQrxAuazvZKcO9ZTW6Q8/vIw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795700282;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:Received:Received:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-TM-AS-GCONF:X-Authority-Analysis:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-GUID:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=02BGqLoy5W4EZR++kJaOBR7XvPnZihslZauH69lTdO4=;
+	b=IbV4uP1k1Elx6MM8VvaC+LbiP0pgEPxH6DAXw5Oby4KuRI+QRrRJdWq3B77ukjJ2DSsP
+	 LDB1zHSyzK9PbmJ+0XyoaROGDtBJGdYbWNOngkpVkezbAaOxCOhEE6MpvMc6G6+pog/EE
+	 FFLuNJEFlGnhbJ09K9Eg9vlFjFTk0SVLTSbobI5v1WGreSU0/CAc87zUoJE3nSVJNnLUz
+	 thrUIX98qsNKwVi6aTUQfyJAka4D2lYAlNYW5nWwl185X4d0Z+GdOvZAbaej6r33ket2X
+	 47vqjA1agsVQNAl0ld46S4BFBjHBWZHkMzCMwo7D1EpS4bmvzgtE6KzGNu7NcPujKJQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="nz9j/5BI";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=linux.ibm.com;
+	spf=pass smtp.mailfrom=linux.ibm.com;
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=KOls12L7;
+	arc=none smtp.remote-ip=148.163.158.5
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05606606A31E;
-	Thu, 26 Nov 2026 12:56:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDDC606A31C;
+	Thu, 26 Nov 2026 13:38:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DEDDC606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nz9j/5BI
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B71201F000C4;
-	Thu, 26 Nov 2026 12:56:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795697775;
-	bh=qVr7AACT3RL5bvofLShn/Pbzkp0suXLu1heNlRCcBQQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=nz9j/5BIJS+5IJjZpKS6g28I3cmR6tYenAFesSBnC2t3iBXpcdA1Ia4gFQtuoT/c4
-	 ANVpSkZU+4Dm1/OAzZbVwqPuiKaGYfnyt4Bsk6lQi/qf/32jhRYt/b6DidINhvl1Y3
-	 iRO117gQ/Lo9fVf1/bMtEkyfIcj7R11hRoP6n7hnC3eHNUy+x5Fz+6H6Xf91h9Gu3h
-	 wooAg9fWxShV8WotHHfDjmISm8nv9WFdnNKppJS43bukCbjhCJfzSErynT3uJ4fkp8
-	 F4LAN85MDgMhwl2dOxN1JNIrbQz2NakP+ZI9riYogIHxGsMyMnTABuADFD8YPGrU2Y
-	 r8cgGgAvAlgFA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xWZ1J-00000003dor-15Cs;
-	Thu, 26 Nov 2026 12:56:13 +0000
-Date: Thu, 26 Nov 2026 12:56:12 +0000
-Message-ID: <86wlpzycnn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Usama Arif <usama.arif@linux.dev>
-Cc: oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	mark.rutland@arm.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	riel@surriel.com,
-	shakeel.butt@linux.dev,
-	kernel-team@meta.com,
-	rkeilty@meta.com,
-	atish.patra@linux.dev,
-	dgreid@meta.com
-Subject: Re: [PATCH] KVM: arm64: Reduce the stage-2 page cache on 64 KiB hosts
-In-Reply-To: <20261124152842.2634495-1-usama.arif@linux.dev>
-References: <20261124152842.2634495-1-usama.arif@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=KOls12L7
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AQBYimN4167477;
+	Thu, 26 Nov 2026 13:37:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=02BGqLoy5W4EZR++kJaOBR7XvPnZih
+	slZauH69lTdO4=; b=KOls12L72vnnjXrTjUWBLWgjFhoKFMKnBVXBRAGkcL2Djt
+	F84Yb17spq3+bZpFQ2wuf0Dcao9/PBpsE+Ji/Qsko+/z0ea0RgYQPIuvQ0KmTSk6
+	jD89jMBb8Rr1Hl4jxQnQYVG86ldhJrSFL5QZzkC9Or/pg+4Dnu5SSZ/Wa+AcqhY3
+	73n8tZrXM5kIk954acvwAbs1xkwH44CPf6bhc/jRo7s0FT2jLUnOC9xdjKP2tFz0
+	Wp1FFOjKaxzZylPsocMJf1VVVWgsHo6ClWoPZAY0O4DM+Uf0rmR601nV6ZMDPBtq
+	T53noGrUPWBTzmmcaoL2PUpT2nan/YjXKVspxHTQ==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4j34gvgy5y-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 26 Nov 2026 13:37:50 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6AQBYJ1s1111383;
+	Thu, 26 Nov 2026 13:37:49 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4j5kfa6bth-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 26 Nov 2026 13:37:49 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6AQDbjgH45482330
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 26 Nov 2026 13:37:45 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ACD2C2004D;
+	Thu, 26 Nov 2026 13:37:45 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8027B20043;
+	Thu, 26 Nov 2026 13:37:45 +0000 (GMT)
+Received: from osiris (unknown [9.68.29.29])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 26 Nov 2026 13:37:45 +0000 (GMT)
+Date: Thu, 26 Nov 2026 14:37:44 +0100
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Dan Carpenter <dan@pereq.eu>
+Cc: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, Oliver Upton <oupton@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, linux-s390@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Karthik Bhargavan <karthik@pereq.eu>,
+        =?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
+Subject: Re: [PATCH v2 2/8] KVM: arm64: Reset SP_EL1, ELR_EL1 and SPSR_EL1
+ when resetting a vcpu
+Message-ID: <20261126133744.219929-A-seiden@linux.ibm.com>
+References: <20261125-double_exception-v2-0-224689d8a764@pereq.eu>
+ <20261125-double_exception-v2-2-224689d8a764@pereq.eu>
+ <sashiko-outbox-232760@kernel.org>
+ <awam4std0Zifdn9k@stanley.mountain>
+ <awan8mSx5cbzXzJ7@stanley.mountain>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -83,89 +100,88 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: usama.arif@linux.dev, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, riel@surriel.com, shakeel.butt@linux.dev, kernel-team@meta.com, rkeilty@meta.com, atish.patra@linux.dev, dgreid@meta.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <awan8mSx5cbzXzJ7@stanley.mountain>
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=CYCdd7rl c=1 sm=1 tr=0 ts=6b08362e cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=kj9zAlcOel0A:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=tATfSOZSwkvfaf42cScA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI2MDA1MyBTYWx0ZWRfX0nYfkJib8H2e
+ C5yHfAPDBViPSMaBWZemZJHITHp196Efv9d9lDY2D4QGRrBtNWXV5QylAghC5+n/C0pzn1CmzVY
+ qvjr/n3MrMw2bBxhZHzBtATb/ZVAYiU=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI2MDA1MyBTYWx0ZWRfX8GlYiN7T4QMa
+ 09eTnuy+v8pDrTupsl1oO0OqWjqvbe3jHCD8CZv4xatonKxI6cOHvo232QfKTodwESNhbhyXSEJ
+ D7itvXKPXSZ8Fqd7UrADUCL+WX8JRx4LI/ziYU0lUSQzq08RDiLeQqGIhvpzFY1mFrBr882Ts6p
+ W/D21RUTR2H4FJGQAoh6Y4SdffEXEMfKw9KWDGZa+KQ2etQ0Qa03cd0WbD46KCnK1DrvtUnGXmm
+ b9APgYjB671qGYz2F03i7L+SrJFsh/9915QBN+h8wSsKEJRkMder+PssfJ+f3X2qU44ND30WVff
+ y5Ipy3rld/r0qscIrEWSD7RobcjH9bphpOehs+KlGEPZ8CTp9vWaDsr6oCYDNUA7OoF1X3YjMQ2
+ J1HbUzf/iGDLV6kEQ5oAMk+6NekXF4aAqK82ZNhT3TkEnViiI9VMq2sfKbnyZZAchtrCxqkKK/7
+ PRcIu11prvhlGzYKwxQ==
+X-Proofpoint-ORIG-GUID: IOCH92TSPRg1nO84vXqoe5hpnwcJ5ANo
+X-Proofpoint-GUID: IOCH92TSPRg1nO84vXqoe5hpnwcJ5ANo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-26_03,2026-11-26_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 malwarescore=0 priorityscore=1501 lowpriorityscore=0
+ clxscore=1011 spamscore=0 bulkscore=0 impostorscore=0 adultscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
+ definitions=main-2611260053
 
-On Tue, 24 Nov 2026 15:28:42 +0000,
-Usama Arif <usama.arif@linux.dev> wrote:
-> 
-> When a stage-2 fault may need new page tables, KVM first tops up the
-> vCPU's page cache: if it holds fewer pages than the fault might need, it
-> is refilled to KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE, which arm64 sets to
-> 40. Unused pages stay in the cache until the vCPU is destroyed.
-> 
-> With 64 KiB pages, that is 2.5 MiB per vCPU, and most of it is never
-> used. Stage-2 has at most three levels and the root is preallocated, so
-> a fault needs at most two new table pages (kvm_mmu_cache_min_pages()).
-> As every last-level table covers 512 MiB, an 8 GiB guest needs just 17
-> table pages to map all of its memory, while its four vCPU caches get
-> filled with 160.
-> 
-> On a production host with 64 KiB pages running 101 VMs with four vCPUs
-> each, the caches were still 86% full. The memory used:
-> 
->                         before      after
->   per-vCPU capacity     2.5 MB     512 KB
->   all 404 vCPUs         869 MB     <= 202 MB
-> 
-> Let's lower the capacity to 8 with 64 KiB pages, In the production
-> usecase above, it frees at least 667 MB. That still covers the two-page
-> minimum and leaves room for several table allocations per refill. 4 KB
-> and 16 KB pages keep 40.
+On Wed, Nov 25, 2026 at 12:18:42PM +0300, Dan Carpenter wrote:
+> On Wed, Nov 25, 2026 at 12:14:10PM +0300, Dan Carpenter wrote:
+> > Let me add the s390 maintainers to the CC list.
+> > 
+> > I considered doing it the way Sashiko suggests but s390 doesn't have the
+> > __vcpu_assign_sys_reg() helpers so it broke the build.  The registers are
+> > not the same so, either way, some of this is going to be specific to
+> > arm64.  But Sashiko is correct that s390 probably keeps a stale SP_EL1
+> > across a reset.  The s390 maintainers could probably take the selftest in
+> > patch 8 and modify it for s390.  :)
+> > 
 
-I'll glance over the use of 64kB pages, because that's definitely a
-niche configuration that hardly anyone uses. But the scale of the
-numbers strike me a bit: 808GB worth of guest memory, and you're
-complaining about 869MB? That's roughly 0.1% of the total, and the
-savings you're gaining are even less... I know memory is expensive,
-but you'd save a lot more than that by using a realistic page size.
-Just saying...
-
-I also question the assumption you are making that the guest is
-strictly using IPA contiguous memory, and that therefore a very small
-set of pages are all you need to map a guest. Guests with multiple,
-disjoint memslots are (sadly) extremely common, specially in these
-days of tiered memory and other random horrors.
+FYI: the arm on s390 KVM in the current upstream state has no idea what
+SP_EL1 is :) 
 
 > 
-> The temporary cache in kvm_phys_addr_ioremap() uses the same capacity,
-> but it is topped up before every page it maps, so 8 is sufficient there
-> as well. The pKVM hypervisor memcache and the eager split cache don't
-> use this capacity.
-> 
-> Signed-off-by: Usama Arif <usama.arif@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_types.h | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
-> index 9a126b9e2d7c99..28568da9ea4a7b 100644
-> --- a/arch/arm64/include/asm/kvm_types.h
-> +++ b/arch/arm64/include/asm/kvm_types.h
-> @@ -2,7 +2,12 @@
->  #ifndef _ASM_ARM64_KVM_TYPES_H
->  #define _ASM_ARM64_KVM_TYPES_H
->  
-> +/* Must cover kvm_mmu_cache_min_pages(), at most 2 with 64 KiB pages. */
-> +#ifdef CONFIG_ARM64_64K_PAGES
-> +#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 8
-> +#else
->  #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
-> +#endif
+> Actually, never mind.  This can be done in kvm_reset_vcpu_core() like
+> Suzuki Poulose suggests.
+>
 
-Now, to the patch itself: I see no reason to special-case this. If
-kvm_mmu_cache_min_pages() is an indication of what is needed, then
-this macro should be driven by it, or the whole allocator take it into
-account. And then you adjust it by whatever fudge factor seems
-appropriate.
+We share kvm_reset_vcpu_core() as well :) 
 
-Thanks,
+I assume this fix series should go into 7.4. right?
 
-	M.
+I have a series posted adding the required functions and infrastructure
+for s390 [1]. This will likely go to 7.5.
 
--- 
-Without deviation from the norm, progress is not possible.
+For 7.4: Add a patch just providing a stub that does nothing for the
+required helper (untested):
+
+diff --git a/arch/s390/include/asm/kvm_host_arm64.h b/arch/s390/include/asm/kvm_host_arm64.h
+index 3e69724f17c9..bdca7ebf6405 100644
+--- a/arch/s390/include/asm/kvm_host_arm64.h
++++ b/arch/s390/include/asm/kvm_host_arm64.h
+@@ -206,4 +206,6 @@ static inline void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu)
+
+ #define kvm_supports_32bit_el0() false
+
++#define __vcpu_assign_sys_reg(__vcpu, __reg, __val) (void)
++
+ #endif /* ASM_KVM_HOST_ARM64_H */
+
+
+If this does goes to 7.5 queuing that after the corresponding s390
+patches would be the simpler approach.
+
+Thanks for fixing the bugs 
+
+	Steffen
+
+
+[1] https://lore.kernel.org/all/20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com
