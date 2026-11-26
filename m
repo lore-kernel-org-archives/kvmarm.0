@@ -1,65 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795711543;
-	b=GXoPG9+erStDYXNizoMu+GhGqLwZ26anCiSBPGDDcOCtABqsmAZST2i/pCv4wbEu1L5f
-	 DWT7UTxKu4o8vDFSWiCo9n2YoSSwGbQJnNBdQUfaaIWQ+GaxbtX4Ken5bDMrj6rXlY6dC
-	 E4puIoL8ZaxzmNrvEhbU7O51H6Crb30EvxXc6nId4JO9cKqupAwWhexrphSvKS+TBZWkY
-	 hN165SwLz6V6c1hBx6UOWO89i5Z2QZP20ByIpCT5X7hdg2+mriDyOTN6eGiqE0xRr9/Nt
-	 SkvItORXlxAqn+zl2uZK2eR3gV0ZdMOa12nixBkdJNxdgzZ9ika4zxGxddLbZ5L2Puw==
+	t=1795711676;
+	b=3aLD03M7NemOa/FWWDZ5SKydD9ggYDMA890Ca1bXVh3cd4cmBORp3qkQycrHw/PQ2MeP
+	 tNn+byhMXTgWw5FVVTV0bMAfs6TMWjEqOlKDHH+LzKsYilB9NPCdFHir9m/e9Cnc0YD7y
+	 mGXYrvhWgwCPDt70KaBSG9x+2i8pptbTD3OvIl2OyFyl1ftEO0OrTR+dTeg/RNhroG33H
+	 9fLP8ePFni/4hRvh96GdMti8NdMd8230Y/GXhCoREX7y9g+ntNvC4XGy9+bBpjHEetgYD
+	 yd7INg7uWCziPslcfWZHXa6njC0ooBjUcCqofKjn312gfC/ffhd4SKZLacLn4jNqNCQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795711543;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=ggq5C5EPaN+V5j/mcWxCGkhHXH9eo2C8yHSBGX3RET0=;
-	b=FUFcLroWpqj5spgTUl2WfNSsDZGNxl8O6+VTnXj4kKSwya42mciIOKP++vH+PCMGnUqi
-	 hd9zrKL3k4lv+cTR4T/dowB90BXD7XDQjceKqOiAJjixdpMGBxQGMOV6sLVsM5N/gvFhg
-	 Y+v5si1tzw9VcyAM/2VpErqqibXeekNrXuTeTIA0+ROKryJj+QC8GOREIB8kuJwsE/Xbi
-	 Vm+emkvJSK0U/uD5LoJT0MX5FOaxzT1KIGRnBJg/1tlN27Ksfw77mlQ5Ra+7eORsaa2wo
-	 ViZx/E9bs2Sr+GNd1kUaeK/+hB/QgAfHWX8Ngkb4wIf4uBENiMEJrmhBR7ikjnYeA/g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795711676;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=Reb0A+vj4WxFhlRPeF5XMU0Gq5g9HJZmhJB2qXFsVXs=;
+	b=CfPZ1+X/w6CXzc8LVsFNjEemqA5EpD/gbXCj+oKM7814VViQyO0EukwrCRrR9FOAzKyT
+	 eG+tayH+S0HGPAqQAn8qXxaGGVYxiAPQVZSQ7s1+9E5vJjxp/agFRANlPrRrvLNWSDYnJ
+	 k9uSoz10UI+lRvUqbjpNm4bx6tlCCqUTL4shTDN9bCIQ1KC9sTnXRGGs/Cv6vsb9hLEnY
+	 244AXUSBnL+QnbhuWKN/VNHEsRf1cMvQNq/NYLWDmabT69QKm02EZj/8qtfgVLlz+KPfW
+	 ZduPDkeKR3wiFX7WT6Wz4J/0A5yIVpw8m0yX7WfIXTkJkNk39aM1MqNN8d/+PtG621A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=T4mD3Jha;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18472606A31E;
-	Thu, 26 Nov 2026 16:45:43 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=LPUTBtrn;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E65606A32C;
+	Thu, 26 Nov 2026 16:47:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 89E65606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=T4mD3Jha
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB00F1F000C0;
-	Thu, 26 Nov 2026 16:45:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795711542;
-	bh=ggq5C5EPaN+V5j/mcWxCGkhHXH9eo2C8yHSBGX3RET0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=T4mD3JhaRXLddV/RvVTcHLTesI5QkpVo1o9mQdfXfFlNtS/1mtAaT4YWgC4W2xahr
-	 MZjX5BAA0sFGdToYtvKmbvGwJp+lKyME8Wh6bkO+lD/ons0rIbcOAaMm6DOGLQDIzq
-	 qboiSbLlm7TCcpvHhIVnwWPT2JAkt7RAgFo/HMQId+jn9ya+cAujSPSV0y9l+fSJc2
-	 iTY0b1Xpd1/J1mo8GWkJQiHZ3UohEaYc0wVt/GMS5XrFH77k4UqmngZREkYHSusIqQ
-	 +kvBghEVgkvDg3J69G9rQ4lP2BiIROJM55VY6hVIWSlxMFUGInyVrkZAW8xABOASoQ
-	 gQeIJBXv4mFVw==
-Date: Thu, 26 Nov 2026 16:45:35 +0000
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Wei-Lin Chang <weilin.chang@arm.com>, 
-	Usama Arif <usama.arif@linux.dev>, maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, riel@surriel.com, shakeel.butt@linux.dev, kernel-team@meta.com, 
-	rkeilty@meta.com, atish.patra@linux.dev, dgreid@meta.com
-Subject: Re: [PATCH] KVM: arm64: Reduce the stage-2 page cache on 64 KiB hosts
-Message-ID: <awhfXrdkHkY-riN3@gremlin>
-References: <20261124152842.2634495-1-usama.arif@linux.dev>
- <awcXhk885lqDRAHy@LeoBrasDK>
- <06a69a4f-59bb-49b8-9ed0-f4cfe0ecad37@linux.dev>
- <awcoCklLOKeuXPhh@LeoBrasDK>
- <e7bdcfa9-bbd8-4649-8318-2f6dc236db15@linux.dev>
- <4jxdf2pkuu2f7dftvf6ltpv27jctfuvvrfcrbfxudsgnp3hdfk@taur55wftexq>
- <awhODYKXnsBi_s_B@LeoBrasDK>
- <klnyvfxwhpw73wo55y5aq3qliglnf7xkfkmfj6cgzje7z3n2fq@aqjxshyjnldu>
- <awhWYdZVkESY9eJs@LeoBrasDK>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=LPUTBtrn
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 10F161BA8;
+	Thu, 26 Nov 2026 08:47:52 -0800 (PST)
+Received: from [10.0.129.128] (e122027.cambridge.arm.com [10.0.129.128])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 94E293F86F;
+	Thu, 26 Nov 2026 08:47:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795711674; bh=wD4nn625t5o2j8O8VCNI52IkSmZmyk+WOropi/y+JW8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LPUTBtrnXanBCrATApbdjyPmJJS0xq86yxfvxWyiGzKa6XUMGIcOrSHyF9nZDjSsL
+	 v0Dt2TBLZ9XTGwTuBVXQ+cCmNd3PJj8enKmDKt35de75keVcWu173jhvW5BormtSZ5
+	 cThoprWY3F0kLdK5qLp++ArCYttwh43Yv3912ARM=
+Message-ID: <78665c8c-2c10-410e-9bd2-b62c91c0de2a@arm.com>
+Date: Thu, 26 Nov 2026 16:47:46 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -69,196 +53,256 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <awhWYdZVkESY9eJs@LeoBrasDK>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 09/11] KVM: arm64: CCA: Prevent memslot modifications
+ after Realm creation
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Kohei Enju <enju.kohei@fujitsu.com>
+References: <20261123104233.95710-1-steven.price@arm.com>
+ <20261123104233.95710-10-steven.price@arm.com>
+ <CAEvNRgFQ5BXqU3KfPFT8bfZTW=RyvBw25z3GZtr3JA=Wv3Yqfw@mail.gmail.com>
+ <e4108d4f-e84c-444c-aa7a-18e823816eae@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <e4108d4f-e84c-444c-aa7a-18e823816eae@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 26, 2026 at 03:55:13PM +0000, Leonardo Bras wrote:
-> On Thu, Nov 26, 2026 at 03:34:19PM +0000, Wei-Lin Chang wrote:
-> > On Thu, Nov 26, 2026 at 03:19:41PM +0000, Leonardo Bras wrote:
-> > > On Thu, Nov 26, 2026 at 08:06:41AM +0000, Wei-Lin Chang wrote:
-> > > > On Wed, Nov 25, 2026 at 09:42:33PM +0000, Usama Arif wrote:
-> > > > >
-> > > > >
-> > > > > On 25/11/2026 10:25, Leonardo Bras wrote:
-> > > > > > On Wed, Nov 25, 2026 at 05:55:29PM +0000, Usama Arif wrote:
-> > > > > >>
-> > > > > >>
-> > > > > >> On 25/11/2026 09:14, Leonardo Bras wrote:
-> > > > > >>> On Tue, Nov 24, 2026 at 07:28:42AM -0800, Usama Arif wrote:
-> > > > > >>>> When a stage-2 fault may need new page tables, KVM first tops up the
-> > > > > >>>> vCPU's page cache: if it holds fewer pages than the fault might need, it
-> > > > > >>>> is refilled to KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE, which arm64 sets to
-> > > > > >>>> 40. Unused pages stay in the cache until the vCPU is destroyed.
-> > > > > >>>>
-> > > > > >>>> With 64 KiB pages, that is 2.5 MiB per vCPU, and most of it is never
-> > > > > >>>> used. Stage-2 has at most three levels and the root is preallocated, so
-> > > > > >>>> a fault needs at most two new table pages (kvm_mmu_cache_min_pages()).
-> > > > > >>>> As every last-level table covers 512 MiB, an 8 GiB guest needs just 17
-> > > > > >>>> table pages to map all of its memory, while its four vCPU caches get
-> > > > > >>>> filled with 160.
-> > > > > >>>>
-> > > > > >>>> On a production host with 64 KiB pages running 101 VMs with four vCPUs
-> > > > > >>>> each, the caches were still 86% full. The memory used:
-> > > > > >>>>
-> > > > > >>>>                         before      after
-> > > > > >>>>   per-vCPU capacity     2.5 MB     512 KB
-> > > > > >>>>   all 404 vCPUs         869 MB     <= 202 MB
-> > > > > >>>>
-> > > > > >>>> Let's lower the capacity to 8 with 64 KiB pages, In the production
-> > > > > >>>> usecase above, it frees at least 667 MB. That still covers the two-page
-> > > > > >>>> minimum and leaves room for several table allocations per refill. 4 KB
-> > > > > >>>> and 16 KB pages keep 40.
-> > > > > >>>>
-> > > > > >>>> The temporary cache in kvm_phys_addr_ioremap() uses the same capacity,
-> > > > > >>>> but it is topped up before every page it maps, so 8 is sufficient there
-> > > > > >>>> as well. The pKVM hypervisor memcache and the eager split cache don't
-> > > > > >>>> use this capacity.
-> > > > > >>>>
-> > > > > >>>> Signed-off-by: Usama Arif <usama.arif@linux.dev>
-> > > > > >>>> ---
-> > > > > >>>>  arch/arm64/include/asm/kvm_types.h | 5 +++++
-> > > > > >>>>  1 file changed, 5 insertions(+)
-> > > > > >>>>
-> > > > > >>>> diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
-> > > > > >>>> index 9a126b9e2d7c99..28568da9ea4a7b 100644
-> > > > > >>>> --- a/arch/arm64/include/asm/kvm_types.h
-> > > > > >>>> +++ b/arch/arm64/include/asm/kvm_types.h
-> > > > > >>>> @@ -2,7 +2,12 @@
-> > > > > >>>>  #ifndef _ASM_ARM64_KVM_TYPES_H
-> > > > > >>>>  #define _ASM_ARM64_KVM_TYPES_H
-> > > > > >>>>
-> > > > > >>>> +/* Must cover kvm_mmu_cache_min_pages(), at most 2 with 64 KiB pages. */
-> > > > > >>>> +#ifdef CONFIG_ARM64_64K_PAGES
-> > > > > >>>> +#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 8
-> > > > > >>>> +#else
-> > > > > >>>>  #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
-> > > > > >>>> +#endif
-> > > > > >>>>
-> > > > > >>>>  #endif /* _ASM_ARM64_KVM_TYPES_H */
-> > > > > >>>>
-> > > > > >>>> --
-> > > > > >>>> 2.53.1-Meta
-> > > > > >>>>
-> > > > > >>>
-> > > > > >>> Hi Usama,
-> > > > > >>>
-> > > > > >>
-> > > > > >> Hello Leonardo,
-> > > > > >>
-> > > > > >>> Have you tried to reproduce this issue in v7.4-rc1 or newer?
-> > > > > >>
-> > > > > >> Yes. The patch is against kvmarm/next (v7.4-rc3), which includes
-> > > > > >> Lorenzo's pre-fault series, and I A/B tested it there.
-> > > > > >>
-> > > > > >> On unpatched v7.4-rc3 with 64 KiB pages, a VM whose 16 vCPUs each fault
-> > > > > >> in one page needs a single stage-2 table page, yet the vCPU caches hold
-> > > > > >> 640 pages (40 MiB). With the patch they hold 127 pages.
-> > > > > >>
-> > > > > >>>
-> > > > > >>> IIUC Lorenzo Stoakes introduced a change that would cause the memcache to
-> > > > > >>> skip topup if the cache contains a minimum of ~4 pages, so it can possibly
-> > > > > >>> improve that issue.
-> > > > > >>
-> > > > > >> I don't think that part is new. __kvm_mmu_topup_memory_cache() has
-> > > > > >> returned early when mc->nobjs >= min since commit 6926f95accee ("KVM:
-> > > > > >> Move x86's MMU memory cache helpers to common KVM code"). Lorenzo's
-> > > > > >> commit d27acc152c62 ("KVM: arm64: Size the stage-2 memcache from the
-> > > > > >> fault MMU") takes min from s2fd->mmu instead of vcpu->arch.hw_mmu. For a
-> > > > > >> guest abort that is the same MMU, so nothing changes here.
-> > > > > >>
-> > > > > >> With 64 KiB pages, min is kvm_mmu_cache_min_pages(), which is at most 2.
-> > > > > >>
-> > > > > >>>
-> > > > > >>> Although I can see that when it's below that minimum it fills the whole
-> > > > > >>> capacity (40) of the cache.
-> > > > > >>>
-> > > > > >>
-> > > > > >> Right, and that is the problem. Skipping the top-up avoids refilling
-> > > > > >> the cache, but nothing ever drains it. A vCPU's first fault fills its
-> > > > > >> cache to 40. Each last-level table covers 512 MiB, so a guest needs very
-> > > > > >> few table pages, and most vCPUs never drop below min. The remaining
-> > > > > >> pages stay allocated until the vCPU is destroyed, which is why the
-> > > > > >> production caches were still 86% full.
-> > > > > >>
-> > > > > >> The patch keeps the early return and only lowers how far a refill goes.
-> > > > > >
-> > > > > > Right,
-> > > > > >
-> > > > > > I took a look in the cache workings, and it does not seem to receive freed
-> > > > > > pages back in. It gets filled by topup and used by map, so IIUC it is used
-> > > > > > only to avoid failing an allocation during the mapping walk.
-> > > > > >
-> > > > > > Maybe it could be the case to simplify this cache to have the capacity
-> > > > > > about the same as the minimum (since it always topup before mapping) and
-> > > > > > avoid the waste altogether.
-> > > >
-> > > > Well the more you reserve the less frequent you'd need to actually allocate at
-> > > > topup, which saves time, so there's this trade-off to consider.
-> > > >
-> > > > Thanks,
-> > > > Wei-Lin Chang
-> > > >
-> > >
-> > > Hi Wei-Lin,
-> > >
-> > > IIUC, every time we topup, we call a mmu_memory_cache_alloc_obj() for every
-> > > one of the objects in the array. So as it is today it runs it 40 times, and
-> >
-> > Not necessarily, I meant with 40,
-> >
-> > if (mc->nobjs >= min)
-> > 	return 0;
-> >
-> > happens way more often.
->
-> That's what I meant with 'waits until it runs down'. Basically we have
->
-> if (mc->nobjs >= min)
-> 	return 0;
->
-> while (mc->nobjs < mc->capacity) {
-> 	obj = mmu_memory_cache_alloc_obj(mc, gfp);
-> 	...
->
-> So, first use it allocates mc->capacity entries, and every further topup
-> will return early unless it goes below min, when it populates again. The
-> only reason for a larger cache being more performant would be to use
-> that cache locality, which could indeed have a large impact, if we use this
-> cache a lot.
+On 25/11/2026 14:58, Suzuki K Poulose wrote:
+> Hi Ackerley
+> 
+> On 25/11/2026 00:09, Ackerley Tng wrote:
+>> Steven Price <steven.price@arm.com> writes:
+>>
+>>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>
+>>> Once the Realm is created, prevent changes to guest_memfd backed
+>>> memslots, which can provide private memory. Validate these changes
+>>> before KVM invalidates the old memslot, so a rejected deletion leaves
+>>> its stage-2 mappings intact. Realm stage-2 faults will also validate
+>>> the private memory backing in a later commit.
+>>>
+>>> Require Realm memslots to lie in the lower half of the IPA space, as the
+>>> upper, shared half aliases the lower, protected half.
+>>>
+>>> Define kvm_arch_has_private_mem() so generic KVM recognizes Realm VMs
+>>> as supporting private memory. Defining the macro also makes
+>>> gmem_in_place_conversion true for every arm64 VM, so guest_memfd
+>>> memslots are marked gmem-only even for non-Realm VMs. A well-formed
+>>> KVM_SET_MEMORY_ATTRIBUTES2 request on a non-Realm guest_memfd now
+>>> reaches the VM check and returns -EINVAL instead of -ENOTTY.
+>>>
+>>> Additionally, similar to pKVM, do not support dirty logging or
+>>> read-only memslots.
+>>>
+>>
+>> Imo this could be split into a few patches
+>>
+>> 1. Add the constraints wrt realm memslots and being in the lower half of
+>>     the IPA space
+>> 2. Defining arm's support for private mem
+>> 3. Imposing rules on memslot changes
+>> 4. Maybe some others, maybe I'm misunderstanding the patch
+> 
+> Agree
 
-I think there's confusion because of this being called a cache, this is more
-pre-allocation than anything it seems. As per the comment above struct
-kvm_mmu_memory_cache in include/linux/kvm_types.h:
+Yes, although as discussed below, I think we probably don't need to have
+as much restriction on memslots as this currently adds.
 
- * Memory caches are used to preallocate memory ahead of various MMU flows,
- * e.g. page fault handlers.  Gracefully handling allocation failures deep in
- * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
- * holding MMU locks.  Note, these caches act more like prefetch buffers than
- * classical caches, i.e. objects are not returned to the cache on being freed.
+>>
+>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>>
+>>> ---
+>>> Changes since v3:
+>>> - Explain the arm64-wide in-place conversion effect and keep the
+>>>    general IPA limit comment.
+>>>
+>>> Changes since v1:
+>>> - Preserve private mappings if KVM invalidates a Realm guest_memfd
+>>>    slot before the prepare hook rejects its deletion.
+>>> ---
+>>>   arch/arm64/include/asm/kvm_host.h |  2 ++
+>>>   arch/arm64/kvm/mmu.c              | 37 ++++++++++++++++++++++++-------
+>>>   2 files changed, 31 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/
+>>> asm/kvm_host.h
+>>> index 3ddeddfacd06..55673d08e3eb 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -1607,6 +1607,8 @@ struct kvm *kvm_arch_alloc_vm(void);
+>>>
+>>>   #define kvm_vm_is_realm(kvm)        ((kvm)->arch.vm_flavor ==
+>>> VM_REALM)
+>>>
+>>> +#define kvm_arch_has_private_mem(kvm) kvm_vm_is_realm(kvm)
+>>> +
+>>>   #define kvm_has_mte(kvm)                    \
+>>>       (system_supports_mte() &&                \
+>>>        test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
+>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>> index 800333a345cd..9af5fe6d87f0 100644
+>>> --- a/arch/arm64/kvm/mmu.c
+>>> +++ b/arch/arm64/kvm/mmu.c
+>>> @@ -2861,17 +2861,32 @@ int kvm_arch_validate_memory_region(struct
+>>> kvm *kvm,
+>>>   {
+>>>       lockdep_assert_held(&kvm->slots_lock);
+>>>
+>>> -    if (kvm_vm_is_protected(kvm)) {
+>>> +    if (kvm_vm_is_protected(kvm) && new &&
+>>> +        (new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)))
+>>> +        return -EPERM;
+>>
+>> gmem is already generically mutually exclusive with
+>> KVM_MEM_LOG_DIRTY_PAGES and KVM_MEM_READONLY, so before this change,
+>> pKVM is saying no to KVM_MEM_LOG_DIRTY_PAGES and KVM_MEM_READONLY for
+>> all memslots, gmem or not, so this check makes sense.
+>>
+>>> +
+>>> +    switch (kvm->arch.vm_flavor) {
+>>> +    case VM_PROTECTED_PKVM:
+>>>           /* Cannot modify memslots once a pVM has run. */
+>>>           if (pkvm_hyp_vm_is_created(kvm) &&
+>>> -            (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
+>>> +            (change == KVM_MR_DELETE || change == KVM_MR_MOVE))
+>>>               return -EPERM;
+>>> -        }
+>>> +        break;
+>>
+>> Not sure why pKVM doesn't allow deleting a memslot after the vm is
+>> created, but this is no change from before this patch, the removal of {}
+>> here is mixed in with the other changes in this patch.
+> 
+> IIRC, pKVM relies on pinning the stage2 until the teardown ?
+> ed
+> from the Stage2 unless we d
+> 
+>>
+>>> +    case VM_REALM:
+>>> +        /*
+>>> +         * Once the Realm is created, we cannot modify any slots that
+>>> +         * could be providing private memory. i.e., guest_memfd backed
+>>> +         * slots.
+>>> +         * TODO: Handle trusted device private memory slots
+>>> +         */
+>>> +        if (!kvm_realm_is_created(kvm))
+>>> +            break;
+>>>
+>>> -        if (new &&
+>>> -            new->flags & (KVM_MEM_LOG_DIRTY_PAGES |
+>>> KVM_MEM_READONLY)) {
+>>> +        if (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new))
+>>>               return -EPERM;
+>>> -        }
+>>> +        break;
+>>
+>> Imo this should be written the same way as the pKVM branch for clarity,
+>> like
+>>
+>> if (kvm_realm_is_created() &&
+>>      (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new)))
+>>          return -EPERM;
+>>
+>> but that aside,
+>>
+>> 1. Why block creating memslots after realm is created?
+>>
+>> Does ARM CCA have no way to add pages after a VM starts? This isn't
+>> blocked for TDX and SNP so I think this constraint seems unnecessary.
+> 
+> This and (2) was triggered by the following thread, raised by Catalin.
+> 
+> https://lore.kernel.org/all/aqrGPK0lFBFXL2qY@arm.com
+> 
+> But having said that, since then, we now have :
+> 
+> 1) All private faults must be serviced by realm_gmem_abort(), which
+> mandates Guest memfd slot. (See Patch 11, realm_mem_abort())
+> 
+> 2) realm_gmem_abort() matches the "private" attribute for a "protected"
+> fault, failing which causes a memory fault exit.
+> 
+> So I think we can remove these memslot restrictions.
 
-The question is would going from 40 to 3 slow things down?
+Agreed. We originally had memslots backed by user space memory. That
+meant adding or removing a memslot had to deal with all the messiness of
+dealing this that. As an initial step it was easier to just prevent
+memslot changes. guest_memfd simplifies things so I don't think this
+restriction is actually necessary - and I think it will actually
+simplify the code to not restrict it.
 
-At 40 you do 40 __get_free_page() calls on topup for the _first_ fault that hits
-it, which adds latency to a random s2 fault (not great).
+>>
+>> 2. Why block deleting memslots after realm is created?
+>>
+>> This also seems like an artificial constraint, and it constrains the way
+>> the userspace VMM operates when stopping a VM, like the memslots can't
+>> be removed ever, the VM just has to be closed? (something like that)
+> 
+> As mentioned above, I think we are good to remove the restrictions.
 
-(If the fault doesn't in fact use a page table, this is only done once until a
-page table is next needed).
+Agreed.
 
-And then as 37 page tables are mapped, those ones don't get allocations at 38
-you go again...
+Thanks,
+Steve
 
-With 3 in the cache you allocate up to 3 for each fault.
+> Suzuki
+> 
+> 
+>>
+>>> +    default:
+>>> +        break;
+>>>       }
+>>>
+>>>       return 0;
+>>> @@ -2883,6 +2898,7 @@ int kvm_arch_prepare_memory_region(struct kvm
+>>> *kvm,
+>>>                      enum kvm_mr_change change)
+>>>   {
+>>>       hva_t hva, reg_end;
+>>> +    gfn_t ipa_limit;
+>>>       int ret = 0;
+>>>
+>>>       if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
+>>> @@ -2891,9 +2907,14 @@ int kvm_arch_prepare_memory_region(struct kvm
+>>> *kvm,
+>>>
+>>>       /*
+>>>        * Prevent userspace from creating a memory region outside of
+>>> the IPA
+>>> -     * space addressable by the KVM guest IPA space.
+>>> +     * space addressable by the KVM guest IPA space. Realm shared
+>>> IPAs alias
+>>> +     * the corresponding private IPAs, so Realm memslots must reside
+>>> entirely
+>>> +     * in the lower half of that space.
+>>>        */
+>>> -    if ((new->base_gfn + new->npages) > (kvm_phys_size(&kvm-
+>>> >arch.mmu) >> PAGE_SHIFT))
+>>> +    ipa_limit = kvm_phys_size(&kvm->arch.mmu) >> PAGE_SHIFT;
+>>> +    if (kvm_vm_is_realm(kvm))
+>>> +        ipa_limit >>= 1;
+>>> +    if (new->base_gfn + new->npages > ipa_limit)
+>>>           return -EFAULT;
+>>>
+>>>       /*
+>>> -- 
+>>> 2.43.0
+> 
 
-So in both cases you allocate the same amount of pages but in the 40 case it's
-all bunched up on one s2 fault with a jump in latency, in the 3 case it's spread
-out.
-
-I'd say 3 is therefore the better choice.
-
-Also, as mentioned elsewhere, you end up leaking pages once the S2 page tables
-are setup until the vCPU is destroyed, as nothing clears down the cache
-AFAICT. With 40 that's way more than with 3.
-
---
-Cheers, Lorenzo
