@@ -1,82 +1,78 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795691577;
-	b=hlw/y+QoQjWPkOHMwnGxR1ZKB9U1i8DdM9yVX4qCJu6DSaixk6qPKmA4TvBirmcyTg2Z
-	 0nzuW98EV27neH7zu1UdF7ek9ixx2HcrxVwoGybHNLxP+FAzqPBNbMs+bNXrdvJE7vfRt
-	 CTijrxTfPourjHLSvmFrPTxkcB5SZeJX0Yb70JdKtctP8yvn8w/+mH4VEMKqNTx+f7BgW
-	 3zIGjXswmqOF3YWMvDG75k6LmilhkJeBRGkgQVLzXH8CoE0B5rCsfABFzndanJ8vm6l0S
-	 b/8q/BhhVNJYXWE/V9r/Gtx2zQeI4xUSm9Z74rX/VrQndByGBZqj+sRwRfW4n8OTjqg==
+	t=1795693806;
+	b=3wF2+Hl8r8YVxmDh69XIVC7o08xTu6ZQthSwzAKsfLZ5gaq4cvbTHKSf14P30VKFgXI/
+	 o7yOiQCOnQw5Wj3BPi2HNO7KNtabiOkfRaAatXbZSDwSznhldiBzbhMskeirOSO+iCZ83
+	 Ob+W+SExYN1z4A/3AJMCpvFwV+90d2aXBPy+2h257CBUHvU35iMx4kz2OytVIk/p2e4LV
+	 s//f4hzlPZTy5b/TCZE2i4ifUyqhSnIMg1RqCagSDzf2hWJMsNs0a9z8ERj4Z/6zd2WSP
+	 fRG0ykQ+Wk2Lmsn8uREa3IJnuVxyTy0+HJJH5CRuGQMIwz+AV5kiLh3L44/GXW0PUPw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795691577;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=1IOWT/d14QlycRCg1JO/Jw8AIofZ/OvIL8rsv66jEYY=;
-	b=CSDRgV57x2T9zhaOYZhOV5/FgcFvvMQ1S/5PgckroWRHFlgbJ/dK6sjT0xdeYuOX3w2n
-	 o3oqEccSZm6i9i3GnZH0ULIb25Whi/Z+jUSugKDrQXl8csFpYiEnHpiVIUe86v+K8VKCr
-	 6tljv0DDpXkhqysuf6ymL/6HpCSZi/a1tDcM1dnd0HUsqVpDA39aC3E9NFXR7JjhiskCv
-	 rsAcqB5NeaXfXSgbJXuVe/rMnIgZD+SiOM5pUs4AuOGBQ627D/Bf6AoiLdwUqAHbV+5cu
-	 rRqNt1O2c63NsmswqJ6H+no35wHjTpqMttbIDOg7ZPL1ZgwFkp3ISwaFyG3ajLNl/lw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795693806;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=nVCD3WqvgCoqhKy/l3yuhy8HMKgb8NDwxlYf03aauoU=;
+	b=DAruOGumSyiKK+dmC0DTAw2BLirfKh+qN9F3qNISFJHrUHh3MJAoEf7utHvKGYeLX4K8
+	 c11JHfWwNQUPlplQ4vh2wDyw8gHuad03b4wYlZRvHk1GerrE4ttbAKPUISvNxocMPLhTy
+	 HQQKQbYEAwUGHOX4GVUeH4ebQcyPehCGKkJqMt1e9nL3iwA90SBYfDLq18mXNUB70raTN
+	 wYaJxaB3HxdGlqfVIR9Uh1+IPGFLFz5owEhHA5rxYquJjNXwvajec7Xu2vzNvanh0bi+L
+	 Q0upJhPLpnGQgngQohv6xKua0g5RFwCQWIhLV7e8R2ab2p5dd/GGUkhaUc1qozIs2wQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="K1/kCLR0";
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=fky3xG22;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84392606A31E
-	for <kvmarm@lists.linux.dev>; Thu, 26 Nov 2026 11:12:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 84392606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8E2606A326
+	for <kvmarm@lists.linux.dev>; Thu, 26 Nov 2026 11:50:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2A8E2606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=K1/kCLR0
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=fky3xG22
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 71E821BA8;
-	Thu, 26 Nov 2026 03:12:52 -0800 (PST)
-Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 799183F632;
-	Thu, 26 Nov 2026 03:12:51 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D3CA1C2B;
+	Thu, 26 Nov 2026 03:50:01 -0800 (PST)
+Received: from e142392.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9D3AD3F632;
+	Thu, 26 Nov 2026 03:50:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795691575; bh=hEzuUTn3NIQ9D3Y7opBppSoWZoPbrfaVx4Stp1mWYZk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K1/kCLR0+zsGKueO4tdlfcGvC9uI1tsDD16FNl70XtlY2s4dLuG8uxI8AV8mSTvpW
-	 CYpB7JHabMm7QHU4onorSCZylhv92pJXFgeQ4CsC8UURe2rU824wndSsxeMuszHm8d
-	 Ny0uSTvsItVYs3DLx4g3j6wwY6T871PnF9x+Rqvc=
-Date: Thu, 26 Nov 2026 11:12:46 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	t=1795693803; bh=8yLuitpP6g12fQ0y1lDT3Vae2vvpE/cs2esk4Vshcdc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=fky3xG22aklLR/T8p1iKGBqJmbO08vZSmDznbP72j7LKp3kpGCOylRpc68JsNkmPX
+	 j5KE7hddFz474U50G9BOo7j870/4lAyURjD1G3tr80qU1kS1PvDRK+SmE5vwl/YeRG
+	 3cHHsUDx5RzHHyGo5a66SzN1G2H8JAaxvWftJS44=
+From: =?UTF-8?q?Kristina=20Mart=C5=A1enko?= <kristina.martsenko@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-acpi@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-efi@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Linu Cherian <linu.cherian@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Hanjun Guo <guohanjun@huawei.com>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 02/23] KVM: arm64: Extract number of sys_reg_desc into
- a constant
-Message-ID: <awgULp1w79g4HvA4@e143914.arm.com>
-References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
- <20261106-sysreg-v3-2-75e95980fb10@linux.ibm.com>
- <awbw3NyDifa0WjhZ@e143914.arm.com>
- <20261125153027.117976-A-seiden@linux.ibm.com>
+	Ard Biesheuvel <ardb@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jinqian Yang <yangjinqian1@huawei.com>,
+	Zi Yan <ziy@nvidia.com>
+Subject: [RFC v2 00/13] arm64: Add support for TLBI domains
+Date: Thu, 26 Nov 2026 11:49:23 +0000
+Message-ID: <20261126114936.864256-1-kristina.martsenko@arm.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -86,73 +82,97 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261125153027.117976-A-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 25, 2026 at 04:30:27PM +0100, Steffen Eiden wrote:
-> On Wed, Nov 25, 2026 at 02:29:48PM +0000, Joey Gouly wrote:
-> > On Fri, Nov 06, 2026 at 05:07:35PM +0100, Steffen Eiden wrote:
-> > > Define the constant `num_sys_reg_descs` which stores the number of
-> > > elements in the sys_reg_descs array. Replace all occurrences of
-> > > ARRAY_SIZE(sys_reg_descs) with the new constant.
-> > > 
-> > > This refactoring eases the integration of handling system registers for
-> > > arm on s390. s390 needs code from the shared code to define the
-> > > sys_reg_descs. But also the shared code needs the definition of the
-> > > sys_reg_array and we cannot forward declare arrays and use their size
-> > > before it is properly defined. This patch solves this chicken or egg
-> > > problem. For the time being s390 cannot process the full arm64 defined
-> > > sys_reg_descs array.
-> > > 
-> > > No functional changes.
-> > > 
-> > > Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
-> > > Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
-> > > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> > 
-> > I see later in the series, the include of sys_regs.c into s390 is done
-> > before the s390 sys_reg_descs array is defined.
-> >
-> 
-> Are you referring to [PATCH v3 08/23] KVM: arm64: Share system register code with s390 
+Hi,
 
-I was talking about arch/s390/kvm/arm64/sys_regs.c in
-[PATCH v3 16/23] KVM: s390: arm64: Implement arm sysreg managing infrastructure.
+This is a follow-up to the initial TLBI domain RFC:
+  https://lore.kernel.org/all/20261001110655.461473-1-kristina.martsenko@arm.com/
 
-+static const size_t num_sys_reg_descs;
-..
-+#include "generated/sys_regs.inc"
-..
-+static const size_t num_sys_reg_descs = ARRAY_SIZE(sys_reg_descs);
+The goal of the series is to improve performance by using TLBI domains
+(FEAT_TLBID) to send TLB invalidations only to the CPUs where a process has
+run. (Specifically, TLBI commands are sent to a fixed “domain”, which may be
+wider than the set of target CPUs.)
 
-> 
-> There, the sharing is done from the arm64 side.
-> 
-> As this is a new file for s390 the sharing only gets effective with
-> [PATCH v3 16/23] KVM: s390: arm64: Implement arm sysreg managing infrastructure
-> 
-> There, in arch/s390/kvm/arm64/Makefile.gen I add the sys_reg.c as shared
-> file. Before it will not be processed (nor included) by s390.
-> 
-> And there in our sys_regs.c I'll define that array.
-> 
-> Or did I miss something?
+This RFC v2 addresses review feedback from the previous RFC v1. It is still an
+RFC because the ACPI table specification is still not public, so this series
+can't be merged yet.
 
-Sorry, I wasn't saying anything was wrong, just reading the code and
-writing why it makes sense to make this change!
+The series does not include KVM support, it only disables domains for guests.
+KVM support has been posted by Jinqian [1].
 
 Thanks,
-Joey
+Kristina
 
-> 
-> > Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-> > 
-> > Thanks,
-> > Joey
-> >
-> 
-> Thank you!
-> 
-> 	Steffen
-> 
+[1] https://lore.kernel.org/all/20261030065617.4090073-1-yangjinqian1@huawei.com/
+
+
+Changes in RFC v2:
+  - Made context-switch only update domains if they would change (and updated
+    the barrier) [Zi]
+  - Explained in commit message why mm_cpumask is not used [Zi]
+  - Added WARN_ON to EFI init [Ard]
+  - Split EL2 setup into a separate patch [Linu]
+  - Fixed ipas2e1is() to use __tlbip() [Jinqian, sashiko]
+  - Fixed memory leaks in error paths [Jinqian, sashiko]
+  - Made ACPI table sanity checks more robust [sashiko]
+  - Fixed 'tlbi' variable to be static [sashiko]
+  - Fixed __tlbip() macro argument expansion [sashiko]
+  - Link to RFC v1: https://lore.kernel.org/all/20261001110655.461473-1-kristina.martsenko@arm.com/
+
+
+Kristina Martšenko (13):
+  arm64: sysreg: Add definitions for TLBID
+  arm64: boot: Handle TLBID boot requirements
+  arm64: Detect TLBID
+  KVM: arm64: Hide TLBID from guest sysregs
+  KVM: arm64: Hide TLBID from guest instructions
+  ACPICA: Add TLBI table definition
+  ACPI: TLBI: Parse domains from table
+  arm64: tlbid: Set up CPU domain bitmaps
+  efi/arm: Check return value of init_new_context()
+  arm64: tlbid: Track the TLBI domain of a task
+  arm64: Support TLBIP instructions
+  arm64: tlbid: Pass domain to TLBI instructions
+  arm64: tlbid: Add documentation
+
+ Documentation/arch/arm64/booting.rst    |  10 ++
+ arch/arm64/Kconfig                      |  12 ++
+ arch/arm64/include/asm/acpi.h           |  10 ++
+ arch/arm64/include/asm/cpu.h            |   1 +
+ arch/arm64/include/asm/cpufeature.h     |  15 ++
+ arch/arm64/include/asm/el2_setup.h      |  77 +++++++-
+ arch/arm64/include/asm/kvm_emulate.h    |   5 +
+ arch/arm64/include/asm/mmu.h            |  13 ++
+ arch/arm64/include/asm/mmu_context.h    |   9 +-
+ arch/arm64/include/asm/tlbflush.h       | 218 +++++++++++++++++------
+ arch/arm64/kernel/cpufeature.c          |  25 +++
+ arch/arm64/kernel/cpuinfo.c             |   3 +
+ arch/arm64/kvm/config.c                 |   6 +
+ arch/arm64/kvm/emulate-nested.c         |   1 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h |   7 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c           |   2 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c            |   4 +-
+ arch/arm64/kvm/sys_regs.c               |   3 +
+ arch/arm64/mm/Makefile                  |   1 +
+ arch/arm64/mm/context.c                 |   6 +-
+ arch/arm64/mm/tlbid.c                   | 227 ++++++++++++++++++++++++
+ arch/arm64/tools/cpucaps                |   1 +
+ arch/arm64/tools/sysreg                 |  53 +++++-
+ drivers/acpi/arm64/Kconfig              |   3 +
+ drivers/acpi/arm64/Makefile             |   1 +
+ drivers/acpi/arm64/init.c               |   2 +
+ drivers/acpi/arm64/init.h               |   1 +
+ drivers/acpi/arm64/tlbi.c               | 217 ++++++++++++++++++++++
+ drivers/firmware/efi/arm-runtime.c      |   3 +-
+ include/acpi/actbl2.h                   |  32 ++++
+ 30 files changed, 897 insertions(+), 71 deletions(-)
+ create mode 100644 arch/arm64/mm/tlbid.c
+ create mode 100644 drivers/acpi/arm64/tlbi.c
+
+
+base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
+-- 
+2.43.0
+
