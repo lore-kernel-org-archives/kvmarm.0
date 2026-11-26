@@ -1,102 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.201.8
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795646218;
-	b=D6jW87PY0XzB+bkuv9Z/8iV8434gfv9aJXnUieDy/vVh7qkhjWCuSL3x+dd4rH6bZ9LC
-	 A9pap0BkLevb+grga5224Wgi1U+CTafuCbjAQkHN+XrFIpQRriHksxfUH31fOJPpaCZBX
-	 eKCaDUQCDA/wS/F3iSKhWQw1bQAurZXEyc8OtblzXn0PXsilPBCdOt62JZlWYjC23yrtR
-	 UmeW3uRgKsQ9l5tW1JYkQHb9ZkXGFaPaZDqHrm8EABcpGA6DCS9rqy83EvCK4W8IN5YAe
-	 zmA5DdgTXyiHwiGvjPuVp22D+ukp0GQXeRTLaOb0KUQM9Bl96E0ueR6nJLrj+zJQrig==
+	t=1795657335;
+	b=s1ird6QnzTjc6OUbAkWwHyTzQJ3A/lT1OjUIwxYDn/kVGEDi1HsbP88RVw/mYiQfDtU/
+	 YFRP6oDZ203MZR9HP0DkCKBmS+XmA30nfJPIY00MjfvytAtijLIBWKhjSNMXbgQAg18/Q
+	 aLXV4eyG/zJVQQjiyT9FLurDh/8HIy8CMrlsp4bpB8KztnNqUFzoQJ3yzY0ObmrF+9pZs
+	 IJcSk+tVuRVwNEikYKT76HWUMBIkqhNSi5tHbMd10OfPq7U6OKF7IqorK6/dVLNDJ90eg
+	 +etruGFTy+sqWXSEfBNKj/3Td8oZMjfPbJnmOBdzOw9uEQ/nDa3A4x94C+ea0KTq0xg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795646218;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Message-ID:Date:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-ClientProxiedBy:MIME-Version:
-	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
-	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
-	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=5lG6hjWpaomtDK0cBZVisErvnCecq5m9FWgBUcR09l8=;
-	b=ek+wyuB6TuNfnBc5Z1bt8OyGGl064g3YT3XmbGxytB16OTKgX1cqM3xnQOVW34cBuPBJ
-	 Qp4SeEU0LbdQQeRuzgSvpjw84vneHvkmxPXlEeF2PY/oSgL1CgzkvNb4kkdAsOh0R2ZW8
-	 m2eKEm4sHqLS9x7meka2aPo2Uy4wTezRE+dX2N0gn/jr97fVo6aWxMlFm3G51iEvYVBER
-	 DKDNsn0srvuDQ3dP6UpPtYVhJuSpnWwDGr7eiWQgxFMdOO57BulyTmEaEUUxPszEenICa
-	 /NMQzPuru3UxJwvFNDofi0llpE6ioIsz6baQcBRdzhA+Vxo4Rf7YRQgjkpJn+H0IgGQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795657335;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=A7MK+0JZdOCZ6OteoBzUeiNtDWO9oGxvpaMs7GXGdz4=;
+	b=ghztrcd/+M2ldrfpmfqMJL5pcnuBKV39yBpdPFMp/j4fuLu1LuUXqZSMb+Aehe4bywNx
+	 dQ7AZUiUyvlBp1IfRusRj2bt7wdBIELLavz2PYAAU2rW6poe5aq1tr1AwzBAS1muFUR1B
+	 +RMP9SLpC97UxbcYGik1X6/ku5QMIw78IeeQqSkxyvfs8hJcS3Izw0rIqTuiAjmW7Cx9K
+	 8JWdBSYG+dzN/NakRmd0nw/CTVR++Y4+YDdEVsrdwjuKc/tStfWw3d3jkOB7G1sQ2bkUH
+	 MdqnOhpcXMeSpXoCh9E21r3WRuQCa8DA2tx/Hia3+y3PiJSj01BVDXVwRnvDoHaXjxw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=nvidia.com;
-	spf=fail smtp.mailfrom=nvidia.com;
-	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=WjEd3r5k;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.201.8
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013008.outbound.protection.outlook.com [40.107.201.8])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YfAFamKX;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5F2606A321
-	for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 22:36:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4C5F2606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DEA2606A31E;
+	Thu, 26 Nov 2026 01:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=WjEd3r5k
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yTn9iaAPyUCMNS+F6SfANNaB4vyln5Y0TRF347I0TB6neWHb+LAofFchWk9BdT8p8ZQ6S/1kRmCAh4wiejgcrdyTwJhoRnbsYud2kYew4ihgHrbIySdf1vV2XSbHT2AP9U+UAzwfGxXaRsS0ETlq0iApxGY4TRHMb9o2jWw2SLUO6+m7GGjoa9ZzGikUZmObxiDixNz52O10IMD/KN+z9vngfBWeoKbn1qp5RBqtMv3bXSKnXHSXXI1l+Yr+Tb+YgOCFSMRYcizNYPKNj+AbVtL6APz0b3x2vFJp0/YY8sGSx77utjOwJWMd1Xz/nqJV2i/PX4C9DEdwg44l6LRqJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5lG6hjWpaomtDK0cBZVisErvnCecq5m9FWgBUcR09l8=;
- b=PFY1Vs2t8zxa8QHN9i1aTUXeC3ZOEZoh4kKJtUO1mrUtXcbAUJ/pkVl758SjephE0XRrTWbvy8Hyqo7zC3CYm79mQP5Z2qDgAR1IUZqa9EdBODJCNzKGYw0W+9U4sn43va6hFjjiEM6mbcRhX77xNzU8W3UEPzq5iC4ph/g5pGRzNJEwPaH8mylenUd+N1R1uPOiNC6LSU/qMz5eSEfJLpjVk0Ps2497mc8ipM0p3txoEGlUfA20RmtUk+c/3mi3L93TiiaJRMmVgmTT2VRC7x3lKV8TkN3T8Z7WxMtxt2KQ25fTHti0cBZUb12cawKjJUeKAiFuvAgREYjpr1BY4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5lG6hjWpaomtDK0cBZVisErvnCecq5m9FWgBUcR09l8=;
- b=WjEd3r5k2GGUAmGinfIy7sEck7FBO/+Z7gDGFFS6Z9VPL4+3HBl6KY0sdJ8cVhJKLi5y35B1Jd7sePEsiSSL5acl+H9dbH8xVsK9E4AzFY6y5fZbcFEwvuHbiFm1cSmRpl9mgEgM2+0VYVubIlWP7zTqD/+Cnzau3cagX/DGUr4IysgYZgBrdJR6BPdsUCABbTOhoYrd3lDTcF2Z8Jh1e6T8M51PKXvv5582538RqArTR/BRUvjyYDPM8hAThTOOBYYYLOEmtkyA6NRkEQ4HUiXvb8bVbcFy8YNyuoGS3XI5Kd8aBwwaMlNn0E9AlyVrgAkzNkzghAJ98zhXW7O6Nw==
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5390.namprd12.prod.outlook.com (2603:10b6:5:389::15)
- by DS0PR12MB7629.namprd12.prod.outlook.com (2603:10b6:8:13e::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.662.6; Wed, 25 Nov
- 2026 22:36:52 +0000
-Received: from DM4PR12MB5390.namprd12.prod.outlook.com
- ([fe80::2815:c27e:a0a:2720]) by DM4PR12MB5390.namprd12.prod.outlook.com
- ([fe80::2815:c27e:a0a:2720%3]) with mapi id 15.21.0662.001; Wed, 25 Nov 2026
- 22:36:52 +0000
-Message-ID: <6bed8c59-476b-442d-a8a5-158fa0d9d978@nvidia.com>
-Date: Wed, 25 Nov 2026 14:36:49 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/6] KVM: arm64: nv: Grow the shadow S2 MMU pool on
- demand
-To: Oliver Upton <oupton@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
- Joey Gouly <joey.gouly@arm.com>, Fuad Tabba <fuad.tabba@linux.dev>,
- Marc Zyngier <maz@kernel.org>, Tom Matthias <tmatthias@nvidia.com>,
- Shameer Kolothum Thodi <skolothumtho@nvidia.com>,
- Jason Gunthorpe <jgg@nvidia.com>, Julian Miller <julianmiller@nvidia.com>
-References: <20261124211218.2751086-1-nathanc@nvidia.com>
- <awYPtXVeY1NYeTla@kernel.org>
-Content-Language: en-US
-From: Nathan Chen <nathanc@nvidia.com>
-In-Reply-To: <awYPtXVeY1NYeTla@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR05CA0003.namprd05.prod.outlook.com
- (2603:10b6:a03:33b::8) To DM4PR12MB5390.namprd12.prod.outlook.com
- (2603:10b6:5:389::15)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YfAFamKX
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1795657334;
+	b=3PhUZtdNjXuHioMjRsF6t0whFkD51teSwjH04pzuJJQtzQqgXJAE3bERMeFqf6tkpCNt
+	 /ty0O2G0FItCAjCN6Oit5MxaBFbNkGGi07cZ6uAo6KowcT9qiEyUrmQTbWLyXNMuRfc0A
+	 1g1TiVlcWSJTDkXNcoOGYlJQCxPibKL2f9QZ5ZMxZuuZAiIUwAraHI5LNpPiCV4/USlvG
+	 MM6idNZKdkKXHkmmsDAcE16nANqzgMqPojcsGsxkdp1sfqIzfNaqI6vlWxFPDzWp8QEGn
+	 WUKMcjtKl0Qg2nPMnQtXQ2QScsaPa/JdAxzzi1UKnYqaZ0aTvucPNy8XUI6vgYmUiAg==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1795657334;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=A7MK+0JZdOCZ6OteoBzUeiNtDWO9oGxvpaMs7GXGdz4=;
+	b=m1Sv3XtwglRNwNe2LbA07PnCBivDejYf+qYwotJNBjYB65BuZNV0R2K/MBaeJWHsMd/7
+	 GzI9pgM1zauS6kpEUbwUxg+TiDt2Tj0wRx6sFd6r6L1xnrgmxj3FJCK6J0slokQ5s+adW
+	 TpBsj1NNCi9hS96vSUXCN6LE7UwzX3qxmNr01ApPbS6X/hPvjz8GjuM2acXeNMdJvXFbL
+	 xxsU2Vj98GnUBeUs/VtqfVQI3FWz21Fe6y5WABRHgCMbTwAfQKwj+T0K8FZlOxD8ExEhI
+	 E3a4kMxsWeLgsym02L8JQPwgt+8R39j7ilkSzNF+UmBxrntKwI7Hw+zyk8MVh3/d2Bg==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPS id 37DE61F000C4;
+	Thu, 26 Nov 2026 01:42:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795657334;
+	bh=A7MK+0JZdOCZ6OteoBzUeiNtDWO9oGxvpaMs7GXGdz4=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=YfAFamKXxrRpAqL9t+wh3NrO3b2Ab6wtCI2Jjm5WbrH5pBsKjwU3DlH9b9ASSoSW/
+	 aHIlxV9UpbfEN3oG/y2mGaToAKvSiYqAoDjPzpgB7eJMF5KITgW0o5ES+B8wyFawMr
+	 KvZxaMY3r10olDU6GApzllrgJGM3MYfDBi/g2jTsD1pLJ3RSO3TdYvyB6hFcUFyeyD
+	 c5aDlt67/fMtX/LOLPdqwNDkCVK5J3SSnPHVWJGw/Nq75uBYSBSy4qBGbidZCXLtnT
+	 mxu3d4qwLEg+SGkGRmO/Z4knovHQTyiAGS+O19wy80/AqqFpFsdltbLUYnN/reRbqj
+	 GluAhVvCOMCWA==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id BD4C44D164;
+	Thu, 26 Nov 2026 01:42:03 +0000 (UTC)
+From: Brad Fitzpatrick via B4 Relay <devnull+bradfitz.tailscale.com@kernel.org>
+Date: Thu, 26 Nov 2026 01:42:04 +0000
+Subject: [PATCH] KVM: arm64: GICv3: Keep active LPIs in the LRs
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -106,119 +82,225 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5390:EE_|DS0PR12MB7629:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8ef06fd8-49a5-4840-0245-08df4b4499c0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|7416014|376014|1800799024|366016|18002099003|22082099003|56012099006|4143699003|5023799004|11063799006|261102123227099003|10067099003|261026140227099003|261022105027099003|261022075727099003|261026121527099003|261021121427099003|261028144727099003;
-X-Microsoft-Antispam-Message-Info:
-	BZgaWtuuACH3QWU2uBnyY1QSUpYJdp8XgGrxrAFCjPe3WkSmsk73jmJcEhLV19QZcwNgcjZC9v9SOCkXtUvYYdILm+2rSp/N/Ovz2f1jy32h38EACPui2GrHYX77OdLzDlwqeGAY+O+PQie4YqE/9MZK+SkTRlL8ykwyX/MQd8XSbcqA7UD3VhU1bgQjszVClr/PbzaIF/QmGb3Vid/7Mh4u2R3bSGT6ZhfIx2IQ8hr25iBGvSdXqMIzFahTPM1kFFIqt8AB8ZhpVALzk3uCesTHP8UuQV5v9fTOWkEpXT4fuSkKf1pZbHPIJS9+QZLSQ+8gRtcZCvCCe6GgBA924QhfPA9rQ8tnhrasLziYO+P8AAI+4gXaY0uqHi/Ji33u6DPq3GOoL0MoGo5mqeETDJSutEAg0e+0zLXlG5BM0RHqTPqs1sWQy3F6aSDbWKNyq7GzKs075iuNKPnyeQtyAXqTYNquS0Qc0ElsmsRHL7p3gOE9Wn+Bu8zFLpIOM38iZOLoZXzskPTAB65Qs6+8Cgl/GFM0QpizMmjq5grg6DzBvyDgQ4jHH39dehnYcG5el1SxN4TDTkme5V6LUb4eT5Po5chkoH3rd7ZFTrxjMMAGPQ3gt6AQWyaNQiZWta7qTh5GEQqXzqdTKftTa8fTo4AqSUuQ/0nLCpCI02XDTyY=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5390.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(1800799024)(366016)(18002099003)(22082099003)(56012099006)(4143699003)(5023799004)(11063799006)(261102123227099003)(10067099003)(261026140227099003)(261022105027099003)(261022075727099003)(261026121527099003)(261021121427099003)(261028144727099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZnZtaENEckpRZkJSNit2bVBqYTRjYjZsY2ZnazBaNG5XaUphTTFwUFdxNDJW?=
- =?utf-8?B?WERLRFY2OHZFNXdkYnI5eldSTndjTmFscjdrSU1LdUFQa05rekhJL3hKK3Zn?=
- =?utf-8?B?cHgzUThkQjJKUE10bjNHcGVabFFvUk0zcktDaXArQTlacjVpN0piTzd5ZUI3?=
- =?utf-8?B?V29RVjRiZjdNdTVQSm04OVFaWExzbDAwdzdsVVlwYmdlRFZBd0FkemYxcnpn?=
- =?utf-8?B?S0s2RGlpWi9XUDIwSldVY3FmVk5kNy9VdWJkUk4yck1WbHA0M1dtczdISXdm?=
- =?utf-8?B?L2V1UXYvamZkR2tmNkRUSzRpV1UwREpJb3U5T2FFQzkraU0wT2JOYnpXM2Ry?=
- =?utf-8?B?TVdUZ3FTWWdSMUx5RUwzNHRyTVNyNHpnQlBYYkZGSjBYZkt6VGwxRElUUmVo?=
- =?utf-8?B?cW5SL3FSMTkybC9qeG5aZ1NBWUE3RlJ4UUNMUmwzZzcwc0VqMDJUcnZsZS8r?=
- =?utf-8?B?akFHN3lLczBPbFVYZFRmeStsalFzRGI4TVRRTCtXVzhrSmswOXJUTHplNk1G?=
- =?utf-8?B?anRodUQveTkrNU1idE03VEZGRnJaT0tYSnE2UWVxUU5BaWRiaDVLMWFSQUl5?=
- =?utf-8?B?Y2kxaEJmNWpMRjBtMmU1RmZ6QTJjV3ZpRWVyRGYzQ2pxSk5ycVFUTVBaNllm?=
- =?utf-8?B?Ulk1SjVlQXNiSjFFa2FtRW9FdWg1OStBRXVBa1hrMUczOXc4UkJiV0k3WTMr?=
- =?utf-8?B?NnMwaWQ0SFU3dUMxQlU4TDFYZGNPcVZYSk1FT0R0Y0V1bXhhVW4yUmxCTEdP?=
- =?utf-8?B?YzFtZTVGT2xtWjNZVk1RRitDVDBQbllsVXZvbnZXMlNNTDFUSHFZdjJ5Rk5j?=
- =?utf-8?B?SEpiSHBoeSs2YUg5R3BKTzdMTFVzYjlrMEY5YXIweU1UMlY3LzBHMHlDL1lQ?=
- =?utf-8?B?RlFuSmUxUm15c3FPUmdTSFJnTEl2ZmtXRVAwRThPZS9lZk15SUs2NWhGZHlN?=
- =?utf-8?B?ekc1UzBzZVByZXZUeEwvbHZ0cFhnU2RtOGdVMUppWE44QVZtVmdQaXJmTHNt?=
- =?utf-8?B?Nk1IVmxrZEx6clhDUm8wVTNKZE9UNTh5dHdKbGJ1MGVGSmJoaEtwUkpnTFhZ?=
- =?utf-8?B?ejM0TnF6SEIxN2lYSUQyclBpcm8wWDFSdVBRR1pBeWUwVlBmVGw5dTBsNWRm?=
- =?utf-8?B?U2ZlMW5sS0ZuMGVaWmFJVUNkc2p5M0ozT3FsU0J5VFRiNjF3eXZWWklrd3Bu?=
- =?utf-8?B?c3BFOWt2WGR0Mlk3NXUrM090UVpIb0RWMTcrZ3hvSWRxcFo5emdqQ3FaRFV5?=
- =?utf-8?B?eWp4dEpPcFVvNkEzTC9KUzZqRHZvcnY0ekRDQlZ4T29ncU9uNUJlam9IdGxJ?=
- =?utf-8?B?eXNCT2FtQXhiU2FmT3lHdlV0amdBbkxrdSs2aHFNN3RnTHpKcGZXQkU4WFJL?=
- =?utf-8?B?ZkpTM1V4a0l4U096S2JlMzJKeWFwQ2xQN0FIZmdzSDB2RVp0R0FLeTYzUm1V?=
- =?utf-8?B?eWI4SmRKc2xhVXYxSzRQZ2pTMjRRSjdMOUZ4ZlpBNHZybmtQdzVXMFNQZ2E2?=
- =?utf-8?B?WnB0aDVOMGpTOWZIbFE3eTNxZTNvbUxLY3hOSTNubVRucWJRS1Nnd01say9v?=
- =?utf-8?B?cXRvVktqWGRJZ29kOE4zYUhzUmFTRnMvRGtPQ3pNc3JxOWxiaDdIM1FKL3hr?=
- =?utf-8?B?V0hBa2dxMVpRMlh2MTJFNXFUOE91MnNIOUtLZkYzUGVXajFEVzF5aWhyNUpX?=
- =?utf-8?B?U09vUWZCZHRORGx5WFFmTTgyTEdHTEFEamJUWThTaDFFZzF4Q2llQ0RPSU12?=
- =?utf-8?B?eGpmNUFZL2x4cUNnZ1BQTDNvcmQzb0lpS3lIR2RPSzZ5Ykl4dUZPamdpbXpT?=
- =?utf-8?B?V2tOZlNyZDU3QjJGdWIwUUNHWVpFRi8zcUdTejhUbXJNWFhwaDNUK1IwZTBM?=
- =?utf-8?B?bmxBZkRJeThTdnFjYVA0R0lNdGQzU0w4QXM0Y3FxTk9nVmx4WjhFUm80Zm5p?=
- =?utf-8?B?V2tpOVZrTll0bmhvYUdHbEJvZWt5ZkhjckZnNTBsYVMycEUwVUdEWDlxWmVX?=
- =?utf-8?B?OFk5UEZ3ZSs4R0RZSTNERFZZTFUzZ00wblFndXVrdENVNlRvbExpdU9XUXc4?=
- =?utf-8?B?WGJEdFlPOFo1bnZLVW84RmZjS0dmMHlZeGRyazRvWmtYRmh6ZUZBVnRBNGFq?=
- =?utf-8?B?bU84MUlPWDZ5V2l4TU0wNVRDOUtoU1hkSzhPWEpZMC95Z3podjZ0N25FUS9V?=
- =?utf-8?B?WWJseU01bGpLRnkraE9HTVR5WEU3NEpvNUFrdkUrU0Y3cFRBeHdGeG1qajRn?=
- =?utf-8?B?Z0VlUWpUUEdkZ3liQnJEK1NwNXY2STFlaHVwdnpzeWdSTDN2SEwzR1IyOFUx?=
- =?utf-8?B?VWUxb3lTaFBPdWJMZ1BvVURqSktGNzBEMk1xVTF5WDdQQ0taSFRzdz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ef06fd8-49a5-4840-0245-08df4b4499c0
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5390.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2026 22:36:52.0653
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XBZSCjvWjHi95DAlv3c7QjKQhZ8q5BHinr79RDWKwO2byzRL1uZKEp3RxhFit/a6kloRtV/F9HYsjYY6VC6QPQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7629
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261126-bradfitz-kvm_lpi_active-v1-1-9ff28176bf66@tailscale.com>
+X-B4-Tracking: v=1; b=H4sIAGuOB2sC/yXMQQqDMBBA0avIrBtwUlDwKqVIMpnU0WolSUOpe
+ PfGunyL/zeIHIQjdNUGgbNEeS0FeKmABrM8WIkrBl3rBlE3ygbjvKSvmvLcP1fpDSXJrLj2V2o
+ dGksIpV4De/n8z7f76fi2I1M6drDvP2uisdh7AAAA
+X-Change-ID: 20261126-bradfitz-kvm_lpi_active-e0f3c7d1abc1
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+ Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ stable@vger.kernel.org, Brad Fitzpatrick <bradfitz@tailscale.com>
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795657323; l=9811;
+ i=bradfitz@tailscale.com; s=20261011; h=from:subject:message-id;
+ bh=BipltIb3Lr8cSMMj0mxE4M1WaC2QTa+l/ibW/HJbl7w=;
+ b=la6OSwzvf+EEB6WnO34xzCyVLZjdkBGux0smwdqe6xbHThMaL04cxuyLvxOZbjCRhf8SNeS4E
+ n3+qQqrguYrDyzZ4fnneNmQ+/Onaykq2fIV9++zhTdKSphOor3M4wUA
+X-Developer-Key: i=bradfitz@tailscale.com; a=ed25519;
+ pk=RL25YdOUenVJzQaiZDrw/Aqu9ZEwUQBon30yMHGsIKY=
+X-Endpoint-Received: by B4 Relay for bradfitz@tailscale.com/20261011 with
+ auth_id=1152
+X-Original-From: Brad Fitzpatrick <bradfitz@tailscale.com>
+Reply-To: bradfitz@tailscale.com
+Content-Transfer-Encoding: 7bit
 
-Hi Oliver,
+From: Brad Fitzpatrick <bradfitz@tailscale.com>
 
-On 11/24/2026 2:29 PM, Oliver Upton wrote:
-> On Tue, Nov 24, 2026 at 01:12:12PM -0800, Nathan Chen wrote:
->> A nested-capable VM gets 2 shadow stage-2 MMUs per vcpu. Once the guest
->> hypervisor runs more nested VMs than that, nearly every nested context
->> switch recycles a live MMU and spikes host CPU usage.
->>
->> This series lets KVM grow the shadow MMU pool on demand when the pool
->> is too small, up to a host-wide VMID budget. It also parks grown MMUs
->> on a guest TLBI ALLE1 and when a guest range invalidation leaves them
->> empty, in order to return unused capacity.
-> Thanks for taking a look at the problem. There's no argument that we
-> need to do something, the existing MMU allocation policy was good enough
-> for doing nested development and would get replaced eventually.
-> 
-> With that said, I feel rather strongly that we should not invest further
-> in the MMU array because it is quite inflexible. On top of that we need
-> an actual eviction policy that selects cold MMUs as victims instead of
-> the current round robin approach. I don't think you need to do anything
-> special on the invalidation side with a good eviction policy.
-> 
-> I think this is what we need:
-> 
->   - A VM-wide hashtable for storing stage-2 MMUs, keyed off of
->     {VTCR_EL2, VTTBR_EL2, HCR_EL2.VM} to align with how we handle TLB
->     match at stage-2. The hashtable can be dimensioned based on a
->     configurable VM limit for shadow stage-2 MMUs.
-> 
->   - A state tracking mechanism for victim selection. An LRU list seems
->     like a reasonable starting point.
-> 
->   - RCU replacement of the evicted MMU. I need to think about it a bit
->     more but you should be able to reuse the PGD in the new MMU context
->     as well since we know that no vCPU holds a reference on the victim.
->     That ought to be the goal anyway.
-> 
-> That should allow us to dynamically allocate MMUs while also improving
-> upon the current behavior for constrained MMU allocations.
+Since commit 73c9726975af ("KVM: arm64: GICv3: Drop LPI active state
+when folding LRs"), the active state of a virtual LPI is discarded on
+every exit. If the guest has acknowledged an LPI but not yet EOI'd it
+when an exit happens, the LPI is then pruned from the ap_list, and the
+guest's subsequent EOI targets an INTID that is not in any LR. KVM then
+relies on the virtual CPU interface performing the priority drop
+regardless.
 
-Thanks for the detailed direction, that makes sense. I'll drop the
-array-based approach, including the invalidation-side parking, and
-rework the series around the approach you mentioned above.
+That doesn't hold for Apple's emulated GICv3 interface, as exposed by
+macOS Virtualization.framework to a Linux guest running with nested
+virtualization (M3 and later, e.g. "tart run --nested"). There, an EOI
+of a vLPI that has no LR leaves the corresponding ICH_AP1R0_EL2 bit set.
+The running priority of the vCPU stays at the LPI's priority forever,
+and since Linux uses the same priority for all of its interrupts,
+nothing is ever delivered to that vCPU again. The nested guest's CPU
+spins on WFI, with KVM seeing pending interrupts and waking it up over
+and over (about 30k WFI exits per second), while the guest itself
+reports a hard lockup on that CPU. With a 2-vCPU Debian guest, this
+happens within the first minute of boot, every time.
 
-For the per-VM limit, should we keep it capped at
-S2_MMU_PER_VCPU * nr_vcpus by default? And should it be overridable
-via a module parameter or per-VM capability, or would you prefer no
-per-VM cap at all, with the pool growing on demand and only evicting
-when allocation fails?
+The architecture is arguably ambiguous here: the ICV_EOIR1_EL1
+description says that a write "drops the priority for the virtual
+interrupt" and the VirtualWriteEOIR1() comment says "just priority drop
+and return", but the pseudocode itself only drops the priority on that
+path if the IMPLEMENTATION DEFINED "Drop before checks" behaviour is
+implemented (Arm IHI 0069E, 9.20 Pseudocode).
 
-Thanks,
-Nathan
+Avoid depending on this when we don't have to: keep the active state of
+LPIs when folding the LRs, so that an acknowledged LPI stays in its LR
+until the guest EOIs it, as was the case before v6.19. The only LPIs
+whose active state is now dropped are the ones that don't make it into
+the LRs, which is where EOIcount can't track their deactivation. On
+implementations like Apple's, that case still relies on the priority
+drop, but it now requires LR overflow instead of a single exit at the
+wrong time.
+
+Tested on Apple M5 Pro, M4 Pro and M1 Macs and on AWS Graviton3.
+
+Fixes: 73c9726975af ("KVM: arm64: GICv3: Drop LPI active state when folding LRs")
+Cc: stable@vger.kernel.org
+Signed-off-by: Brad Fitzpatrick <bradfitz@tailscale.com>
+---
+This is a bug report in the form of a vibe-coded patch, which came out of
+me asking Claude to bisect why my Linux kernel upgrade broke nested virt
+on my Mac mini Proxmox cluster. Things worked fine with
+proxmox-kernel-6.17 (6.17.13-1-pve), but every kernel option after that
+(7.0.14-30-pve, 7.3.5-1-pve, mainline 7.4-rc4) was busted: Linux guests
+of the Proxmox node hang during boot with a hard lockup on one vCPU.
+
+Claude bisected it and tested this patch, which makes Proxmox nested virt
+work on my Mac minis again (both M5 Pro and M4 Pro minis).
+
+Claude slop text follows. I don't claim to know any of this. You're
+welcome to ignore this patch entirely and fix it in a proper way.
+
+The setup: macOS's Virtualization.framework (via Tart, "tart run
+--nested") runs an arm64 Linux VM with EL2, which runs KVM in nVHE mode
+as a Proxmox node; that node runs a Linux guest. The vGIC in the middle
+VM is Apple's emulated GICv3 CPU interface (ICH_VTR_EL2 = 0x90580007,
+8 LRs, 5 priority bits, TDS set).
+
+What goes wrong, per instrumentation of the middle kernel: the stuck vCPU
+has ICH_AP1R0_EL2 = BIT(24), i.e. an active priority of 0xc0, with no
+interrupt active in KVM's view, and all four used LRs still holding
+pending interrupts (timer PPI 27, SGIs 1 and 6, an LPI). Since Linux uses
+0xc0 for all of its interrupts, nothing is ever delivered again; the vCPU
+spins on WFI about 30k times per second with KVM waking it every time.
+Logging every time vgic_v3_fold_lr() discards an LPI's active state shows
+that it happened exactly once in a hung run, on the vCPU that then got
+stuck, for virtio-blk's MSI at priority 0xc0.
+
+So the guest's EOI of an LPI that is no longer in any LR doesn't drop
+the priority on Apple's emulated GIC. The patch keeps active LPIs in the
+LRs, as before v6.19, and drops the active state only of LPIs that don't
+fit in the LRs. Details are in the commit message.
+
+This looks specific to Virtualization.framework's emulated GIC, not to
+Apple silicon: on an M1 MacBook Pro running Asahi Linux on bare metal,
+with Fedora Asahi Remix's stock 7.3.4 kernel (which includes
+73c9726975af1), the same Debian sid guest under QEMU/KVM, using the ITS
+and LPIs, booted fine 4/4 times with 2 and 4 vCPUs. So M1's hardware vGIC
+does the priority drop.
+
+Testing:
+
+  - Nested (KVM in nVHE mode in a Tart VM), QEMU guest (Debian sid, 2
+    and 4 vCPUs), M5 Pro Mac mini on macOS 27.0: unpatched 7.4-rc4+ hung
+    5/5 boots, patched booted 4/4.
+  - Same on an M4 Pro Mac mini on macOS 26.6.2: unpatched hung 2/2,
+    patched booted 4/4.
+  - Nested, real Proxmox VE 9.2 node on the M5 Pro, booting a Proxmox
+    guest (Debian sid): 6.12 and 6.17.13-1-pve boot, 7.0.14-30-pve hangs,
+    and patched 7.4-rc4+ built with Proxmox's full config booted 4/4 (2
+    and 4 vCPUs), with the node's cluster and Ceph services healthy.
+  - Bare metal M1 (Asahi, Fedora's 7.3.4-401.asahi.fc43 source): boots
+    4/4 both unpatched, as above, and with this patch applied on top.
+  - Bare metal AWS Graviton3 (c7g.metal, Neoverse-V1, GICv3 with ITS, 4
+    LRs), mainline 4dce97c6c265 with and without this patch, each in VHE,
+    nVHE and protected mode:
+      - KVM selftests: identical results with and without the patch in
+        every mode (VHE and nVHE: 40 pass, 9 skip, 0 fail; protected: 37
+        pass, 10 skip, 2 fail, where vgic_init gets EINVAL instead of
+        E2BIG and mmu_stress_test times out, both without the patch too).
+      - vgic_lpi_stress at up to 16 vCPUs and 64 devices: passes.
+      - Debian sid guests with 2, 4 and 16 vCPUs and 32 virtio-blk
+        queues under O_DIRECT read load: boot and finish, no stalls.
+      - To exercise the LR overflow path with active LPIs: a local copy
+        of vgic_lpi_stress whose guest handler spins between ack and EOI,
+        with a kprobe on vgic_v3_configure_hcr() histogramming the
+        ap_list summary on every guest entry. With this patch, the LRs
+        overflowed while LPIs were active 904 times (VHE), 376 (nVHE) and
+        344 (protected), and all 160 runs passed. Without the patch that
+        count is always 0, since LPI active state is dropped on exit.
+
+Not tested: kvm-unit-tests, GICv4.1 direct injection (KVM reported
+"GICv4 support disabled" on the Graviton3), and any non-Apple, non-AWS
+hardware.
+---
+ arch/arm64/kvm/vgic/vgic-v3.c |  4 +---
+ arch/arm64/kvm/vgic/vgic.c    | 26 +++++++++++++++++++++-----
+ 2 files changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 65b77fb35be37..ba50809f66928 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -90,9 +90,7 @@ static void vgic_v3_fold_lr(struct kvm_vcpu *vcpu, u64 val)
+ 		return;
+ 
+ 	scoped_guard(raw_spinlock, &irq->irq_lock) {
+-		/* Always preserve the active bit for !LPIs, note deactivation */
+-		if (irq->intid >= VGIC_MIN_LPI)
+-			val &= ~ICH_LR_ACTIVE_BIT;
++		/* Always preserve the active bit, note deactivation */
+ 		deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
+ 		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index fe09ada322625..05459d662965c 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -1013,11 +1013,13 @@ static void summarize_ap_list(struct kvm_vcpu *vcpu,
+  * - Virtual LPIs have an active state (surprise!), which gets removed on
+  *   priority drop (EOI). However, EOIcount doesn't get bumped when the LPI
+  *   is not present in the LR (surprise again!). Special care must therefore
+- *   be taken to remove the active state from any activated LPI when exiting
+- *   from the guest. This is in a way no different from what happens on the
+- *   physical side. We still rely on the running priority to have been
+- *   removed from the APRs, irrespective of the LPI being present in the LRs
+- *   or not.
++ *   be taken to remove the active state from any activated LPI that doesn't
++ *   make it into the LRs. This is in a way no different from what happens
++ *   on the physical side. Active LPIs that fit are kept in the LRs, as some
++ *   implementations (such as Apple's emulated GICv3 under nested virt)
++ *   don't perform the priority drop for an EOI of a vLPI that has no LR,
++ *   leaving the running priority stuck forever. Overflowing the LRs with
++ *   active LPIs still relies on the priority drop.
+  *
+  * - Virtual SGIs directly injected via GICv4.1 must not affect EOIcount, as
+  *   they are not managed in SW and don't have a true active state. So only
+@@ -1059,6 +1061,20 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 			break;
+ 	}
+ 
++	/*
++	 * Active LPIs left out of the LRs can't be deactivated by EOIcount, so
++	 * drop their active state. See the LPI rules above.
++	 */
++	irq = *host_data_ptr(last_lr_irq);
++	if (irq) {
++		list_for_each_entry_continue(irq, &vgic_cpu->ap_list_head, ap_list) {
++			if (irq->intid >= VGIC_MIN_LPI) {
++				guard(raw_spinlock)(&irq->irq_lock);
++				irq->active = false;
++			}
++		}
++	}
++
+ 	/* Nuke remaining LRs */
+ 	for (int i = count ; i < kvm_vgic_global_state.nr_lr; i++)
+ 		vgic_clear_lr(vcpu, i);
+
+---
+base-commit: 4dce97c6c265544342e716e62fd24bbb232590c5
+change-id: 20261126-bradfitz-kvm_lpi_active-e0f3c7d1abc1
+
+Best regards,
+--  
+Brad Fitzpatrick <bradfitz@tailscale.com>
+
+
