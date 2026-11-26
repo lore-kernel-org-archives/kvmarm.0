@@ -1,56 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795658754;
-	b=v4IFuNy6hRnCjdigZ1ZIKy5/HgWShjkdq7Z+sotTlZOGTpScbRzQwOZpmhBFIHUrpgjo
-	 7S42eXjaCDaydoOF63VOIfbLyNMeeB8/sKJnN+IX4JjVT0h2tS0IXOIS5WfWAM7z2daGA
-	 sZY7eBkYrsyJ4owAT/dxXDVLNfzwmRoiYkL660IeWhtuJ5v2K/1SzRd+7Ier6xxkvlbbi
-	 nJX4IUskyvBdvRgrUO1kGnhDV8eVkcrwZmbmyEGkFS/JW+a529PQBiAiqq/loWPZ/5I8m
-	 SWIAwrwBuHNiIhIJ9oGwVJT747l3l3PIW79iizLqiDT1L/MHNvfXmWbE63/stUVBPQw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795658754;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=rQO6nctWokdL7kaPAlPNobD5zXIvnmJLXhHKWB6ucDc=;
-	b=5p2vyWpkH0o+/UbI6k3ZPB/oRxCEfS5LJFIwX8ll1KbPMNNpSV06UTWjZ2g2OVZxoIcm
-	 ViGtMalw6zuQpi4pdTLvBmRRHTFhEPetKazXEcUZ7FxSlR0gJcwYxC1S1xOlBAS0GWzOf
-	 FLG99p5wrJAxMYMD/LLB2WCFJfdr4B9Y4FkvcGiJTSH76bGPlw8n7lKf/pOq7EeYRYmHl
-	 QNZ9qPBXA45Wz16Si+CgQlCKIah/JKkP7t7Mz0I9nxxP3gopc8huLNPvfsgeg7chg3i+1
-	 JuGKzeQ59i0T+buR4DHYD1cnShC2Z4LKP2Bb+qki7MrBzrSPLK0MFSbWmZqKkm6jsUg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QBKPETqa;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.178
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795668789;
+	b=AQBDetre2t+W0Uk7rRNlntdNWSVaOx4gD/IzYP/LReQ/1blK9RuVP22oUpCusep/3eOu
+	 HjWAUUrgNdHOVTwfoKcoXiYDoas6G3z5I2wNnWwJbHMxP8RNDx52CuwhvXMrDOHPlUiVp
+	 pbW0XjnXMDbxqJClWFHd95hgIGi9RD+YSUP7TNQ+bSJjg3laRdcFa7lVyugFOGTJ23J7W
+	 Xcrm3xImzoEW99S7Z/bGsQWdzhLM9DklJPFNrdWvg9NO2cOtHbx5bL73utNkX2kIgVm4b
+	 M/dgPnR17DzvFVbWGubdpF3sQIchuDkTQ8ZSvsJDkHK0DL0MsynMVNgjlV9PR6/3t+Q==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795668789;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=3Lt4WVagAGoPNQQ8sUuV+xbM6KmxoNVjHzW8jPpsfl4=;
+	b=4LIg5IcSOwx1kvDe9W5eM5bbcR8XwdWcLmv5XEpUPXqQCchaOgOMZOi/h+umiFJU9C9a
+	 i/eL3ZbROP3SrElBwKwmAnrGvYOA6XjScgdUWo6Jcqpn+30G/CpKnB6+a1HwYD59LMkiI
+	 2LWyOGooAA/KS4j474FDggzFKa41w+V4pkTg872XjiL2ngqPbEw8c3sPsCGkJPfd2QWZB
+	 cA4m8x+dSFzy3uo889PgMCOO6tIVixZPs2HFYZMBOLSE2e+y+ymZuKJ1Q94ismJSeKIm7
+	 HPQKcECGYQhRdgkjzCD01svFV5mv2j5lLGi6lDUZJ76eJQJraYcoYjQ6Oh3ueGVdytw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Wd+w00+j;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.178
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE60606A32A
-	for <kvmarm@lists.linux.dev>; Thu, 26 Nov 2026 02:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BC3606A32C
+	for <kvmarm@lists.linux.dev>; Thu, 26 Nov 2026 04:53:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 57BC3606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QBKPETqa
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C86C1F000C4;
-	Thu, 26 Nov 2026 02:05:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795658754;
-	bh=rQO6nctWokdL7kaPAlPNobD5zXIvnmJLXhHKWB6ucDc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=QBKPETqa8ccNzv9io4MSuAZiismQxf2sFkzR+4x7Y+DF9df5hr3OMD4Rz2hJcCrN8
-	 ZBQBwrgsK5MSqDElBPnA2BFF9MmCsgR7C5poyZjtD/zjNb/u1Y/hYZA8kG+HNGN/kE
-	 UUkD348llC+7JeCbHk0A0qopUGO4m6gdYdwwIyX3qLV2zYGCcAONI6ERAZNsIMHAzf
-	 Na2f0DW1ECrybsYIuGf7lolZmXJSuDpRWGNngEHLL2YvjcqTwEREefPeYTD1nv1vgA
-	 t0UxYsJjnpGDRTQf2YLzUO7o28Hvf0lq2Zj2p9gtrexTlcJctSNM5vg0WHhKAeADTt
-	 Qxz0qGqIs9iyw==
-Message-ID: <sashiko-outbox-234602@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] KVM: arm64: GICv3: Keep active LPIs in the LRs
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Brad Fitzpatrick" <bradfitz@tailscale.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20261126-bradfitz-kvm_lpi_active-v1-1-9ff28176bf66@tailscale.com>
-References: <20261126-bradfitz-kvm_lpi_active-v1-1-9ff28176bf66@tailscale.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Nov 2026 02:05:53 +0000
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Wd+w00+j
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-55c7445cf85so1381061cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 25 Nov 2026 20:53:09 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795668788; cv=none;
+        d=google.com; s=arc-20260327;
+        b=jSPoY6Rozj+mUZc+WGe1DvWuhy4wYTStKe2hoTSZu1HZKKI+lDdmKKywkr+qkdVUvo
+         n+RuLB97iJfMOH7LBIc2MhyE3LSozGepvmQVmciA2OtNZ6ZJUZg9xtYFri/T8DOoyUDf
+         EDdywutU092ASXm6TLWr080zayKNU1Y/OLQ95QQcnLNr7Q9eJfwzqalOmOqAbN4qFgTI
+         2sm7Bs4Owf9AW862lsRONmSUC0aDcsMYw09kcw6eJGP0h+MgatZp5UkUxzhN0A1FlRJU
+         KqJ5VxEFPGtvnWcJLHLhogkTlQttsGK4kf6mMB6Q7rPFJ1xutgIzqbSnCJHSmdTkZyFS
+         RxRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3Lt4WVagAGoPNQQ8sUuV+xbM6KmxoNVjHzW8jPpsfl4=;
+        fh=peWThKuqxrCMK7lZ1XkW0UTGd3MxaraWIspQPHDJTXo=;
+        b=KNAiMWBI8kVsCgaWjFCifAQ0GAO+vNf3a6rcE2j2KPOslA1zUPksFaAqJXo+2r7DmN
+         X+pMmkeg4EZEg8WnhqJbncXauQ6/FPHIHeinEPlGZvr3WGUaIkWHlTR99pGY4qcbsVZe
+         IoY8wbLyFdMd6c62zUm2cOSdmwSLqBgqyEvPqX07vzmYynLZVJWhBRGLJs33oE1vx373
+         Z4xk4NFDnC0T95U2UixSu6X8kj5mFWQVQat2SloZ4/XDqupOuQ7xxu+ms4JZkcULyh7P
+         nsm/NTQLwVpTvjGqzHhlU4d0r7V2M482DL28yfV45l7P8EWq5GsSE8ZNuAnL47SbgfPe
+         7WUg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1795668788; x=1796273588; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=3Lt4WVagAGoPNQQ8sUuV+xbM6KmxoNVjHzW8jPpsfl4=;
+        b=Wd+w00+jwprH2Z7WaB0z9B+eXn8VFSBg9vXrPggY+8dvXkKNWOGXmmPPgXtKo2cs0b
+         1Nv6r3K5sy9ukrueHL7Qd1zX0NXV9GwTnkcV34yL+j5AzAfXphYvGjTiQOZKel26sS0O
+         RESaNfPrqDL3xjKl+UIAQ6h+6TKCeoZdfhY6ngrtyMs5l3QLeK+f4hwUCTTSC57hfcsx
+         SkNmH3CbqFox4LsvPxIcdRg98abwh0ObP/OSXed2HoTnMOAOfaT2jlHrXmEIlsp55aFf
+         gEQ3c2lOlTlHAblApePu2yA6ObqmDo42EdaxXuLX1Jxqqx9ZB1hLJqzbeUdRef9VS85k
+         0jXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795668788; x=1796273588;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=3Lt4WVagAGoPNQQ8sUuV+xbM6KmxoNVjHzW8jPpsfl4=;
+        b=gFUtAbrT0WeBD3Q5vQl7SSLmHYuWhrA+Ixn//BVZhEVJyE2ng0HSC7Lf72amAOnh8i
+         BpxErX3aeR/+Cm1qWc3NDwfQpgEf2iS30lXI+iLn3rrHCvxkoxfVsBCY/kxLvfJobSgk
+         4ufdFonhdzRp6iDLnGI19MJtWw+mQAWAvBxfeE643NRQVo7A62v2UcRh16vDqF5OKsAS
+         8lr5ext1x4lfD6Eupr+/JbtOlG7JxscXjpDsr2u5h/wc8BUNBowSx2WpSyrOJJJp8GIm
+         pngRAqwgbsXKMejTQNYZREeKIikthk5GzYUb14aY+SzyhjPbLulnG1gE9/p+BJwpXUH/
+         aKOg==
+X-Forwarded-Encrypted: i=1; AL+hErFB/TJlviIVGhtgJ63cqHxxHwyiZa67mrd7FJdGkfDdH293I/yuID5kDT9RGjkACh94IDXns3c=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/3h2uoEbXLAlVTnwFUojoGYkftgJfwq9YVRE1GmtyYPF/1q3Q2
+	UVFam0lw5KF8VS8rqIHecIVCSOrfSe8hETJp++OQQvgR5F+WGqLBR3K5U4QrRzBd7v1lpskKVfw
+	jKCbRPlsw7K1xhTFDVFyxCvXZ6kQW0VLz87e9QlGP
+X-Gm-Gg: AZFdTZeDF37hHbZfmvsr86wX8clDiztFH2fJySYBaoV+WLXlgGi36qIE0+Y7jIt/+R6
+	YmXLTQ94kp/XKwNpjbyxEPvZwBvTMsab5y97XYZ3tzIMkbz8UQMKgMdlhKZ4/zAEHvWlWM1RdtM
+	R59YKnesAz3x+UjBB263ggDuuBgN5Zc9pRHWc6L3GfVXYkqdejXyHawl2Ihm5NFNS6HcEObY80u
+	Q8m84DBJ3aohpjT3bnEX4LBVy1/Wh7cdyMTX8vkOq/qqiuWz00MQOSnFoBXyYWKqEBprtfy5Xrw
+	bZ55MYLjDVZgAZUs6luI5DttkWxEJF+jADJhUeFuH/I72VSu1Ybl06YMjPqak3zjQl01wchsdTp
+	pB9SOkGBOwbSR6abr7vh+unEwHCP2FWhDYgmNob/2G0O0L7LU+yQC9HTZ4Q==
+X-Received: by 2002:a05:622a:1e86:b0:536:3ee4:81cd with SMTP id
+ d75a77b69052e-55d88127bafmr101738501cf.4.1795668787640; Wed, 25 Nov 2026
+ 20:53:07 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,125 +103,57 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+References: <20261125061523.1540234-1-irogers@google.com> <DN4FM3TBOJ9T.2QOOL77P5HETO@garyguo.net>
+ <20261125132225.00254c37@gandalf.local.home>
+In-Reply-To: <20261125132225.00254c37@gandalf.local.home>
+From: Ian Rogers <irogers@google.com>
+Date: Wed, 25 Nov 2026 20:52:56 -0800
+X-Gm-Features: Aa3M54pMQmXw5Cgtc0EakW9NOiIZs8STgUuBigJfJMSZlzejGTE6XZMetCnzc-8
+Message-ID: <CAP-5=fWkUW787c4dGx9rccucqD67dfRgwBB_SoCxFnfZXtXP-w@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 00/30] unwind: Minimal DWARF CFI unwinding for user
+ and kernel space
+To: Steven Rostedt <rostedt@goodmis.org>, Gary Guo <gary@garyguo.net>
+Cc: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, jpoimboe@kernel.org, peterz@infradead.org, 
+	mingo@redhat.com, tglx@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, 
+	x86@kernel.org, catalin.marinas@arm.com, will@kernel.org, 
+	mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, pjw@kernel.org, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, 
+	linux-riscv@lists.infradead.org, acme@kernel.org, namhyung@kernel.org, 
+	linux-perf-users@vger.kernel.org, mhiramat@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, bpf@vger.kernel.org, 
+	nathan@kernel.org, llvm@lists.linux.dev, nsc@kernel.org, 
+	linux-kbuild@vger.kernel.org, ojeda@kernel.org, 
+	rust-for-linux@vger.kernel.org, ardb@kernel.org, linux-efi@vger.kernel.org, 
+	maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, shuah@kernel.org, 
+	linux-kselftest@vger.kernel.org, indu.bhagat@oracle.com, jremus@linux.ibm.com, 
+	wnliu@google.com, dylanbhatch@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your contribution! Sashiko AI review found 2 potential
-issues to consider:
-- [Medium] KVM: arm64: vgic: stale ap_list_summary and sort order in
-  vgic_flush_lr_state()
-- [Medium] KVM: arm64: vgic: active LPIs left stuck active by
-  vgic_flush_pending_lpis()
---
+On Wed, Nov 25, 2026 at 10:22=E2=80=AFAM Steven Rostedt <rostedt@goodmis.or=
+g> wrote:
+>
+> On Wed, 25 Nov 2026 16:28:02 +0000
+> "Gary Guo" <gary@garyguo.net> wrote:
+>
+> > A quick question: how do you plan to get this working on 32-bit ARM whi=
+ch has
+> > its own EHABI?
+>
+> Do we care? Isn't ARM 32 mostly deprecated at this moment? Or at least no=
+t
+> adding new features.
 
-commit c554f5d3ddcbf7ba9d43ffa052060d79ec852b3b
-Author: Brad Fitzpatrick <bradfitz@tailscale.com>
+There has been recent work on both MIPS and Alpha for perf events, so
+supporting ARM32 EHABI doesn't seem unreasonable. Devices like the
+Raspberry Pi Zero W/WH, which use a 32-bit CPU are end-of-life in 2030
+(according to https://endoflife.date/raspberry-pi ). It is
+out-of-scope here, but extending the kernel and verification
+infrastructure shouldn't be hard.
 
-KVM: arm64: GICv3: Keep active LPIs in the LRs
+Thanks,
+Ian
 
-This commit keeps the active state of virtual LPIs when folding list
-registers on guest exit, and drops the active state in
-vgic_flush_lr_state() only for LPIs that do not fit into the list
-registers.
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 65b77fb35be37..ba50809f66928 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -90,9 +90,7 @@ static void vgic_v3_fold_lr(struct kvm_vcpu *vcpu, u64 =
-val)
->  		return;
-> =20
->  	scoped_guard(raw_spinlock, &irq->irq_lock) {
-> -		/* Always preserve the active bit for !LPIs, note deactivation */
-> -		if (irq->intid >=3D VGIC_MIN_LPI)
-> -			val &=3D ~ICH_LR_ACTIVE_BIT;
-> +		/* Always preserve the active bit, note deactivation */
->  		deactivated =3D irq->active && !(val & ICH_LR_ACTIVE_BIT);
->  		irq->active =3D !!(val & ICH_LR_ACTIVE_BIT);
-> =20
-
-[Severity: Medium]
-Now that vgic_v3_fold_lr() preserves irq->active on LPIs across exits, can
-vgic_flush_pending_lpis() unqueue an active LPI while leaving
-irq->active =3D=3D true?
-
-When the guest clears GICR_CTLR_ENABLE_LPIS while an LPI is active,
-vgic_mmio_write_v3r_ctlr() pauses the vCPU (folding the active bit into
-irq->active) and calls vgic_flush_pending_lpis():
-
-arch/arm64/kvm/vgic/vgic.c:vgic_flush_pending_lpis() {
-    ...
-	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
-		if (irq_is_lpi(vcpu->kvm, irq->intid)) {
-			raw_spin_lock(&irq->irq_lock);
-			irq->pending_latch =3D false;
-			list_del(&irq->ap_list);
-			irq->vcpu =3D NULL;
-			raw_spin_unlock(&irq->irq_lock);
-			deleted |=3D vgic_put_irq_norelease(vcpu->kvm, irq);
-		}
-	}
-    ...
-}
-
-Because irq->active is still true with irq->vcpu =3D=3D NULL,
-vgic_target_oracle() hits its first check (if (irq->active) return
-irq->vcpu ? : irq->target_vcpu;) and bypasses the enabled, pending and
-vgic_lpis_enabled() checks.  When the vCPU resumes, the LPI is not in any
-LR for the guest's EOI, and any later vgic_queue_irq_unlock() (such as
-its_sync_lpi_pending_table() when LPIs are re-enabled or update_lpi_config()
-on an ITS invalidation) re-queues the LPI onto ap_list_head and loads it
-into an LR as active, permanently wedging that LPI and its LR slot because
-the guest has already EOI'd the earlier activation.
-
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index fe09ada322625..05459d662965c 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-
-[ ... ]
-
-> @@ -1059,6 +1061,20 @@ static void vgic_flush_lr_state(struct kvm_vcpu *v=
-cpu)
->  			break;
->  	}
-> =20
-> +	/*
-> +	 * Active LPIs left out of the LRs can't be deactivated by EOIcount, so
-> +	 * drop their active state. See the LPI rules above.
-> +	 */
-> +	irq =3D *host_data_ptr(last_lr_irq);
-> +	if (irq) {
-> +		list_for_each_entry_continue(irq, &vgic_cpu->ap_list_head, ap_list) {
-> +			if (irq->intid >=3D VGIC_MIN_LPI) {
-> +				guard(raw_spinlock)(&irq->irq_lock);
-> +				irq->active =3D false;
-> +			}
-> +		}
-> +	}
-> +
->  	/* Nuke remaining LRs */
->  	for (int i =3D count ; i < kvm_vgic_global_state.nr_lr; i++)
->  		vgic_clear_lr(vcpu, i);
-
-[Severity: Medium]
-Does clearing irq->active here leave struct ap_list_summary stale when
-vgic_v3_configure_hcr() runs below?
-
-summarize_ap_list() and vgic_sort_ap_list() run at the start of
-vgic_flush_lr_state() while overflowing LPIs still have irq->active =3D=3D =
-true,
-counting them in als.nr_act instead of als.nr_pend and sorting
-active+pending LPIs as active rather than pending.
-
-When an overflowing LPI was active+pending, clearing irq->active turns it
-into a pending interrupt outside the LRs without incrementing als.nr_pend,
-so irqs_pending_outside_lrs(&als) can be false and vgic_v3_configure_hcr()
-will not set ICH_HCR_EL2_NPIE to deliver it once in-LR pending interrupts
-are acknowledged.  When an overflowing LPI was active-only, als.nr_act
-remains inflated after irq->active is dropped, causing
-vgic_v3_configure_hcr() to spuriously enable ICH_HCR_EL2_UIE,
-ICH_HCR_EL2_LRENPIE and ICH_HCR_EL2_TDIR.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261126-bradfitz-k=
-vm_lpi_active-v1-1-9ff28176bf66@tailscale.com?part=3D1
+> -- Steve
