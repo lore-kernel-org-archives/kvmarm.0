@@ -1,66 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795713298;
-	b=KRY0dwrfU35x4fUND8OvARP3jSJt10Ph4dg/zSjy1IItuRA+OJpb1OTRyJRoK1yh5Ekw
-	 5EO9RIrEPrm3hXZ9HMN47DIJsVtvgpsy/igVVTmC358lpwqDXjd0JuQ0VccKFd2e7Ooha
-	 /KqtgTRmzzwc5BBqtnfY5p1CjRRPT93XjWHH4NDWRkfIOlYOl3qdkX2IPDCpVfdg5lKk6
-	 4V2E8V7QOY60MDsqhmB/v93K3hvFVh+X/VACNcbYiCyYrE3k/uTUdqK0HptpBBXZCKVcy
-	 bxzWK+uR3H4NIT5m8xpOwNGWLIlSKCkp1oVonLUAQ9RaTOr7rDCRkjH0f0E58InsPwg==
+	t=1795713303;
+	b=hVEWlPq8LuMvcgi5Q5RYbW35yBDHZSZlSycHMMu71kHr7Cc/W4IJMIHXoLZAkbVwT52/
+	 XaEbVbV4tCIZCxMXfimnhuEMNa4IDtnD3MBSSYdDsMGw5SROn/3GUNRfqH6XUr5htS9t4
+	 f8h1s/MEtpI5TYGETgJ9ofGspOcsekNAbasulQkw1AnRtyOM7DpdXt76hiIpdpLMxOoyb
+	 i4RH/5YRCfc63GmYB+wfRnWN0bHOoDOXTmwu2yiipEbOKp5FIgMfMT2fb8eHTpsgpQaND
+	 sclibeDMWt5hMiVwFFbehQDqoHyuA59kC+UnyvvY83Pbf6IzockeQ2CGAFjeJhLEIWg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795713298;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795713303;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=LNLrvcxnQvJha1qURA3bNFc1ECDgKKs6fCmI6FYzJRk=;
-	b=inzYP2OdaYpgSK/LyJbWDdiiVNKMZwoeEiWH+0KNmqfN7/ffw8YxM0Y0Saj7flieAzEp
-	 yTgkzqdAv/IRlaAAlMHpsHNOq7w3hNZVJMOzpCoIIPX4xm6zYUCkvAFdK9EW4Tv93MYF3
-	 Q+o0Y6Zs6f6cxumMVVoFrCHp4/TWFK4XBlhFYq1/zt05BmBHy20vbH+cMPpwDYi3pCoRI
-	 IkBg6TflTKXeQ1wVAzPyjyxKMTQBNzsdHOSIREO2ebj9ml+fMdCp+FaTNZ4Fvv1gCHRvs
-	 097J8Hm9aNEkxfUaAXk0E16EnEkUiTvV21aMAtVwuPI5/aaa6iwdYF2At9/e4niG0Lg==
+	bh=q0B2zDEgWbij3ExR5m6tj05ZE8Loybx2WzGdd3/XLjI=;
+	b=le6iBaOVseDJwUV0R8uitImKB4Ze9wysgN3Tuwo21pXsIeKFKeMwk3dir8FTOF8BgPuF
+	 bdieWCfon07kNDRR3Jgmgb1K6AbvDARxP5A3Sv9neEja91MT4u9Xyu3AP/umHpzE2IzcZ
+	 W8yFv6CW7e5TbVPo6px9Xt4Xh+gvfz1BWVS17EwSGicbmd6bmrjwylj5r/RSGIFR4ftjE
+	 dGYRz8d8daQU1NuA82LmHd/BhI7HfeLThGSSBwgmBB/XThNKzl6wDZHIj6gu16LhBZDb0
+	 ZZp6WsmN1qu65XcQigS5urI+gkgi2v9DMGfmriPqEnxGMbodYLaLsW27z+ReM1NPwYQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IOXIp9jH;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LXAHTVYl;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FF1606A31C;
-	Thu, 26 Nov 2026 17:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9AD606A326;
+	Thu, 26 Nov 2026 17:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IOXIp9jH
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBF621F000CA;
-	Thu, 26 Nov 2026 17:14:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LXAHTVYl
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA3F01F000C4;
+	Thu, 26 Nov 2026 17:15:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795713297;
-	bh=LNLrvcxnQvJha1qURA3bNFc1ECDgKKs6fCmI6FYzJRk=;
+	s=k20260515; t=1795713302;
+	bh=q0B2zDEgWbij3ExR5m6tj05ZE8Loybx2WzGdd3/XLjI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=IOXIp9jHYazwntO8Ap2zx03XbW7xKMdrftiXk1FFY7GSAv8oYyQ01wLqYpj1RpOmk
-	 2xIknPlzCAi0jdZxpZHleDe8E2EtpLIi3cElLPZf5KnuMn40b4s6rOL8dsWVkCX0fa
-	 oYTO33VwWlQnTFQsflbPhJy1MO/rYfkoW1FmqeapdgnbyrQJbUdLNUcQquOLtW6QxQ
-	 3P5vMz8OOfJ5MrYGDdr1tE1TWhVl91VilO+QKsiC/+G2dxt+EVFAwhj+XLzDtb5n0A
-	 MwesCwPrl29TX0YTIkwvEnyaxM7MH+5L4k5fdVoOntnz3mt+DsO7Mq3SpvBOTWs5BX
-	 Tm8R+sTcD+VTw==
+	b=LXAHTVYleZCk77A0KBVbrzVRYYEk8g7LGNr8lllNPuL9sKP+j2DfhkzBJ1S2wZL1Z
+	 A5AXutDExSkrph5niuRZo7dEbRYuYTYTha/KAKQ9tkBtJODdwiFaP/HtB+if2l7/Dc
+	 O4Ex0tPnSNLLmmKC0sb0BI9/Zh/Ma8YPG59thZGmDLRUAyxINmsKqnnyHuc0VCUugY
+	 Emp+dcJSpeZBoD9WSpFaVD1uzqHOLlM5VlejVVjMSAOE9lRBAeHhHwNyI81aJPP7In
+	 16eUs95PIwZ2ghew/15VY98zDvVgKzmZuCfgBiOvaYq6EWeDLnKJVxHgsV8Xz72mvo
+	 3F66kqPafhguA==
 From: Will Deacon <will@kernel.org>
 To: kvm@vger.kernel.org,
-	Fuad Tabba <fuad.tabba@linux.dev>
+	Kajetan Puchalski <kajetan.puchalski@arm.com>
 Cc: catalin.marinas@arm.com,
 	mark.rutland@arm.com,
 	kernel-team@android.com,
 	Will Deacon <will@kernel.org>,
-	kvmarm@lists.linux.dev,
-	Julien Thierry <julien.thierry.kdev@gmail.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH kvmtool 0/5] Fix diagnostics and capability probes for protected VMs
-Date: Thu, 26 Nov 2026 17:14:32 +0000
-Message-ID: <179570893511.2890117.634086321709624460.b4-ty@kernel.org>
+	julien.thierry.kdev@gmail.com,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH kvmtool] include: linux/types.h: Add 128-bit integer types
+Date: Thu, 26 Nov 2026 17:14:34 +0000
+Message-ID: <179571110464.2963221.18320321266334097396.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260831192406.1341841-1-fuad.tabba@linux.dev>
-References: <20260831192406.1341841-1-fuad.tabba@linux.dev>
+In-Reply-To: <20261113153847.60183-1-kajetan.puchalski@arm.com>
+References: <20261113153847.60183-1-kajetan.puchalski@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -73,30 +67,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Mon, 31 Aug 2026 20:24:01 +0100, Fuad Tabba wrote:
-> These are the kvmtool changes that go with the pKVM series confining a
-> protected VM's vCPU state to EL2 [1].
+On Fri, 13 Nov 2026 15:38:47 +0000, Kajetan Puchalski wrote:
+> The tree no longer builds on new systems (e.g. latest Fedora images)
+> because the included types.h is missing 128-bit integer types.
 > 
-> That series stops the host reading a protected vCPU's registers once it
-> has run, and stops it setting the PVTIME attribute. kvmtool dies on
-> both. Its arm64 register-dump helpers call die() when KVM_GET_ONE_REG
-> fails, which turns a diagnostic into a VMM abort.
-> kvm_cpu__setup_pvtime() runs into the new -EPERM and fails vCPU init.
+> Add typedefs analogous to Linux commit 10a47fb67340bca274276faf855d7 to
+> fix the build failures.
+> 
 > 
 > [...]
 
 Applied to kvmtool (master), thanks!
 
-[1/5] arm64: Do not abort on register-dump failures
-      https://git.kernel.org/will/kvmtool/c/65d45d30d900
-[2/5] kvm: Bound-check the exit-reason string lookup
-      https://git.kernel.org/will/kvmtool/c/470428ef30b4
-[3/5] kvm: Name every exit reason the UAPI header defines
-      https://git.kernel.org/will/kvmtool/c/c6f61255f665
-[4/5] arm64: Query steal-time support on the VM fd
-      https://git.kernel.org/will/kvmtool/c/d2d15431d8f6
-[5/5] arm64: Query counter-offset support on the VM fd
-      https://git.kernel.org/will/kvmtool/c/eac6efc9fefb
+[1/1] include: linux/types.h: Add 128-bit integer types
+      https://git.kernel.org/will/kvmtool/c/6aeffc7ad7ad
 
 Cheers,
 -- 
