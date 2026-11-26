@@ -1,97 +1,104 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795700282;
-	b=NRY+9EnjEyUtuL/mR1oIk5xukBfxvAkx2YGWwpGeRKkNL+MuggGQxZUhqH+aCCVulBTC
-	 5OSZ3xwNlcIwuooQciAHtgIHcSCGua0jgDdwzWRpBfdDBPN7F4oMmsK0wMENNxaeBAbs1
-	 +yW1yEcd37BtvAZp5fa9Ki7JTg0qOsUegFMcfrgTtsNjHrkY2adGvLXPwEhNMHLh00Cvt
-	 MWghsGESG6a48Ur7DxNB8yyuKW6OkqoOUidMExs+wqirJoG2pre5ILESn9U+Hif1WzElb
-	 IsXcxyiUBX4HTrUsgnaxU5kS5PT85mXxTXBjgnhEodiBPliWU9ZoESpasYz4iR/xZJw==
+	t=1795701889;
+	b=R4TeF9gJJkH0zF93jSqLlKO/r3g5eQLPRYesvsM2Bcl9in2ptYYlG6bXiol8Whhw4s4m
+	 qSBTVSfgh5jXFRrmLMVXRyDYvdOwohtlL0/4dT/W//3312qfnt1xv2xQR6R0SmhZx0RLe
+	 ngVMtPAihc8+rU6UAKTIU0IYGln4OoluggvG/s175YCdmurbs6oqnm1ogt6kAlVnAkPpV
+	 Ab2f8DPXZrYIXGC0vjuUrC8+dx1M60zejQ0gS/L6doB2OzUuw0V6hFsKM8oGU0/YScDuo
+	 7uqpcrVJ44dkf8ICTSQuJf/MBAAaQXUqtnZYzbCDKwPrA+ynpHh7uEIDIlPnCPYJzCA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795700282;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received:Received:Received:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To:X-TM-AS-GCONF:X-Authority-Analysis:X-Proofpoint-Spam-Info:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
-	 X-Proofpoint-GUID:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=02BGqLoy5W4EZR++kJaOBR7XvPnZihslZauH69lTdO4=;
-	b=IbV4uP1k1Elx6MM8VvaC+LbiP0pgEPxH6DAXw5Oby4KuRI+QRrRJdWq3B77ukjJ2DSsP
-	 LDB1zHSyzK9PbmJ+0XyoaROGDtBJGdYbWNOngkpVkezbAaOxCOhEE6MpvMc6G6+pog/EE
-	 FFLuNJEFlGnhbJ09K9Eg9vlFjFTk0SVLTSbobI5v1WGreSU0/CAc87zUoJE3nSVJNnLUz
-	 thrUIX98qsNKwVi6aTUQfyJAka4D2lYAlNYW5nWwl185X4d0Z+GdOvZAbaej6r33ket2X
-	 47vqjA1agsVQNAl0ld46S4BFBjHBWZHkMzCMwo7D1EpS4bmvzgtE6KzGNu7NcPujKJQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795701889;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=ULOdJrhzU/wAffNTY82qW4SO373n9wxqM9z/O7l2caA=;
+	b=CGXgzhonbHuvBXO79oGr6Dvw3ddt9E24gnTgujWa2k510mL9Xc851qgvwqnBmNiKMfVc
+	 tROTcl8YSSgwvqwEps4mHZY9xCWo80N6XfHNTnqu5wdDA0cCGZr0XE+aI+ES4axOCtqF7
+	 0VcdLCv/KAO+0vDaNB78P1SlOvnWSIJokp+M4+g86Jxca1h76UXzP3PdjGzbP5JxswZku
+	 jUg7iF/V9AHaPrs/DgolGX8rx81304o2DZFbJ6Fvv8c/lyO1nenxVwW7lek5vePARHIzQ
+	 3Fz7XgGC5kTdt1R2Za/4cu16flsi0mD4axhO6pAo+EWWoqG244n/I67DtfmPW4Wv4KA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.ibm.com;
-	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=KOls12L7;
-	arc=none smtp.remote-ip=148.163.158.5
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=pereq.eu;
+	spf=pass smtp.mailfrom=cryspen.com;
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=I09l4ZDN;
+	arc=none smtp.remote-ip=209.85.128.41
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDDC606A31C;
-	Thu, 26 Nov 2026 13:38:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DEDDC606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B64606A321
+	for <kvmarm@lists.linux.dev>; Thu, 26 Nov 2026 14:04:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 53B64606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=KOls12L7
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AQBYimN4167477;
-	Thu, 26 Nov 2026 13:37:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=02BGqLoy5W4EZR++kJaOBR7XvPnZih
-	slZauH69lTdO4=; b=KOls12L72vnnjXrTjUWBLWgjFhoKFMKnBVXBRAGkcL2Djt
-	F84Yb17spq3+bZpFQ2wuf0Dcao9/PBpsE+Ji/Qsko+/z0ea0RgYQPIuvQ0KmTSk6
-	jD89jMBb8Rr1Hl4jxQnQYVG86ldhJrSFL5QZzkC9Or/pg+4Dnu5SSZ/Wa+AcqhY3
-	73n8tZrXM5kIk954acvwAbs1xkwH44CPf6bhc/jRo7s0FT2jLUnOC9xdjKP2tFz0
-	Wp1FFOjKaxzZylPsocMJf1VVVWgsHo6ClWoPZAY0O4DM+Uf0rmR601nV6ZMDPBtq
-	T53noGrUPWBTzmmcaoL2PUpT2nan/YjXKVspxHTQ==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4j34gvgy5y-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 26 Nov 2026 13:37:50 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6AQBYJ1s1111383;
-	Thu, 26 Nov 2026 13:37:49 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4j5kfa6bth-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Nov 2026 13:37:49 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6AQDbjgH45482330
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 26 Nov 2026 13:37:45 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ACD2C2004D;
-	Thu, 26 Nov 2026 13:37:45 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8027B20043;
-	Thu, 26 Nov 2026 13:37:45 +0000 (GMT)
-Received: from osiris (unknown [9.68.29.29])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 26 Nov 2026 13:37:45 +0000 (GMT)
-Date: Thu, 26 Nov 2026 14:37:44 +0100
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Dan Carpenter <dan@pereq.eu>
+	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=I09l4ZDN
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4bb64ef5a14so70162245e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 26 Nov 2026 06:04:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pereq.eu; s=google; t=1795701888; x=1796306688; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=ULOdJrhzU/wAffNTY82qW4SO373n9wxqM9z/O7l2caA=;
+        b=I09l4ZDNcHtcyK8YRWXxxJpkIz2HzJvD0ODjihfffcmROTbzOKnrPhtCsumAhMuSFT
+         INO0dDry+Gu53Y0W9UDUnvxKVbQxpVkU3NtgknEpFBw5PvcDwAuiveMlIgQIjiCP9zTF
+         pAIyEhlUQ6d9Q/MzCGUEZYiaS1rh72wNZaFW4dWZoJU9o0INzvt6eTzDXKN8HmDUA1Il
+         u8vnUdBCv7i1ZBDlaSxg0lWYLFcWmcKLbcps9QkNQnXIWeWpSJLvXuZXKD5xRHPW/r+A
+         uixUuj3GR1bUq4KO8kJcMRjOkUoRKQ+Ok415i946+7QAY3l1uDNudPu9plWk5D+vxRxC
+         LHmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795701888; x=1796306688;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ULOdJrhzU/wAffNTY82qW4SO373n9wxqM9z/O7l2caA=;
+        b=rm2en4PaJLFDdpxajMJmyjmbciMySivy+I9MZcTx9sWGqyDmZtvaP7fm3lxd2ESZg4
+         ip5V0zt+WR4BWBTheNMxci/2MhDxp8DbAkR4bfX3h9kL4+BBY2ppZt1+iOgMoHJa3/iB
+         2kEqgdmb32CCn/9VxwD8iOBuOdowVWMpkdHIMbyHk7NXkxTDNoLeJxa6dEXQUuHrs419
+         5kCIAtGwEBUw5Mhdha5gdCK3T9F8CqxGuk5Pr3UBSbPqZWnzVjE6IeKmNSx7sQq5F0Po
+         KkHa/7+EauvLyUnHO9XT1c9q7YCSDS4p3N3N30mhaLE6D6iO7LkhP0xruYiXAWWQKwLJ
+         AAjQ==
+X-Forwarded-Encrypted: i=1; AL+hErFkyDu0tQMl3kzdKSpa07ccj6/GfOgl7/ira8RtmTQDNUH1VbUmpSGzyCHfh0SXMZ4mqbFTAfE=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8CA2G1AnRKJ7CqStEmQkvVUB3wr1xR1F1LfROhmqw89lmpD7k5
+	A/4lxXaHNR98RZj4WpV7ROnnkX5+eziRzJAucYy9K9KwdR64lRzB7mx10eHVoG0iTJs=
+X-Gm-Gg: AZFdTZdO6vaRxM2DgHFGn7ejfqHNZZE7msfuWXCyKBHLDPebLn9sQiwEH5Gi4vMY8fO
+	jeW5T06n8u8nG9v5v2GmY+YSGnFH8+3OgzS9bAj11oDTTgEa4oOcVQAq1sviU9bU/4BLX7TZ2+K
+	MD/mMbnw66LV4heL4e/136Bkn5tWIpImsxLUT69M3aHYiR++TsXQP541bUCTZBC/IwXaLNLqncv
+	ADa7fhrQd/SI5McoZw0Mcd6tLk9Zoz+C+t9i/Lvmo0B5WRWy2zNBFrrsRnVKDjadww1vReLrjN4
+	4x3j/Al2DSYOh+Uf7JIpI3GnRYwbcuIbNHtqXnB3utszAd0nk4hIAXKAMJlqR6nHLMPe7q5j8Rl
+	GzCVxeYwxS4RX4GM5Y9K8wbcEmDTD1Cx8O2U7+CT6bSz3ioBlGXgWESPSeqW8JK0S+T086WO4e2
+	n1iuKRqJm9sUINsgKcdvdd4bI8TS7HDJjXTYqKzxcd6Tm2TSzZcT4wDGhXiUYsIqOA27iJKNhpu
+	Iz95OiY83ugJKNF327tMR3j2cWPrGpofdmeyZqJCspa5KAQV7tEeSCwH1UeLIgXpElw570WV+MB
+	Iso/q2TDGo++8gYzkt4rBKLM57NnxTuRjnXjDF4C
+X-Received: by 2002:a05:600c:8b83:b0:4bb:60da:56af with SMTP id 5b1f17b1804b1-4bb8893053dmr381871055e9.25.1795701887195;
+        Thu, 26 Nov 2026 06:04:47 -0800 (PST)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb884911e3sm736831665e9.6.2026.11.26.06.04.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Nov 2026 06:04:46 -0800 (PST)
+Date: Thu, 26 Nov 2026 17:04:43 +0300
+From: Dan Carpenter <dan@pereq.eu>
+To: Steffen Eiden <seiden@linux.ibm.com>
 Cc: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, Oliver Upton <oupton@kernel.org>,
-        Marc Zyngier <maz@kernel.org>, linux-s390@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Karthik Bhargavan <karthik@pereq.eu>,
-        =?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
+	kvm@vger.kernel.org, Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, linux-s390@vger.kernel.org,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Karthik Bhargavan <karthik@pereq.eu>,
+	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
 Subject: Re: [PATCH v2 2/8] KVM: arm64: Reset SP_EL1, ELR_EL1 and SPSR_EL1
  when resetting a vcpu
-Message-ID: <20261126133744.219929-A-seiden@linux.ibm.com>
+Message-ID: <awg8e0zM2DL87AKP@stanley.mountain>
 References: <20261125-double_exception-v2-0-224689d8a764@pereq.eu>
  <20261125-double_exception-v2-2-224689d8a764@pereq.eu>
  <sashiko-outbox-232760@kernel.org>
  <awam4std0Zifdn9k@stanley.mountain>
  <awan8mSx5cbzXzJ7@stanley.mountain>
+ <20261126133744.219929-A-seiden@linux.ibm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -103,85 +110,35 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <awan8mSx5cbzXzJ7@stanley.mountain>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=CYCdd7rl c=1 sm=1 tr=0 ts=6b08362e cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=kj9zAlcOel0A:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VwQbUJbxAAAA:8
- a=VnNF1IyMAAAA:8 a=tATfSOZSwkvfaf42cScA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI2MDA1MyBTYWx0ZWRfX0nYfkJib8H2e
- C5yHfAPDBViPSMaBWZemZJHITHp196Efv9d9lDY2D4QGRrBtNWXV5QylAghC5+n/C0pzn1CmzVY
- qvjr/n3MrMw2bBxhZHzBtATb/ZVAYiU=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI2MDA1MyBTYWx0ZWRfX8GlYiN7T4QMa
- 09eTnuy+v8pDrTupsl1oO0OqWjqvbe3jHCD8CZv4xatonKxI6cOHvo232QfKTodwESNhbhyXSEJ
- D7itvXKPXSZ8Fqd7UrADUCL+WX8JRx4LI/ziYU0lUSQzq08RDiLeQqGIhvpzFY1mFrBr882Ts6p
- W/D21RUTR2H4FJGQAoh6Y4SdffEXEMfKw9KWDGZa+KQ2etQ0Qa03cd0WbD46KCnK1DrvtUnGXmm
- b9APgYjB671qGYz2F03i7L+SrJFsh/9915QBN+h8wSsKEJRkMder+PssfJ+f3X2qU44ND30WVff
- y5Ipy3rld/r0qscIrEWSD7RobcjH9bphpOehs+KlGEPZ8CTp9vWaDsr6oCYDNUA7OoF1X3YjMQ2
- J1HbUzf/iGDLV6kEQ5oAMk+6NekXF4aAqK82ZNhT3TkEnViiI9VMq2sfKbnyZZAchtrCxqkKK/7
- PRcIu11prvhlGzYKwxQ==
-X-Proofpoint-ORIG-GUID: IOCH92TSPRg1nO84vXqoe5hpnwcJ5ANo
-X-Proofpoint-GUID: IOCH92TSPRg1nO84vXqoe5hpnwcJ5ANo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-26_03,2026-11-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 malwarescore=0 priorityscore=1501 lowpriorityscore=0
- clxscore=1011 spamscore=0 bulkscore=0 impostorscore=0 adultscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
- definitions=main-2611260053
+In-Reply-To: <20261126133744.219929-A-seiden@linux.ibm.com>
 
-On Wed, Nov 25, 2026 at 12:18:42PM +0300, Dan Carpenter wrote:
-> On Wed, Nov 25, 2026 at 12:14:10PM +0300, Dan Carpenter wrote:
-> > Let me add the s390 maintainers to the CC list.
-> > 
-> > I considered doing it the way Sashiko suggests but s390 doesn't have the
-> > __vcpu_assign_sys_reg() helpers so it broke the build.  The registers are
-> > not the same so, either way, some of this is going to be specific to
-> > arm64.  But Sashiko is correct that s390 probably keeps a stale SP_EL1
-> > across a reset.  The s390 maintainers could probably take the selftest in
-> > patch 8 and modify it for s390.  :)
-> > 
-
-FYI: the arm on s390 KVM in the current upstream state has no idea what
-SP_EL1 is :) 
-
+On Thu, Nov 26, 2026 at 02:37:44PM +0100, Steffen Eiden wrote:
+> On Wed, Nov 25, 2026 at 12:18:42PM +0300, Dan Carpenter wrote:
+> > On Wed, Nov 25, 2026 at 12:14:10PM +0300, Dan Carpenter wrote:
+> > > Let me add the s390 maintainers to the CC list.
+> > > 
+> > > I considered doing it the way Sashiko suggests but s390 doesn't have the
+> > > __vcpu_assign_sys_reg() helpers so it broke the build.  The registers are
+> > > not the same so, either way, some of this is going to be specific to
+> > > arm64.  But Sashiko is correct that s390 probably keeps a stale SP_EL1
+> > > across a reset.  The s390 maintainers could probably take the selftest in
+> > > patch 8 and modify it for s390.  :)
+> > > 
 > 
-> Actually, never mind.  This can be done in kvm_reset_vcpu_core() like
-> Suzuki Poulose suggests.
->
+> FYI: the arm on s390 KVM in the current upstream state has no idea what
+> SP_EL1 is :) 
+> 
+> > 
+> > Actually, never mind.  This can be done in kvm_reset_vcpu_core() like
+> > Suzuki Poulose suggests.
+> >
+> 
+> We share kvm_reset_vcpu_core() as well :) 
+> 
 
-We share kvm_reset_vcpu_core() as well :) 
+Yes, Suzuki Poulose told me about kvm_reset_vcpu_core().  If I put it there
+then I don't need __vcpu_assign_sys_reg().  Thanks, though!
 
-I assume this fix series should go into 7.4. right?
+regards,
+dan carpenter
 
-I have a series posted adding the required functions and infrastructure
-for s390 [1]. This will likely go to 7.5.
-
-For 7.4: Add a patch just providing a stub that does nothing for the
-required helper (untested):
-
-diff --git a/arch/s390/include/asm/kvm_host_arm64.h b/arch/s390/include/asm/kvm_host_arm64.h
-index 3e69724f17c9..bdca7ebf6405 100644
---- a/arch/s390/include/asm/kvm_host_arm64.h
-+++ b/arch/s390/include/asm/kvm_host_arm64.h
-@@ -206,4 +206,6 @@ static inline void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu)
-
- #define kvm_supports_32bit_el0() false
-
-+#define __vcpu_assign_sys_reg(__vcpu, __reg, __val) (void)
-+
- #endif /* ASM_KVM_HOST_ARM64_H */
-
-
-If this does goes to 7.5 queuing that after the corresponding s390
-patches would be the simpler approach.
-
-Thanks for fixing the bugs 
-
-	Steffen
-
-
-[1] https://lore.kernel.org/all/20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com
