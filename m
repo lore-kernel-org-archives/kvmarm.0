@@ -1,105 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795708332;
-	b=KkaT4HPPdVbTYsdzKso9FsrjoOLuyW0HkEepunpqGPkzEMprGM/ol5KuRV8iFvAExX/a
-	 4DuoDJnk8PInG3ksG+YNhv0YjIDO3BIgqJnUSiotFppTbbTKa6dC0N05VEe+fjONLTPVG
-	 vdlzjxeIFGLQoyGISgb/ZfH9dDIcINIjCtElj5rGApcsIP9ML1UJdeyPDwxyyeunOCBWw
-	 QyiAN1nxONxlq0l/d/OIEOBPmC1Vq9nKijMWykaTXpbxC2uud+yvoKLlrD8KweFiYgl4m
-	 f4AMz5bs9yenFarNfKwQHYeJbawuHs5o12epamp0KhfUeT+ubTaEg9QELmp0uPBBViA==
+	t=1795708429;
+	b=atI9Z7b8vZF5cTGO0gM0rOlzzBytwrpa8YyteqAXTlZqI+pszAV1uC5rG8pZ4hoNFV38
+	 fx3j0Q0wgLgMx6CbxUYF4KSLyqgFXiv1wnjVOCelyvsN0584QM735tFmXmqS0lB0QHnMK
+	 dL2xyJZ3pISOb+e7roYGwESg3fj30PLVZDwTslDkqjUiT1CydUXD8CvLpawCAx5IRqcZO
+	 6AdpI/go0Tfah8A9b3WBxEApmnKDLy03MmUzH54mTjUkpmFhteoRJwrd23auJ7xK4kwxz
+	 uwCFnKnsBNfd9y0kC6VG/2IEQINraWLmZq4qXvn8ni3W+AHK6mILhKB0NL/08ccXNtw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795708332;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=PsJrhw/qD5kUJUapuNeSh8uHKjzWdiRgnqrKaM1xuOk=;
-	b=L0gDB4FwRpalC3fd9HpH1lcXOt5LVcsICWx6QN8n9/hp/8FD3/aDe4opeqkRDEhasOXq
-	 w7asuFDyDHgqqmsT9+Tz8MHWhI9SbRY/Oj3v/XIcLi5WghI8CVU7sH6YtgIVEu8+k1IyT
-	 yEI1kg2/miWaDY7Fpw7o61fI5YVt4JWwCGBeiN3deH+OQPwdqBkkjhD4tNVbhuiGr4Lp6
-	 RB+Mm1QI5RihGo9LnaALI+YzJuxHuNiGwpj3WpjKy+culqJQz0nbpOdXSpjjo3kGEqryS
-	 ZLL/K/ZChFbjbY0Nl+HTONXfGwC52eR47bwfkWYnF1iEn2cRx5ubNva4Uv9A5oCBh8g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795708429;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=PAqADx6BCDJW/l9oyP65JCbSK+i8IXF6jV/NhPgDrvU=;
+	b=qxqIPl1xWg0usFnLXoQmPCbSjKhtUxdn02lTetowW0K1+S0cmwDsvaN0R++aVt9/Asfm
+	 zfBDxFX4ULA8bcyd3NIevZvL/zyWQtKpPmQpYYdna7Iepo2KsHvQudAH2PS5rzBq0dk4H
+	 bOw7dtIBcqU5WCG9IZDZGUpr1BkioYa1QV27NhZtlb1WA/SPmJ0oSuPO1xZPKrlzx/z2U
+	 TrN32+pqcF8FVHrCUWEERmRpu5C826Su1qEOrkpRVItw4gQ8apvkZBmsOKi+ZaLDawiZf
+	 FcWU3Bykc+Z85iO5HzwICUG1vUCVucPiE6oATQhv0+kSLMFVkUMBRDRbzhy1TSZGRIw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=So+WdnWi;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8303A606A31C;
-	Thu, 26 Nov 2026 15:52:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8303A606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DCW3kp4b;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF44B606A31C;
+	Thu, 26 Nov 2026 15:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=So+WdnWi
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E995E1BA8;
-	Thu, 26 Nov 2026 07:52:07 -0800 (PST)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8D9373F632;
-	Thu, 26 Nov 2026 07:52:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795708330; bh=t/iAXo76mNWOYi6NXRXLm9HYRbfENwEmeSuVZl+vjQ8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=So+WdnWiITxUEA+zPA0qZrHfIgEWB8UDt3yn4IEO5THcFQuUupbSyZ38WSbYLlzZO
-	 Rdd4TpDOmHWWTHsRW+t1aSXOFu6+xeusbEXx8t6R4TR3fxZ+3I/eAfWH7BVYVPd6hg
-	 fcIkARwHaaJVtuaYyOlwbtgwfzyTh/vzHdKQd+qA=
-Date: Thu, 26 Nov 2026 15:52:00 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	linux-coco@lists.linux.dev,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Christian K?nig <christian.koenig@amd.com>,
-	Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-	Brian Starkey <Brian.Starkey@arm.com>,
-	John Stultz <jstultz@google.com>,
-	Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
-	"T.J. Mercier" <tjmercier@google.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DCW3kp4b
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C04D01F000C4;
+	Thu, 26 Nov 2026 15:53:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795708429;
+	bh=PAqADx6BCDJW/l9oyP65JCbSK+i8IXF6jV/NhPgDrvU=;
+	h=From:To:Cc:Subject:Date;
+	b=DCW3kp4bO4zkrtAStC232kE2c10swC9+NjsauNb1VICxzYnBnC6Js0Z7klYUz3qBs
+	 xNb09tUvy+3jSA5vNRRsyZs6N405zHR4Zb8eBnYa1MPmXXiDOsWIScby8hIIbkNSOj
+	 dPqo4IaDRiRWo+3dGuFQg/SMUlqX9udE+0JE3/uZTpy7EksLLYDexqgC1fbOGCRajV
+	 v63CFcispC9ldwvdNol8EJ/5AT+RAJUrotsMS7d0pp3OVGGW/wvmK0dVeO1JUXbKwd
+	 fviFjAB8o5HcmcZfBjavIBP3TkE8UlEjNjYW0RoSzHHKJSrdB8MjryAYKSkACAdo3Y
+	 eNUvF7upBFtWA==
+From: Arnd Bergmann <arnd@kernel.org>
+To: linux-arm-kernel@lists.infradead.org
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	apais@microsoft.com,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	linaro-mm-sig@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH v10 04/13] irqchip/gic-v3-its: Allocate shared tables
- using CoCo shared memory allocator
-Message-ID: <awhVoDXluqpncgcd@arm.com>
-References: <20261116091137.94252-1-aneesh.kumar@kernel.org>
- <20261116091137.94252-5-aneesh.kumar@kernel.org>
- <awQd81MwZqi55gf8@arm.com>
- <yq5aa4mybbmv.fsf@kernel.org>
- <20261124134621.GI9566@ziepe.ca>
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	hargar@linux.microsoft.com,
+	Joey Gouly <joey.gouly@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Navneet Singh <navneetsingh@microsoft.com>,
+	Oliver Upton <oupton@kernel.org>,
+	rlmenge@gmail.com,
+	Siddharth Chintamaneni <sidchintamaneni@gmail.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sven Schnelle <sven@linux.ibm.com>,
+	Will Deacon <will@kernel.org>,
+	Yicong Yang <yangyicong@hisilicon.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Zhou Wang <wangzhou1@hisilicon.com>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/3] st64bv0 support in iommu-sva
+Date: Thu, 26 Nov 2026 16:53:36 +0100
+Message-ID: <20261126155339.1349218-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -109,31 +77,71 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261124134621.GI9566@ziepe.ca>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 24, 2026 at 09:46:21AM -0400, Jason Gunthorpe wrote:
-> On Tue, Nov 24, 2026 at 07:00:00PM +0530, Aneesh Kumar K.V wrote:
-> 
-> > Taking Jason's feedback into account, we could have the allocator
-> > request compound pages and recover the actual allocation order with
-> > compound_order(). That would avoid passing an order to free:
-> > 
-> > void *alloc_cc_shared_node(int nid, gfp_t gfp, unsigned int order);
-> > void *alloc_cc_shared(gfp_t gfp, unsigned int order);
-> > void free_cc_shared(void *addr);
-> 
-> It probably shouldn't be order here, that is hard to use. Just size_t
-> len
-> 
-> And round up internally
+From: Arnd Bergmann <arnd@arndb.de>
 
-Minor point in favour of keeping the '_pages' naming and order is that
-it makes it more obvious what alignment is returned for code that needs
-it like the ITS. Otherwise we can just document it, I don't have a
-strong opinion either way (only that it's simpler than what was proposed
-earlier).
+This is an updated set of patches to enable ls64_accdata with the
+st64bv0 instruction in Linux.
+
+I have included feeback from Siddharth and Sven here, in
+particular:
+
+ - fix SCTLR_USER_MASK and reset feature on fork/exec
+ - add a testcase for the HWCAP
+ - fix compilation with old assembler version
+ - enable HCRX_EL2_EnAS0 when booting in EL2
+ - restore ACCDATA_EL1 in cpu_resume
+ - context-switch host ACCDATA when entering KVM guest
+
+     Arnd
+
+Arnd Bergmann (3):
+  arm64: dynamically enable st64bv0 for SVA
+  arm64: add HWCAP3_LS64_ACCDATA
+  kselftest/arm64: Add HWCAP test for FEAT_LS64_ACCDATA
+
+ Documentation/arch/arm64/elf_hwcaps.rst    |  7 +++
+ arch/arm64/include/asm/cpufeature.h        |  6 +++
+ arch/arm64/include/asm/el2_setup.h         |  3 ++
+ arch/arm64/include/asm/exception.h         |  1 +
+ arch/arm64/include/asm/mmu_context.h       | 17 +++++++
+ arch/arm64/include/asm/processor.h         |  2 +-
+ arch/arm64/include/uapi/asm/hwcap.h        |  1 +
+ arch/arm64/kernel/cpufeature.c             |  1 +
+ arch/arm64/kernel/cpuinfo.c                |  1 +
+ arch/arm64/kernel/entry-common.c           | 11 ++++
+ arch/arm64/kernel/process.c                | 25 +++++++++
+ arch/arm64/kernel/suspend.c                | 17 +++++++
+ arch/arm64/kernel/traps.c                  | 59 ++++++++++++++++++++++
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  8 ++-
+ arch/arm64/tools/sysreg                    |  5 ++
+ tools/testing/selftests/arm64/abi/hwcap.c  | 50 ++++++++++++++++++
+ 16 files changed, 211 insertions(+), 3 deletions(-)
 
 -- 
-Catalin
+2.53.0
+Cc: apais@microsoft.com
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: hargar@linux.microsoft.com
+Cc: Joey Gouly <joey.gouly@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Navneet Singh <navneetsingh@microsoft.com>
+Cc: Oliver Upton <oupton@kernel.org>
+Cc: rlmenge@gmail.com
+Cc: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+Cc: Steffen Eiden <seiden@linux.ibm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Sven Schnelle <sven@linux.ibm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Yicong Yang <yangyicong@hisilicon.com>
+Cc: Zenghui Yu <yuzenghui@huawei.com>
+Cc: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+
