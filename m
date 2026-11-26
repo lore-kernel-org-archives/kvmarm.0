@@ -1,62 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.95
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795696843;
-	b=pHtQ/a/ljqHIQqKtrgPqEw4SwNIoXIQ0VlnGJiugxxUy355+sBnc2RkFK30uCWdXo8xK
-	 XEan9Dz8iVa5N+kLPIP+MklBipOqiw4OwwVKjNe8baeNi6yX/O2a9xgUMbNKpWc4Z4RIu
-	 LY8RjgkCu4clM+A5hvCpqSIrBkE70W/I9oFAmHKV+9dnkcEoOIiQ+tkrDWY1qDo4ZOsYo
-	 IjdeV+PLsPXLeNYUNmPdKQM7l/aruItLUrTVRnClV/ysa0qJsQNAqajr2wZ56NIg0PLWo
-	 GvVg/o30uWD7JJXuRARQtbSSrFzzuxehcfYPmOxlhYCQi4XpGEcaDiAoFO48PywKqMQ==
+	t=1795697776;
+	b=A0zbZsy9NYaSNRxEpGSAXIdy94fHUROgsO+QU7SyzrMSSpfqbob1kSRDmjKo3iXzkJHJ
+	 wXrkRxdluiNQ3vlqlBz7Vg91ZQef1hbK+x43caYmqmSfI3Ym1GcfBV+mNIyVyuxuxVjRm
+	 xYL3D6cJvO1kq1xYnHDo9+K8F2/cWC1M/0HLaXMDSOl1U2bCpEXRAMgGjxRDRPqvL//fb
+	 qdm42fBD/PVXmcJQx84k5/0FQPLPBzCIB73sKCIPpLFr/gi0/qv6zj75N+t3PvT1O9Z2Y
+	 qUFSWVH9ke3xWuZ3BDRl7i8N5zK4QKg5u2v1/LfgKMpyYuWwhzbqrQUxBprcK9F4wfQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795696843;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=nftPNhHACaAjmrWyLnFiFxg6dPd//Ubc6ntdo0W25Vs=;
-	b=f+YRKhyZ/hB24bb793dtnOOjcllQLCpYckKcY+ECuOwK/ITpLxg0Isw3v/qE5m/2l7S4
-	 gZnvKsKkTAzDGMjVWV15WT6LcfX8ijslB0mYclkHvbEQ7ZmVTuEu0GuFn7Pr6bDyK7HoG
-	 EkUIb1A7XjXcLoXVNNn3fXodpm2E1liS3oHnoeAyxrfpRbV8/mAa/QskOG5PGQbBocen/
-	 jp6Bkd3lLy0CZKp0pdwdnUBene1CW3oBH09Ip74av9ybG3tRqW2OYxOToLbQtx/VmIXkH
-	 K6tt9Sb3RSjISaNFnEwZRVvx43bunwJnfxflfQQydUfn4vRdw7E7u9zTJQkRSnkrqnQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795697776;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=qVr7AACT3RL5bvofLShn/Pbzkp0suXLu1heNlRCcBQQ=;
+	b=0CwV4fduOMZdhTKza1mPJAtvRE3RURUTc2UBKDA9eGsveE1EuFS7ooAHjRqFk6A2j9FW
+	 QBjYuanAQTSF5m2KnHy/CJR1EPpzqyLNT6fUNES5LErr+glcL9Co8LQuKrF6vbYAkewGo
+	 K3UxDm6fZFYjFREFR18qOJZ40hwcdUZDDiTrgeJKEzJ3e4gXFo9mX+kPDCQZabnkYRyvg
+	 zvhBcQyL3f6GvyX8mDLSPyJRfWtU9KhBVR7RgCPy8eob6/Ke754HiQlUKsBg+0CMrgHhl
+	 gTZWEwshWyksd2MKfBd8FHDLYup9JjhJRBTtQmt8sB6eQrxAuazvZKcO9ZTW6Q8/vIw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Y+8M3B18;
-	arc=none smtp.remote-ip=91.218.175.95
-Received: from mta0.migadu.com (out-95.mta0.migadu.com [91.218.175.95])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="nz9j/5BI";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48697606A327
-	for <kvmarm@lists.linux.dev>; Thu, 26 Nov 2026 12:40:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 48697606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05606606A31E;
+	Thu, 26 Nov 2026 12:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Y+8M3B18
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=3S+tkRDlt8mmbrhI28toVD30bvDmGMUv8PKIjZ3+uC8=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795696840; v=1; x=1796301640;
- b=Y+8M3B18sEpQeNwvwEy/giJTALEFan5kKjpIE0qnHdr/I8Pj7a3z/WSGcMRJn3FCHYrsPm0S
- M5U/wJwJVEkWyV6gQCVIUksmncFeLgYzM1xGr4vRcH0nKJqiUrnkF5BdVSBBwnWkmdNvlc6JAoH
- h3kckpQldx0XXji8iu1tKo/k=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id bcab7ac0159c6a26;
-	Thu, 26 Nov 2026 12:40:39 +0000
-X-Mizu-Trace-ID: bcab7ac0159c6a26
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5c144eb2f43so36945e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 26 Nov 2026 04:40:35 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErHgonF4kEY5odMgjhovxUMDcjk6U6N72c9YmmJjMXaUUgrHAsAEzPk5vsHBXJNYU2QkpXPzPfY=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/9V+XSJsjp6scN/k3VSUzXgTIG9Rwyv2/KlOypiRPGVrK1mAIJ
-	nLAmlWhBYMdl+pnKzobg+koN1qvleXPQRpDRn8e9EyOdudAILjSEp72dklcmpNpO2/3rNmii50q
-	vcpZqMihefXoYBov3e+8jfGveLm3fTVyYdHcWIqD7
-X-Received: by 2002:a05:6512:3983:b0:5c1:ac33:5a4a with SMTP id
- 2adb3069b0e04-5c21a27a14emr850306e87.14.1795696834316; Thu, 26 Nov 2026
- 04:40:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nz9j/5BI
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B71201F000C4;
+	Thu, 26 Nov 2026 12:56:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795697775;
+	bh=qVr7AACT3RL5bvofLShn/Pbzkp0suXLu1heNlRCcBQQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=nz9j/5BIJS+5IJjZpKS6g28I3cmR6tYenAFesSBnC2t3iBXpcdA1Ia4gFQtuoT/c4
+	 ANVpSkZU+4Dm1/OAzZbVwqPuiKaGYfnyt4Bsk6lQi/qf/32jhRYt/b6DidINhvl1Y3
+	 iRO117gQ/Lo9fVf1/bMtEkyfIcj7R11hRoP6n7hnC3eHNUy+x5Fz+6H6Xf91h9Gu3h
+	 wooAg9fWxShV8WotHHfDjmISm8nv9WFdnNKppJS43bukCbjhCJfzSErynT3uJ4fkp8
+	 F4LAN85MDgMhwl2dOxN1JNIrbQz2NakP+ZI9riYogIHxGsMyMnTABuADFD8YPGrU2Y
+	 r8cgGgAvAlgFA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xWZ1J-00000003dor-15Cs;
+	Thu, 26 Nov 2026 12:56:13 +0000
+Date: Thu, 26 Nov 2026 12:56:12 +0000
+Message-ID: <86wlpzycnn.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Usama Arif <usama.arif@linux.dev>
+Cc: oupton@kernel.org,
+	fuad.tabba@linux.dev,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	mark.rutland@arm.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	riel@surriel.com,
+	shakeel.butt@linux.dev,
+	kernel-team@meta.com,
+	rkeilty@meta.com,
+	atish.patra@linux.dev,
+	dgreid@meta.com
+Subject: Re: [PATCH] KVM: arm64: Reduce the stage-2 page cache on 64 KiB hosts
+In-Reply-To: <20261124152842.2634495-1-usama.arif@linux.dev>
+References: <20261124152842.2634495-1-usama.arif@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,55 +83,89 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <20261126100023.1286902-1-fuad.tabba@linux.dev> <06effdad-0a76-4d73-9542-cb628a40d887@arm.com>
-In-Reply-To: <06effdad-0a76-4d73-9542-cb628a40d887@arm.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 26 Nov 2026 12:39:58 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTwVzRPi-cxH4jbvpm2P5x9B2kvBUeuWyX__i9nHZpPmew@mail.gmail.com>
-X-Gm-Features: Aa3M54rSvorHaYPxJpGhhECQu83ycbJnsMQoQINlgHkxCOdeEgWdWCtjoCL7aJ8
-Message-ID: <CA+EHjTwVzRPi-cxH4jbvpm2P5x9B2kvBUeuWyX__i9nHZpPmew@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: gic-v5: Reject an ID_BITS too large for a
- linear IST
-To: Sascha Bischoff <sascha.bischoff@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: usama.arif@linux.dev, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, riel@surriel.com, shakeel.butt@linux.dev, kernel-team@meta.com, rkeilty@meta.com, atish.patra@linux.dev, dgreid@meta.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Sascha,
+On Tue, 24 Nov 2026 15:28:42 +0000,
+Usama Arif <usama.arif@linux.dev> wrote:
+> 
+> When a stage-2 fault may need new page tables, KVM first tops up the
+> vCPU's page cache: if it holds fewer pages than the fault might need, it
+> is refilled to KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE, which arm64 sets to
+> 40. Unused pages stay in the cache until the vCPU is destroyed.
+> 
+> With 64 KiB pages, that is 2.5 MiB per vCPU, and most of it is never
+> used. Stage-2 has at most three levels and the root is preallocated, so
+> a fault needs at most two new table pages (kvm_mmu_cache_min_pages()).
+> As every last-level table covers 512 MiB, an 8 GiB guest needs just 17
+> table pages to map all of its memory, while its four vCPU caches get
+> filled with 160.
+> 
+> On a production host with 64 KiB pages running 101 VMs with four vCPUs
+> each, the caches were still 86% full. The memory used:
+> 
+>                         before      after
+>   per-vCPU capacity     2.5 MB     512 KB
+>   all 404 vCPUs         869 MB     <= 202 MB
+> 
+> Let's lower the capacity to 8 with 64 KiB pages, In the production
+> usecase above, it frees at least 667 MB. That still covers the two-page
+> minimum and leaves room for several table allocations per refill. 4 KB
+> and 16 KB pages keep 40.
 
-On Thu, 26 Nov 2026 at 12:28, Sascha Bischoff <sascha.bischoff@arm.com> wrote:
-[...]
-> > Reject an ID_BITS for which a linear IST would be larger than
-> > KMALLOC_MAX_SIZE. This applies even for a Linux guest, which
-> > configures a much smaller IST. Userspace writes to IRS_IDR2 are new
-> > in this cycle, so no release has them.
->
-> Thanks for catching and fixing this issue. I agree that we shouldn't
-> allow this to happen, and what you have here is a defensive check.
-> However, I was surprised that this was reachable in the first place, and
-> now see the mistake I'd made.
->
-> In general, we limit GICv5-based VMs to 16-bits of ID space in both the
-> CPUIF (see vgic_v5_reset()) and in the emulated IRS (see
-> kvm_vgic_v5_irs_init()). The userspace write path fails to enforce that
-> limit, however, and only checks the hardware capabilities. I see no
-> reason to allow a vIRS that supports more ID bits than the CPUIF.
->
-> Maybe something along the lines of the following in
-> vgic_v5_mmio_uaccess_write_irs()?
->
-> /* We limit the CPU interface to 16 ID bits, so match that here. */
-> if (FIELD_GET(GICV5_IRS_IDR2_ID_BITS, val) > 16)
->          return -EINVAL;
->
-> Are you happy to add this (or similar) to your patch, or would you
-> prefer me to fix that up separately?
+I'll glance over the use of 64kB pages, because that's definitely a
+niche configuration that hardly anyone uses. But the scale of the
+numbers strike me a bit: 808GB worth of guest memory, and you're
+complaining about 869MB? That's roughly 0.1% of the total, and the
+savings you're gaining are even less... I know memory is expensive,
+but you'd save a lot more than that by using a realistic page size.
+Just saying...
 
-I think that this is the better fix. I'll respin with that.
+I also question the assumption you are making that the guest is
+strictly using IPA contiguous memory, and that therefore a very small
+set of pages are all you need to map a guest. Guests with multiple,
+disjoint memslots are (sadly) extremely common, specially in these
+days of tiered memory and other random horrors.
 
-Thanks!
-/fuad
+> 
+> The temporary cache in kvm_phys_addr_ioremap() uses the same capacity,
+> but it is topped up before every page it maps, so 8 is sufficient there
+> as well. The pKVM hypervisor memcache and the eager split cache don't
+> use this capacity.
+> 
+> Signed-off-by: Usama Arif <usama.arif@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_types.h | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
+> index 9a126b9e2d7c99..28568da9ea4a7b 100644
+> --- a/arch/arm64/include/asm/kvm_types.h
+> +++ b/arch/arm64/include/asm/kvm_types.h
+> @@ -2,7 +2,12 @@
+>  #ifndef _ASM_ARM64_KVM_TYPES_H
+>  #define _ASM_ARM64_KVM_TYPES_H
+>  
+> +/* Must cover kvm_mmu_cache_min_pages(), at most 2 with 64 KiB pages. */
+> +#ifdef CONFIG_ARM64_64K_PAGES
+> +#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 8
+> +#else
+>  #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
+> +#endif
+
+Now, to the patch itself: I see no reason to special-case this. If
+kvm_mmu_cache_min_pages() is an indication of what is needed, then
+this macro should be driven by it, or the whole allocator take it into
+account. And then you adjust it by whatever fudge factor seems
+appropriate.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
