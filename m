@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795716212;
-	b=DPOAndpujJCljNgrDhXccahCN6QJ/6D8odLzFXG489KhXkntmJBYif8imdnQE/r0ASog
-	 Yn6uml/nCynOqmP/jGWye9d8qU5MnI2TY+nR4pGTMcMdlSLMuvr1ZnjRTz9Xghcj9np/5
-	 xOoQ5ZWhC68o1OoyC8AAVIUK7uYTIIz4Tx7jo7MtiYUEGNC9F18CTGfdH+OTATFuH4TAA
-	 Hv0Th45Rwjt8bfo1c+RioGKA5rh2KbOyhgp7KzFlobx2fHpdAa60YJ4aSDQxUVxhI/l5t
-	 VJ1d4bGPTxQ0BB609ExdDEvLBHw/iduIY5V3n14xpkhmzEj/zTlnHng8S/SoBZ4T8sQ==
+	t=1795716296;
+	b=XvcaJsetn6qmPB0+DDJyoVzeGW2Pb3X58qFO6+z6qIdBzmO2+JsHggLEruMSUshjxmzK
+	 5aEgL1ofcjdbYyUVs70zLAxBZEADyhKfjE1dLsDCWA5pSbU7+/3HdPR5owI131BEcfZYf
+	 2sf34X4D4mHB4uwr77edZfxDV5jUFfVq4qP1s5j+mX6DW/PFra6YtEf0igqMddRsnr5H9
+	 NU3UMI718Fc9f7DXKFidJlWZZ9AU6nE8Mv99sFsSzyfPIfNq/4/2+pomvVbM0W9YEliP7
+	 k+HCpsEj/MzUE3MpVzhS7/Uobn6nMPRDqtuB4+mVBpZzGxDhxpQddYvVBKuA7EOKpjw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795716212;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795716296;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:In-Reply-To:References:
 	 Date:Message-ID:User-Agent:MIME-Version:Content-Type;
-	bh=SRMbopjT2ZDCp3S0bduHH4K2gvQ2HvHqic8ibWdFK5o=;
-	b=lIw3B1KkhNJJZUceqREmThcW7u00HidKLvvGtrkQtxWRqbq831o+vpyfrZeGayc69d5X
-	 xEXmasKjRKjTQD10Sb22AfusP94L9aUfHG1vYAQVuy2SDkou+kpA0QL0M7KG0p+LrGpiF
-	 OnOs6Wz9itaUQdMFkk3sWxQFVoRMz9jTdFWuhpkf30kWgbC3jMHM1aYeyVGOB/F9aIWW1
-	 GkiJ6JCcSkNySIUexFQhJTxQemjmgyg3HwBG68xn1/FoWVOQeaCvw4FJHi5ez+sZxNPmk
-	 Bq1IqhM9/lCk4w3TTM8RCOi0eQwgir6PP+wC8+yWvA6rCFa7wklMUgXp4XwDbwnTAfA==
+	bh=wyeadx8A+qjGGKflAd6kjiHqlv7VopvbXaimXP38c3g=;
+	b=Mr+K4op17/EH5OR87H4dZrQTeAK6pgMwrzd8KTisIwK05lFFQa0c2oMRJuROg7nZyJYB
+	 eVxJ294wxHm5SvLeZoNkdoMoFH3SC+02kLouSLS4zdcr4uUWyisqT0/sTE+ViVmsuIUrr
+	 3fhqxN+OkljLyiQPv4CfvyqKVO5VBficibWKs9aoPfYlRQL8bv+pXbUh+hqGPsr8lVIxZ
+	 N651u2C8DpSm7/DpOWgj81pDHN8Hkd57Y4AlMQ5PhK+L3ukwHXVHg/YMA1B3NeLlNgtNF
+	 yfaN5XN38AbyD7kvE0q+eVtwcfna7cWr2Tfasuv3dWLrHXaWT6r8RgJKHRBDCVwok1w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OGnBv2u0;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EqS38396;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360C7606A333;
-	Thu, 26 Nov 2026 18:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AC1606A31C;
+	Thu, 26 Nov 2026 18:04:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OGnBv2u0
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89F3F1F00AE3;
-	Thu, 26 Nov 2026 18:03:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EqS38396
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D1B81F000CA;
+	Thu, 26 Nov 2026 18:04:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795716211;
-	bh=SRMbopjT2ZDCp3S0bduHH4K2gvQ2HvHqic8ibWdFK5o=;
+	s=k20260515; t=1795716296;
+	bh=wyeadx8A+qjGGKflAd6kjiHqlv7VopvbXaimXP38c3g=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=OGnBv2u03WCFZWsDn0SqFklZyJny8+Af7jkPORwbwrdfJO9Uuyh3rw7lkea/8Q6vB
-	 cSIp8xQifnWtaWmwzYmEuwcFqqquwhEDZYU9qydrjf+sBZlYdV0Uh4OcohneorzOIF
-	 dQPa+xbeiqQcdPDC9Oa7jdvVgs4qB+n6553AGLoeNcTPRVh325vt+HhS5HZHGL1sQs
-	 OkUadX01xuDVnzUkH625JGfejnQ3/CAK3j6h3DWaPExj7QpjphDplmcLYj/MRIcgd0
-	 eVototx5kDwOQb/DevkWMQPYQDKm10UmfNq6zCKguaXM2lSgE0EpwfzgMQkEYxMgnP
-	 jCJ1NS7tAygTQ==
+	b=EqS38396Z/iq27cU9pt1bZvkBZNs2vlZLiamVFn+y25C+t9ZVrIAPHvMUWzhklPNP
+	 HFlsyNtm+f8t96tCn/siJCDZuV1XtDvPYjdJqVqKSpH7VFHyCh9f6uOi3Z9ejseiY4
+	 yiA4CVErYDCkwKKlJKqm8i2Sa7AcFoY130mUzRzuiM+gnKIaLLWvpo800U8dbryzmU
+	 Ie6ee1bcLsBZPAJVP+PhrLXv/FwN2eXOmuWWDguEbpYP1xOXMR4fwmkl6C5BmqrEfu
+	 d4UA9FhkCeKKlVEZWBE+E/unDJ3VkCOcP+G9AxHsM5x6LxQMUSfXvO2ckf9/IBGfFo
+	 /Y/pUt7+dSRtg==
 From: Pratyush Yadav <pratyush@kernel.org>
-To: Tarun Sahu <tarunsahu@google.com>
-Cc: Pasha Tatashin <pasha.tatashin@soleen.com>,  Mike Rapoport
- <rppt@kernel.org>,  robin.murphy@arm.com,  maz@kernel.org,
-  will@kernel.org,  David Matlack <dmatlack@google.com>,  Alexander Graf
+To: tarunsahu@google.com
+Cc: David Matlack <dmatlack@google.com>,  Pasha Tatashin
+ <pasha.tatashin@soleen.com>,  Mike Rapoport <rppt@kernel.org>,
+  robin.murphy@arm.com,  maz@kernel.org,  will@kernel.org,  Alexander Graf
  <graf@amazon.com>,  seanjc@google.com,  jgg@nvidia.com,
   loganodell@google.com,  arnd@arndb.de,  dwmw2@infradead.org,
   baolu.lu@linux.intel.com,  Bjorn Helgaas <bhelgaas@google.com>,
@@ -55,13 +55,15 @@ Cc: Pasha Tatashin <pasha.tatashin@soleen.com>,  Mike Rapoport
   linux-arm-kernel@lists.infradead.org,  skhawaja@google.com,
   sagis@google.com,  linux-arch@vger.kernel.org,  linux-mm@kvack.org,
   linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 07/19] kho: vmalloc: Add the feature header
-In-Reply-To: <20261110050202.529473-8-tarunsahu@google.com> (Tarun Sahu's
-	message of "Tue, 10 Nov 2026 05:01:50 +0000")
+Subject: Re: [PATCH v4 08/19] kho: block: Add the feature header to blocks
+In-Reply-To: <9huzse13pxhq.fsf@tarunix.c.googlers.com> (tarunsahu@google.com's
+	message of "Sat, 14 Nov 2026 09:34:41 +0000")
 References: <20261110050202.529473-1-tarunsahu@google.com>
-	<20261110050202.529473-8-tarunsahu@google.com>
-Date: Thu, 26 Nov 2026 18:03:23 +0000
-Message-ID: <2vxzh5h3wjv8.fsf@kernel.org>
+	<20261110050202.529473-9-tarunsahu@google.com>
+	<DMRP21FATCC0.ARAURXWV85JP@google.com>
+	<9huzse13pxhq.fsf@tarunix.c.googlers.com>
+Date: Thu, 26 Nov 2026 18:04:48 +0000
+Message-ID: <2vxzcxrrwjsv.fsf@kernel.org>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -74,121 +76,43 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain
 
-On Tue, Nov 10 2026, Tarun Sahu wrote:
+On Sat, Nov 14 2026, tarunsahu@google.com wrote:
 
-> Register struct kho_vmalloc with the KHO serialization feature header
-> mechanism to allow future additive fields or feature extensions without
-> breaking live update ABI compatibility.
+> "David Matlack" <dmatlack@google.com> writes:
 >
-> Add DECLARE_KHO_SER(kho_vmalloc, 16, 0, 0) to register the 16-byte
-> structure with 0 required and 0 optional features. Update function
-> prototypes in include/linux/kexec_handover.h to take
-> DECLARE_KHO_SER_HDR(kho_vmalloc, *fhdr) parameters, documenting which
-> registered structure the feature header belongs to while enforcing
-> compile-time type verification.
+>> On Tue Nov 10, 2026 at 5:01 AM UTC, Tarun Sahu wrote:
+>>> Precede struct kho_block_header_ser with struct kho_ser_hdr using
+>>> DECLARE_KHO_SER. Each block in a block set starts with struct
+>>> kho_ser_hdr followed by struct kho_block_header_ser. Serialized entries
+>>> start immediately after the header payload at offset fhdr->size.
+>>
+>> This adds a feature header to every block in the set, but the layout it
+>> describes is a property of the whole set: all blocks are written by the
+>> same kernel with the same header.
+>>
+>> Blocks are only ever added and removed at the tail, so the head block
+>> is stable for the lifetime of the set. I'd put a single set-wide
+>> header in the first block only, e.g. a struct kho_block_set_ser with
+>> its own feature header, and keep the per-block header to next and
+>> count.
+>>
+>> entry_size (added in patch 2) is another set-wide property that belongs
+>> there. All blocks in a set have the same entry size, so recording it in
+>> every block is redundant, and restore has to check that the copies
+>> agree.
+>>
 >
-> In kho_preserve_vmalloc(), initialize the feature header with
-> kho_ser_init() and access the payload fields via kho_ser_payload().
-> In kho_restore_vmalloc(), validate incoming required features with
-> kho_ser_validate() and access payload fields via kho_ser_payload().
-> In kho_unpreserve_vmalloc(), access payload fields via kho_ser_payload().
-> The chunk page format and traversal remain unchanged.
->
-> Update memfd_luo and test_kho to pass typed feature header pointers
-> and use kho_ser_size() for allocation sizing.
->
-> Signed-off-by: Tarun Sahu <tarunsahu@google.com>
-[...]
-> diff --git a/include/linux/kho/abi/memfd.h b/include/linux/kho/abi/memfd.h
-> index 7b49dd6d7e2a..b0597c438973 100644
-> --- a/include/linux/kho/abi/memfd.h
-> +++ b/include/linux/kho/abi/memfd.h
-> @@ -80,9 +80,9 @@ static_assert(!IS_ENABLED(CONFIG_64BIT) ||
->   * @seals:     The seals present on the memfd. The seals are uABI so it is safe
->   *             to directly use them in the ABI.
->   * @flags:     Flags for the file. Unused flag bits must be set to 0.
-> - * @nr_folios: Number of folios in the folios array.
-> - * @folios:    Pointer to KHO vmalloc descriptor for the array of
-> - *             struct memfd_luo_folio_ser.
-> + * @nr_folios:   Number of folios in the folios array.
-> + * @folios_fhdr: Pointer to KHO vmalloc descriptor for the array of
-> + *               struct memfd_luo_folio_ser.
->   */
->  struct memfd_luo_ser {
->  	u64 pos;
-> @@ -90,7 +90,7 @@ struct memfd_luo_ser {
->  	u32 seals;
->  	u32 flags;
->  	u64 nr_folios;
-> -	DECLARE_KHOSER_PTR(folios, struct kho_vmalloc *);
-> +	DECLARE_KHOSER_PTR(folios_fhdr, DECLARE_KHO_SER_HDR(kho_vmalloc, *));
+> Yes, adding a ser_hdr to each block_header is unnecessary and also cause
+> 8 bytes to get added to every block. This can be solved like you said by
+> adding it only to the first block. But this will make number of entries
+> in block[0] to be less than blocks 1..N. I am not sure if that is
+> acceptable but if it can be then we can avoid adding ser_hdr to each
+> block. Same for entry_size which can be moved to the first block only
+> like you suggested part of struct kho_block_set_ser.
 
-This doesn't _only_ point to the feature header. It points to the
-vmalloc buffer of of folios, conceptually. So it should be called
-"folios". Reading folios_fhdr everywhere is super confusing and hard to
-read. Users of KHO vmalloc should be pointing to the KHO malloc
-serialization structure, not to its headers or so on.
+I think it is simpler to do as kho_vmalloc does and just have a separate
+out-of-band structure to hold all the metadata.
 
-The feature header is an implementation detail of kho_vmalloc (same for
-others). It should not be visible to its callers.
-
->  };
->  
->  static_assert(sizeof(struct memfd_luo_ser) == 40);
-> diff --git a/kernel/liveupdate/kexec_handover.c b/kernel/liveupdate/kexec_handover.c
-> index 641a3b4c88fb..6e428df717cc 100644
-> --- a/kernel/liveupdate/kexec_handover.c
-> +++ b/kernel/liveupdate/kexec_handover.c
-> @@ -1378,20 +1378,20 @@ static void kho_vmalloc_unpreserve_chunk(struct kho_vmalloc_chunk *chunk,
->  /**
->   * kho_preserve_vmalloc - preserve memory allocated with vmalloc() across kexec
->   * @ptr: pointer to the area in vmalloc address space
-> - * @preservation: placeholder for preservation metadata
-> + * @fhdr:         placeholder for preservation metadata
->   *
->   * Instructs KHO to preserve the area in vmalloc address space at @ptr. The
->   * physical pages mapped at @ptr will be preserved and on successful return
-> - * @preservation will hold the physical address of a structure that describes
-> - * the preservation.
-> + * @fhdr will hold the preservation metadata.
->   *
->   * NOTE: The memory allocated with vmalloc_node() variants cannot be reliably
->   * restored on the same node
->   *
->   * Return: 0 on success, error code on failure
->   */
-> -int kho_preserve_vmalloc(void *ptr, struct kho_vmalloc *preservation)
-> +int kho_preserve_vmalloc(void *ptr, DECLARE_KHO_SER_HDR(kho_vmalloc, *fhdr))
->  {
-> +	struct kho_vmalloc *vmalloc_ser;
->  	struct kho_vmalloc_chunk *chunk;
->  	struct vm_struct *vm = find_vm_area(ptr);
->  	unsigned int order, flags, nr_contig_pages;
-> @@ -1404,13 +1404,18 @@ int kho_preserve_vmalloc(void *ptr, struct kho_vmalloc *preservation)
->  	if (vm->flags & ~KHO_VMALLOC_SUPPORTED_FLAGS)
->  		return -EOPNOTSUPP;
->  
-> +	kho_ser_init(fhdr, kho_vmalloc);
-> +
-> +	vmalloc_ser = kho_ser_payload(fhdr, kho_vmalloc);
-> +
->  	flags = vmalloc_flags_to_kho(vm->flags);
->  	order = get_vm_area_page_order(vm);
-> +	vmalloc_ser->order = order;
-
-Nit: Why is this moving around? Seems like a stray change.
-
-Also, renaming preservation to vmalloc_ser adds a lot of noise to your
-diff. Perhaps keep it as-is for now?
->  
->  	chunk = new_vmalloc_chunk(NULL);
->  	if (!chunk)
->  		return -ENOMEM;
-> -	KHOSER_STORE_PTR(preservation->first, chunk);
-> +	KHOSER_STORE_PTR(vmalloc_ser->first, chunk);
->  
->  	nr_contig_pages = (1 << order);
->  	for (int i = 0; i < vm->nr_pages; i += nr_contig_pages) {
 [...]
 
 -- 
