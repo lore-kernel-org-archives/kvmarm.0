@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795713303;
-	b=hVEWlPq8LuMvcgi5Q5RYbW35yBDHZSZlSycHMMu71kHr7Cc/W4IJMIHXoLZAkbVwT52/
-	 XaEbVbV4tCIZCxMXfimnhuEMNa4IDtnD3MBSSYdDsMGw5SROn/3GUNRfqH6XUr5htS9t4
-	 f8h1s/MEtpI5TYGETgJ9ofGspOcsekNAbasulQkw1AnRtyOM7DpdXt76hiIpdpLMxOoyb
-	 i4RH/5YRCfc63GmYB+wfRnWN0bHOoDOXTmwu2yiipEbOKp5FIgMfMT2fb8eHTpsgpQaND
-	 sclibeDMWt5hMiVwFFbehQDqoHyuA59kC+UnyvvY83Pbf6IzockeQ2CGAFjeJhLEIWg==
+	t=1795713300;
+	b=UyXO8SZOocBOGBa+aYAwRPrDmyJw8JF6md1qY1xTKBIZ73StpTTVhFehI4D7PWEQ1dmr
+	 ue3rs/CQX5eNW0m8jUveN361qDVi1TJXajO5O/Mdf9PzBM+/I/WwdyEjS/TuPhKlT2zRN
+	 10pRnC3iYftXCof+aztR/I6+MjwayV9FC7okC/c0TdLDpBc+a2G9JfklhnC2O9gngzKxm
+	 cKPRdnsdtB8m7AJ5O+hCpefmJorOtP3YL/KYSFIqoAmEHSZd7W7epifiIseeBClqvV/hx
+	 AaZImvLS5Lyw69IrFEWur5ck7Gd5gMKkoPeMBIXFUb7ItbPKt5yaNBBDw6dsxzhVLfg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795713303;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795713300;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=q0B2zDEgWbij3ExR5m6tj05ZE8Loybx2WzGdd3/XLjI=;
-	b=le6iBaOVseDJwUV0R8uitImKB4Ze9wysgN3Tuwo21pXsIeKFKeMwk3dir8FTOF8BgPuF
-	 bdieWCfon07kNDRR3Jgmgb1K6AbvDARxP5A3Sv9neEja91MT4u9Xyu3AP/umHpzE2IzcZ
-	 W8yFv6CW7e5TbVPo6px9Xt4Xh+gvfz1BWVS17EwSGicbmd6bmrjwylj5r/RSGIFR4ftjE
-	 dGYRz8d8daQU1NuA82LmHd/BhI7HfeLThGSSBwgmBB/XThNKzl6wDZHIj6gu16LhBZDb0
-	 ZZp6WsmN1qu65XcQigS5urI+gkgi2v9DMGfmriPqEnxGMbodYLaLsW27z+ReM1NPwYQ==
+	bh=/V0rZuxbPpqV90335mZqBu8TYpDdCcCDOR66aUIa36E=;
+	b=aNfRq/wSpUQHHir7fJZFSOkC1bWQNk1Prz35bhcqD3abFVQgmfOqZ7zMJPjH9kj3hqbh
+	 yO5maLmlVRXdxPJZu2awcp1PcWzWWy/n0oA4taUqG77pPcgXVT08wNU0UaiODxjKVE3Y+
+	 k/9ZQ5nLIAJhOFh3cgE04cwmi86g/Dq0DSWu/Kts7hj1er6jOowf0D5SkrS0RAnBhA49W
+	 26w2Wu/oxiMCbKQRCKbXUlTWfA1oktCrC3OS97r6GWpw9Mmxzgkx1hO5qrfahg9vzU3te
+	 OBWybzXfVbzAsL8DGr6uLPntp99omalJR1YiNKinz0WJCTwji0j2vVFIOfGbR+5FuDg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LXAHTVYl;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dow3ELZ0;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9AD606A326;
-	Thu, 26 Nov 2026 17:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LXAHTVYl
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA3F01F000C4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890A0606A31E;
 	Thu, 26 Nov 2026 17:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dow3ELZ0
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42F8C1F000CA;
+	Thu, 26 Nov 2026 17:14:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795713302;
-	bh=q0B2zDEgWbij3ExR5m6tj05ZE8Loybx2WzGdd3/XLjI=;
+	s=k20260515; t=1795713300;
+	bh=/V0rZuxbPpqV90335mZqBu8TYpDdCcCDOR66aUIa36E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=LXAHTVYleZCk77A0KBVbrzVRYYEk8g7LGNr8lllNPuL9sKP+j2DfhkzBJ1S2wZL1Z
-	 A5AXutDExSkrph5niuRZo7dEbRYuYTYTha/KAKQ9tkBtJODdwiFaP/HtB+if2l7/Dc
-	 O4Ex0tPnSNLLmmKC0sb0BI9/Zh/Ma8YPG59thZGmDLRUAyxINmsKqnnyHuc0VCUugY
-	 Emp+dcJSpeZBoD9WSpFaVD1uzqHOLlM5VlejVVjMSAOE9lRBAeHhHwNyI81aJPP7In
-	 16eUs95PIwZ2ghew/15VY98zDvVgKzmZuCfgBiOvaYq6EWeDLnKJVxHgsV8Xz72mvo
-	 3F66kqPafhguA==
+	b=dow3ELZ0D2CeJBkNAyQMzjzO977vKeb/E+uOTGAOEUJc9G4gjajUP6/sD03f6Aa39
+	 SlEgX4IBb7QROZxhe7HNTyuGnpQ5bmOEdQN+E3jB64psaoCYsRVAmE3rQuIzCNoeD2
+	 zR0SB5/05xyrVdS16WbnL/6dvKixOmLt+xuiEIc1s6B+dUcwtOSJkful3HhMV9eCQp
+	 fPCb/u1xaZjd93D6EGCsJyY+vqlH8dRw4gygjwdWTH2Od0gr2k54NALeiwZZZ2z4a0
+	 NZXuvrY7rGSFQ2mFlvVmHOn6M0zJ39N74UIK7cU1XJ6bJfAYeS46/e3zAEsvZ2xrPW
+	 DDGMtBjI1Tf5w==
 From: Will Deacon <will@kernel.org>
 To: kvm@vger.kernel.org,
 	Kajetan Puchalski <kajetan.puchalski@arm.com>
@@ -49,12 +49,12 @@ Cc: catalin.marinas@arm.com,
 	Will Deacon <will@kernel.org>,
 	julien.thierry.kdev@gmail.com,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH kvmtool] include: linux/types.h: Add 128-bit integer types
-Date: Thu, 26 Nov 2026 17:14:34 +0000
-Message-ID: <179571110464.2963221.18320321266334097396.b4-ty@kernel.org>
+Subject: Re: [PATCH kvmtool 1/2] net: dhcp: Fix parsing of resolv.conf
+Date: Thu, 26 Nov 2026 17:14:33 +0000
+Message-ID: <179571118646.2964088.15371184378928458278.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261113153847.60183-1-kajetan.puchalski@arm.com>
-References: <20261113153847.60183-1-kajetan.puchalski@arm.com>
+In-Reply-To: <20261117161019.142337-1-kajetan.puchalski@arm.com>
+References: <20261117161019.142337-1-kajetan.puchalski@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -67,20 +67,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Fri, 13 Nov 2026 15:38:47 +0000, Kajetan Puchalski wrote:
-> The tree no longer builds on new systems (e.g. latest Fedora images)
-> because the included types.h is missing 128-bit integer types.
+On Tue, 17 Nov 2026 16:10:18 +0000, Kajetan Puchalski wrote:
+> Parsing logic for /etc/resolv.conf currently does not take into account
+> line breaks and can erroneously interpret e.g. comments in the file as
+> valid nameservers. Fix the parser to scan line by line and explicitly
+> expect a bounded key-val pair to resolve the issue.
 > 
-> Add typedefs analogous to Linux commit 10a47fb67340bca274276faf855d7 to
-> fix the build failures.
 > 
-> 
-> [...]
 
 Applied to kvmtool (master), thanks!
 
-[1/1] include: linux/types.h: Add 128-bit integer types
-      https://git.kernel.org/will/kvmtool/c/6aeffc7ad7ad
+[1/2] net: dhcp: Fix parsing of resolv.conf
+      https://git.kernel.org/will/kvmtool/c/3185095e8afb
+[2/2] net: Use the host as a DNS proxy on loopback DNS
+      https://git.kernel.org/will/kvmtool/c/f97e6d645b79
 
 Cheers,
 -- 
