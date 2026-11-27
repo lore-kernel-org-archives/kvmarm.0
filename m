@@ -1,83 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795789443;
-	b=mAW0mNfzGBDOnZA1kxey1CjlT9WhAadDd68Z8TL47kjVFM1PmZKv3u9OdZ4kN8w2KwpT
-	 0NLdifilvZjC8WBkUajPGHueykok5GW1/WQ8T5jP2mKaJl5yjmGsOMcsyrNiBjPiAaeKb
-	 5dPcTTnWofrHoog/RdiZiZcITvUX1fXssN78dKf51lbK6BlbY9qL4D2BZT5CiLb86Gep1
-	 GrkKHGm08i0ZzfQVYY46C6Gx/NO7ZmnLk2qBzJOazT1DE+wN6bZZ+yHacN5SpgqimmeTL
-	 x8T16m7HUslRc18mTQKBugz+YEP4KuURb1Bok6jnJWMViNwKeL5gvZg0q0IgHgcWpow==
+	t=1795789446;
+	b=F2z3jJkyyYxUyRBdo/a61o1gk6zeRg9WA5olmf+wnQdAw4I2mPpYAmF/by2RVuo7bz/E
+	 ScI1xyAzuyJIn6mwLc4pjn6FtGXSrdDE3HusKFAEFJjwwgdtWPjGQlML2gCXLFPfcc1jt
+	 VOxVMhz8JvVax+D8sr5xsIWdswQhAFEOSP6LxOqjaSQCvN60qH/y/mfrLj+0/cIqDgN0h
+	 Dfwp11yf1V33x8APRKaUx3vTFbg3XZNUPPYF0OeocBqpiy/1H7FrTTfLaVtveTqZnu+Yy
+	 BnBjmW20/B3lLEddHBnc3ur3nGYKMqLcBXWuVSOV6Fbfb68iC90dq3bA3bVZhJDOYxw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795789443;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795789446;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
 	 Received:Received:Received:Received:From:Date:Subject:MIME-Version:
 	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
-	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:X-Proofpoint-Spam-Info:
-	 X-Proofpoint-GUID:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-ORIG-GUID:X-Authority-Analysis:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=x3wKeRgQn3K+x3tZ3X2EDKaSNjcSdkwUoCfWG9V8P0I=;
-	b=a1I8t/iOO5jLy6nl0RKeAeXdm9UK4ZJtziwAr5dXeyw18h80oZH9NCw3Su/69ewI95eb
-	 yUdpjPyXrvG2rTWmYUyPnNzOlKADeqK/YlwLgmOEnCc6DWWetDCLGASsPG9c0wyQmB1z3
-	 PeaRaQO3FcI4ofhlXWPNJbJufFijHJXA47gJO+FStCUZtWeXvEhUeuvii46RcXlux3QYb
-	 aDAX8jBRcVLDYynNR/F4b4NS6BhFKurvULdaLXcFi0xwquWrlBos8DqMG1ZVeowQ4TIvc
-	 HaSiWLy8Qp9dHagLSt+idVrr/9R+7w9bmEmLv4DMLUxdSfilnbfja7IfyoXDPpB5xoQ==
+	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:X-Authority-Analysis:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=OOI9+qdxzwaIBiV3QCDuxZoO6ODGYcCUsZ6w/cxwluo=;
+	b=uQGjLxVeDDkvSzaS6CSJAh+odWUoZXqXytOeO7pbZemNxdWCkZwReboqdGS6ht7vpQye
+	 IxeNl/0BaYdUyKX1F/Wf/4o7u/wmZ5SZxAbehSVQ7JLBUKLGaIKvBztI+AQ8Cd4w1hhx6
+	 DC2rrTTguhqsnwQQPnSNjTSfN4tzZUbeWEyClEKgvqS4V18DRLyoJAWPnTRe+0d8a4MUr
+	 afeN6eihp1zsbttkdr4Wh9Fyx3Tp4j+eW700lGuiSS90dVhEHTRNYiVIevMamSZ7OCC1Q
+	 M3pwnDHoLGZOox9VDCnlumZlFCuPv/hRwrOPF2dRFfkuLGpj72nFXfDN2oDQ91S750A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.ibm.com;
 	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=h0vahw4J;
-	arc=none smtp.remote-ip=148.163.158.5
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=E0yVmGAz;
+	arc=none smtp.remote-ip=148.163.156.1
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75D4606A68E
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 14:24:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C75D4606A68E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6083606A332
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 14:24:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A6083606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=h0vahw4J
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4uew2012171;
-	Fri, 27 Nov 2026 14:23:23 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=E0yVmGAz
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4Yxq1650069;
+	Fri, 27 Nov 2026 14:23:31 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=x3wKeR
-	gQn3K+x3tZ3X2EDKaSNjcSdkwUoCfWG9V8P0I=; b=h0vahw4JyNZOj2of2zSTdJ
-	W3CRJJJrfsHcuUQCCR4HiDBhP5WKczlHgEM9eR8BxmXzu0zZVpy1fAVx5HlLNTby
-	kboOUghsbaQKIPyNGjWCxXUciF4SkgqY+qT5vUewWXd5xGS9v7fmo7k9AKhhYLXV
-	y+odxeTIYAuOCf82fEj2kzGJgM6pvBq+FOJLgHiUyrAskFQdU0RIH4FW7c7HGkNJ
-	z5eU2gFdU3RkwZztmhxtQKfdE1Png0rC8/nhhKn61boQXiUyO1E7OtkjCkHCJnc2
-	YqEheovXiBiJFcQ1HtHj+wPARNHHK70K65lodXVjhJDBITWRJ+qbQutRae7podRw
+	:message-id:mime-version:references:subject:to; s=pp1; bh=OOI9+q
+	dxzwaIBiV3QCDuxZoO6ODGYcCUsZ6w/cxwluo=; b=E0yVmGAzSbpNpxquPfdJV5
+	ElzcmNjRUZifJmBf8YB+TsV6boE43Xh9QnnoINsM4ZMSnesIwBa1Fxou0mPv08gN
+	kr6T44XGQuNt3OT67Ka8ZiYatSd4yk7N+gFUucQ96ti3Pfyom4qxchAGrsXylNjq
+	3VIB8wD6RUBPJMR+alz1X6noruDQqlhhT38nW06YYjVEZ1T13zQm1QJqqKN10EUz
+	1ZE6zPUi2WKNhWmL+NV9Fi1Iq64vCtyqm3Ym+0NRshkTShvnDFHhZFwVPmtEaAVb
+	4dENRXcBxYAeR2gSLiXK1JoCN1gId5kcDRi4oZx2E0F9OIriAf1hg17OQsaGNFWg
 	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4j34p4w8fw-1
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4j34g3p7jx-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 27 Nov 2026 14:23:23 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4HwW861610;
-	Fri, 27 Nov 2026 14:23:23 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4j6mjg4d5a-1
+	Fri, 27 Nov 2026 14:23:31 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4KH73245757;
+	Fri, 27 Nov 2026 14:23:30 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4j5uxx951d-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 27 Nov 2026 14:23:22 +0000 (GMT)
+	Fri, 27 Nov 2026 14:23:30 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6ARENHWl18088434
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6ARENQnq36176176
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 27 Nov 2026 14:23:19 GMT
+	Fri, 27 Nov 2026 14:23:26 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 781102004F;
-	Fri, 27 Nov 2026 14:23:17 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 157862004E;
+	Fri, 27 Nov 2026 14:23:26 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 062F62006A;
-	Fri, 27 Nov 2026 14:23:17 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 7C0EB2004F;
+	Fri, 27 Nov 2026 14:23:25 +0000 (GMT)
 Received: from a46lp73.lnxne.boe (unknown [9.87.84.240])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 27 Nov 2026 14:23:16 +0000 (GMT)
+	Fri, 27 Nov 2026 14:23:25 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
-Date: Fri, 27 Nov 2026 15:22:11 +0100
-Subject: [PATCH v4 08/25] KVM: s390: arm64: Prepare for sharing arm64 SVE
- and ftr-reg code
+Date: Fri, 27 Nov 2026 15:22:27 +0100
+Subject: [PATCH v4 24/25] KVM: s390: arm64: Promote PTRAUTH capability
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -89,7 +88,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261127-sysreg-v4-8-a6318d18aab5@linux.ibm.com>
+Message-Id: <20261127-sysreg-v4-24-a6318d18aab5@linux.ibm.com>
 References: <20261127-sysreg-v4-0-a6318d18aab5@linux.ibm.com>
 In-Reply-To: <20261127-sysreg-v4-0-a6318d18aab5@linux.ibm.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
@@ -118,82 +117,208 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         linux-s390@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>
 X-Mailer: b4 0.14.3
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI3MDA1NiBTYWx0ZWRfX7Rd9jNslBOz4
- 9S8fvPJqPpEeh864YB/c0A36nu7vxSC1XR64uBtrWVQnGo2N16DrH6kfuWvaUqjiwa3NdN/C01M
- fNYP6cuepkiJJy1yRcGXJ1F5hrWqDaU=
-X-Proofpoint-GUID: lZ_6xlPBJlT6QTnBJulvU0AfgSHuW_ls
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI3MDA1NiBTYWx0ZWRfX1BSZogXyHG1I
- SB6n+4TYJUSo7tukKUp2N8xh4a8/TsLjiB4287fS3KcSliEbV+cPNGrP8443Gl0V/qSW8u1BFrH
- XBeuuKnW0N/5r8tyHWynrSvNvkvWeNjH5HVzSlJPK4QJXJSrxdC8fpHeTuFauSNA2YCI0p5DFKR
- gRy8v1C/6HBrtWHPHvIWyWBFUi6WBsJzUAja3xtVgFabQw71vCrbyTnOJ7w9VXaW0cSeBTzzBWY
- iuyvbPmBc3EGc2w1k3hR+qQsHh627RwAlUdQIfnaZ/4jQmSD7SSMBJoXd6Y9Eid4kw73SMemqKx
- lrQAdwF9n8OSEeDGhGhgtePu6n2Ha7+6kHAPNxbArzGb/J54R/ycU9rA2R4/Kq+0+aAn1GNe+xr
- qpFPBa7tkG8YyRg5LNi6gUTSAhkDYLQXRxEx0rh05Ilu/51H3iMGxyogEKy3OeXPvUORFJyR/0R
- +xvv+E8fzMPbtn/RKfA==
-X-Proofpoint-ORIG-GUID: lZ_6xlPBJlT6QTnBJulvU0AfgSHuW_ls
-X-Authority-Analysis: v=2.4 cv=QabzLcbv c=1 sm=1 tr=0 ts=6b09925b cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+X-Authority-Analysis: v=2.4 cv=SoQFe/O0 c=1 sm=1 tr=0 ts=6b099263 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
  a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8
- a=pU5mCtL58HmMNmPAhBwA:9 a=QEXdDO2ut3YA:10
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
+ a=Z9ZwPO1K5bdhHLDsFksA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI3MDA1NiBTYWx0ZWRfX7PFboSHWJxS7
+ yzn+DJ8U9lK/iIQHNhfl2DeFFCknonhxB/u6z827UL19gzMtfOsED63MnEJXi7RSS1wFIEy9Vgj
+ VT9CcK8XvzURhdCOmPwdLBuluVee/44=
+X-Proofpoint-ORIG-GUID: iICTyvak-bYuqbchSkg_JBR8moYlT15X
+X-Proofpoint-GUID: iICTyvak-bYuqbchSkg_JBR8moYlT15X
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI3MDA1NiBTYWx0ZWRfX8N4c4KXQjNoN
+ Wczv+EAZc8F6AwulDnzOPgsrTiRe8uCno/Ev+ozQi+nrE92shC2GAYFLVsYT96NYjIPk/cnQZ/8
+ 4W5WevnM1VgtzTMvgEw3tTtB54ezbO/ED1cmenGZalo8QDhNMJ4+D5uSU1Rb0MmBLuk7HkozVXI
+ YeD3Onl2mVAwvP4umpTaxD9xPLn5yI09PNrzx0iQAD4qys4ieITFO7qW3I3CMb4XDwG9T6PGkkc
+ Oi94A/pwQ1oVEwRpH07LSQaSfKhYudqj6Ud6uXicRYrarTpUu6xg9cHCtmaldivsoUN63yJO8j6
+ y+gf8b73DghmukFYKUoaGDLgedP4K06bJwuVK1pVhSxsM0oLai+MVCVqvAEFGovzNtEKlBsUXrx
+ 5jLPZJxkIRtDSbeEl/5/Kz5FbZUNDUgaceKPPj5OHcLPBwbF7+BBcYFWH4pcQ1CN20jDjhEhz5I
+ jOcAy9uwCKkJ0JrDMvg==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-11-27_02,2026-11-27_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0
- bulkscore=0 priorityscore=1501 clxscore=1015 malwarescore=0 impostorscore=0
+ priorityscore=1501 suspectscore=0 spamscore=0 bulkscore=0 adultscore=0
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 impostorscore=0 phishscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611270056
 
-Add required SVE and feature-register definitions to the arm64 on s390
-host code. The definitions are required to be able to build shared SVE
-related code.
+Promote the pointer authentication capability if supported by hardware
+and allow userspace to access those.
 
 Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
 Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/s390/kvm/arm64/arm.c   | 2 ++
- arch/s390/kvm/arm64/guest.c | 6 ++++++
- 2 files changed, 8 insertions(+)
+ arch/s390/include/asm/kvm_host_arm64.h | 12 ++++--------
+ arch/s390/kvm/arm64/arm.c              | 17 +++++++++++++++++
+ arch/s390/kvm/arm64/feature.c          | 18 ++++++++++++++++++
+ arch/s390/kvm/arm64/feature.h          |  5 +++++
+ arch/s390/kvm/arm64/sys_regs.c         | 10 ++++++++--
+ 5 files changed, 52 insertions(+), 10 deletions(-)
 
+diff --git a/arch/s390/include/asm/kvm_host_arm64.h b/arch/s390/include/asm/kvm_host_arm64.h
+index d09ed3a211f3..a76e1bfc64bb 100644
+--- a/arch/s390/include/asm/kvm_host_arm64.h
++++ b/arch/s390/include/asm/kvm_host_arm64.h
+@@ -34,8 +34,10 @@ bool cpus_have_final_cap(unsigned int num);
+ #define KVM_MAX_VCPUS 1
+ #define __KVM_HAVE_VCPU_RUN_PID_CHANGE
+ 
+-#define KVM_S390_ARM64_IMPL_FEATURES (		\
+-	 BIT(KVM_ARM_VCPU_SVE)			\
++#define KVM_S390_ARM64_IMPL_FEATURES (			\
++	 BIT(KVM_ARM_VCPU_PTRAUTH_ADDRESS)	|	\
++	 BIT(KVM_ARM_VCPU_PTRAUTH_GENERIC)	|	\
++	 BIT(KVM_ARM_VCPU_SVE)				\
+ )
+ #define KVM_HALT_POLL_NS_DEFAULT 50000
+ 
+@@ -132,7 +134,6 @@ struct kvm_vcpu_stat {
+ };
+ 
+ #define kvm_has_mte(_kvm) false
+-#define vcpu_has_ptrauth(_vcpu) false
+ 
+ #define kvm_has_fpmr(kvm) \
+ 	 kvm_has_feat((kvm), ID_AA64PFR2_EL1, FPMR, IMP)
+@@ -173,11 +174,6 @@ struct kvm_vm_stat {
+ 	struct kvm_vm_stat_generic generic;
+ };
+ 
+-static inline bool system_has_full_ptr_auth(void)
+-{
+-	return true;
+-}
+-
+ #define kvm_vm_is_protected(_kvm) false
+ #define vcpu_is_protected(_vcpu) false
+ 
 diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
-index bd9d85235f43..29d3add0bbda 100644
+index b06c101ef6a9..cd59a382a70c 100644
 --- a/arch/s390/kvm/arm64/arm.c
 +++ b/arch/s390/kvm/arm64/arm.c
-@@ -8,6 +8,7 @@
- #include <linux/kvm_host.h>
- #include <linux/cleanup.h>
- #include <linux/fpu.h>
-+#include <linux/bitfield.h>
+@@ -57,6 +57,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_SVE:
+ 		ret = system_supports_sve();
+ 		break;
++	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
++	case KVM_CAP_ARM_PTRAUTH_GENERIC:
++		ret = kvm_has_full_ptr_auth();
++		break;
+ 	default:
+ 		ret = 0;
+ 	}
+@@ -227,6 +231,12 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	VCPU_EVENT(vcpu, 3, "%s", "free cpu");
+ }
  
- #include <asm/access-regs.h>
- 
-@@ -24,6 +25,7 @@
- #include "trace.h"
- 
- static unsigned long system_supported_vcpu_features(struct kvm_vcpu *vcpu);
-+#define read_sanitised_ftr_reg(_id) 0
- 
- #define __INCL_GEN_ARM_FILE
- #include "generated/arm.inc"
-diff --git a/arch/s390/kvm/arm64/guest.c b/arch/s390/kvm/arm64/guest.c
-index 4ea6fe2c270d..8b5ee9e79a4f 100644
---- a/arch/s390/kvm/arm64/guest.c
-+++ b/arch/s390/kvm/arm64/guest.c
-@@ -5,6 +5,12 @@
- #include <arm64/kvm_emulate.h>
- #include <arm64/kvm_nested.h>
- 
-+#define SVE_VQ_MIN	__SVE_VQ_MIN
-+#define SVE_NUM_ZREGS	KVM_ARM64_SVE_NUM_ZREGS
-+#define SVE_NUM_PREGS	KVM_ARM64_SVE_NUM_PREGS
++static void vcpu_set_pauth_traps(struct kvm_vcpu *vcpu)
++{
++	if (vcpu_has_ptrauth(vcpu))
++		vcpu->arch.hcr_el2 |= (HCR_EL2_API | HCR_EL2_APK);
++}
 +
-+#define vcpu_sve_slices(_vcpu) 1
+ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+ 	save_access_regs(&vcpu->arch.host_acrs[0]);
+@@ -235,6 +245,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	lasrm(&vcpu->arch.save_area);
+ 
+ 	vcpu->arch.sae_block.gpto = vcpu->kvm->arch.epd;
 +
- #define __INCL_GEN_ARM_FILE
- #include "generated/guest.inc"
++	vcpu_set_pauth_traps(vcpu);
+ }
+ 
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+@@ -270,6 +282,11 @@ static unsigned long system_supported_vcpu_features(struct kvm_vcpu *vcpu)
+ 	if (!system_supports_sve())
+ 		clear_bit(KVM_ARM_VCPU_SVE, &features);
+ 
++	if (!kvm_has_full_ptr_auth()) {
++		clear_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, &features);
++		clear_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features);
++	}
++
+ 	return features;
+ }
+ 
+diff --git a/arch/s390/kvm/arm64/feature.c b/arch/s390/kvm/arm64/feature.c
+index fc5b159a94b3..41c9e14784d3 100644
+--- a/arch/s390/kvm/arm64/feature.c
++++ b/arch/s390/kvm/arm64/feature.c
+@@ -158,3 +158,21 @@ bool system_supports_sve(void)
+ 			     read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1)) ==
+ 		       ID_AA64PFR0_EL1_SVE_IMP;
+ }
++
++bool system_has_full_ptr_auth(void)
++{
++	u64 isar1 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
++	u64 isar2 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR2_EL1);
++	bool address_auth;
++	bool generic_auth;
++
++	address_auth = SYS_FIELD_GET(ID_AA64ISAR1_EL1, APA, isar1) >= ID_AA64ISAR1_EL1_APA_PAuth ||
++		       SYS_FIELD_GET(ID_AA64ISAR1_EL1, API, isar1) >= ID_AA64ISAR1_EL1_API_PAuth ||
++		       SYS_FIELD_GET(ID_AA64ISAR2_EL1, APA3, isar2) >= ID_AA64ISAR2_EL1_APA3_PAuth;
++
++	generic_auth = SYS_FIELD_GET(ID_AA64ISAR1_EL1, GPA, isar1) >= ID_AA64ISAR1_EL1_GPA_IMP ||
++		       SYS_FIELD_GET(ID_AA64ISAR1_EL1, GPI, isar1) >= ID_AA64ISAR1_EL1_GPI_IMP ||
++		       SYS_FIELD_GET(ID_AA64ISAR2_EL1, GPA3, isar2) >= ID_AA64ISAR2_EL1_GPA3_IMP;
++
++	return address_auth && generic_auth;
++}
+diff --git a/arch/s390/kvm/arm64/feature.h b/arch/s390/kvm/arm64/feature.h
+index e6916d8064c3..57c8945fb46f 100644
+--- a/arch/s390/kvm/arm64/feature.h
++++ b/arch/s390/kvm/arm64/feature.h
+@@ -89,4 +89,9 @@ static inline u64 kvm_sae_irptc(void)
+ 
+ bool system_supports_sve(void);
+ 
++#define vcpu_has_ptrauth(vcpu)						\
++	 (vcpu_has_feature(vcpu, KVM_ARM_VCPU_PTRAUTH_ADDRESS) ||       \
++	  vcpu_has_feature(vcpu, KVM_ARM_VCPU_PTRAUTH_GENERIC))
++bool system_has_full_ptr_auth(void);
++
+ #endif /* ARCH_S390_KVM_FEATURE_H */
+diff --git a/arch/s390/kvm/arm64/sys_regs.c b/arch/s390/kvm/arm64/sys_regs.c
+index e240efb77b9b..50979e29fec4 100644
+--- a/arch/s390/kvm/arm64/sys_regs.c
++++ b/arch/s390/kvm/arm64/sys_regs.c
+@@ -33,7 +33,6 @@ static u64 __ro_after_init boot_cpu_aidr_val;
  #undef __INCL_GEN_ARM_FILE
+ 
+ DEFINE_STATIC_KEY_FALSE(broken_cntvoff_key);
+-
+ #define SR_INVALID 0x8badf00d8badf00d
+ 
+ enum sr_loc_attr {
+@@ -639,6 +638,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_TTBR1_EL1), access_rw, reset_val, TTBR1_EL1, 0 },
+ 	{ SYS_DESC(SYS_TCR_EL1), access_rw, reset_val, TCR_EL1, 0 },
+ 
++	/* CRm = 1 */
++	PTRAUTH_KEY(APIA),
++	PTRAUTH_KEY(APIB),
++	/* CRm = 2 */
++	PTRAUTH_KEY(APDA),
++	PTRAUTH_KEY(APDB),
++	/* CRm = 3 */
++	PTRAUTH_KEY(APGA),
+ 	/* CRn = 5 */
+ 	{ SYS_DESC(SYS_AFSR0_EL1), access_rw, reset_unknown, AFSR0_EL1 },
+ 	{ SYS_DESC(SYS_AFSR1_EL1), access_rw, reset_unknown, AFSR1_EL1 },
+@@ -647,7 +654,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_FAR_EL1), access_rw, reset_unknown, FAR_EL1 },
+ 	/* CRn = 7 */
+ 	{ SYS_DESC(SYS_PAR_EL1), access_rw, reset_unknown, PAR_EL1 },
+-
+ 	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
+ 	/* CRn = 10 */
+ 	{ SYS_DESC(SYS_MAIR_EL1), NULL, reset_unknown, MAIR_EL1 },
 
 -- 
 2.56.1
