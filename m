@@ -1,83 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795789456;
-	b=f+CMo2KmbiByyqKQ3BbTMcsrAxmZRhWrIq3ljkpq1nVUlyX0T6Ln4jZ/aDXa/00Qv+nn
-	 IEGbStMQLYaopTIEkQwzEtKJtqJnDinQxt3xhiaX59peV9cokPm/N8sUiGW3E3r/+5Ll2
-	 b2wL6hzGUm/MT2kyceJ0kH9rF6HeGPliVy9csCQoR49g+Ekeffx6UXYHPncMkp8o35eCj
-	 OKI79hOg73cim9EbrsUiY63+QZvogtoccCggoRnroXdobhk3ss1ZxNhPVlokjt6nGi1KI
-	 qXMjhpSmPb6bZunJXdG2IOfNI87uonoBmZzqWnmhY2c/Nj+ZakPyGoC3OPahl2R6h7g==
+	b=oiGt73Cs9bbo2a9LU2u3QYwJxnnUoHNb57yyupl5q8BYkkmdpEzHZG7GD169zT+9K73l
+	 Z8gyLnyZfmgDAecu0dQ001TBY5ovlG0zRcPcBrZY0ZEbPyUT311Ns21qckLKBJbdQ9UQU
+	 HBfd6xesdAnWwLmKmMafDCY0xp6XYJ5KFmTQ2mB7MhWbeaO4cb554266BPKQYJd484/Al
+	 SfydFLWRM90NcwyqyPu7Kc5mM6VtjQEcTBGB0qRGSJoN49U2D34AIQIowwVOEbut5A85R
+	 D8nb6LJYRE+UnEH19lI1IbybpWigmkpCh5aEaJMHKqsO1kmuj6wVrb+aOqE0CP1y6tw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795789456;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
 	 Received:Received:Received:Received:From:Date:Subject:MIME-Version:
 	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
-	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
-	 X-Authority-Analysis:X-Proofpoint-GUID:X-Proofpoint-Spam-Info:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=dr6anXfFaRUPLtcUaE0xnSp+SE8ftkLjWqinLtQgvsQ=;
-	b=1N4KusnlMPdNkwZxzwUiby4nry8xuFh0ddSCuF79u//WKvGoghrZkIDwcFECpIN6Upl3
-	 /GUr1j5UlyejM2IFPQTCQNGC0SoaycNUlH6Vbnr3PoZHptG9QNjSaMz5vy3Yz0nGqvMOk
-	 6QJIEm/qS/zBjInJ/ugzK1eqMsYxCeoXLoVLFjKV2IqMhwemE3Bsz85a+Sb7uoxJnRgzD
-	 xllURWrQenZ7gdUG5XwqQxO8xJMWxew+eO8oabGkpHTYCc7ZsMKPRqC28NPEWIUxIXOsl
-	 KJxXymcLGseNOF6CsFdXV80VvRf8uFyfxywD7g9uiRXwZPPp3fXnwp7o27wCmZKl/uA==
+	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:X-Authority-Analysis:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=LxGg80roB/T2VMVa2JS/xSUiJuo79We2YYLICTkZtcA=;
+	b=Id8LAeIdHw4Ubv8FqJdPXXmg85VmbsjuF4l0Rm6/4SaIiicMx1QVqn6V1M+tAqVPp7xC
+	 yoI2DSG8aiFiUm3iCslweKiXp0DhPMlhWh8CnWz3Iczufr21P5JwV3J/rsxg8MeaaFyLn
+	 BR0KNulLp8pjs86hKnYpVK7fZCy0QV/s2SAd5JdouEBi0ghjXKDQntrQimxkSL26Gsgnq
+	 2z/1puLZUNRxJFEfdiBcU3vKiY+QlBuxcgjt5kLs/gDjqzTqKTnp78SoOCMPRmooKzcqg
+	 MfU0CEGlsZs6VNLs/EAgn3Qg7xcJPX1uqjDJtMT/qmz2sBLLTCxvIzpWLqpf6CPCTZg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.ibm.com;
 	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=A7DFN17S;
-	arc=none smtp.remote-ip=148.163.156.1
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=G8vveRO0;
+	arc=none smtp.remote-ip=148.163.158.5
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC06606B18A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D7E606C70D
 	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 14:24:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3CC06606B18A
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 34D7E606C70D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=A7DFN17S
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4ovZ3419760;
-	Fri, 27 Nov 2026 14:23:24 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=G8vveRO0
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4oQs3234409;
+	Fri, 27 Nov 2026 14:23:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=dr6anX
-	fFaRUPLtcUaE0xnSp+SE8ftkLjWqinLtQgvsQ=; b=A7DFN17S2kpOKREMiVsMae
-	0dVmKAWZQ7DTqcfyNilh4a4LQDwo3PoexYRiJUr+CrR0Ec7M74i1+YPZHV1DtCnc
-	xuIQzR3Wrmyec7IZ2ZMr+bKTVnYKU+vz31jVw8JXAs2KUELU1tCH9kwwGifgX/cT
-	Q+wiMXd4E1GG2kWirPpfQNkQ/9bX+p45eUr/b359FEltjGs2FBnongTwiJpGUtQR
-	1E76p9zwzyOsDJKJsN34S9gwtHyxWN0gwofCw94X71klGwqxuvxCicoLNkS818d4
-	g4tkV0U1Pu42HBalHbYkVz5Wb9K7no/1rF/cGdLxycaI8l9/t9iA0F49rbn6E+OA
+	:message-id:mime-version:references:subject:to; s=pp1; bh=LxGg80
+	roB/T2VMVa2JS/xSUiJuo79We2YYLICTkZtcA=; b=G8vveRO04FM5DbJVODFcyk
+	ZLiY2NiHrXOOLq0Or86nJ5oyUOmZmL5ZammqefYlcH6LQyQmoI/WxGswS01jM9+m
+	yl8mLXHiD44KVAPKfUVxax5PwoS4VtUSBmfkXXFeKura5Kln/NUqMOwHwXtGcVPI
+	b+hD35Y3PrSr04/oxV1BhODWNhXI9y/qECHvBOVfySABWfyXpTdNtsSvj/OjwB5B
+	QXxWT7Ua4Dr3FIc5IqyoNfU56KksHzZeCEVmcqN8jvd+XjgcIr3Kw+qtRwv2B/PK
+	8DdhbU6LjTlUg/IT30xfiKV0uGRe1jr6zpFxhY6OFVmyqcEVFBMYKZ/rEGq2uvZA
 	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4j34fap8kk-1
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4j34gvng54-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 27 Nov 2026 14:23:24 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4FHg1180993;
-	Fri, 27 Nov 2026 14:23:23 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4j6rhckj7x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Fri, 27 Nov 2026 14:23:23 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4JUH861635;
+	Fri, 27 Nov 2026 14:23:23 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4j6mjg4d4k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 27 Nov 2026 14:23:21 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6ARENEcf27066722
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6ARENGDO38863292
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 27 Nov 2026 14:23:14 GMT
+	Fri, 27 Nov 2026 14:23:16 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7715F20040;
-	Fri, 27 Nov 2026 14:23:14 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 0EC0A2004B;
+	Fri, 27 Nov 2026 14:23:16 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 09EF920063;
-	Fri, 27 Nov 2026 14:23:14 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 7A58920063;
+	Fri, 27 Nov 2026 14:23:15 +0000 (GMT)
 Received: from a46lp73.lnxne.boe (unknown [9.87.84.240])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 27 Nov 2026 14:23:13 +0000 (GMT)
+	Fri, 27 Nov 2026 14:23:15 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
-Date: Fri, 27 Nov 2026 15:22:05 +0100
-Subject: [PATCH v4 02/25] KVM: arm64: Refactor idreg caching into dedicated
- structure
+Date: Fri, 27 Nov 2026 15:22:08 +0100
+Subject: [PATCH v4 05/25] arm64: vdso: Define ARM64_S390_COMMON=1 for all
+ vdso builds
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -89,7 +89,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261127-sysreg-v4-2-a6318d18aab5@linux.ibm.com>
+Message-Id: <20261127-sysreg-v4-5-a6318d18aab5@linux.ibm.com>
 References: <20261127-sysreg-v4-0-a6318d18aab5@linux.ibm.com>
 In-Reply-To: <20261127-sysreg-v4-0-a6318d18aab5@linux.ibm.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
@@ -115,171 +115,61 @@ To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
         Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+        linux-s390@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>
 X-Mailer: b4 0.14.3
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI3MDA1NiBTYWx0ZWRfX+mBVQ9bm35qV
- fq9CgDmRuGSoq3s0RVdYgA29pXLus6csLhzUD/Locxswf7BIJwyRIYMIYOFGeunT9QDavP89fR1
- e9WtBwnhwi84kwoYphYt/xvBA12bx4spDrP9EYxMvd83bd55T49OyF8QoAjQbUZUz8ZpeWOsI6V
- bh78vd3rp2n75wVm0/pAl4Y+mRC6uI8K947yoTp31UTLEW5skVU0Rir/2578LE98V7mPz1CWCWR
- bR4Va205+VI9ySkvnTdicZRrHneccR1xAqBtksNu7zD9KQA0uBtcUWWMPmcm0Ot8kX70yvMTXcw
- Ah3/dnfStzCxJ9hR8hA05a0xZKhyNC9ku1XgAkHT/0e4s+1yyJAyJF8xR+g+0ujafmuHXRWuOMb
- dTbK/EgH41ekFFYSjK4pyGRDKYq+01Q1VuPUm5ofcBxLL3vhq2UAX83a02cPI/sZbMLH1GlAXLv
- GBBxFXAGRB/OoBVarCg==
-X-Proofpoint-ORIG-GUID: yj0mw7K8HM2Je7B_AGb9dVexBMwhbkI7
-X-Authority-Analysis: v=2.4 cv=U6QHnuru c=1 sm=1 tr=0 ts=6b09925c cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+X-Authority-Analysis: v=2.4 cv=CYCdd7rl c=1 sm=1 tr=0 ts=6b09925b cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
  a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=MW4Uhza44UK2E-9FfEsA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: yj0mw7K8HM2Je7B_AGb9dVexBMwhbkI7
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI3MDA1NiBTYWx0ZWRfX8KNan99mmsHz
- fUBgi4bMLHrTZ+cgsmUupGz3xxnSIC+XMQ/JGDQpYH4/0GCbhXNOCNVvn7vhuhvJLWDAfZg7IB3
- 2/68GkVhr8qe406f9G8VrpYAyfuYgBc=
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8
+ a=sEnpHoJLZwujkWsBufgA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI3MDA1NiBTYWx0ZWRfX3fOfNI7+7rip
+ 0o+RAlv1e4zvd5RQzGZGRIn9FDylravuVjzRfI71MdlKAEu+HqQPYBpBHWw+TiF7p8KiY9a7FiI
+ sBoVW5KbJ31rE2pRJYaaVg8Grn2Ss7s=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI3MDA1NiBTYWx0ZWRfXxg3Wj/i9l+FJ
+ tcg2XSPue0aQ4gCTQs0uS58inBNqy8BOMyQeu/VWAjmA9NEkOSXeKPobFZhcDTlAF/fS2Rmh1Jz
+ UfWX7MOWV7cpggxb7LxV+qHGK7XrWS3DSLBGUnYSlbx9zZxxSzLTIwATeMNS9sJcvhd3sJdWIms
+ JMlDXhuzDt+TtlxRPxf+HtvnZ4+6Cb81WJ7xLb4wKmvyig/ZLSmzygVmxxe9ciikWhpMle0kl8+
+ /yahYi9nYXilcpRTdselbbCi27kN5LUAHW3eVFr6LdIWyH1zu1CseFxNJQWAjRZd9U3yApqXLH2
+ J0atGJX8lgmirblClS3Fh4f+c8FFIF8gQm9eEk3ZG2MZDWGAiHfqHwyEuKhCwDQnp68GWziXDJb
+ EuzODoZ+wZCyFk0aon3DXq7yFZDy/6qveFyHp4Q8Ez66sFi61xqVoIBAQAq2sR+jYTBS32orhPH
+ y6rp43bnU+Yp0H2K+qw==
+X-Proofpoint-ORIG-GUID: wtQB5fvhxE1Jo9lMUpt16acEWMNvE9r9
+X-Proofpoint-GUID: wtQB5fvhxE1Jo9lMUpt16acEWMNvE9r9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-11-27_02,2026-11-27_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 lowpriorityscore=0 spamscore=0 impostorscore=0
- clxscore=1015 bulkscore=0 suspectscore=0 adultscore=0 phishscore=0
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ phishscore=0 malwarescore=0 priorityscore=1501 lowpriorityscore=0
+ clxscore=1015 spamscore=0 bulkscore=0 impostorscore=0 adultscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
  definitions=main-2611270056
 
-Move VM-wide ID register emulation fields from struct kvm_arch into a
-new struct kvm_vm_id_regs. The new struct is placed in a shared region.
-Update the helper function and one memcopy in pkvm to use the new
-structure;
+The compat vDSO builds with LINUXINCLUDE but without KBUILD_CPPFLAGS,
+where -DARM64_S390_COMMON is defined. Future marker in e,g, asm/cache.h
+will hide definitions or break the build at the prepare stage if Werror
+& Wundef is defined. Define the marker for the 32-bit vDSO build as
+well.
 
-No functional changes.
-
-Suggested-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
-Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 56 +++++++++++++++++++++------------------
- arch/arm64/kvm/hyp/nvhe/pkvm.c    |  3 ++-
- 2 files changed, 32 insertions(+), 27 deletions(-)
+ arch/arm64/kernel/vdso32/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 83a6993e21cf..cfb2721053ed 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -105,6 +105,25 @@ struct vcpu_reset_state {
- 	bool		reset;
- };
+diff --git a/arch/arm64/kernel/vdso32/Makefile b/arch/arm64/kernel/vdso32/Makefile
+index 00efdc5d2354..880449ea36d3 100644
+--- a/arch/arm64/kernel/vdso32/Makefile
++++ b/arch/arm64/kernel/vdso32/Makefile
+@@ -33,6 +33,8 @@ cc32-option = $(call try-run,\
+ VDSO_CPPFLAGS := -DBUILD_VDSO -D__KERNEL__ -nostdinc
+ VDSO_CPPFLAGS += -isystem $(shell $(CC_COMPAT) -print-file-name=include 2>/dev/null)
+ VDSO_CPPFLAGS += $(LINUXINCLUDE)
++# arch/arm64/Makefile puts this in KBUILD_CPPFLAGS, which is not used here
++VDSO_CPPFLAGS += -DARM64_S390_COMMON=1
  
-+struct kvm_vm_id_regs {
-+	/*
-+	 * Emulated CPU ID registers per VM
-+	 * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
-+	 * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
-+	 *
-+	 * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
-+	 * Atomic access to multiple idregs are guarded by kvm_arch.config_lock.
-+	 */
-+#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
-+#define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
-+	u64 ftr_regs[KVM_ARM_ID_REG_NUM];
-+
-+	u64 midr_el1;
-+	u64 revidr_el1;
-+	u64 aidr_el1;
-+	u64 ctr_el0;
-+};
-+
- #endif /* ARM64_S390_COMMON == 1 */
- 
- #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
-@@ -478,22 +497,7 @@ struct kvm_arch {
- 	struct kvm_smccc_features smccc_feat;
- 	struct maple_tree smccc_filter;
- 
--	/*
--	 * Emulated CPU ID registers per VM
--	 * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
--	 * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
--	 *
--	 * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
--	 * Atomic access to multiple idregs are guarded by kvm_arch.config_lock.
--	 */
--#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
--#define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
--	u64 id_regs[KVM_ARM_ID_REG_NUM];
--
--	u64 midr_el1;
--	u64 revidr_el1;
--	u64 aidr_el1;
--	u64 ctr_el0;
-+	struct kvm_vm_id_regs id_regs;
- 
- 	/* Masks for VNCR-backed and general EL2 sysregs */
- 	struct kvm_sysreg_masks	*sysreg_masks;
-@@ -1637,24 +1641,24 @@ void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
- bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
- bool kvm_pkvm_vcpu_is_powered_off(struct kvm_vcpu *vcpu);
- 
--static inline u64 *__vm_ftr_reg_by_idx(struct kvm_arch *ka, u32 idx)
-+static inline u64 *__vm_ftr_reg_by_idx(struct kvm_vm_id_regs *id_regs, u32 idx)
- {
--		return &ka->id_regs[idx];
-+		return &id_regs->ftr_regs[idx];
- }
- 
--static inline u64 *__vm_id_reg(struct kvm_arch *ka, u32 reg)
-+static inline u64 *__vm_id_reg(struct kvm_vm_id_regs *id_regs, u32 reg)
- {
- 	switch (reg) {
- 	case sys_reg(3, 0, 0, 1, 0) ... sys_reg(3, 0, 0, 7, 7):
--		return __vm_ftr_reg_by_idx(ka, IDREG_IDX(reg));
-+		return __vm_ftr_reg_by_idx(id_regs, IDREG_IDX(reg));
- 	case SYS_CTR_EL0:
--		return &ka->ctr_el0;
-+		return &id_regs->ctr_el0;
- 	case SYS_MIDR_EL1:
--		return &ka->midr_el1;
-+		return &id_regs->midr_el1;
- 	case SYS_REVIDR_EL1:
--		return &ka->revidr_el1;
-+		return &id_regs->revidr_el1;
- 	case SYS_AIDR_EL1:
--		return &ka->aidr_el1;
-+		return &id_regs->aidr_el1;
- 	default:
- 		WARN_ON_ONCE(1);
- 		return NULL;
-@@ -1663,13 +1667,13 @@ static inline u64 *__vm_id_reg(struct kvm_arch *ka, u32 reg)
- 
- #define kvm_get_vm_ftr_reg_by_idx(kvm, idx)					\
- 	({									\
--		u64 *__valp = __vm_ftr_reg_by_idx(&(kvm)->arch, idx);		\
-+		u64 *__valp = __vm_ftr_reg_by_idx(&(kvm)->arch.id_regs, idx);	\
- 		__valp;								\
- 	})
- 
- #define kvm_get_vm_id_reg(kvm, reg)					\
- 	({								\
--		u64 *__valp = __vm_id_reg(&(kvm)->arch, reg);		\
-+		u64 *__valp = __vm_id_reg(&(kvm)->arch.id_regs, reg);	\
- 		__valp;							\
- 	})
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index db51174ffbe0..471f6d82bc3e 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -591,7 +591,8 @@ static int vm_copy_id_regs(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	if (test_and_set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags))
- 		return 0;
- 
--	memcpy(kvm->arch.id_regs, host_kvm->arch.id_regs, sizeof(kvm->arch.id_regs));
-+	memcpy(kvm->arch.id_regs.ftr_regs, host_kvm->arch.id_regs.ftr_regs,
-+	       sizeof(kvm->arch.id_regs.ftr_regs));
- 
- 	return 0;
- }
+ # Common C and assembly flags
+ # From top-level Makefile
 
 -- 
 2.56.1
