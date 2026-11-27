@@ -1,64 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795791745;
-	b=PywJXfo3W/SOIaLOpQaZYRcWDtglYLj5NTAsULAY96tFiza1TyAGEratl+kPd4jyZlSo
-	 I1fsACatlKXL/uVzWs6a7Fc0OxnFn752VcAJFwmJ39mQNkgr9UhMzrl+1u4qxr1jtE7dA
-	 lMY37AWVM2CKlQQtAwH7zs9yGtWtSDcJM4ZUlaQxNVu9tSOeu7M6pYD1KwWxACYxfrcD5
-	 5kqd6ZRcJfkQT8CB5oKMoXVWu8n/pzDMfYWBF1iabsk1iFvapSTKlzhU8iN1ATlCvjoho
-	 /n8z4a7UkHZziwKgwZ9MpBqtpIezNC9987+E2kSrBSZ1FiVWIqw6k+umrERQDkr4DtQ==
+	t=1795791847;
+	b=KcrWZTmuNNH4UTAIzqj0sGxmvWcp880NNXsgQ6CSmuGFIwTLe4S+qxO1i+A4RwWUVWEt
+	 D4k/vhdYWImE8itPXHJf+pKyAqwW6EcC4R09RX/Xi/oEkoYOrzdFfYjZ6RO0eEHzxMl/7
+	 ey7g4csttOMMcR1+QRhYGH/IYU4Rn2EiUJDFhxfBEb1ZsEtyuNQ9TwJuNVc1nmLZ4/Ev+
+	 Z/psuj46J7+xq6Qt2fMPZ5kRasYAd/skGiKSIUau4AbQfWCg5+RPEGOwA+zUDK8YN0KFT
+	 hDkvZ25VUbEOM/Y+HoNBePV9HQ8krmxuFS94s0F7TgTRcH6/fHXhmY13x5AVxgOmbsQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795791745;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=y4eKG9taiB9eB/Qf2Z8j0/REU4SNPEh0gD95UBGC7uc=;
-	b=JVNE2AVP9o1dk2mRZ5bErMaEXsKMKrimQzFNuCGXDpzewDvoW/bKmkZu/+GOnmPeWvNi
-	 hAClQdjOEpYKGwaKb3vIVfbCeWBdXcaKisdgXrtY+tq+ctEYVYVFjfCCKwAsgXcIEIeeJ
-	 feh2n7S2Rv+es/TSLAmHRhNw6GzRuW+DMlhpmBQtrzR2d6MngNzI3D92aaUCoxt5L4DSN
-	 jx18yH+hRHIls5Qpd+BuIl/mZm2Q8TwP0vdOmziEZzsVAGUQ4HkxuixYU9zWSrieLfEHN
-	 cuZIpLdYEJftZJjW9ivP3hYseDu2gd7E49dC1pUne7F1/c3A98C9RG/100dlOIrpWOA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795791847;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=U3c++Uj+UHAoqFFiB1EKXeNNJOFEUngS8YdKGAytKDU=;
+	b=MaTVuAWz/V8Q1Ups0inheDFDklIdL9RkreB1c4v5j8UwDaZcPc1bJ3dTQ/UuwsJoY8Sn
+	 YCUCAqFomqLjaHPj61c8rbL05WUPz+25iAtvTY4M9FRg+UUDNbaHOoi6AvbDwkMRGenu2
+	 pk4UHdNvSxLzndI4Pv4eQ6KrUQm+xySUHenyxzb4XlKJ6jlq7Z8autvEu+H5XWijm9Vas
+	 A590ugzw9H9bHJ2jigVZbT2WLugWLj9tDq7qVwB9v4v2n/6RqXvxXOVhdv0Bcrqof5KXv
+	 5TOronol+a7W2TBzO9eAWJ2L4Xb9hkq3BKnLLDTib0clC9Qd1q5GPtJdQX++vrzZqjA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=uL1YJ1vk;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D3A606A31E
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 15:02:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 55D3A606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BaHYVdwe;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FF6606A31C;
+	Fri, 27 Nov 2026 15:04:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=uL1YJ1vk
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D5BAF169E;
-	Fri, 27 Nov 2026 07:02:21 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EB2833F86C;
-	Fri, 27 Nov 2026 07:02:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795791744; bh=/60+uV6MGkmJY4+B30J1nI4Z6rYXY4H1P3pCsqHWBGs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uL1YJ1vkIAfsGkACGt/UNCS3ATBt/W/Wv6CgV5Ir54xLJrjZjX/hJyTaPnhdQS4wD
-	 ngvmEScfqauFVKfF1WZSooj0roxgqrFW7T7kG9QGRDYTLJ8x3LWjL8GbZXGL3Rvj0d
-	 NGApLgCsm5zNnhrT4b7wY3/LM3Jo4rlA2jhQL19k=
-Date: Fri, 27 Nov 2026 15:02:19 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev,
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, will@kernel.org, mark.rutland@arm.com,
-	linux-perf-users@vger.kernel.org, catalin.marinas@arm.com,
-	james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 07/28] KVM: arm64: Add KVM_ARM_VCPU_SPE VCPU
- feature
-Message-ID: <awmbe4dRgEkgqL-O@raptor>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-8-alexandru.elisei@arm.com>
- <atIr8IWcXcrjQ0wF@gremlin>
- <avX0-TDCOlQq-4iX@raptor>
- <avtEJaF27eHb_Ryd@gremlin>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BaHYVdwe
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D967B1F000C1;
+	Fri, 27 Nov 2026 15:04:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795791846;
+	bh=U3c++Uj+UHAoqFFiB1EKXeNNJOFEUngS8YdKGAytKDU=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=BaHYVdweYexZ+2iegz7+2sDs5h8ZT6d/xevc29Pc+DWsWllUEiyRo51VvPQHrXrkK
+	 Wu8HOCAmS+keChoFZAvnELGwO5NKoWz2UcyOKlV0EQxdhTBzIPgWG9iKFR3/E8vXBE
+	 nS2z/54n0imZT5ZpxsZ8f0AXeLUahHfGnsyLDpZaEV9dQXP8rBNsxNOPU/keDPgasS
+	 bd871w4qXlzBhi3TmQIdZnQ1wXbhTH4AT5AL0jpDNWnUZZj56RBbCLeA4X82TNJ+dM
+	 3Vb8NHolFpJ91W6xHYTdNYl9jMxK3JAdd9nKmYeUDdyE4Z/BRla+2ByTUff1Ulv3BB
+	 Jv67vu+QUZsYw==
+Message-ID: <sashiko-outbox-237671@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v4 18/25] KVM: s390: arm64: Implement arm system
+ register managing infrastructure
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steffen Eiden" <seiden@linux.ibm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Alexander
+ Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>
+In-Reply-To: <20261127-sysreg-v4-18-a6318d18aab5@linux.ibm.com>
+References: <20261127-sysreg-v4-0-a6318d18aab5@linux.ibm.com>
+ <20261127-sysreg-v4-18-a6318d18aab5@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 27 Nov 2026 15:04:05 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -67,94 +63,79 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <avtEJaF27eHb_Ryd@gremlin>
 
-Hi Lorenzo,
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Low] KVM: s390: arm64: check SYS_CTR_EL0 against host_val in
+  arm64_check_features()
+--
 
-On Mon, Nov 16, 2026 at 05:59:07PM +0000, Lorenzo Stoakes (ARM) wrote:
-> On Thu, Nov 12, 2026 at 05:18:49PM +0000, Alexandru Elisei wrote:
-> > Hi Lorenzo,
-> >
-> > On Fri, Oct 16, 2026 at 03:23:57PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > > On Thu, Sep 03, 2026 at 05:06:02PM +0100, Alexandru Elisei wrote:
-> > > > Add a new VCPU feature that enables SPE virtualization when set by
-> > > > userspace. KVM_VCPU_MAX_FEATURE will be bumped and the feature will
-> > > > become selectable by userspace once SPE support in KVM is implemented.
-> > >
-> > > I guess it's also limited currently at this point in the series by
-> > > KVM_CAP_ARM_SPE being unselectable as it stands I think?
-> >
-> > Yes, indirectly - KVM_CAP_ARM_SPE is advertised only when
-> > kvm_supports_spe() is true, and KVM_ARM_VCPU_SPE also depends on
-> > kvm_supports_spe(). CONFIG_KVM_ARM_SPE=y is required, but not sufficient,
-> > for kvm_supports_spe() to be true. So all of this depends on the Kconfig
-> > option, maybe I should document that in the capability doc.
-> 
-> Thanks that'd be good.
+commit 1217d103aa61e7d71cfb3221749c5c2dc344fb25
+Author: Steffen Eiden <seiden@linux.ibm.com>
 
-I documented the dependency between KVM_CAP_ARM_SPE and CONFIG_KVM_ARM_SPE in
-the previous patch, where KVM_CAP_ARM_SPE is introduced.
+KVM: s390: arm64: Implement arm system register managing infrastructure
 
-> 
-> >
-> > >
-> > > Maybe worth mentioning here that you're adding KVM_ARM_VPCU_SPE to the uapi,
-> > > updating docs, etc.?
-> >
-> > I can mention it, but the short diff should speak for itself?
-> 
-> I think it's worth giving the intent of your changes in the commit message, it
-> doesn't have to be much like 'Export to UAPI, document' etc. etc.
+This commit implements the infrastructure for the s390 KVM host to read,
+write, trap, and sanitize arm64 guest system registers.
 
-Done.
+> diff --git a/arch/s390/kvm/arm64/sys_regs.c b/arch/s390/kvm/arm64/sys_reg=
+s.c
+> new file mode 100644
+> index 0000000000000..e240efb77b9b7
+> --- /dev/null
+> +++ b/arch/s390/kvm/arm64/sys_regs.c
+> @@ -0,0 +1,825 @@
 
-Thanks,
-Alex
+[ ... ]
 
-> 
-> >
-> > >
-> > > >
-> > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > >
-> > > I wonder if there are any dependencies that need expressing in
-> > > arch/arm64/kvm/config.c?
-> > >
-> > > In any case all LGTM, with mega-nit below addressed :):
-> > >
-> > > Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > >
-> > > > ---
-> > > >  Documentation/virt/kvm/api.rst    | 2 ++
-> > > >  arch/arm64/include/asm/kvm_spe.h  | 5 +++++
-> > > >  arch/arm64/include/uapi/asm/kvm.h | 1 +
-> > > >  arch/arm64/kvm/arm.c              | 7 +++++++
-> > > >  4 files changed, 15 insertions(+)
-> > > >
-> > > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > > > index 1ed5c389c7a4..654736fac78c 100644
-> > > > --- a/Documentation/virt/kvm/api.rst
-> > > > +++ b/Documentation/virt/kvm/api.rst
-> > > > @@ -3591,6 +3591,8 @@ Possible features:
-> > > >  	  Depends on KVM_CAP_ARM_EL2_E2H0.
-> > > >  	  KVM_ARM_VCPU_HAS_EL2 must also be set.
-> > > >
-> > > > +        - KVM_ARM_VCPU_SPE: Enable SPE for the CPU. Depends on KVM_CAP_ARM_SPE.
-> > >
-> > > Super nitty, sorry, but it seems other parts of the docs use tabs, whereas this
-> > > uses spaces?
-> >
-> > Fixed.
-> 
-> Thanks!
-> 
-> >
-> > Thanks,
-> > Alex
-> 
-> --
-> Cheers, Lorenzo
-> 
+> +static int arm64_check_features(struct kvm_vcpu *vcpu,
+> +				const struct sys_reg_desc *rd, u64 val)
+> +{
+> +	u32 id =3D reg_to_encoding(rd);
+> +	u64 host_val;
+> +	u64 old_val;
+> +
+> +	/*
+> +	 * This is a very minimal implementation to sanitise only the craziest
+> +	 * shenanigans we could get from userspace. The final goal is to share
+> +	 * the sanitisation with arm as well but this needs access to arm
+> +	 * (core) kernel code for which there is no suitable solution yet. TODO
+> +	 */
+> +
+> +	/*
+> +	 * If the register is RAZ we know the only safe value is 0.
+> +	 */
+> +	if (sysreg_visible_as_raz(vcpu, rd))
+> +		return val ? -E2BIG : 0;
+> +
+> +	host_val =3D read_sanitised_ftr_reg(id);
+> +
+> +	switch (id) {
+> +	case SYS_ID_AA64MMFR0_EL1:
+> +		/* Forbid PARANGE values larger than the host supports */
+> +		if (SYS_FIELD_GET(ID_AA64MMFR0_EL1, PARANGE, val) >
+> +		    SYS_FIELD_GET(ID_AA64MMFR0_EL1, PARANGE, host_val))
+> +			return -E2BIG;
+> +		if (kvm_parange_to_address_sanitized(
+> +			    SYS_FIELD_GET(ID_AA64MMFR0_EL1, PARANGE, val)) <
+> +			    vcpu->kvm->arch.guest_phys_size)
+> +			return -E2BIG;
+> +		break;
+> +	case SYS_CTR_EL0:
+> +		/* forbid upgrading from VIPT to PIPT */
+> +		old_val =3D read_id_reg(vcpu, rd);
+> +		if (SYS_FIELD_GET(CTR_EL0, L1Ip, old_val) =3D=3D CTR_EL0_L1Ip_VIPT &&
+> +		    SYS_FIELD_GET(CTR_EL0, L1Ip, val) =3D=3D CTR_EL0_L1Ip_PIPT)
+> +			return -E2BIG;
+> +		break;
+
+[Severity: Low]
+Should SYS_CTR_EL0 check L1Ip against host_val rather than
+read_id_reg(vcpu, rd)?  read_id_reg() returns the mutable per-VM value in
+vcpu->kvm->arch.id_regs, so if userspace writes CTR_EL0_L1Ip_VIPT and
+later writes CTR_EL0_L1Ip_PIPT on a PIPT-capable host before the VM is
+finalized, the second write is rejected with -E2BIG (-EINVAL).
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261127-sysreg-v4-=
+0-a6318d18aab5@linux.ibm.com?part=3D18
