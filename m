@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795798981;
-	b=MmbRycpwZddyIvI2dZ7YuiS998PNzRI18qyky5p2VKoz5u/pM5y54jc8w/doLY2Ins+v
-	 NU9VAk7xr6qaU+z6Q4QFHcZy420ULPSuPOABHzi7r0FAJekQE1L2ZPvwbMkObxgS+Jt5g
-	 eKKYJ9thHLvgo4QsXg55DkJSxDdJnUUqyr+OVu8SA8eP/5AR/EWNsw/FgNa1g6OakMp4n
-	 B4fNU1PSyvISQSkhECKXT0UtYdXUpu+GfmwWCCUyc3xNvCoB8DRxePponlIUVwJDXrqUH
-	 DXEceVxGDBJ9VrkBJo3wWE2a31+ovhojrAuzVuV3sfKj1mc7Eyvjw4s46x2ntCJcezw==
+	t=1795798985;
+	b=d5q3NIzbwZTbEWZVLVPINzZylEa0clJUSfLRVGApGnqAhr1nUpFOopOKkJ8vPWbKJ4G4
+	 XOiXTCoSdUCWOZXmDEK8KtmY3nlouyQ1Jy+FtuyclajoEXj3Lz4HYIAepZJeQ6CV5qvsv
+	 eojr/Pv9/fI4+fgNrnPD8plADZnMSg1srub20uSy61hMaa11ciHpi363tmfbHcn1dL89Z
+	 J7l9JbMj2k/uCtPj8XyiAOaGBCU2xcyH9ZMfv79HLDPdkKCd7gJb5OBq89lrlqEGNGLR+
+	 OsOo62Rd+T1rm9xv5/QSMWUodoqkGl3Bzk0crbSBy4DXgUTibiJGVrV3Q1svRGVE4dA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795798981;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795798985;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=tVFHv5fcDxduoe5rLK81/cHawUIwJ7k88sNX30nlvJU=;
-	b=vTNQ78lvV/k7xhXCMF94ac5njfZ4FeEMslEypaGoN8iIOwVkuBdyuT3wlD+2FzOQohzX
-	 VWEwFwTgqyErLgdyg/z4BjbojR4hHNfdlfiXAdlhMWgvDqNGlSu5RTSgxFagBLC5xjy/f
-	 pAv9GQTuy+c29YUQ2z+DKsVUoxWXz4ncAGKi+Z1MfTHbASj3jDZMjaqSgvjYMrbyoEuHB
-	 9mNXUgVC7Gn1jOf1f4ComkaTz5aWw5bAK3tVHtUIbOk94OfrRNpP3GCOvgizhWVgI8nwq
-	 I41qd1mL3w33O/EQXdJrkG4yBtatRafKBNz9iOeoYZhpBPOpeRmUgar3hGcy1MXLtig==
+	bh=kXcNf23EjeX82tKtPOKqKsn322nY30E+/ZXjQHE1EAo=;
+	b=UHXJKds3nQhr/67cqGqlKlQcOcrM1NiSfLg8K7fX3nuDbaMiLQYhR5kzn5CKKeysjE8g
+	 sHpHAYFncBvpR8uPF+Mp5YXYj4BGl7Pw71umptPN2jYacvdhc2E9vfbIxfDPBWxaAuykW
+	 TaNP2D6T0VllqA7Wu0kWno1tR1UrY6DnXMnIJaFtMFIUdf1aUzxcq/aCo86e1raFrcdRd
+	 A+xdnV9VNEeDnhXHpYZiP7yufFObptrtNm48K7VXmoG240qKVPjx7+wDuIvH9p6ZdvRFc
+	 IS7+BTeQvWhA+wkzVsYvENg2xw408+sLazAZWNKz49Yi03u2C9j6/owgg2sskopF/wQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dYvoilDT;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=boN4GZFu;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA0AB606A31F
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 17:03:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CA0AB606A31F
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1521B606A31E
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 17:03:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1521B606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dYvoilDT
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=boN4GZFu
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B2D5169E;
-	Fri, 27 Nov 2026 09:02:57 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D5DC1DB5;
+	Fri, 27 Nov 2026 09:03:01 -0800 (PST)
 Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DF13E3F632;
-	Fri, 27 Nov 2026 09:02:58 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1CF283F632;
+	Fri, 27 Nov 2026 09:03:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795798980; bh=CZm0vDwtQsuU0m2+h4bJjr5Hus88SeA5JbAb2h2Ly1s=;
+	t=1795798984; bh=NjA+aNj+OPFvHEV2Ek7m+cEitX7CdVkRKvWWOhubcw8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dYvoilDTdRCe2wA9z9acC5aahCeC/z3tulviwL+4i+xAQKTeZgA0EqCNk47A6D6ke
-	 zdClWNzbvLjIC4aFE2dNVrwX4oEZG4rek/RU4opEUb1Yr9OW4QP8BB3fzxuu47eWMv
-	 GFbBB8Rm1twXn74IsC4PnNrKWQeHWLe9kfdYkJ0Y=
+	b=boN4GZFuD0FsplCrF9tL5kb9cvkyi5cq6lYSHZJp2KmYKDbU7RxB0GhElf0WeitkA
+	 w4pz8X56ykQi1Zir3cZR9LNQZx48VVAPrzHTTW/XP7BZjiw4eVZAahXLC54k4nmYeV
+	 4iGVlEZNmMLUfHt/jw1Mi06xRn4IFeMoTVKguY+4=
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 To: will@kernel.org,
 	julien.thierry.kdev@gmail.com
@@ -51,9 +51,9 @@ Cc: vladimir.murzin@arm.com,
 	kvmarm@lists.linux.dev,
 	timothy.hayes@arm.com,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH kvmtool v7 17/23] arm64: Generate GICv5 PCI INTx specifiers
-Date: Fri, 27 Nov 2026 17:01:39 +0000
-Message-Id: <20261127170145.4138182-18-sascha.bischoff@arm.com>
+Subject: [PATCH kvmtool v7 18/23] arm64: Expose the GICv5 irqchip option
+Date: Fri, 27 Nov 2026 17:01:40 +0000
+Message-Id: <20261127170145.4138182-19-sascha.bischoff@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261127170145.4138182-1-sascha.bischoff@arm.com>
 References: <20261127170145.4138182-1-sascha.bischoff@arm.com>
@@ -68,43 +68,53 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-PCI interrupt-map entries currently use the GICv2/v3 SPI type and an
-IRQ number with the SPI base subtracted. GICv5 uses a different SPI
-type (matching the hardware) and zero-based SPI numbers. Use the GICv5
-encoding for its INTx entries while retaining the existing encoding
-for other GICs.
+Allow --irqchip=gicv5 and prefer GICv5 for automatic irqchip selection
+when the kernel supports it. The IRS and guest DT support are now in
+place.
 
 Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arm64/pci.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arm64/gic.c                         | 4 +++-
+ arm64/include/kvm/kvm-config-arch.h | 2 +-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arm64/pci.c b/arm64/pci.c
-index db87db8b..91265f67 100644
---- a/arm64/pci.c
-+++ b/arm64/pci.c
-@@ -84,6 +84,8 @@ void pci__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 		u8 pin = pci_hdr->irq_pin;
- 		u8 irq = pci_hdr->irq_line;
- 		u32 irq_flags = pci_hdr->irq_type;
-+		u32 int_type = gic__get_spi_fdt_type();
-+		u32 int_id = irq - gic__get_spi_base();
+diff --git a/arm64/gic.c b/arm64/gic.c
+index 955eeb5f..c1408502 100644
+--- a/arm64/gic.c
++++ b/arm64/gic.c
+@@ -78,6 +78,8 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
+ 		*type = IRQCHIP_GICV3;
+ 	} else if (!strcmp(arg, "gicv3-its")) {
+ 		*type = IRQCHIP_GICV3_ITS;
++	} else if (!strcmp(arg, "gicv5")) {
++		*type = IRQCHIP_GICV5;
+ 	} else {
+ 		pr_err("irqchip: unknown type \"%s\"\n", arg);
+ 		return -1;
+@@ -405,7 +407,7 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
  
- 		/*
- 		 * Avoid adding entries in "interrupt-map" for devices that
-@@ -108,8 +110,8 @@ void pci__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 			.gic_addr_hi	= 0,
- 			.gic_addr_lo	= 0,
- 			.gic_irq = {
--				.type	= cpu_to_fdt32(GIC_FDT_IRQ_TYPE_SPI),
--				.num	= cpu_to_fdt32(irq - GIC_SPI_IRQ_BASE),
-+				.type	= cpu_to_fdt32(int_type),
-+				.num	= cpu_to_fdt32(int_id),
- 				.flags	= cpu_to_fdt32(irq_flags),
- 			},
- 		};
+ 	switch (type) {
+ 	case IRQCHIP_AUTO:
+-		for (try = IRQCHIP_GICV3_ITS; try >= IRQCHIP_GICV2; try--) {
++		for (try = IRQCHIP_GICV5; try >= IRQCHIP_GICV2; try--) {
+ 			err = gic__create(kvm, try);
+ 			if (!err)
+ 				break;
+diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
+index adda6403..a1a9336a 100644
+--- a/arm64/include/kvm/kvm-config-arch.h
++++ b/arm64/include/kvm/kvm-config-arch.h
+@@ -54,7 +54,7 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
+ 			   "transport (Deprecated: Use --virtio-transport "	\
+ 			   "option instead)", virtio_transport_parser, kvm),	\
+ 	OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
+-		     "[gicv2|gicv2m|gicv3|gicv3-its]",				\
++		     "[gicv2|gicv2m|gicv3|gicv3-its|gicv5]",			\
+ 		     "Type of interrupt controller to emulate in the guest",	\
+ 		     irqchip_parser, NULL),					\
+ 	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
 -- 
 2.34.1
 
