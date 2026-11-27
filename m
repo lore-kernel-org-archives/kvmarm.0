@@ -1,62 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795799005;
-	b=n8vjC/xCzM5DjqPyqddqPWD6RF/aPFU2nqBmWvg2P+NGgKweTiIFgsvPdDhRw2COHzZa
-	 lcw/1yDgovaW9XKo3qMdOFZaiwaKtL0zuhMlRewBkSAfXc4V1i0RA0ggyYg98LuYzciYK
-	 pCK2q1jw/HKjMeExDRP+HrAbwbuV98Ep0GePXnkW4cjW2j8K16VbaJts1qNs04OUcNl6D
-	 Lq61YreKS53xYqiPRTtAeb00uU5DNyIkhvgyKb2XcdTFYoJvxrgeyMYN84wx6VvkNo5qe
-	 BVXCEUzPBjYScLxG8rcR/w73WqAoYcrCMtxH2ihuF2l5ZP8iy038y87QGJyybdcKADQ==
+	t=1795799041;
+	b=fMKK3ikuV2FFIQCASO3zNH/dem8cXQcB/33X82Dgt2KGB17acUuTSAmvXF9kuYtXEDGH
+	 phzPvD7jMUP4HIywqI2rPO1MKGPA35XRlGwluhm/QEezQP6ZWIppzyUnLMHa4LfYXdLmg
+	 V5zEioyIc+qf+3FtFPou4XJD2pKyUHx9522sqrM5NydztevDFWvFzRcjtWwC36RVA7fIG
+	 LpmvLba4Blo9w71iKVlZ65a5er6BhklND5HCEJiI9XgrNjwnysfa9F98aFgQux5jbPJjA
+	 aw63m+GwvSpPx5Uzlet7KQV3pFs8dtfHHhC2+jAG8hLSXSPx3Ttsc4chvyt/F63o+FQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795799005;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=gdBfE6bEts0fvvRXyjQM5soH0cWO8NWZYgy+IW2SU5M=;
-	b=c8WR5bSk1ZYPPLEbBSMjf/10iWbTmNe4IfdQ5XIS3kWInuuSixwLo2Oyjs0KF06RRtdo
-	 vYl90neZUh+BBa2aqinGG21K5fFLoIb3rBRJTKiyI9bGIYJZEkgW3JwFwYcCnhLuoNtXw
-	 z+d2rI6msyhQys1/EgF5oeN9XB1Z8dLVFuS5GyngCyVF03lcmb7doHINt/z6PxJQ7zQ+f
-	 TAKNTIt9HC8AVW05ge9kvCxQNFToURY85YcKrsbeMN13cUZ5UZGMA9IeHt8ldIBokbQof
-	 lvdnk1Cw3dCvtnvfKmhpZQo/qvSKiPWNpIwu6V/KITeeJ7XwWLg8k7xCXvsy/Wuesyg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795799041;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=mvdbAcNvPUl8+xzdr4AGicznVSCZCG5IMnLlhWSXHrU=;
+	b=vXbURUgn3x0lmBv2aHPkfzDI/4GvJPITKxE2CQ8ORTwnvqwyg/ZgNWpZ2iltCF/rZmnW
+	 cHDxTo/5JxQYQoKI8jpShFDe7mGda4Yn7OqzB58MTiV9YoDn8Epdv+nt9swu6pNfR8w6P
+	 g39r7GSkhNiDCIuEX/d6YRv/OYfx7qp8UPgRPftJuqsuCuIupQv7mjgCKX7tbXkoADZYw
+	 TaONnHY85A45YkM8qsufC00oI5BlMGWMUPE9smWIO6qkEARCNX0bHdMJ7eQjtA6pUj0yU
+	 L28og98fiifW9dTc78OOoJh49BLFiUSAwXaQhfg8cSGW/WVBrmhQgMrbDq9R3vIQ60Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=gZAw5BSz;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=tTkQH1ZZ;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB76B606A321
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 17:03:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BB76B606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617AE606A31E
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 17:04:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 617AE606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=gZAw5BSz
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=tTkQH1ZZ
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 851251758;
-	Fri, 27 Nov 2026 09:03:21 -0800 (PST)
-Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1D2FF3F632;
-	Fri, 27 Nov 2026 09:03:22 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 097361575;
+	Fri, 27 Nov 2026 09:03:58 -0800 (PST)
+Received: from [10.57.93.100] (unknown [10.57.93.100])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B22653F632;
+	Fri, 27 Nov 2026 09:03:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795799004; bh=E2cojus6uhZYqsh4kDWK5jCwzJJLVe4rLjYpXm5YWUU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gZAw5BSzAdm2gLqAO3MNCR25zkBp0Uh23U0nLWJiYxiebaqD1IWcwN4MumrMzTZty
-	 65rv/J2bRaXfFccn9Uy/R4ANI17yJTk1teVqOxft0+ZjgvPnKYIFJmpZfyUiatlDNI
-	 fQZac4TNaZkjAen5iyNVtxsW7bYhOsru9HjSO/DE=
-From: Sascha Bischoff <sascha.bischoff@arm.com>
-To: will@kernel.org,
-	julien.thierry.kdev@gmail.com
-Cc: vladimir.murzin@arm.com,
-	maz@kernel.org,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	timothy.hayes@arm.com,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH kvmtool v7 23/23] arm64: Expose the GICv5 ITS irqchip option
-Date: Fri, 27 Nov 2026 17:01:45 +0000
-Message-Id: <20261127170145.4138182-24-sascha.bischoff@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20261127170145.4138182-1-sascha.bischoff@arm.com>
-References: <20261127170145.4138182-1-sascha.bischoff@arm.com>
+	t=1795799040; bh=i+TR0LzfgP/WQDZoX/lAs0W+jLjvNb+/N+OgMW3wgv8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tTkQH1ZZfilUfU3xL7Yhc+Jx/xhLm5R5sKA/HF/HbtoIdwQyfb0+pnWiJtFaPOfat
+	 IIIuNDYDs24vugGcoicxQ7dSLW+uyvT94G04XT7TlOULBPuHuBee6FCMxLjZU6iOUX
+	 GU6TxtjrHYWE+xM8PyTqEVXlPuwZgHKeREHNcL1U=
+Message-ID: <e8d77727-5d88-42a8-9df3-234bbc5137e5@arm.com>
+Date: Fri, 27 Nov 2026 17:03:58 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,53 +53,39 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool v6 00/23] arm64: Support GICv5-based guests
+To: Will Deacon <will@kernel.org>, Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: julien.thierry.kdev@gmail.com, maz@kernel.org, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, timothy.hayes@arm.com,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20261125151356.2875108-1-sascha.bischoff@arm.com>
+ <1aa97f61-b740-4044-9065-f3ccfcb709fd@arm.com>
+ <awhpViXFw-mts2ck@willie-the-truck>
+Content-Language: en-GB
+From: Sascha Bischoff <sascha.bischoff@arm.com>
+In-Reply-To: <awhpViXFw-mts2ck@willie-the-truck>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Allow --irqchip=gicv5-its now that the ITS DT nodes and PCI MSI
-requester mapping are in place. Start automatic irqchip selection at
-GICv5 ITS so it is preferred ahead of base GICv5 and older models.
+Hi Will,
 
-Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
----
- arm64/gic.c                         | 4 +++-
- arm64/include/kvm/kvm-config-arch.h | 2 +-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+On 26/11/2026 17:16, Will Deacon wrote:
+> On Thu, Nov 26, 2026 at 10:22:56AM +0000, Vladimir Murzin wrote:
+>> I reviewed and tested the patches for GICv5 IRS support (01-18). They
+>> do what they promise - allow booting a GICv5-enabled guest. In my
+>> opinion, patches are in good shape, so could you please have a look and
+>> consider merging GICv5 IRS support (patches 01-18)?
+> 
+> I just hoovered up the pile of kvmtool patches sitting on the list, so
+> this doesn't apply any more. Please can you send a v7?
+> 
 
-diff --git a/arm64/gic.c b/arm64/gic.c
-index 2b24f5b6..230448e8 100644
---- a/arm64/gic.c
-+++ b/arm64/gic.c
-@@ -81,6 +81,8 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
- 		*type = IRQCHIP_GICV3_ITS;
- 	} else if (!strcmp(arg, "gicv5")) {
- 		*type = IRQCHIP_GICV5;
-+	} else if (!strcmp(arg, "gicv5-its")) {
-+		*type = IRQCHIP_GICV5_ITS;
- 	} else {
- 		pr_err("irqchip: unknown type \"%s\"\n", arg);
- 		return -1;
-@@ -415,7 +417,7 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
- 
- 	switch (type) {
- 	case IRQCHIP_AUTO:
--		for (try = IRQCHIP_GICV5; try >= IRQCHIP_GICV2; try--) {
-+		for (try = IRQCHIP_GICV5_ITS; try >= IRQCHIP_GICV2; try--) {
- 			err = gic__create(kvm, try);
- 			if (!err)
- 				break;
-diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-index a1a9336a..15cbd7c4 100644
---- a/arm64/include/kvm/kvm-config-arch.h
-+++ b/arm64/include/kvm/kvm-config-arch.h
-@@ -54,7 +54,7 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
- 			   "transport (Deprecated: Use --virtio-transport "	\
- 			   "option instead)", virtio_transport_parser, kvm),	\
- 	OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
--		     "[gicv2|gicv2m|gicv3|gicv3-its|gicv5]",			\
-+		     "[gicv2|gicv2m|gicv3|gicv3-its|gicv5|gicv5-its]",		\
- 		     "Type of interrupt controller to emulate in the guest",	\
- 		     irqchip_parser, NULL),					\
- 	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
--- 
-2.34.1
+Done!
 
+> Cheers,
+> 
+> Will
+
+Thanks,
+Sascha
