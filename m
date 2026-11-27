@@ -1,57 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795803250;
-	b=GVsTVhbKAVJqrL9rsoTQ6+delPKdFOC83WTAPzP4aeyD7mfLHV5KchBVC0FAyVHSLv9h
-	 5l0vN/FVFmSM+jRb4qMHgdPKO9oGKbHhQlpwQT3TrjoAR4yKd84B2MPb3dJHEQaTM1+0F
-	 7FJ7ICRjVgDKppM3sD8oPBLsS0H62xmlXyc7GLh64cOo+NW+8fr9x0FePtewbm1oPpB4D
-	 kzvlO/iNZGGTDXQPndHbxZH+vjV4APWplXVesZzPDyVST/S33JZdqOeh5RHl0JXFKTImr
-	 s3nve/jDaHD3DHNYmkTlrDazCNo+iolLUN9fB0fL5sW6b8KwTSl1pSOU8oDn0kTUX5g==
+	t=1795804793;
+	b=mAVsvtb9021ZhQGedoaFY3dGMm0Y4fxD65DJ/Ap3mJQFddg4w3Lt6monqAYsLV93Mye6
+	 iCW4X1p7bA5CH62hLkTi9rQX98GMstpJJFf5NhL253/5I7IYNKxhMAMMOi9zEZzW84CfZ
+	 A+ZP8yZPHTNr5a3oRugVqAWyJIYi0i1zvZM5FeKfyl4mjLPLHjdkTqm/+rZGALLFtBNiU
+	 +gE9bCeA9abgc2fk9eRZSAKMliPi4C13+0oczUZQ9FT2O73mrtOZtjyNZUVhX0XBHukGh
+	 B+Dx1X3WGwDmt3MK9jNDCAuRwHW72tYnHJdul3vwyX378QTQs1bf/kqCHPugfdZ6Qdw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795803250;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=CKHTaSLzxdSV1614RGH74z1CYt8yFd3I+q3rL4tHKUE=;
-	b=tWFaSSYIbc4OOvVVCKaIxGifgx0SSUp0wC1X1VjaKHzJ7VoWrITTeKCQak9p3ANrBoB4
-	 FgS7OjvY+klG4BKSMssN097q+XYijJD++rYr0H0akv6u8r/RRbRgfFs8Ee5k7VfwGiuXx
-	 n6RspKxOf2IC5w+SfeUyk9RRvFeqkQoJCMfcr6D6SfrQyCrjPyN6Mm87P6qqBbVMWRgT+
-	 lHifQthdYrWljdyYV5I/zdUTOiUCpygIqO81Yviz2pYgs6WirLGzTCMuFrDMVk9tsS+PZ
-	 bI0XQJDj9iqEcHqb85PluOQ8d4yOVVJv0cq/kwy2GiBXdYRyJJhQvKrD9HoIT9JqNwA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795804793;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=GMnIj8q9kqDMWvDp1Ahec1IURkuOha5hwJFXn0dtihM=;
+	b=t97v8mokM9ekro7TXXkd2UtwGwdR1cR5tmecVmWSM8Z0Sjov62eT5f7YwhCcaVYM4Ynt
+	 scyxCeXgwNlY/B+vS38hU/rUWal+Dh0zGeA2LNUTAaYycVHbLHMNC6e2s79B9iPRKEobu
+	 DDBNOLODQwPmTr93RtVcjL4DrmWAworatjxfZkFhUSH66XQnMUyVhyTBvxqTcEjBixSsN
+	 gCZhO0aIdMv77TuhVxW7aA4S7PkpJn2s/WKjiaaTc9hU+h7+42lcAipRLkAfNpu8aKRIy
+	 F3C1N5Cfohefr6En2DT8Wl+txTmnSPLJUVZIA6sO5WxGqNrnfhUrC0sB5RcLwVguWAQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eA1a1wqB;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PLx+PMfc;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB6C606A31C
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 18:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9975560A2620;
+	Fri, 27 Nov 2026 18:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eA1a1wqB
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50FB51F00898;
-	Fri, 27 Nov 2026 18:14:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PLx+PMfc
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C09711F031D6;
+	Fri, 27 Nov 2026 18:39:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795803249;
-	bh=CKHTaSLzxdSV1614RGH74z1CYt8yFd3I+q3rL4tHKUE=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=eA1a1wqBAk9Yx922OY96kc60iH8nuMWn0NLMyFvYWHu3wR5B+BwLDqXvbUM4At2Wf
-	 v/3i0GraqGQgVRA7f/E/w5T52SO/8/HNCdzC5FuoSeNxjsraD5VUFp0h41FWdZAg1z
-	 UowLnsWQovtdtaJF9TbDN3q+v4U6NQ6v4ymILTi5hwxPQL4T81kl4M/ppMi+qNlYrN
-	 kXYwWMIZQy4UouehUjx2PkNzJZAMIM/9KWkklg3+RAMaqpdDHy9p2ovD0pLimpYR67
-	 lfD8U3FUMYoxA5eOpSbLLycd8xwx41N2e2xCS4PzSvL7r4olJhWsKV7NtF/I74DdAi
-	 c/XzQ0a/JY21A==
-Message-ID: <sashiko-outbox-238059@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] KVM: arm64: Drop a pending MMIO access when injecting
- an unmasked SError
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Dan Carpenter" <dan@pereq.eu>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20261127-serror-drop-mmio-v2-v1-1-96bd01bef6d8@pereq.eu>
-References: <20261127-serror-drop-mmio-v2-v1-1-96bd01bef6d8@pereq.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 27 Nov 2026 18:14:08 +0000
+	s=k20260515; t=1795804793;
+	bh=GMnIj8q9kqDMWvDp1Ahec1IURkuOha5hwJFXn0dtihM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=PLx+PMfc7vjDf9xZiK+vAvRvCC6w5PV5VkvQOJk/S3QOM8SeGwDq2hJGCqee0t00y
+	 0KIKpwWtdjgPLm1VpHc3p359yK//u7di3/X4i+U40305ax1M1uaUfWWP1qr1tIBX1e
+	 AgfKwi0EI9Fo7aHbVHDDEdOQN0ZDUHgpRKVMZNE++Q09GKMDBllcXrE6vjS9PiiTxy
+	 B1bo5dszztX0AakE9L9M0iXqt2SFrq4CMOsURWRywWem5olBh8XOM4hl5dP8AFh4k3
+	 eUOZO6MGv2GMSgtjTDcDWSaMdidd9FsI0bI54pSPrYkzoQ1YYzRjs/gEFZ8JJ0Y3G5
+	 A5Cpg3IWhWf8w==
+From: Will Deacon <will@kernel.org>
+To: julien.thierry.kdev@gmail.com,
+	Sascha Bischoff <sascha.bischoff@arm.com>
+Cc: catalin.marinas@arm.com,
+	mark.rutland@arm.com,
+	kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	vladimir.murzin@arm.com,
+	maz@kernel.org,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	timothy.hayes@arm.com,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH kvmtool v7 00/23] arm64: Support GICv5-based guests
+Date: Fri, 27 Nov 2026 18:39:17 +0000
+Message-ID: <179580197868.1668728.14216688807361955321.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261127170145.4138182-1-sascha.bischoff@arm.com>
+References: <20261127170145.4138182-1-sascha.bischoff@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,57 +67,65 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Low] KVM: arm64: PSR_A_BIT check in kvm_inject_serror_esr() ignores
-  SCTLR2_ELx.NMEA
---
+On Fri, 27 Nov 2026 17:01:22 +0000, Sascha Bischoff wrote:
+> This series adds support for GICv5-based VMs to kvmtool. These are
+> exposed as --irqchip=gicv5 and --irqchip=gicv5-its, where the former
+> creates a vGICv5 device and the latter adds a GICv5 ITS. The GICv5
+> specification can be found at [1].
+> 
+> The GICv5 support in KVM needed by --irqchip=gicv5 is available as of
+> Linux v7.4-rc1. The GICv5 ITS support is described in [2]; using
+> --irqchip=gicv5-its requires a KVM build with those changes.
+> 
+> [...]
 
-commit 3baf52b3ece0a678fb430e38fdfba08de0591af4
-Author: Dan Carpenter <dan@pereq.eu>
+Applied first 18 (i.e. sans ITS) to kvmtool (master), thanks!
 
-KVM: arm64: Drop a pending MMIO access when injecting an unmasked SError
+[01/23] arm64: Propagate IRQ routing initialisation errors
+        https://git.kernel.org/will/kvmtool/c/643c84fcabdf
+[02/23] arm64: Close the ITS descriptor when setup fails
+        https://git.kernel.org/will/kvmtool/c/fd4073f5e2e7
+[03/23] arm64: Split GIC device setup
+        https://git.kernel.org/will/kvmtool/c/c97b9ac472c4
+[04/23] Sync kernel UAPI headers with v7.4-rc1
+        https://git.kernel.org/will/kvmtool/c/31cacdfe9610
+[05/23] arm64: Add GICv5 irqchip device support
+        https://git.kernel.org/will/kvmtool/c/ebcac904ebc9
+[06/23] arm64: Configure GIC interrupt bases
+        https://git.kernel.org/will/kvmtool/c/3eda0ae06c3f
+[07/23] irq: Allow the initial interrupt line number to be set
+        https://git.kernel.org/will/kvmtool/c/2ec8a3ef3529
+[08/23] arm64: Start GICv5 SPI line allocation at zero
+        https://git.kernel.org/will/kvmtool/c/217760904a04
+[09/23] arm64: Configure the GICv5 IRS
+        https://git.kernel.org/will/kvmtool/c/94a57e57620e
+[10/23] arm64: Define GICv5 interrupt types
+        https://git.kernel.org/will/kvmtool/c/bb395ae93047
+[11/23] arm64: Describe the PMU interrupt for GICv5
+        https://git.kernel.org/will/kvmtool/c/886ac67b5f4b
+[12/23] arm64: Describe timer PPIs for GICv5
+        https://git.kernel.org/will/kvmtool/c/c6f9c988b76b
+[13/23] arm64: Assign CPU DT phandles
+        https://git.kernel.org/will/kvmtool/c/6794fb727311
+[14/23] arm64: Describe the GICv5 CPU interface in the DT
+        https://git.kernel.org/will/kvmtool/c/265b478fc159
+[15/23] arm64: Describe the GICv5 IRS in the DT
+        https://git.kernel.org/will/kvmtool/c/93d7111bc83e
+[16/23] arm64: Generate GICv5 SPI specifiers for platform devices
+        https://git.kernel.org/will/kvmtool/c/5ac92cbe187a
+[17/23] arm64: Generate GICv5 PCI INTx specifiers
+        https://git.kernel.org/will/kvmtool/c/a21cd5dababc
+[18/23] arm64: Expose the GICv5 irqchip option
+        https://git.kernel.org/will/kvmtool/c/c5b95e85d3c4
 
-This commit clears vcpu->mmio_needed when injecting an unmasked SError via
-HCR_EL2.VSE so that non-NV vCPUs cancel a pending MMIO exit like NV vCPUs
-do.
+Cheers,
+-- 
+Will
 
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index aa2011cc0d5a0..61df0338290d9 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -386,6 +386,13 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64=
- esr)
->  		return 1;
->  	}
-> =20
-> +	/*
-> +	 * Like the emulated entry above, an unmasked SError cancels the MMIO
-> +	 * access the vcpu exited on.
-> +	 */
-> +	if (!(*vcpu_cpsr(vcpu) & PSR_A_BIT))
-> +		vcpu->mmio_needed =3D false;
-
-[Severity: Low]
-Does hardware deliver a virtual SError pended via HCR_EL2.VSE when
-PSTATE.A is 1 and the effective SCTLR2_ELx.NMEA bit is 1?
-
-This rests on an architecture detail that could not be confirmed from the
-kernel source.  Earlier in this file, serror_is_masked() treats SErrors as
-unmasked when effective_sctlr2_nmea(vcpu) is set, and the NV path right
-above emulates the exception entry and clears vcpu->mmio_needed in that
-state:
-
-arch/arm64/kvm/inject_fault.c:serror_is_masked() {
-	return (*vcpu_cpsr(vcpu) & PSR_A_BIT) && !effective_sctlr2_nmea(vcpu);
-}
-
-If HCR_EL2.VSE also delivers the virtual SError when PSTATE.A is 1 and
-effective SCTLR2_EL1.NMEA is 1, testing only PSR_A_BIT here leaves
-vcpu->mmio_needed set on a non-NV vCPU, so the next KVM_RUN completes the
-MMIO access and advances PC before the guest takes the SError.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261127-serror-dro=
-p-mmio-v2-v1-1-96bd01bef6d8@pereq.eu?part=3D1
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
