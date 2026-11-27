@@ -1,82 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.74
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795789460;
-	b=CiqyBXgj9cnL1lVNAeY/5SM9zh2Tu5vHSmDYjYJk3EMFHhZwrVOqwYy4r+vZEvt4KhcZ
-	 aZ+A+NPwRKtfgu/eds3pYkIngYDXjMdUzxO481Vn6/1fnPbBfXp97P9MhCk6GMWWDLLLf
-	 ejTjT35vV3rPUfWzRDykt8cMSCDL2SlkrBJLoul06NuL4ZHein5WApixvyvZYnTJNy75Y
-	 be/HLEXHW/6+AefqnZmxT4i+CzjcWIyrysncn/3i6qe3sgO0IxRUJAEg1CGsdu7BeqQsQ
-	 fFY8V3jERd3fG14AGOPazA0RpJzN2i1/uR0JURgaEIWIRHZBS/ecv9/KYkUdlm1dgEQ==
+	t=1795789721;
+	b=o+pJdDeZDfvZpUztyuUqpXB75/voCR+USbNtQRXL+/Y6GCKJvebcF2L/35q4VPpDFGRX
+	 iN9CjeqLeYlIA+anQbvsZvlBK1hMIcjfh9BF28UiNHY4kpDft3wQFDP9awLJVU4nNkUxV
+	 1Js0xUxjrBt/7oLhqgFVnu0Jf8hmMTWymEFUkk+c+h0gHDemYBpbEQF7kdBDUbCIgg9u5
+	 EiH/xC/97dZTpoUDSxXi2hr9oHeiYZfrwP9cevEUb2Pca+o6i+bpoXUN1VLGUMzwqBGrK
+	 zdpeiZFLGgR7TYqOblKSiWOpUpyrpSYmpcwejt4E2XiyFpPNczb4YpKRQPj4KzY5JzA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795789460;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received:Received:Received:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
-	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
-	 X-Authority-Analysis:X-Proofpoint-GUID:X-Proofpoint-Spam-Info:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=Zz4xWtI9vVSUQVx48zTuDenwYcnh+LkrBlA+b384qak=;
-	b=luZvwHe8kawIZ4K4N3s12mNSuqQ7S8GC/sJ5NG/hZz3egNdn+tt59IsHODLvRzCFfyJE
-	 xRcb4Yt29aXxryDW6/D74z221FKAEgNnDiHXHvmExz6mD+hxoG6h25YH20RJR+yKW2UhT
-	 J8ipufXg9qUTPBrISv6TkXsiDJgo5dDxTVwJLmpSOCLAvu1NdSAC29IKLaGSq3jgcHFc0
-	 3ZfXxMMkkwRwyhyqFX9oBV5f9DNuZRmA4tX9V+3IfzqXYcI1Ey5pEgVf29dNQC/NpIhyF
-	 WnJtbH0BiTzsY4MOdPesW+PgUrRg7B8bwV56twYOedTWdnGBeauJ2V91NE3tbRGRyFA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795789721;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=TjVvH8NZqlBve9bypwBIcPsakGhfaX78G28bM4dn8ZY=;
+	b=tnIRjQONMvR9Q+h/S7gdGJBkokdN99hk6txQJ9KRqVJpfCB1fq4msZ+/CCyZ2/DHW85h
+	 8cZ//n+DKBButc3mC/CZBmCsiDP/5mu0GkJh1mskUQx7m2929iROKzFH2YjYyyU8kKS05
+	 EpCEcLmJQbSJnPXzzxV1k6CI3Y4LJ51iDDaGZQyEDGy6wr5tFC4mMT1TPrYAyKS7x+krr
+	 qunKPkxdAIT2Fm06X5kktL5ECIl4YC8/NLTBa/Y58b0Wsh1uhn7sMxuWJ2cP/4Fs3C6Nq
+	 PWuuQmgrO8BsMbKQNyKBiLBmD2CmWiuXF6KnRscctR4gbzUTDr/8Kpe2A3Ce6v4AL1Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.ibm.com;
-	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=rmvSJeNC;
-	arc=none smtp.remote-ip=148.163.156.1
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=DJLnuq5r;
+	arc=none smtp.remote-ip=95.215.58.74
+Received: from mta1.migadu.com (out-74.mta1.migadu.com [95.215.58.74])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DD6606EF17
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 14:24:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 82DD6606EF17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDA7606B401
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 14:28:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0BDA7606B401
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=rmvSJeNC
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4wVr3419817;
-	Fri, 27 Nov 2026 14:23:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Zz4xWt
-	I9vVSUQVx48zTuDenwYcnh+LkrBlA+b384qak=; b=rmvSJeNC+Cn8vQo60l73w5
-	BjtIagbd9Je+6j7SII4C5sCl31jsOLpK7gVNbk+AV8Cpn+RdbuTUIAMDrvPq2Kjg
-	+6MWqhDsLY39jakGwqn2LGNQ/6dL80NSZFSu5HdbX98GLePJMiHkRvZPYCb4mAbz
-	qCNdt1+AoVv3iqTangtRZpp3IbqBNMks/O1F03RpF5yDSI62dlimQjeaEHCqH132
-	djJoxFpGOdZwmTB1Aihs9/cNs6wvqETsb63/E1mSBRT9TAlBUZkbWkNt6alKAl25
-	LlLwlatAY89bvBdUBPeAd4mNLN0GXbztNNUu1oTzI0czWYeP0M8gBoiUj4s0jDpg
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4j34fap8ma-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 27 Nov 2026 14:23:30 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4IUs2819277;
-	Fri, 27 Nov 2026 14:23:29 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4j5kfaahku-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 27 Nov 2026 14:23:29 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6ARENPPo37880106
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 27 Nov 2026 14:23:25 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 77DC82004E;
-	Fri, 27 Nov 2026 14:23:25 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F3F822006C;
-	Fri, 27 Nov 2026 14:23:24 +0000 (GMT)
-Received: from a46lp73.lnxne.boe (unknown [9.87.84.240])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 27 Nov 2026 14:23:24 +0000 (GMT)
-From: Steffen Eiden <seiden@linux.ibm.com>
-Date: Fri, 27 Nov 2026 15:22:26 +0100
-Subject: [PATCH v4 23/25] KVM: s390: arm64: Implement SVE for arm guests
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=DJLnuq5r
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=LlRJdcs2tH2PBRhiheJnivWS5Dj9upnmbgY2TWeD+iQ=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795789717; v=1; x=1796394517;
+ b=DJLnuq5r/I4dQ9dXom2tD2xpCJ7hGrk2a70EGiSarbdEK02gxfA/8M3n+Eekp9SqWq+8YBuG
+ x/BFHNJ9L8uIxUxo82xhLQ/tKXO3RrV/swXIhlis463eibPM6b5HFLwL2qId4SpytkN942gBUSj
+ PVTwtxdWBvFuPfB/OWqP3W2Y=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id bdd05ed73b3b6aea;
+	Fri, 27 Nov 2026 14:28:37 +0000
+X-Mizu-Trace-ID: bdd05ed73b3b6aea
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <d2b6e735-a685-4e79-bb39-2fb75ebecd09@linux.dev>
+Date: Fri, 27 Nov 2026 14:28:32 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -86,529 +58,211 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: Reduce the stage-2 page cache on 64 KiB hosts
+To: Marc Zyngier <maz@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>,
+ Leonardo Bras <leo.bras@arm.com>
+Cc: oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com,
+ seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, riel@surriel.com, shakeel.butt@linux.dev,
+ kernel-team@meta.com, rkeilty@meta.com, atish.patra@linux.dev,
+ dgreid@meta.com, Lorenzo Stoakes <ljs@kernel.org>
+References: <20261124152842.2634495-1-usama.arif@linux.dev>
+ <86wlpzycnn.wl-maz@kernel.org>
+ <563d2406-dcfe-43b6-8f21-2a7694f1f266@linux.dev>
+ <86v75jy48c.wl-maz@kernel.org>
+Content-Language: en-US
+From: Usama Arif <usama.arif@linux.dev>
+In-Reply-To: <86v75jy48c.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261127-sysreg-v4-23-a6318d18aab5@linux.ibm.com>
-References: <20261127-sysreg-v4-0-a6318d18aab5@linux.ibm.com>
-In-Reply-To: <20261127-sysreg-v4-0-a6318d18aab5@linux.ibm.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-        Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Friedrich Welter <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>
-X-Mailer: b4 0.14.3
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI3MDA1NiBTYWx0ZWRfX8IaBewKar55V
- 9Fhaws3ojIaTBvMVHi2L3ZjNeyf647J5Fe/GvoYjC+oiipB3rJ/cthzNnNuQ+PtFdCZlMZBhCgE
- oLSrLtqAMQ3azvEYBzVE7k7puufPZCx71Sy0wtkiB7w/mI77sDRwZh64yWqPSG57OFFdArlj75/
- kBPhHioLU0Fe+izKX9TFuFI4fd6qt10xqG0hU0ldLuJee7ia40UEnvTQYTlDg7NSI4duDBdnRT6
- vuLgAQxDh32EUL1kfvnet+pEKk4j5caGd04QKvoHqTZmhI3wUq0by9svvyTfE/Z0Jax5cAME+mb
- CClwcEYdPOAzCKykW0H3IuPEiaLwlW93xQDffxZh78yLlTgtBBNuW3Tawxk+sxtvWpWpk9Y1xbD
- Of0vFbIIWe43savnmz8Vnpsjax3VPQi4EG6Y2qxTD/52dz9pUQcEIO2AKX7lHLqcxw2a1bHuLHU
- +92KNS4OGrt5nyXSIHQ==
-X-Proofpoint-ORIG-GUID: QoMiXpm52ieS_1F44DlO7m_zmBm8zuyr
-X-Authority-Analysis: v=2.4 cv=U6QHnuru c=1 sm=1 tr=0 ts=6b099262 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=E2f1HnvsrPvGzuHPg88A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: QoMiXpm52ieS_1F44DlO7m_zmBm8zuyr
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI3MDA1NiBTYWx0ZWRfX2kJdilavIQ8/
- u0+BreUV4zHKsRWdNWL7/YUq+c6IhOZohDgiWpPCiY8nwzx4bRNv+kbFR6DSzrN/va6czaAFjT9
- zgwrMq7LFDnsnxL3PPAWQLtMCQ/RS+w=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-27_02,2026-11-27_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 lowpriorityscore=0 spamscore=0 impostorscore=0
- clxscore=1015 bulkscore=0 suspectscore=0 adultscore=0 phishscore=0
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
- definitions=main-2611270056
 
-From: Friedrich Welter <fritz@linux.ibm.com>
 
-Add support for Scalable Vector Extension (SVE) in ARM64 guests running
-on s390 hardware, providing 128-bit vector operations backed by s390's
-Vector Extension (VX).
 
-The implementation is limited to 128-bit vectors (VQ=1) matching s390 VX
-register width. Z registers reuse existing FP/SIMD register space (vregs),
-while P registers and FFR are stored in the SAE block.
+On 26/11/2026 07:58, Marc Zyngier wrote:
+> On Thu, 26 Nov 2026 14:32:04 +0000,
+> Usama Arif <usama.arif@linux.dev> wrote:
+> 
+> [nonsense deleted]
+> 
+>>> Now, to the patch itself: I see no reason to special-case this. If
+>>> kvm_mmu_cache_min_pages() is an indication of what is needed, then
+>>> this macro should be driven by it, or the whole allocator take it into
+>>> account. And then you adjust it by whatever fudge factor seems
+>>> appropriate.
+>>>
+>>
+>> Completely agree! [1] does that: no page-size special case, and
+>> a capacity of KVM_PGTABLE_LAST_LEVEL - KVM_PGTABLE_FIRST_LEVEL for every
+>> page size.  It can't track kvm_mmu_cache_min_pages()
+>> at runtime: the vCPU's cache is shared by the canonical and NV shadow
+>> MMUs, and its capacity must stay fixed. So it has to cover the largest
+>> minimum, which stage-2 caps at 3, and 4 is that plus one page of fudge.
+> 
+> Of course it can. That's not exactly rock science to add, rather than
+> relying on another set of bad heuristics.
 
-Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
-Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
-Co-developed-by: Steffen Eiden <seiden@linux.ibm.com>
-Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-Signed-off-by: Friedrich Welter <fritz@linux.ibm.com>
+You're right, it can. __kvm_mmu_topup_memory_cache() fixes a cache's
+capacity at its first refill, but nothing requires that to be a
+compile-time constant. Does something like the patch below work for
+you? Each VM records twice the largest kvm_mmu_cache_min_pages() of its
+stage-2s as they are initialised, and every top-up passes that to
+__kvm_mmu_topup_memory_cache(), as the eager-split cache already does.
+
+
+> And this must cover more
+> than a single mapping per top-up, because that has a ripple effect on
+> the speed at which we can split large blocks (funnily enough, people
+> care about that stuff).
+> 
+> 	M.
+> 
+
+With twice the minimum, each refill covers at least two worst-case
+maps. I asked a LLM to comeup with a way to time for block splitting and pagefaults
+and I found it reasonable, I have attached the results in the commit message.
+
+Does a factor of 2 sound reasonable to everyone?
+
+If this looks ok, happy to send as v2.
+
+
+From dad1d43f1c2dcb8ffbc8084ec19467731e8548f4 Mon Sep 17 00:00:00 2001
+From: Usama Arif <usama.arif@linux.dev>
+Date: Fri, 27 Nov 2026 06:07:35 -0800
+Subject: [PATCH] KVM: arm64: Size the stage-2 memcache from
+ kvm_mmu_cache_min_pages()
+
+When fewer than kvm_mmu_cache_min_pages() pages are left, a stage-2
+fault that may need new tables refills the vCPU's memcache to
+KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE, 40 on arm64. A map allocates at most
+one table per level below the preallocated root, which is
+kvm_mmu_cache_min_pages() and at most 3 pages. Only vCPU destruction
+frees the memcache, so whatever a refill leaves unused stays allocated:
+up to 2.5 MiB per vCPU with 64 KiB pages. On a 64 KiB host running 101
+VMs with 4 vCPUs and 1 GiB each, the memcaches held 986 MiB, against
+25 MiB of stage-2 tables in use.
+
+Size the memcache at twice the largest kvm_mmu_cache_min_pages() of the
+VM's stage-2s instead, so that each refill covers at least two
+worst-case maps. With NV, the vCPU's memcache also feeds the shadow
+stage-2s, and a memcache's capacity can't change once used, so record
+the largest value as each stage-2 is initialised. The VM's stage-2 is
+set up at VM creation and the first shadow stage-2s by the first
+KVM_ARM_VCPU_INIT, before any vCPU can fault, and later shadow stage-2s
+have the same size. kvm_phys_addr_ioremap()'s temporary memcache uses
+the same capacity, so arm64 no longer uses the value of
+KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE.
+
+With a 48-bit IPA, the capacity is 4 pages with 16 KiB and 64 KiB pages
+and 6 with 4 KiB pages; with the default 40-bit IPA, 2 and 4. On the
+host above and on a production host also running 101 VMs with 4 vCPUs
+each, both with 64 KiB pages and 48-bit IPA VMs:
+
+                     memcaches                saved
+                     before      after
+  host above         986 MiB     81 MiB       905 MiB
+  production host    869 MiB     <= 101 MiB   >= 768 MiB
+
+A memcache now refills at most once every two tables, as a capacity of
+4 does with 4 KiB pages and a 48-bit IPA. Measured that way, per fault
+for the median vCPU, one VM at a time:
+
+                                        40           4
+  2M blocks split under dirty logging   4.9-5.1 us   4.9-5.0 us
+  1G block split, then refaulted        2.7-2.8 us   2.8 us
+  every fault allocating a table        4.0-4.1 us   3.7-4.1 us
+
+Suggested-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Usama Arif <usama.arif@linux.dev>
 ---
- arch/s390/include/asm/kvm_host_arm64.h |   5 +-
- arch/s390/kvm/arm64/arm.c              |   6 +
- arch/s390/kvm/arm64/feature.c          |   9 +-
- arch/s390/kvm/arm64/feature.h          |   6 +
- arch/s390/kvm/arm64/guest.c            | 250 +++++++++++++++++++++++++++++++++
- arch/s390/kvm/arm64/reset.c            |  24 ++++
- 6 files changed, 297 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h  |  2 ++
+ arch/arm64/include/asm/kvm_types.h |  1 +
+ arch/arm64/kvm/mmu.c               | 19 +++++++++++++++----
+ 3 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/arch/s390/include/asm/kvm_host_arm64.h b/arch/s390/include/asm/kvm_host_arm64.h
-index a3874288a151..d09ed3a211f3 100644
---- a/arch/s390/include/asm/kvm_host_arm64.h
-+++ b/arch/s390/include/asm/kvm_host_arm64.h
-@@ -34,7 +34,9 @@ bool cpus_have_final_cap(unsigned int num);
- #define KVM_MAX_VCPUS 1
- #define __KVM_HAVE_VCPU_RUN_PID_CHANGE
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 97332ffcb1300e..515869c190c66a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -413,6 +413,8 @@ enum kvm_arm_vm_flavor {
  
--#define KVM_S390_ARM64_IMPL_FEATURES 0
-+#define KVM_S390_ARM64_IMPL_FEATURES (		\
-+	 BIT(KVM_ARM_VCPU_SVE)			\
-+)
- #define KVM_HALT_POLL_NS_DEFAULT 50000
+ struct kvm_arch {
+ 	struct kvm_s2_mmu mmu;
++	/* Capacity of the vCPU stage-2 memcaches, see kvm_init_stage2_mmu() */
++	int mmu_page_cache_capacity;
+ 	const struct kvm_vm_s2_ops *vm_s2_ops;
  
- #define KVM_S390_MANAGES_S390_GUEST 0
-@@ -130,7 +132,6 @@ struct kvm_vcpu_stat {
- };
+ 	enum kvm_arm_vm_flavor vm_flavor;
+diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
+index 9a126b9e2d7c99..68472a593578f3 100644
+--- a/arch/arm64/include/asm/kvm_types.h
++++ b/arch/arm64/include/asm/kvm_types.h
+@@ -2,6 +2,7 @@
+ #ifndef _ASM_ARM64_KVM_TYPES_H
+ #define _ASM_ARM64_KVM_TYPES_H
  
- #define kvm_has_mte(_kvm) false
--#define vcpu_has_sve(_vcpu) false
- #define vcpu_has_ptrauth(_vcpu) false
++/* Enables the generic MMU memory caches; arm64 passes its own capacity. */
+ #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
  
- #define kvm_has_fpmr(kvm) \
-diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
-index 899a897c5486..b06c101ef6a9 100644
---- a/arch/s390/kvm/arm64/arm.c
-+++ b/arch/s390/kvm/arm64/arm.c
-@@ -54,6 +54,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ONE_REG:
- 		ret = 1;
- 		break;
-+	case KVM_CAP_ARM_SVE:
-+		ret = system_supports_sve();
-+		break;
- 	default:
- 		ret = 0;
- 	}
-@@ -264,6 +267,9 @@ static unsigned long system_supported_vcpu_features(struct kvm_vcpu *vcpu)
+ #endif /* _ASM_ARM64_KVM_TYPES_H */
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 042dc53267cb36..cd0605cce45d2a 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1045,7 +1045,7 @@ static void kvm_stage2_destroy(struct kvm_pgtable *pgt)
+  */
+ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type)
  {
- 	unsigned long features = KVM_S390_ARM64_IMPL_FEATURES;
+-	int cpu, err;
++	int cpu, err, capacity;
+ 	struct kvm_pgtable *pgt;
  
-+	if (!system_supports_sve())
-+		clear_bit(KVM_ARM_VCPU_SVE, &features);
-+
- 	return features;
- }
+ 	/* Initialize the VM ops for the VM instance for the first time */
+@@ -1086,6 +1086,15 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+ 		goto out_free_pgtable;
  
-diff --git a/arch/s390/kvm/arm64/feature.c b/arch/s390/kvm/arm64/feature.c
-index 8fd278ace942..fc5b159a94b3 100644
---- a/arch/s390/kvm/arm64/feature.c
-+++ b/arch/s390/kvm/arm64/feature.c
-@@ -56,7 +56,6 @@ void __init kvm_arm_host_sanitize_features(struct qaaf_qmc_block *qaaf_qmc)
- 	MASK_RESERVED(qaaf_qmc, ID_AA64MMFR4_EL1);
- 
- 	MODIFY(qaaf_qmc, ID_AA64PFR0_EL1, SEL2, NI);
--	MODIFY(qaaf_qmc, ID_AA64PFR0_EL1, SVE, NI);
- 	MASK_RESERVED(qaaf_qmc, ID_AA64PFR0_EL1);
- 	MASK_RESERVED(qaaf_qmc, ID_AA64PFR1_EL1);
- 	MASK_RESERVED(qaaf_qmc, ID_AA64PFR2_EL1);
-@@ -151,3 +150,11 @@ bool cpus_have_final_cap(unsigned int num)
- 		return false;
- 	}
- }
-+
-+bool system_supports_sve(void)
-+{
-+	return cpu_has_vx() &&
-+	       SYS_FIELD_GET(ID_AA64PFR0_EL1, SVE,
-+			     read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1)) ==
-+		       ID_AA64PFR0_EL1_SVE_IMP;
-+}
-diff --git a/arch/s390/kvm/arm64/feature.h b/arch/s390/kvm/arm64/feature.h
-index 7b0698cc5563..e6916d8064c3 100644
---- a/arch/s390/kvm/arm64/feature.h
-+++ b/arch/s390/kvm/arm64/feature.h
-@@ -83,4 +83,10 @@ static inline u64 kvm_sae_irptc(void)
- 
- #define kvm_vcpu_has_pmu(_v) false
- 
-+#define vcpu_has_sve(_vcpu)							\
-+	(system_supports_sve() &&						\
-+	 test_bit(KVM_ARCH_FLAG_GUEST_HAS_SVE, &((_vcpu)->kvm)->arch.flags))
-+
-+bool system_supports_sve(void);
-+
- #endif /* ARCH_S390_KVM_FEATURE_H */
-diff --git a/arch/s390/kvm/arm64/guest.c b/arch/s390/kvm/arm64/guest.c
-index 047460975936..bdc489a7c7e9 100644
---- a/arch/s390/kvm/arm64/guest.c
-+++ b/arch/s390/kvm/arm64/guest.c
-@@ -5,6 +5,9 @@
- #include <arm64/kvm_emulate.h>
- #include <arm64/kvm_nested.h>
- #include <arm64/sys_regs.h>
-+#include <arm64/sve_context.h>
-+
-+#include "feature.h"
- 
- #define SVE_VQ_MIN	__SVE_VQ_MIN
- #define SVE_NUM_ZREGS	KVM_ARM64_SVE_NUM_ZREGS
-@@ -52,6 +55,243 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
- 		       sizeof(kvm_vcpu_stats_desc),
- };
- 
-+static int sve_zreg_index(__u64 id, unsigned int *regnum)
-+{
-+	/* Currently only one slice is supported on arm, and our zreg is only 128 bit */
-+	const u64 zreg_id_max = KVM_REG_ARM64_SVE_ZREG(KVM_ARM64_SVE_NUM_ZREGS - 1,
-+						       KVM_ARM64_SVE_MAX_SLICES - 1);
-+	const u64 zreg_id_min = KVM_REG_ARM64_SVE_ZREG(0, 0);
-+
-+	if (id < zreg_id_min || id > zreg_id_max)
-+		return -ENOENT;
-+	if ((id & SVE_REG_SLICE_MASK) > 0)
-+		return -ENOENT;
-+
-+	*regnum = (id & SVE_REG_ID_MASK) >> SVE_REG_ID_SHIFT;
-+
-+	return 0;
-+}
-+
-+static int sve_preg_index(u64 id, unsigned int *regnum)
-+{
-+	const u64 preg_id_max = KVM_REG_ARM64_SVE_FFR(KVM_ARM64_SVE_MAX_SLICES - 1);
-+	const u64 preg_id_min = KVM_REG_ARM64_SVE_PREG(0, 0);
-+
-+	if (id < preg_id_min || id > preg_id_max)
-+		return -ENOENT;
-+	if ((id & SVE_REG_SLICE_MASK) > 0)
-+		return -ENOENT;
-+
-+	*regnum = (id & SVE_REG_ID_MASK) >> SVE_REG_ID_SHIFT;
-+
-+	return 0;
-+}
-+
-+static int sve_ffr_index(u64 id, unsigned int *regnum)
-+{
-+	if (id != KVM_REG_ARM64_SVE_FFR(0))
-+		return -ENOENT;
-+	if ((id & SVE_REG_SLICE_MASK) > 0)
-+		return -ENOENT;
-+
-+	*regnum = (id & SVE_REG_ID_MASK) >> SVE_REG_ID_SHIFT;
-+
-+	return 0;
-+}
-+
-+static inline int get_sve_ffr_reg(struct kvm_vcpu *vcpu, unsigned int regnum,
-+				  u16 __user *uptr)
-+{
-+	/* ffr is pregmax + 1 */
-+	if (regnum != KVM_ARM64_SVE_NUM_PREGS)
-+		return -EINVAL;
-+
-+	if (put_user(vcpu->arch.sae_block.sve_ffr, uptr))
-+		return -EFAULT;
-+	return sizeof(vcpu->arch.sae_block.sve_ffr);
-+}
-+
-+static inline int get_sve_preg(struct kvm_vcpu *vcpu, unsigned int regnum,
-+			       u16 __user *uptr)
-+{
-+	if (regnum >= KVM_ARM64_SVE_NUM_PREGS)
-+		return -EINVAL;
-+
-+	if (put_user(vcpu->arch.sae_block.sve_pregs[regnum], uptr))
-+		return -EFAULT;
-+	return sizeof(vcpu->arch.sae_block.sve_pregs[regnum]);
-+}
-+
-+static inline int get_sve_zreg(struct kvm_vcpu *vcpu, unsigned int regnum,
-+			       __vector128 __user *uptr)
-+{
-+	if (regnum >= KVM_ARM64_SVE_NUM_ZREGS)
-+		return -EINVAL;
-+
-+	/* vreg and svreg overlap and zreg is also just 128 bit so we reuse the vreg space */
-+	if (copy_to_user(uptr, &vcpu->arch.ctxt.vregs[regnum],
-+			 sizeof(vcpu->arch.ctxt.vregs[regnum])))
-+		return -EFAULT;
-+	return sizeof(vcpu->arch.ctxt.vregs[regnum]);
-+}
-+
-+static inline int set_sve_ffr_reg(struct kvm_vcpu *vcpu, unsigned int regnum,
-+				  const u16 __user *uptr)
-+{
-+	/* ffr is pregmax + 1*/
-+	if (regnum != KVM_ARM64_SVE_NUM_PREGS)
-+		return -EINVAL;
-+
-+	if (get_user(vcpu->arch.sae_block.sve_ffr, uptr))
-+		return -EFAULT;
-+	return 0;
-+}
-+
-+static inline int set_sve_preg(struct kvm_vcpu *vcpu, unsigned int regnum,
-+			       const u16 __user *uptr)
-+{
-+	if (regnum >= KVM_ARM64_SVE_NUM_PREGS)
-+		return -EINVAL;
-+
-+	if (get_user(vcpu->arch.sae_block.sve_pregs[regnum], uptr))
-+		return -EFAULT;
-+	return 0;
-+}
-+
-+static inline int set_sve_zreg(struct kvm_vcpu *vcpu, unsigned int regnum,
-+			       const __vector128 __user *uptr)
-+{
-+	if (regnum >= KVM_ARM64_SVE_NUM_ZREGS)
-+		return -EINVAL;
-+
-+	/*vreg and svreg overlap and zreg is also just 128 bit so we reuse the vreg space*/
-+	if (copy_from_user(&vcpu->arch.ctxt.vregs[regnum], uptr,
-+			   sizeof(vcpu->arch.ctxt.vregs[regnum])))
-+		return -EFAULT;
-+	return 0;
-+}
-+
-+static int set_sve_vls(struct kvm_vcpu *vcpu, const void __user *uptr)
-+{
-+	u64 vqs[KVM_ARM64_SVE_VLS_WORDS] = { 0 };
-+	unsigned int vq;
-+
-+	if (!vcpu_has_sve(vcpu))
-+		return -ENOENT;
-+
-+	if (kvm_arm_vcpu_sve_finalized(vcpu))
-+		return -EPERM;
-+
-+	if (copy_from_user(vqs, uptr, sizeof(vqs)))
-+		return -EFAULT;
-+
-+	/* only 128 bit and 1 VQ are supported , nothing saved just check validity */
-+	for (vq = KVM_ARM64_SVE_VQ_MIN + 1; vq <= KVM_ARM64_SVE_VQ_MAX; ++vq)
-+		if (vq_present(vqs, vq))
-+			return -EINVAL;
-+
-+	/* run with a vl of 0 not valid */
-+	if (!vq_present(vqs, KVM_ARM64_SVE_VQ_MIN))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int get_sve_vls(struct kvm_vcpu *vcpu, void __user *uptr)
-+{
-+	u64 vqs[KVM_ARM64_SVE_VLS_WORDS] = { 0 };
-+
-+	if (!vcpu_has_sve(vcpu))
-+		return -ENOENT;
-+
-+	/* currently only 128 bit are supported so we only set bit 0  hardcoded */
-+	vqs[0] |= vq_mask(KVM_ARM64_SVE_VQ_MIN);
-+
-+	if (copy_to_user(uptr, vqs, sizeof(vqs)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int sve_reg_index(u64 id, unsigned int *regnum)
-+{
-+	int ret;
-+
-+	ret = sve_ffr_index(id, regnum);
-+	if (ret == -ENOENT)
-+		ret = sve_preg_index(id, regnum);
-+	if (ret == -ENOENT)
-+		ret = sve_zreg_index(id, regnum);
-+
-+	return ret;
-+}
-+
-+static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+{
-+	void __user *uptr = (void __user *)reg->addr;
-+	unsigned int regnum;
-+	int size;
-+	int ret;
-+
-+	if (reg->id == KVM_REG_ARM64_SVE_VLS)
-+		return get_sve_vls(vcpu, uptr);
-+
-+	ret = sve_reg_index(reg->id, &regnum);
-+	if (ret)
-+		return ret;
-+
-+	if (!vcpu_has_sve(vcpu))
-+		return -ENOENT;
-+
-+	if (!kvm_arm_vcpu_sve_finalized(vcpu))
-+		return -EPERM;
-+
-+	if (sve_ffr_index(reg->id, &regnum) == 0)
-+		size = get_sve_ffr_reg(vcpu, regnum, uptr);
-+	else if (sve_preg_index(reg->id, &regnum) == 0)
-+		size = get_sve_preg(vcpu, regnum, uptr);
-+	else
-+		size = get_sve_zreg(vcpu, regnum, uptr);
-+
-+	if (size < 0)
-+		return size;
+ 	mmu->pgt = pgt;
 +
 +	/*
-+	 * Only the low 128 bits of a Z register and the low 16 bits of a
-+	 * P register or the FFR are live: zero-pad the rest.
++	 * The vCPU memcaches serve all of the VM's stage-2s and can't be
++	 * resized once used, so make them cover two maps on the deepest one.
 +	 */
-+	if (clear_user((u8 __user *)uptr + size, KVM_REG_SIZE(reg->id) - size))
-+		return -EFAULT;
++	capacity = 2 * kvm_mmu_cache_min_pages(mmu);
++	if (capacity > kvm->arch.mmu_page_cache_capacity)
++		kvm->arch.mmu_page_cache_capacity = capacity;
 +
-+	return 0;
-+}
-+
-+static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+{
-+	const void __user *uptr = (const void __user *)reg->addr;
-+	unsigned int regnum;
-+	int ret;
-+
-+	if (reg->id == KVM_REG_ARM64_SVE_VLS)
-+		return set_sve_vls(vcpu, uptr);
-+
-+	ret = sve_reg_index(reg->id, &regnum);
-+	if (ret)
-+		return ret;
-+
-+	if (!vcpu_has_sve(vcpu))
-+		return -ENOENT;
-+
-+	if (!kvm_arm_vcpu_sve_finalized(vcpu))
-+		return -EPERM;
-+
-+	if (sve_ffr_index(reg->id, &regnum) == 0)
-+		return set_sve_ffr_reg(vcpu, regnum, uptr);
-+	if (sve_preg_index(reg->id, &regnum) == 0)
-+		return set_sve_preg(vcpu, regnum, uptr);
-+	return set_sve_zreg(vcpu, regnum, uptr);
-+}
-+
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+ 	if (is_protected_kvm_enabled())
+ 		return 0;
+ 
+@@ -1317,8 +1326,9 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 	guest_ipa &= PAGE_MASK;
+ 
+ 	for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
+-		ret = kvm_mmu_topup_memory_cache(&cache,
+-						 kvm_mmu_cache_min_pages(mmu));
++		ret = __kvm_mmu_topup_memory_cache(&cache,
++						   kvm->arch.mmu_page_cache_capacity,
++						   kvm_mmu_cache_min_pages(mmu));
+ 		if (ret)
+ 			break;
+ 
+@@ -1669,10 +1679,11 @@ static void *get_mmu_memcache(struct kvm_vcpu *vcpu)
+ 
+ static int topup_mmu_memcache(struct kvm_s2_mmu *mmu, void *memcache)
  {
- 	int ret;
-@@ -61,6 +301,11 @@ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- 		return ret;
- 	uindices += ret;
++	int capacity = kvm_s2_mmu_to_kvm(mmu)->arch.mmu_page_cache_capacity;
+ 	int min_pages = kvm_mmu_cache_min_pages(mmu);
  
-+	ret = copy_sve_reg_indices(vcpu, uindices);
-+	if (ret < 0)
-+		return ret;
-+	uindices += ret;
-+
- 	return kvm_arm_copy_sys_reg_indices(vcpu, uindices);
+ 	if (!is_protected_kvm_enabled())
+-		return kvm_mmu_topup_memory_cache(memcache, min_pages);
++		return __kvm_mmu_topup_memory_cache(memcache, capacity, min_pages);
+ 
+ 	return topup_hyp_memcache(memcache, min_pages);
  }
- 
-@@ -68,6 +313,7 @@ unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu)
- {
- 	unsigned long num = num_core_regs(vcpu);
- 
-+	num += num_sve_regs(vcpu);
- 	num += kvm_arm_num_sys_reg_descs(vcpu);
- 	return num;
- }
-@@ -81,6 +327,8 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
- 	case KVM_REG_ARM_CORE:
- 		return get_core_reg(vcpu, reg);
-+	case KVM_REG_ARM64_SVE:
-+		return get_sve_reg(vcpu, reg);
- 	default:
- 		return kvm_arm_sys_reg_get_reg(vcpu, reg);
- 	}
-@@ -95,6 +343,8 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
- 	case KVM_REG_ARM_CORE:
- 		return set_core_reg(vcpu, reg);
-+	case KVM_REG_ARM64_SVE:
-+		return set_sve_reg(vcpu, reg);
- 	default:
- 		return kvm_arm_sys_reg_set_reg(vcpu, reg);
- 	}
-diff --git a/arch/s390/kvm/arm64/reset.c b/arch/s390/kvm/arm64/reset.c
-index b36f45f30b9b..2ae363f6821a 100644
---- a/arch/s390/kvm/arm64/reset.c
-+++ b/arch/s390/kvm/arm64/reset.c
-@@ -2,6 +2,7 @@
- 
- #include <linux/kvm_host.h>
- #include <linux/fpu.h>
-+#include <linux/cpufeature.h>
- 
- #include <asm/aef.h>
- 
-@@ -12,8 +13,13 @@
- 
- #include <clocksource/arm_arch_timer.h>
- 
-+#include "feature.h"
-+
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
- {
-+	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
-+		return false;
-+
- 	return true;
- }
- 
-@@ -77,6 +83,14 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	 */
- 	preempt_disable();
- 
-+	if (!vcpu_get_flag(vcpu, VCPU_SVE_FINALIZED)) {
-+		if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE))
-+			set_bit(KVM_ARCH_FLAG_GUEST_HAS_SVE, &vcpu->kvm->arch.flags);
-+	} else if (vcpu_has_sve(vcpu)) {
-+		memset(vcpu->arch.sae_block.sve_pregs, 0, sizeof(vcpu->arch.sae_block.sve_pregs));
-+		vcpu->arch.sae_block.sve_ffr = 0;
-+	}
-+
- 	/* The reset must run with an unloaded save area */
- 	loaded = vcpu_is_loaded(vcpu);
- 	if (loaded)
-@@ -115,5 +129,15 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
- {
-+	switch (feature) {
-+	case KVM_ARM_VCPU_SVE:
-+		if (!vcpu_has_sve(vcpu))
-+			return -EINVAL;
-+		if (vcpu_get_flag(vcpu, VCPU_SVE_FINALIZED))
-+			return -EPERM;
-+		vcpu_set_flag(vcpu, VCPU_SVE_FINALIZED);
-+		return 0;
-+	}
-+
- 	return -EINVAL;
- }
-
 -- 
-2.56.1
+2.53.1-Meta
+
 
