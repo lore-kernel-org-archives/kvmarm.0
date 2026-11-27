@@ -1,87 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795793510;
-	b=Trly3qos5eAyPsyOxizA2ziTk0RgPovs7UacjDj/ispDp7QRpuxkyIpu+4+3197XRKps
-	 eumEERtSKJjdHPwwRawa/TQFHdx1FKL9xJ8/QWkjoUcLM1D+47lKf7tZhIHgqKhx/B/Lh
-	 //Cg5uK/uE1GHgbetSJCfV29cT2jL4+2fue8kseJimkCwStP3w0g616010VNa1aGrfYFt
-	 4Q2H/bxpQ1dScEaxKxZPOfGpSEf4hScqIReDClppmclecAMW39FcC+jRyJicosPNdANBO
-	 oZwzF+djWEPkR4aowo/cHY3eui4fXlk2yILs/VWUmEWhBu+RXkDdX5nzlhEQ0ZG9qJQ==
+	t=1795793513;
+	b=S41oRsG0jmdPXb7pe8yzoahkWgl1QKZmksccpt+8KFlw5vFB9yPVOxDRVEo3/nWu+mt8
+	 B6ZSm2IFVAzyGgOly5Y8/PD4sQu7oehJLieB2aL0mi3tttZoF+M2MFhfCOXvYqpUkkpcx
+	 BfajFEr/pvn2l8VOppjNO6ixjYHAC1YIWkPjhlW2EskII05z9e3n9osNJnI0yeAz6e2SQ
+	 W5DzzJqqVNdsiRC48XkJbtEjtIOBIS+DsQSjVdwQzAR02SCC93jOX+7ZyoovYXvm1EuHG
+	 u9MQkg+WwzIjFUgQV4rxMp88Mhx7FqfZbR6qbrZrO/YFB340lFvjGtkMjS9REXuzCCw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795793510;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795793513;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer;
-	bh=psEWMDtbK/VEnWlI7cGkj3njVmGtbz4cdV2wNJVv0u4=;
-	b=Ye0fQlEu94mZlxsTouhu3aiYbY3M5ev/EvdVY1XR1Hf1L8TjNPTWiVfprkQlCrfRlHO4
-	 hmvm6I8hSRF2ZW1cBCMWz22JwcDJkWt6wnzu3gLbciFuMWywrASuWy+myJY3LssaisoX4
-	 uoluhepFR6QBHANLt0iUl7ztDD5JixcmvVBONW4D/+uGJCBKuUaqrj6tornkwQ00ntxJh
-	 eHu2OMdWE9haLxNkf23FfVjsqJp1J54wHk8YBzHx2LbnvmfFo0CYhefCCa+OD6tqP3jpU
-	 s1n2Va+/nsmxRYUnjEc8+ylEFA9qjUbE0P/KtaccBwp6eJgfZUpr3D1QeLv6LalR2iA==
+	bh=top+HnOpM+4RH0scm4jzna/HFUR/dd44kXQf3BTGLP4=;
+	b=qt+mEgpblnxGGBg5BbN0KfnznQu0qOO25QXF7oLR822hklmq2vaCLO85SWxuI5bXLCNn
+	 ckQ38c+1aalWurRjpr8J/90Zyrar+6IjYFpEZPSRDLdjDFaUwVjdGFmQ/QOT1fhHrod+D
+	 EkCeVT/fhNSHK544WklO6EPr5zDL88KEq6/uqZ+fWO/HUKTz87jxVRZ7AbYlinzCBM20C
+	 r9jeiIJnq0Tl73pfyOnHhQGQfiUB7Knm/xgnuFGTZPsrb0BrE7NhczsbnL//oHCnUthmV
+	 mZAt/B2IwWhvK1rkWeMyj8B24D3ICAUpt/gJmNLP2qswJUXsBeY2GRAC2NGc0lj9sBg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=pereq.eu;
 	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=O14+SAqt;
-	arc=none smtp.remote-ip=209.85.128.49
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=ezMRHHqR;
+	arc=none smtp.remote-ip=209.85.221.48
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D98606A31E
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 15:31:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E6D98606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728CB606A31E
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 15:31:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 728CB606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=O14+SAqt
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4a3517554f7so74537885e9.2
-        for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 07:31:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=ezMRHHqR
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-490d59c3edaso5609562f8f.1
+        for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 07:31:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1795793508; x=1796398308; darn=lists.linux.dev;
+        d=pereq.eu; s=google; t=1795793512; x=1796398312; darn=lists.linux.dev;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=psEWMDtbK/VEnWlI7cGkj3njVmGtbz4cdV2wNJVv0u4=;
-        b=O14+SAqtezA3uR8ZHIDxP4eiHipbPm1cPr9KoY/1OlkwVnGEKTsu25AwUj49PXDPCP
-         wMNJCU3M2BS8gjZGlbz2yUonnmeoXDyfmpL0qu31ZZqBVkoiAip4ck2kyjwUwJgBpn8j
-         uNvgmQl8qb1e1io7y6Pkgv38j359zr6ByhUsKevk23N8LlJYTzDnFnjJCBoVC1pxBc0R
-         frK8XoufYBVP4jlIUhik9BkIp3AkGF/+OX5t0bwRLfCt1+1XcuFeRnRLUfenAySBdXQd
-         Y/7YaX+mVogN84qL1A0BAA0X+0X4zzkLl7SsyqOKIATMYYu+cNLr6sXu9EDnZprWY2La
-         ZB/g==
+        bh=top+HnOpM+4RH0scm4jzna/HFUR/dd44kXQf3BTGLP4=;
+        b=ezMRHHqRX/VnrCkTvT2d2506VPB2KIuet+opGolMl1dbh9hb1378uAqcelXjs//wOe
+         +AZ+OnnoKka2K+R4VY+QYldnc4hLbqI013Jb/CQOh0DrZmC0BNjjM1Ph5kE+9UgDI1lO
+         j14lAt2mVhldkCLD0gChpW4c0Qo86wRyaUJUYrXgwMpFXpcI+KQure3xlR4Ml+1UsuJ9
+         mQUKDCIPl5EPHhEsUk2xgWIZm2XkqB+KbqmuTdQ7+SecBxJX+ZM3bQ5ZTWBLC8gCAZZp
+         C9bDUE3thxVA5QrF/cFULy5TY5Rg4kMblOck73oZ01XZpXk9z5UErUVyid4ksCY8BRKp
+         /pxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795793508; x=1796398308;
+        d=1e100.net; s=20260707; t=1795793512; x=1796398312;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=psEWMDtbK/VEnWlI7cGkj3njVmGtbz4cdV2wNJVv0u4=;
-        b=gEJUhXbz1aYw/onknNh0+Qczi+YoyvcAcjmZEKgpF8mJtSbZwXIMt0T8COuOb9V5ny
-         5LCye5qxBFn2M9tf2yFmYzVh2E1PK+ZD+vn24AfeuBb6Kv2cu665Bth2NRhzmgchJxz4
-         c+nNobrXxlgOvys7CJwi2fDcnl6mlVRsUTjnkBM4NitLxNbUgqUmIOyFhtIDJlHJZ0MW
-         t0ZhsiVa6D5OecOc0lz++XOCM8ifMJAQ9oj3mCN3vQgIdS0MTggZwqgW68f3HIbKwu9Z
-         X0Vn4Dskz6Z5p+7qSJuwJDZ5NwUhivWOkRRr9wf86ZsdA8NduZY1cEuC9pkTgWHZQQeb
-         zLaA==
-X-Forwarded-Encrypted: i=1; AL+hErEeKhX9grbcHesuCrh89Y/5ulAz8RGz2iP2G2R2DfaZ5/5bpDB161FAy/YGGBtNv3NHiufnnBc=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9MJ5lsauCYOSXBaxVumq1anaqZWNishPL+qmBwCpxVI40QAMI7
-	o7QoBvsHzzEoCasmJCVrp4k5vmr6ogi1p8WkubeUz2W+6HBsy52K5Jlf7hkWZYLOUWc=
-X-Gm-Gg: AZFdTZfKbYnw+c4jlMDaoWncPa6T/iQOFZhzOYxaGV0NPeP2UmF4RKPLTvT1FQMnIoX
-	QCNQiIcwlOHHrvaO7m3YGAUBCJDCV/VSPxIcZg9VSFgQepHV+AVVjd9ATNkBpH+yKSQlQN8iLZg
-	waeEoVuaee030wotz5uqyxoruXRD5cAtk55R6edXrICaK7qc+mAetCmemuabezS5m5HgOpllM4H
-	pVTFOol2ePZ6JqFHMesRMnbO1bdhhG1LaonNn1YYIi5lqn0urPrVq5bIwcpq8kCnkdB/DZ0g1pQ
-	66DPqRZUI8bytXGAlQuGzZZGveh3WcbxHy5idBGHaqh4kfpNYcpQQkZIM+lCsICQnDXAdG6Ov5L
-	Zn3xP5rqq8xNsoKU5xB6PQDRlRn60v3aSIVquAzOGELCFE//EoHKaOMfrykOjwUcCOJwrtP4aXp
-	T/TEz0pT6o33hW8P1tPmErXYRg5uJpiky/0ND8UotmL7d+eO8WAwMpmfWmdxNFmyfS10Dn2hpE7
-	lCGLGDAEzyXk/ioELyYZbjIpjPzRRC2yEElfc5V2lUVprC8Wi8wKNbrf+tf2TM0dSJ++R3X43cT
-	zl0mkOw0zl/aJi8bYAk=
-X-Received: by 2002:a05:600c:64c9:b0:4bb:8701:bb14 with SMTP id 5b1f17b1804b1-4bb88804d1cmr535797655e9.5.1795793508061;
-        Fri, 27 Nov 2026 07:31:48 -0800 (PST)
+        bh=top+HnOpM+4RH0scm4jzna/HFUR/dd44kXQf3BTGLP4=;
+        b=Nja/ngZQWunsM6FeN8Wl6lzcWkkhybiJ3DzSi+SNXBQ3Eda1dHd4ANN2ITWDpx+1ee
+         sKX0T4aDPPj+8JH2EiohXN7w5RyD0MEiT3riVjzOf3YS1EA6OM5coXV4NFmhxwZmNXEJ
+         Lu8BEna3QsgkepdT+U8hFTZyrb2gtyncflwO5OtF0YLFDotMINdHMq8rrzIRDBicupND
+         1RKtEigcOSO8Sh3m5hHPZu8qC7bHIszG95NcDuYgm5rtxi1rPsBW5L7FCu/kT1oRvMqt
+         8KWMnoOxzNSMp4RwcDWRkU82CulDYRDIuXU8Dkl8kgL7oFrWWQL0fQpM3q4pJc8As7DX
+         JXIA==
+X-Forwarded-Encrypted: i=1; AL+hErH4FprvisWpO68GulzwkltOxOy9ReO7W3OqT2FrEiSkN/B4X6k6nYUTljLbpCxRjbxxC6+IwpU=@lists.linux.dev
+X-Gm-Message-State: APuU4Z9P/0UOToFJnkz3A5ioNfDz6bEJ68g3tChPJmACKW4MT+5OxTz6
+	cgEUzzZjeeXVcQglvbzR/QBsKdOEaoKh5YMdzJqPf9p8/556WRcwjnnB45BYmCUT3YI=
+X-Gm-Gg: AZFdTZcqMwv6rZjQw+ZRkRxrQDHxhROWfuyihMwOm7rmaUmPHKIPZ3KxMJUrhPX1I1r
+	WEYMrB8rbNWeWLpB2/2dH+Xis9pafeyWoe9tLUQV79bhKhP5tZ4bGnoxDg6+aek5u8uT3PUjsYh
+	EjoS4h5exVTABb4d92kgU7fTGfV7aezgBk+m9TC2EEBJj5XUKpctrWp7Ubr42vlQ4f66U+U/NDM
+	H/W978qkOFA+/aAeIDQHUjqrYS5x3JbWGftyif5H4qkqc9AY7T99kqRBw18lHFaJSdmx1IcP3O+
+	p38XBrZK86lX5l+MwUGjDot3GQsVsvwTUskBNsA//lZowmpcfQuG3RzasVao6rnQY74xgOzi/Vr
+	UQABSLThGCBC5pG83QD27sqyD8g6XRDQN3QO3hCTZD9XR47c/NhvDzUIdkzXpObR+W3lTA4Wh8o
+	+8joCLmxpXbPndJW3C09SLScuQFtR893jSO5CkS4QC6vKxNfF1PRy0H5N73krdkivCFkSLOP7NM
+	1yzYjQuyfmGvSMFKRXXiqxU8CiLQL43T9DBM4kDXw27noveVIV/P5VSXK/ccq8XRqeL6/KyBwx+
+	fnX0xS3SQFTArN2d/1g=
+X-Received: by 2002:a05:6000:2681:b0:4a7:dcc2:a36f with SMTP id ffacd0b85a97d-4aa5a2dc7bfmr67515855f8f.26.1795793511060;
+        Fri, 27 Nov 2026 07:31:51 -0800 (PST)
 Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bbab390cf5sm217781495e9.7.2026.11.27.07.31.46
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6a67fe75sm54912096f8f.24.2026.11.27.07.31.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 07:31:47 -0800 (PST)
+        Fri, 27 Nov 2026 07:31:50 -0800 (PST)
 From: Dan Carpenter <dan@pereq.eu>
-Date: Fri, 27 Nov 2026 18:31:38 +0300
-Subject: [PATCH 1/3] KVM: arm64: nv: Fix AT emulation for TCR2_EL1
+Date: Fri, 27 Nov 2026 18:31:39 +0300
+Subject: [PATCH 2/3] KVM: arm64: Load no-access permissions when S1PIE or
+ S1POE is hidden
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -93,7 +94,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261127-nv-tcr2-v3-v1-1-9c15c1cabe01@pereq.eu>
+Message-Id: <20261127-nv-tcr2-v3-v1-2-9c15c1cabe01@pereq.eu>
 References: <20261127-nv-tcr2-v3-v1-0-9c15c1cabe01@pereq.eu>
 In-Reply-To: <20261127-nv-tcr2-v3-v1-0-9c15c1cabe01@pereq.eu>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
@@ -109,198 +110,162 @@ Cc: Karthik Bhargavan <karthik@pereq.eu>,
  Dan Carpenter <dan@pereq.eu>, stable@vger.kernel.org
 X-Mailer: b4 0.16.0
 
-Arm provides an AT instruction that translates a virtual address the way
-the MMU would and returns the result.  We emulate this instruction by
-setting up the state and calling the actual AT instruction.  There is a
-bug in how the TCR2_EL1 permission bits are handled.
+A VMM can offer FEAT_TCR2 to a guest but hide FEAT_S1PIE or FEAT_S1POE,
+for example to keep the VM migratable.
 
-The TCR2_EL1 register has bits which turn on permission indirection (PIE)
-and permission overlays (POE).  When these bits are set, the AT
-instruction reads the permissions stored in permission registers PIR_EL1,
-PIRE0_EL1, POR_EL1 and POR_EL0.  If you have the right features and
-permissions then the return value from the AT instruction has bit that is
-0 if the access is allowed or 1 if it would fault.
+But the complication is that the guest can still write to the PIE, POE
+and E0POE bits in TCR2_EL1, and when those bits are set the CPU uses
+the permission registers.  So the guest runs with the permissions that
+another VM left in PIR_EL1, PIRE0_EL1 and POR_EL1, or with the VMM's
+POR_EL0.  By checking which accesses fault, the guest can work out
+another VM's permission settings.  This is a kind of small information
+leak.
 
-The bug is that the current code assumes that if the VM doesn't have
-the feature then the host doesn't have it either, and isn't necessarily
-true.  The host can have the features but disable them for a guest.  The
-way the current code is written, if the VM doesn't have the features then
-KVM doesn't bother to load the TCR2_EL1 or the permission registers, but
-uses whatever was left there previously.
+Currently, KVM doesn't save or load PIR_EL1, PIRE0_EL1, POR_EL1 and
+POR_EL0 for a guest where S1PIE or S1POE is hidden.  After this patch,
+KVM switches these registers whenever the CPU has the feature, even for
+a guest that doesn't have it: PIR_EL1, PIRE0_EL1 and POR_EL1 when the
+vcpu is loaded and put, and POR_EL0, which the VMM uses, on every guest
+entry and exit.  For a guest that doesn't have the feature, KVM loads 0
+instead of the guest's value.  A permission of 0 allows no access, so if
+the guest sets PIE, POE or E0POE anyway, the accesses all fault and the
+information leak is gone.
 
-The impact of this information leak is very small.  It's hard to imagine
-how knowing someone else's permission bits is useful to an attacker.
-Claude suggests that potentially two guests could set up a secret
-back channel where they communicate by flipping their permissions on and
-off.  :)
-
-Fix this by clearing the PIE and POE bits in effective_tcr2() when the
-VM doesn't have those features, and load the result into TCR2_EL1
-whenever the CPU has TCR2, not only when the VM has it.
-
-When the AT runs on the guest hypervisor's own registers, in
-__kvm_at_s1e2() and __kvm_at_s1e01_fast(), use the new load_guest_tcr2()
-function to load the guest's TCR2_EL2 for the AT and restore the
-original value afterwards.  If the VM doesn't have the PIE and POE
-features, those bits of TCR2_EL2 are RES0 because
-kvm_vcpu_apply_reg_masks() clears them.
-
-There is a closely related bug in __kvm_at_s1e01_fast().  Here the issue
-is that KVM is performing an AT command for a guest hypervisor but the
-POR_EL0 isn't loaded, so we use the VMM's.  This bug is triggered when
-the guest hypervisor runs with HCR_EL2.{E2H,TGE} = {1,1}.  Fix this by
-loading the guest's POR_EL0 before the AT and restoring the VMM's value
-afterwards.
-
-Fixes: 477e89cabb14 ("KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}")
-Fixes: 23e7a34c8397 ("KVM: arm64: Add AT fast-path support for S1PIE")
-Fixes: 846c993df982 ("KVM: arm64: Add POE save/restore for AT emulation fast-path")
+Fixes: 58627b722ee2 ("KVM: arm64: Make PIR{,E0}_EL1 UNDEF if S1PIE is not advertised to the guest")
+Fixes: b86c9bea6349 ("KVM: arm64: Save/restore POE registers")
 Cc: stable@vger.kernel.org
 Signed-off-by: Dan Carpenter <dan@pereq.eu>
 ---
-v3: Re-write commit message
-    Add a new fix for the guest's POR_EL0 when HCR_EL2.{E2H,TGE} = {1,1}
-    and add a new Fixes tag for that.
-
-    Btw, Marc the zeros in the load_guest_tcr2() don't come from the
-    reset value, they're actually set in tcr2_el2_feat_map[] so that
-    should re-assure you.  :)  Update that comment.
-
-v2: Restore the original TCR2 at the end as pointed out by Sashiko.
-    Cleanup the code based on Marc's review.
-    Clear the guest's TCR2 in effective_tcr2().
+v3: Load no-access permissions instead of trapping TCR_EL1 and TCR2_EL1
+    writes, as Marc suggested.  This also covers nested virtualization, so
+    the follow-up patch for it is gone.
 ---
- arch/arm64/kvm/at.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 52 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 40 ++++++++++++++++++++++--------
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 15 +++++++----
+ 2 files changed, 40 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 30d8f062b2c2..893bf88f2f75 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -91,11 +91,18 @@ static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 o
- static u64 effective_tcr2(struct kvm_vcpu *vcpu, enum trans_regime regime)
- {
- 	if (regime == TR_EL10) {
-+		u64 val;
-+
- 		if (vcpu_has_nv(vcpu) &&
- 		    !(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En))
- 			return 0;
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index 4a008c8a696b..ca9c2f6ae5da 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -17,6 +17,7 @@
+ #include <asm/kvm_mmu.h>
  
--		return vcpu_read_sys_reg(vcpu, TCR2_EL1);
-+		val = vcpu_read_sys_reg(vcpu, TCR2_EL1);
-+		if (!kvm_has_s1pie(vcpu->kvm))
-+			val &= ~TCR2_EL1_PIE;
-+		if (!kvm_has_s1poe(vcpu->kvm))
-+			val &= ~(TCR2_EL1_POE | TCR2_EL1_E0POE);
-+		return val;
- 	}
+ static inline bool ctxt_has_s1poe(struct kvm_cpu_context *ctxt);
++static inline u64 ctxt_s1poe_val(struct kvm_cpu_context *ctxt, u64 val);
+ static inline bool ctxt_has_accdata(struct kvm_cpu_context *ctxt);
  
- 	return vcpu_read_sys_reg(vcpu, TCR2_EL2);
-@@ -1384,6 +1391,23 @@ static int handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr, u64 *par)
- 	return 0;
+ static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
+@@ -60,7 +61,7 @@ static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+ 	*ctxt_mdscr_el1(ctxt)	= read_sysreg(mdscr_el1);
+ 
+ 	// POR_EL0 can affect uaccess, so must be saved/restored early.
+-	if (ctxt_has_s1poe(ctxt))
++	if (system_supports_poe())
+ 		ctxt_sys_reg(ctxt, POR_EL0)	= read_sysreg_s(SYS_POR_EL0);
+ }
+ 
+@@ -117,6 +118,21 @@ static inline bool ctxt_has_s1poe(struct kvm_cpu_context *ctxt)
+ 	return kvm_has_s1poe(kern_hyp_va(vcpu->kvm));
  }
  
 +/*
-+ * Load the guest's TCR2_EL2 and return the original TCR2 so we can restore
-+ * it after running the AT command.
++ * A guest can turn on TCR2_EL1.PIE, POE or E0POE even when the feature is
++ * hidden from it.  Give it permissions of 0, which allow no access, instead
++ * of whatever another context left in the registers.
 + */
-+static u64 load_guest_tcr2(struct kvm_vcpu *vcpu)
++static inline u64 ctxt_s1pie_val(struct kvm_cpu_context *ctxt, u64 val)
 +{
-+	u64 orig = read_sysreg_el1(SYS_TCR2);
-+
-+	/*
-+	 * TCR2 features are not always exposed to the guests.  If they
-+	 * aren't exposed then the bits are RES0.
-+	 */
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR2_EL2), SYS_TCR2);
-+
-+	return orig;
++	return ctxt_is_guest(ctxt) && !ctxt_has_s1pie(ctxt) ? 0 : val;
 +}
 +
- /*
-  * Return the PAR_EL1 value as the result of a valid translation.
-  *
-@@ -1397,7 +1421,9 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
++static inline u64 ctxt_s1poe_val(struct kvm_cpu_context *ctxt, u64 val)
++{
++	return ctxt_is_guest(ctxt) && !ctxt_has_s1poe(ctxt) ? 0 : val;
++}
++
+ static inline bool ctxt_has_ras(struct kvm_cpu_context *ctxt)
  {
- 	struct mmu_config config;
- 	struct kvm_s2_mmu *mmu;
-+	bool swap_tcr2 = false, swap_por_el0 = false;
- 	bool fail, mmu_cs;
-+	u64 orig_tcr2, orig_por_el0;
- 	u64 par;
+ 	struct kvm_vcpu *vcpu;
+@@ -161,12 +177,12 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ 	if (ctxt_has_tcrx(ctxt)) {
+ 		ctxt_sys_reg(ctxt, TCR2_EL1)	= read_sysreg_el1(SYS_TCR2);
  
- 	par = SYS_PAR_EL1_F;
-@@ -1437,8 +1463,9 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TTBR1_EL1),	SYS_TTBR1);
- 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR_EL1),	SYS_TCR);
- 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, MAIR_EL1),	SYS_MAIR);
-+	if (cpus_have_final_cap(ARM64_HAS_TCR2))
-+		write_sysreg_el1(effective_tcr2(vcpu, TR_EL10), SYS_TCR2);
- 	if (kvm_has_tcr2(vcpu->kvm)) {
--		write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR2_EL1), SYS_TCR2);
- 		if (kvm_has_s1pie(vcpu->kvm)) {
- 			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIR_EL1), SYS_PIR);
- 			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIRE0_EL1), SYS_PIRE0);
-@@ -1452,6 +1479,17 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	__load_stage2(mmu);
+-		if (ctxt_has_s1pie(ctxt)) {
++		if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
+ 			ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
+ 			ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
+ 		}
  
- skip_mmu_switch:
-+	if (!mmu_cs && vcpu_has_nv(vcpu) &&
-+	    cpus_have_final_cap(ARM64_HAS_TCR2)) {
-+		swap_tcr2 = true;
-+		orig_tcr2 = load_guest_tcr2(vcpu);
-+	}
-+	if (!mmu_cs && vcpu_has_nv(vcpu) && kvm_has_s1poe(vcpu->kvm)) {
-+		swap_por_el0 = true;
-+		orig_por_el0 = read_sysreg_s(SYS_POR_EL0);
-+		write_sysreg_s(vcpu_read_sys_reg(vcpu, POR_EL0), SYS_POR_EL0);
-+	}
-+
- 	/* Temporarily switch back to guest context */
- 	write_sysreg_hcr(vcpu->arch.hcr_el2);
- 	isb();
-@@ -1485,6 +1523,11 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	if (!fail)
- 		par = read_sysreg_par();
- 
-+	if (swap_tcr2)
-+		write_sysreg_el1(orig_tcr2, SYS_TCR2);
-+	if (swap_por_el0)
-+		write_sysreg_s(orig_por_el0, SYS_POR_EL0);
-+
- 	write_sysreg_hcr(HCR_HOST_VHE_FLAGS);
- 
- 	if (mmu_cs)
-@@ -1544,7 +1587,7 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	 * switching context behind everybody's back, disable interrupts...
- 	 */
- 	scoped_guard(write_lock_irqsave, &vcpu->kvm->mmu_lock) {
--		u64 val, hcr;
-+		u64 val, hcr, orig_tcr2;
- 		bool fail;
- 
- 		val = hcr = read_sysreg(hcr_el2);
-@@ -1554,6 +1597,9 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		if (!vcpu_el2_e2h_is_set(vcpu))
- 			val |= HCR_EL2_NV | HCR_EL2_NV1;
- 
-+		if (cpus_have_final_cap(ARM64_HAS_TCR2))
-+			orig_tcr2 = load_guest_tcr2(vcpu);
-+
- 		write_sysreg_hcr(val);
- 		isb();
- 
-@@ -1577,6 +1623,9 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		if (!fail)
- 			par = read_sysreg_par();
- 
-+		if (cpus_have_final_cap(ARM64_HAS_TCR2))
-+			write_sysreg_el1(orig_tcr2, SYS_TCR2);
-+
- 		write_sysreg_hcr(hcr);
- 		isb();
+-		if (ctxt_has_s1poe(ctxt))
++		if (system_supports_poe())
+ 			ctxt_sys_reg(ctxt, POR_EL1)	= read_sysreg_el1(SYS_POR);
  	}
+ 	ctxt_sys_reg(ctxt, ESR_EL1)	= read_sysreg_el1(SYS_ESR);
+@@ -222,8 +238,9 @@ static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg(*ctxt_mdscr_el1(ctxt),  mdscr_el1);
+ 
+ 	// POR_EL0 can affect uaccess, so must be saved/restored early.
+-	if (ctxt_has_s1poe(ctxt))
+-		write_sysreg_s(ctxt_sys_reg(ctxt, POR_EL0),	SYS_POR_EL0);
++	if (system_supports_poe())
++		write_sysreg_s(ctxt_s1poe_val(ctxt, ctxt_sys_reg(ctxt, POR_EL0)),
++			       SYS_POR_EL0);
+ }
+ 
+ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
+@@ -263,13 +280,16 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
+ 	if (ctxt_has_tcrx(ctxt)) {
+ 		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR2_EL1),	SYS_TCR2);
+ 
+-		if (ctxt_has_s1pie(ctxt)) {
+-			write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
+-			write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
++		if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
++			write_sysreg_el1(ctxt_s1pie_val(ctxt, ctxt_sys_reg(ctxt, PIR_EL1)),
++					 SYS_PIR);
++			write_sysreg_el1(ctxt_s1pie_val(ctxt, ctxt_sys_reg(ctxt, PIRE0_EL1)),
++					 SYS_PIRE0);
+ 		}
+ 
+-		if (ctxt_has_s1poe(ctxt))
+-			write_sysreg_el1(ctxt_sys_reg(ctxt, POR_EL1),	SYS_POR);
++		if (system_supports_poe())
++			write_sysreg_el1(ctxt_s1poe_val(ctxt, ctxt_sys_reg(ctxt, POR_EL1)),
++					 SYS_POR);
+ 	}
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, ESR_EL1),	SYS_ESR);
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR0_EL1),	SYS_AFSR0);
+diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+index 0c4ef1ce32ae..b06d85cb085a 100644
+--- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+@@ -133,15 +133,20 @@ static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	if (ctxt_has_tcrx(&vcpu->arch.ctxt)) {
++		struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
++
+ 		write_sysreg_el1(__vcpu_sys_reg(vcpu, TCR2_EL2), SYS_TCR2);
+ 
+-		if (ctxt_has_s1pie(&vcpu->arch.ctxt)) {
+-			write_sysreg_el1(__vcpu_sys_reg(vcpu, PIR_EL2), SYS_PIR);
+-			write_sysreg_el1(__vcpu_sys_reg(vcpu, PIRE0_EL2), SYS_PIRE0);
++		if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
++			write_sysreg_el1(ctxt_s1pie_val(ctxt, __vcpu_sys_reg(vcpu, PIR_EL2)),
++					 SYS_PIR);
++			write_sysreg_el1(ctxt_s1pie_val(ctxt, __vcpu_sys_reg(vcpu, PIRE0_EL2)),
++					 SYS_PIRE0);
+ 		}
+ 
+-		if (ctxt_has_s1poe(&vcpu->arch.ctxt))
+-			write_sysreg_el1(__vcpu_sys_reg(vcpu, POR_EL2), SYS_POR);
++		if (system_supports_poe())
++			write_sysreg_el1(ctxt_s1poe_val(ctxt, __vcpu_sys_reg(vcpu, POR_EL2)),
++					 SYS_POR);
+ 	}
+ 
+ 	write_sysreg_el1(__vcpu_sys_reg(vcpu, ESR_EL2),		SYS_ESR);
 
 -- 
 2.53.0
