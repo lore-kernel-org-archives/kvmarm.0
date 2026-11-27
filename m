@@ -1,78 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=139.138.36.223
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=68.232.139.117
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795757854;
-	b=w/v5K2IdyDuX9QF9rdVJEV4eL6zwEvXU1FRMws6FXB5Ja+l42bUbo6AyUyJ75QHTubzG
-	 46BLkr6w7x14imxpWVXgDickpXtZafQwfGf2KaVVUFhXZPmkhs1dsvtduZXfNaMF/GVbD
-	 8TZF/gfdc354MM1C9j5UrgL6Olr6t/apvD7Xf2VwpV++i/rG5JPWKo60ExcAfmP7v+6+N
-	 jCb3w6qfoIMIPM+6GpmWT4iEAHnhAlPMk0d5gtapF9C6Q7K1ybE9j0JVFR8LHs6tyXt/W
-	 0l1wJRzxVESxUFvXrhjAGLD+MPj6IPE7uJpS4UE+eCPA2kwAaRghtry5lnh1gcqLk0g==
+	t=1795757868;
+	b=ZaXjK/YUIE1xZh+w+eNWZf2nbQ1JCpuPlJ5a9C+efkYdljdKW7LQeVJ1tVc/UwW8u3c4
+	 +0tNbLbGdWLuMKAhkwQGn/l8CvpFK+5MAV9ZFVmqKd9q2GTitB988Q0Uu3Wf2LOm4SPsi
+	 DkKQVcbaP4YB9PqOeaBbbvmDf8cISzFkC6WDraWkaoqd5F/oWoZKJ9uo0IXN80ND33Qyq
+	 PhFpPy9WxjRPdNKl8IHZ5mqEyn2PmNW/zuhu+Tuk0oAFEN1F/X04j1B4c/+dh0gVm0Lf/
+	 NxvJnLZVrF0F/Jz27I23zbi1OWJBCbpW4J7dmbbc/iBjSp1jdjTiOqD8tOcIa5//pLA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795757854;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795757868;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:Received:Received:Received:From:
 	 Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key;
-	bh=JPhQEI9frtB4q1Dy2GrCVUf3Smezhd3saqs/6akCHv4=;
-	b=OG1oOLACVaSKAIkSu3AY9ezIPvxn+pGt6DmIFk9B6RK0YI/NFpzrYnGh1WL0qykAnr25
-	 1E93pjPmrrpP58nUVudXoPJ7rBq2uKJWfmQL0f6wGJopN2W52XBrv+hHSAA0URtH498a3
-	 N5iuuMVaPGsv43oFskbeUgUEoQazMkryzkqh1c92z59JJJAsewWufVW4vaLcESfZM6BAX
-	 eJ4yDrcPsGWITIs5qX9Ts9UR+BTFkVEiTNolmbZsnVWEQ8oudWFr3IPELUpqCVwRUFcnR
-	 /k745GGFNHElm5lerwTDdQhR8aSyxKoIa0n1mQ843rp/Jtv6hwwyUFf11YMCEnw6bLg==
+	bh=GcwOmZOhg86jI0lRAL6VRDDi7N2nNyA6lCcyVCLLrs8=;
+	b=E/KiAPhBRUwHPQxyQA0Ux1aHyO+UoMTifl75bIHGPem21qIRo9/Mzgh7BtjeQeigktSQ
+	 Lc4o2pp/7sBclQeDFNC6ciVnGKmoXEWjyrRR+PbQZLvXpa6/8sihjMgms55srghcsbaUJ
+	 rLtPY4UlS0ev1mpJ0ojqUIxISYbv/DRAb0Q74U3iBx96S1sSf6ZfddE0xqr30iorTbAE4
+	 GXPcsgEVYp+RSDq39abgsVXPNYBspxUi1Sf3z6SzmKyV3aiKh1kJDUymD7oyWw9xk6rQe
+	 Ooh7Y/gqIo5LXK/SPqik+zwufQ4EPxZSiSEM9+j3SeVcr/e2Rqvk7tT4FAU61OqN21A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=fujitsu.com;
 	spf=pass smtp.mailfrom=fujitsu.com;
-	dkim=pass header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=rPT9X2fF;
-	arc=none smtp.remote-ip=139.138.36.223
-Received: from esa9.hc1455-7.c3s2.iphmx.com (esa9.hc1455-7.c3s2.iphmx.com [139.138.36.223])
+	dkim=pass header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=marBrmv7;
+	arc=none smtp.remote-ip=68.232.139.117
+Received: from esa4.hc1455-7.c3s2.iphmx.com (esa4.hc1455-7.c3s2.iphmx.com [68.232.139.117])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E35606A332
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 05:37:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E6E35606A332
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BEC606A323
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 05:37:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 38BEC606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=rPT9X2fF
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=marBrmv7
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1795757854; x=1827293854;
+  t=1795757867; x=1827293867;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=fzn0m2Y9zbD6PJz9nHijaT4lZZ91hzz4BOhR03gov3k=;
-  b=rPT9X2fFPOHgD+PzGJXtzgA8H7NgoADHW8BIi4gMIuCKvGif9i4hka7o
-   jnYKJVbaNKLgA7Jw/tgxJ6MN/HJE7BxgrFcNUiFAAALS/nJeHhwQ9oi7Z
-   Epq42gCQ3dUKbgD/bCKo2ykpy2xX4XYpuRmDwynHfv9mXA2Tah5+JNewv
-   BBhdACMtmTG7gKbDqdyC/D61bb0Lf84s2ySP5n/TD0VEhNQ8JBmXB2hxB
-   ohl/Sl9cy3qkaOGKKvnHKpk+3J/b3seMXGe56akqY2SVfmfZ3PlcG5XBH
-   02WAyhoVhNfhyDOmeNbu/iTaXaW8o3MC+8dQS6lqyqxU/SfGz+Y9lLQAk
-   w==;
-X-CSE-ConnectionGUID: WQ95D163RxuFHhH8dFHodg==
-X-CSE-MsgGUID: DhTngBBTRg27gLxs6LilXQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11978"; a="250860252"
+  bh=njt+3iaAfTIgJguhwrDXASiiKgJTF4wH2ZIbGB+ON1k=;
+  b=marBrmv7JEe7KmoYLAmNI2sTch+lQKBZNsq7VY+AllPUW2MLGvVFWnBa
+   7K/iuO/FUiF20Su/nm4yL1d6eg34VmQLIIvU0toEEKg/xJBDzefL3WOAq
+   P9W6oGaqppQERjZO9LO67QLgUypaZP6/HvJVSpvV1mDATGPaksL+mGYHT
+   jHljR3zPjjTSaGRO7JIupCmf70RsCg2fbCIT+s2y2p/JeGeS7/g3Q1n+b
+   UDmU/x+UO1QjmwRHgDzrT6zg8MN+CdDFJUi8ifIJttLOZ3/8axwjA/tpR
+   rQD2O/tJidI/mJkDfQ8yImHftZSqTkNzCnIk4dUZnpV+OAtXc0tONL2ax
+   Q==;
+X-CSE-ConnectionGUID: cGFRYaC6TMeSsC6x21nsZg==
+X-CSE-MsgGUID: qIFtj6jXT0OY3lMbY51rkg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11978"; a="262847562"
 X-IronPort-AV: E=Sophos;i="6.27,236,1786978800"; 
-   d="scan'208";a="250860252"
-Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa9.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2026 14:37:32 +0900
-Received: from az2uksmgm4.o.css.fujitsu.com (unknown [10.151.22.201])
+   d="scan'208";a="262847562"
+Received: from gmgwnl01.global.fujitsu.com (HELO mgmgwnl01.global.fujitsu.com) ([52.143.17.124])
+  by esa4.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2026 14:37:39 +0900
+Received: from az2nlsmgm3.fujitsu.com (unknown [10.150.26.205])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 768098317F8
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 05:37:32 +0000 (UTC)
+	by mgmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id A48E933E3
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 05:37:39 +0000 (UTC)
 Received: from az2uksmom4.o.css.fujitsu.com (unknown [10.151.22.204])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by az2uksmgm4.o.css.fujitsu.com (Postfix) with ESMTPS id 2A4751400625
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 05:37:32 +0000 (UTC)
+	by az2nlsmgm3.fujitsu.com (Postfix) with ESMTPS id 5526B18026DC
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 05:37:39 +0000 (UTC)
 Received: from [127.0.1.1] (unknown [10.124.178.20])
-	by az2uksmom4.o.css.fujitsu.com (Postfix) with ESMTP id BA87D40262B;
-	Fri, 27 Nov 2026 05:37:24 +0000 (UTC)
+	by az2uksmom4.o.css.fujitsu.com (Postfix) with ESMTP id D293C4045EE;
+	Fri, 27 Nov 2026 05:37:31 +0000 (UTC)
 From: Tomohiro Misono <misono.tomohiro@fujitsu.com>
-Date: Fri, 27 Nov 2026 14:36:32 +0900
-Subject: [PATCH v4 3/5] perf: arm_pmu: Add workaround for FUJITSU-MONAKA
- Erratum E#030002
+Date: Fri, 27 Nov 2026 14:36:33 +0900
+Subject: [PATCH v4 4/5] irqchip/gicv3: Add workaround for FUJITSU-MONAKA
+ Erratum E#030003
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -84,7 +84,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261127-monaka-fix-for-upstream-v4-3-3395c415bbe4@fujitsu.com>
+Message-Id: <20261127-monaka-fix-for-upstream-v4-4-3395c415bbe4@fujitsu.com>
 References: <20261127-monaka-fix-for-upstream-v4-0-3395c415bbe4@fujitsu.com>
 In-Reply-To: <20261127-monaka-fix-for-upstream-v4-0-3395c415bbe4@fujitsu.com>
 To: Tomohiro Misono <misono.tomohiro@fujitsu.com>, 
@@ -103,162 +103,148 @@ Cc: Kohei Enju <enju.kohei@fujitsu.com>,
  linux-doc@vger.kernel.org, linux-perf-users@vger.kernel.org, 
  kvmarm@lists.linux.dev
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1795757822; l=6405;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795757822; l=5445;
  i=misono.tomohiro@fujitsu.com; s=20261002; h=from:subject:message-id;
- bh=fzn0m2Y9zbD6PJz9nHijaT4lZZ91hzz4BOhR03gov3k=;
- b=pQN0YRwT/DIz0WsXrZxlQA+PWskrISVPrV1qBaecvyNeOYSD+Emym9n9ZskRz7YIgWc/Y0sMV
- Q+tMiwNuX31AQS2D5fTL/D+clAQgrN7dHPYUQUVXZ5Dil1BrUaFFNTo
+ bh=AO0SHHOsMFpPJAvVfyvDbNvFFD/5lyT+73Egw7EYZus=;
+ b=MoJMUgSq8ZSoPQ6LJVnl+zjtInKqgmzrK7igsHbtw0vapePHEGNvI2mXI6dXO7tjHaDWSt+8v
+ zrIH0ndA+pQDH9HZHPCcOAtN9lHzIcrKQFkfYfUWJd5fivMh01KRuZO
 X-Developer-Key: i=misono.tomohiro@fujitsu.com; a=ed25519;
  pk=VLRxj5y4GJrHLmj3e2NBg30fX2U//ydi7c2G2qiNo10=
 
-FUJITSU-MONAKA Erratum E#030002 affects FUJITSU-MONAKA CPU.
+From: Kohei Enju <enju.kohei@fujitsu.com>
 
-On affected FUJITSU-MONAKA CPUs, after a PMU event counter is
-stopped at a value just before overflow, an overflow might still
-be incorrectly detected, resulting interrupt storm in some case.
+On affected FUJITSU-MONAKA CPUs, the erratum may occur when an SGI is
+generated by writing to ICC_SGI0R_EL1, ICC_SGI1R_EL1, or ICC_ASGI1R_EL1,
+if the operation races with CPU interface processing triggered by the
+arrival of a higher-priority interrupt, an update to a pending
+interrupt, or a transition of the PE to the Sleep state. When the
+erratum occurs, the SGI is lost and the system register write does not
+complete, causing the issuing core to hang.
 
-For example, if the following conditions are met:
-  1) Running perf to count an event in user space only
-  2) The event can also occur in kernel space
-  3) The counter value is set just before the overflow
-     (when using the -F option, initial counter value is -1)
+Guest accesses to these registers are not affected by this erratum, as
+they are trapped to EL2 and handled without issuing the affected system
+register write.
 
-when the kernel is about to return to user space after enabling
-the count, an overflow interrupt is incorrectly triggered by an
-event that occurred in kernel space. Since the counter value is
-not updated (correctly), the interrupt handler does nothing and
-returns with the same condition. This leads to another wrong interrupt
-and results in an interrupt storm and eventually a softlockup.
+Work around the erratum by writing 1 to the bit corresponding to the
+target SGI INTID in GICR_ISPENDR0 of each target PE's GIC Redistributor,
+instead of writing to the affected system registers.
 
-Work around the erratum by avoiding programming PMU event counters
-with values within 7 counts of overflow because the counter
-can increase up to 7 at a time.
+Accessing a target PE's GICR_ISPENDR0 requires its Redistributor base to
+have been discovered. Affected platforms conform to SBBR, which requires
+PSCI for secondary CPU boot. They therefore do not use the ACPI Parking
+protocol, which sends an IPI before the secondary CPU has initialized
+its Redistributor. With PSCI, a secondary CPU discovers its
+Redistributor before becoming an IPI target.
 
+Signed-off-by: Kohei Enju <enju.kohei@fujitsu.com>
 Signed-off-by: Tomohiro Misono <misono.tomohiro@fujitsu.com>
-
 ---
 Changes in v4:
- - Update minor wording. No code change
+- Fix unused variable 'gic_fujitsu_030003_erratum' warning.
+
 Changes in v3:
- - Use ERRATA_MIDR_ALL_VERSIONS macro
- - Correct the maximum number of increments at a time from 5 to 7,
-   since it was found that micro-op fusion can increase the number
-   of evetns counted at a time for certain events.
+- Remove the unnecessary DSB after writes to GICR_ISPENDR0.
+- Fix build issue when CONFIG_ARM=y.
+- Add an SoB of Tomohiro.
+
+Changes in v2:
+- Clarify the erratum description and document that virtual accesses are
+  unaffected.
+- Remove the gic_send_sgi_via_rdist() helper.
+- Remove the write-count rationale.
+- Use the CPU MIDR instead of the SoC ID for filtering.
 ---
  Documentation/arch/arm64/silicon-errata.rst |  2 ++
- arch/arm64/Kconfig                          | 18 ++++++++++++++++++
- arch/arm64/include/asm/cpucaps.h            |  2 ++
- arch/arm64/kernel/cpu_errata.c              |  7 +++++++
- arch/arm64/tools/cpucaps                    |  1 +
- drivers/perf/arm_pmu.c                      | 13 +++++++++++++
- 6 files changed, 43 insertions(+)
+ drivers/irqchip/irq-gic-v3.c                | 35 +++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+)
 
 diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
-index 751f478a71b7..01db1b906ba4 100644
+index 01db1b906ba4..e6bbc54208b1 100644
 --- a/Documentation/arch/arm64/silicon-errata.rst
 +++ b/Documentation/arch/arm64/silicon-errata.rst
-@@ -401,6 +401,8 @@ stable kernels.
+@@ -403,6 +403,8 @@ stable kernels.
  +----------------+-----------------+-----------------+-----------------------------+
- | Fujitsu        | MONAKA          | E#030001        | FUJITSU_ERRATUM_030001      |
+ | Fujitsu        | MONAKA          | E#030002        | FUJITSU_ERRATUM_030002      |
  +----------------+-----------------+-----------------+-----------------------------+
-+| Fujitsu        | MONAKA          | E#030002        | FUJITSU_ERRATUM_030002      |
++| Fujitsu        | MONAKA GICv3/v4 | E#030003        | N/A                         |
 ++----------------+-----------------+-----------------+-----------------------------+
  +----------------+-----------------+-----------------+-----------------------------+
  | ASR            | ASR8601         | #8601001        | N/A                         |
  +----------------+-----------------+-----------------+-----------------------------+
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 8a0c94a0c879..2f195da6dd1c 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1402,6 +1402,24 @@ config FUJITSU_ERRATUM_030001
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index 94873646d46f..c28447966158 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -80,6 +80,8 @@ static DEFINE_STATIC_KEY_FALSE(gic_nvidia_t241_erratum);
  
- 	  If unsure, say Y.
+ static DEFINE_STATIC_KEY_FALSE(gic_arm64_2941627_erratum);
  
-+config FUJITSU_ERRATUM_030002
-+	bool "FUJITSU-MONAKA erratum E#030002: PMU overflow may be incorrectly detected"
-+	depends on ARM_PMUV3
-+	default y
-+	help
-+	  This option adds a workaround for FUJITSU-MONAKA erratum E#030002.
-+	  On affected FUJITSU-MONAKA CPUs, after a PMU event counter is
-+	  stopped at a value just before overflow, an overflow might still
-+	  be incorrectly detected, resulting interrupt storm in some case.
++static __maybe_unused DEFINE_STATIC_KEY_FALSE(gic_fujitsu_030003_erratum);
 +
-+	  Work around the erratum by avoiding programming PMU event counters
-+	  with values within 7 counts of overflow because the counter
-+	  can increase up to 7 at a time.
-+
-+	  The workaround only affects the FUJITSU-MONAKA.
-+
-+	  If unsure, say Y.
-+
- config HISILICON_ERRATUM_161600802
- 	bool "Hip07 161600802: Erroneous redistributor VLPI base"
- 	default y
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 7c73a739eee1..f4aa6bd257c5 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -70,6 +70,8 @@ cpucap_is_possible(const unsigned int cap)
- 		return IS_ENABLED(CONFIG_NXP_IMX8QM_ERRATUM_ERR050104);
- 	case ARM64_WORKAROUND_FUJITSU_030001:
- 		return IS_ENABLED(CONFIG_FUJITSU_ERRATUM_030001);
-+	case ARM64_WORKAROUND_FUJITSU_030002:
-+		return IS_ENABLED(CONFIG_FUJITSU_ERRATUM_030002);
- 	case ARM64_MPAM:
- 		/*
- 		 * KVM MPAM support doesn't rely on the host kernel supporting MPAM.
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index c8a0ea73ec1a..37bbe8268499 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -1102,6 +1102,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 		.capability = ARM64_WORKAROUND_FUJITSU_030001,
- 		ERRATA_MIDR_ALL_VERSIONS(MIDR_FUJITSU_MONAKA),
- 	},
-+#endif
-+#ifdef CONFIG_FUJITSU_ERRATUM_030002
-+	{
-+		.desc = "FUJITSU-MONAKA Erratum E#030002",
-+		.capability = ARM64_WORKAROUND_FUJITSU_030002,
-+		ERRATA_MIDR_ALL_VERSIONS(MIDR_FUJITSU_MONAKA),
-+	},
- #endif
- 	{
- 		.desc = "Known broken GICv3 SEIS implementation",
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 1a199502614d..73a4aeb535a0 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -135,3 +135,4 @@ WORKAROUND_SPECULATIVE_UNPRIV_LOAD
- WORKAROUND_BROKEN_AMU_CONSTCNT
- WORKAROUND_BROKEN_AMU_CORECNT
- WORKAROUND_FUJITSU_030001
-+WORKAROUND_FUJITSU_030002
-diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
-index 115069565389..bbf9f3a52adf 100644
---- a/drivers/perf/arm_pmu.c
-+++ b/drivers/perf/arm_pmu.c
-@@ -234,6 +234,19 @@ int armpmu_event_set_period(struct perf_event *event)
- 	if (left > (max_period >> 1))
- 		left = (max_period >> 1);
+ static struct gic_chip_data gic_data __read_mostly;
+ static DEFINE_STATIC_KEY_TRUE(supports_deactivate_key);
  
-+#if IS_ENABLED(CONFIG_ARM64)
-+	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_FUJITSU_030002)) {
-+		/*
-+		 * Due to the errata, overflow might be incorrectly detected in the handler
-+		 * when the counter is about to overflow in a single increment, resulting
-+		 * interrupt storm in some case. As the counter can increase by up to
-+		 * 7 at a time, set 8 here to prevent the condition.
-+		 */
-+		if (left > 0 && left < 8)
-+			left = 8;
+@@ -240,6 +242,9 @@ static DEFINE_PER_CPU(bool, has_rss);
+ #define gic_data_rdist()		(this_cpu_ptr(gic_data.rdists.rdist))
+ #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+ #define gic_data_rdist_sgi_base()	(gic_data_rdist_rd_base() + SZ_64K)
++#define gic_data_rdist_cpu(cpu)		(per_cpu_ptr(gic_data.rdists.rdist, cpu))
++#define gic_data_rdist_rd_base_cpu(cpu)	(gic_data_rdist_cpu(cpu)->rd_base)
++#define gic_data_rdist_sgi_base_cpu(cpu)	(gic_data_rdist_rd_base_cpu(cpu) + SZ_64K)
+ 
+ /* Our default, arbitrary priority value. Linux only uses one anyway. */
+ #define DEFAULT_PMR_VALUE	0xf0
+@@ -1388,6 +1393,16 @@ static void gic_ipi_send_mask(struct irq_data *d, const struct cpumask *mask)
+ 	 */
+ 	dsb(ishst);
+ 
++	if (static_branch_unlikely(&gic_fujitsu_030003_erratum)) {
++		for_each_cpu(cpu, mask) {
++			void __iomem *base = gic_data_rdist_sgi_base_cpu(cpu);
++
++			writel_relaxed(BIT(d->hwirq), base + GICR_ISPENDR0);
++		}
++
++		return;
 +	}
++
+ 	for_each_cpu(cpu, mask) {
+ 		u64 cluster_id = MPIDR_TO_SGI_CLUSTER_ID(gic_cpu_to_affinity(cpu));
+ 		u16 tlist;
+@@ -1874,6 +1889,18 @@ static bool gic_enable_quirk_rk3399(void *data)
+ 	return false;
+ }
+ 
++#ifdef CONFIG_ARM64
++static bool gic_enable_quirk_fujitsu_030003(void *data)
++{
++	if (read_cpuid_implementor() != ARM_CPU_IMP_FUJITSU ||
++	    read_cpuid_part_number() != FUJITSU_CPU_PART_MONAKA)
++		return false;
++
++	static_branch_enable(&gic_fujitsu_030003_erratum);
++	return true;
++}
 +#endif
 +
- 	local64_set(&hwc->prev_count, (u64)-left);
- 
- 	armpmu->write_counter(event, (u64)(-left) & max_period);
+ static bool rd_set_non_coherent(void *data)
+ {
+ 	struct gic_chip_data *d = data;
+@@ -1954,6 +1981,14 @@ static const struct gic_quirk gic_quirks[] = {
+ 		.mask	= 0xff000fff,
+ 		.init	= gic_enable_quirk_rk3399,
+ 	},
++#ifdef CONFIG_ARM64
++	{
++		.desc	= "GICv3: FUJITSU-MONAKA Erratum E#030003",
++		.iidr	= 0x0403043b,
++		.mask	= 0xffffffff,
++		.init	= gic_enable_quirk_fujitsu_030003,
++	},
++#endif
+ 	{
+ 	}
+ };
 
 -- 
 2.43.0
