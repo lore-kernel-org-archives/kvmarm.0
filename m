@@ -1,60 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795800416;
-	b=IJZUUsJJVnw2sT0CXMsPonah/LspkyIvRTY10syqngKx/nav3E7y5dxABPWfMdqgTZCM
-	 ZWLxiSus/xLV1AWDkElg3GSnt4VApGBUeEAm1E8rFaIRKfTd0lhfJbTXNGNEeRv6ZkQXU
-	 sza2vVZNVp/LfRQPbl+TC27lN77j0IVL52AXuG7kOyCuGgKmiwrl9oNvp/nkF3xZzAtF1
-	 e4dbVkd4jL/KEtqpYJDpSTbYDgpw1TZZV6pksHN+5qQgvfS64ofw3PztOK00K00DC+JQ4
-	 dbQaccgfCJ4f6mM7gTkZnOURbd/8iGXFLmS0cCReWrt6P8v6shYdcBNROa2d5PaXTww==
+	t=1795801966;
+	b=AYjX01ShLtswkrHiDKLwbhqwW6Le6zjM/BbDIhHMqjvHteumj51Y8lxptqnPzB/kQles
+	 OEYETKgesgaQRgVa1KqKkoaxtX89QD/uhbZjX+3o31higqkBbbsj4odv6QGBIyKrcC09p
+	 ZwdRXUHaOwLBWl6kdRmRHKLAB7F4WzT0G3WevgYPDCXh7+YrwD1cDOhefBZjgi6Ss/KXC
+	 CUyZ6/DtkdgBJXM6uoVydyPWlKOY1jw6rPQsnZ3PJJeWGN98/UfIjU00AWVGcrs6/v1Zh
+	 HAzwERlPbZsh1qKgiK/es26CIFF4lcWlPaig6bXWmQzBuXuuavb0nCu3PV9ERdVZc/w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795800416;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=0XmBI/vsqTPBFjciFZ00jSFFbSfcYJDZA86bCCNbmx4=;
-	b=hzCA+/orQXi+pKPklQtyJRVmBoIJB36p58pXW+vkHpYLYvfMKaDDPUteqROwfiNQxexg
-	 fq20A4RZIlLH450usiajBYiL1hhaPUbSsla1zudHTumnAgYfH0HBRd/7mE7gPAjwwg+pB
-	 dMTNWowz0H2CZLsWpsVcsZH8Eu/HsXF7bybvdzibSnyVlyk4WA63DlR4dru1SY7ZKsTdn
-	 odGKOqz9D9/afzv0gtZtcuOd9nUeUPT1+u028zdG5SzVlSTKc6j/FLBHZhDz/I2ezJgz5
-	 n/RYY3+F70UA87JRPn8Jp4YjxO1R/5P5AbEf03LWMP+UyqfjBbmLhG6kA+rGE5TwWXw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795801966;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer;
+	bh=HrpoliOMKq3aKEsYDXSMctB2Gs1JdFSq0O+s/fh27WY=;
+	b=FRXyoSGMrwlK1tpLOq8CK86iR7i0skncUEMl8LheA4ixcttsxJlfqJNeS0Cbi39o0zgg
+	 D11qgKHYxzUh2NuTI4YFWJga06bDuZ45O8Czp/P4PC7O9nR8IjsccbPHUhT8OffKSCgK2
+	 I6Ld4EoF39low8rPp27WZ5olRp2OPGTcDb30eUr7rwz7kYLUy9VYUJ9ZN7nBzCN3XOFyK
+	 JOtBh/GqhJ7ODf9QKSamFFRjlZvirzvr/rxw2J9MLgJtkxo+DeGyrLnLgX08757MBto4H
+	 ZPqqQOXwTc4Fypv3UIeEx/lv/LF9jbWvxatfDsFVQRenNh4qfIT+RPINngIuCkUgSGg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hAeX8wcz;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=pereq.eu;
+	spf=pass smtp.mailfrom=cryspen.com;
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=G09ZMXNc;
+	arc=none smtp.remote-ip=209.85.128.52
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DD5606A31F;
-	Fri, 27 Nov 2026 17:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1737D606A31E
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 17:52:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1737D606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hAeX8wcz
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 996B61F00899;
-	Fri, 27 Nov 2026 17:26:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795800415;
-	bh=0XmBI/vsqTPBFjciFZ00jSFFbSfcYJDZA86bCCNbmx4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hAeX8wczzScMlEi3kseFTivVf002FWoibXkMKuLG6apA2bRnJyiRirF5XbENTHJDp
-	 0x6ugFO3kD0HQzi3PtEw7kD20tOU2MDWYPDxSjhTAD2gZ8EqsSR2g9EAk+FsL2kiDy
-	 TZ1heB+nrzY+3cwOvy0TCS0afFYTdANPqm7LIu//Z1TZaK5oUXQ+ippkqyqynlQKRO
-	 PGQXOjOCEE1GkIQEiIyfpBvA5w4PolyCkmXNCsTfNj6edRzylITYCv5tBdxU5EYxOn
-	 B8bP4MOti4xv6qTcxcx/QnFGAKuL1NkuxFnkgsFMWDdRss1C4TXJnY+oCJ0T+I2Mt5
-	 J6lEthLHAmaGA==
-Date: Fri, 27 Nov 2026 17:26:47 +0000
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Usama Arif <usama.arif@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Christoffer Dall <christoffer.dall@linaro.org>, Jintack Lim <jintack.lim@linaro.org>, 
-	Leonardo Bras <leo.bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Top up the mmu memcache on user fault for NV
-Message-ID: <awm5PZYWxVOXdBfm@gremlin>
-References: <20261126-fix-nv-cache-topup-v1-1-a22c936872fe@kernel.org>
- <20261127152237.108363-1-usama.arif@linux.dev>
+	dkim=pass (2048-bit key, unprotected) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=G09ZMXNc
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4bb77a462c6so67432685e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 09:52:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pereq.eu; s=google; t=1795801964; x=1796406764; darn=lists.linux.dev;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=HrpoliOMKq3aKEsYDXSMctB2Gs1JdFSq0O+s/fh27WY=;
+        b=G09ZMXNcfzuLdvM9Bwm/7zB4J+8hsw/HZaAUxwb4gK1ncQajRw46fvikY/N+LSfiS5
+         w93z5V+XhSED1Ws7h2lwyq/VDipQI7uR/7WU3dJvATNId52+gsaMiIpfHFavXrLGmzt8
+         2OygqMgQdOtFid9iRATf9MLMoZiBqCjAQ/NF7CYQg+wLx/Y2xgcssEu7FncTYIjBLpNZ
+         3eh7A0wUQplf1Uw5JNaFhuu89tNeWwsFxpesVPPxRlVNJr3o9mQAwYAwhFrxlEACBpMj
+         JS3H/8ynfLOkq1JKnDrypRjocR6f5BJM0UduFX+Cp7sDY81BjnlKDZG11kjJfLGnCzaD
+         Hn9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795801964; x=1796406764;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=HrpoliOMKq3aKEsYDXSMctB2Gs1JdFSq0O+s/fh27WY=;
+        b=Oy9aIVo87GdEtuFvw8gjVpKEnGv2LDX5+K2KNHuz5VhtVm4UdwqtfOCBzrM6S4T4sD
+         t2libNuT6OS6IUDeDNK4oaxbAQR7gl95TPMIjFW2idRi+wOXPf+6BydOg5LcT5tSPYvQ
+         813bFUykObZFzpKQgBw8EYOtrBQ0b7LpCfj6fNZWOwvT8htNDBs5ajWp8BDbTWz2znx4
+         QUEtZooqpNGal303AY6HxcrepT0FQjPCaJsTTIBQWTJnCk/I1jBy6OrIzq0TSEedaZBP
+         bIl/W6cluPU+LSbFsMuwP6yOjPZ4Vb8HiyQLfdFvck+8vWCKkb0NQ5Nyxv8SZqJn4LLa
+         PiBQ==
+X-Forwarded-Encrypted: i=1; AL+hErH27nJO4ktkTmUtbTCKaPm7WYP2AnENMF6hWzMdpmylPcP5Au0H/5c9mOgqyFAnz+Lq5ITyuAw=@lists.linux.dev
+X-Gm-Message-State: APuU4Z9V0f5o1tLG2N2KVYD3tbC1CQFLQL0Bs9010D6MQxnxnGaS4hNU
+	9ClhYFMwUMaa91gagu/ZvS1WZBVefljKKYPljTI+4xolMQN9fJoNMQNiPXLnF+JyHO0=
+X-Gm-Gg: AZFdTZfwSvhyWGjw3zMcGXieQBb1AKYVIDIZSVsFCqAYH/kjKXApBeabTEF+uGBeqUv
+	NhKZcxr0cX+bgY993Jykg7ZlWEw8fmBuhB1xM3FiTEphaAhMjS0/uHhA+mpVfs3UFIRjfRZLxnC
+	L4Ekwln6DXtVSv7sc36QolNCDy8RECCCFHM3QP+9v8L2OoJnsKRGULUuM75vUh/teLqVVD+X7uZ
+	HoC8W404JOHUSYld6BdC5RAEy7sism3XYzxORlSQvO1ygRzcz3aS3dETqzCb/Rkq5MVRX3xyfmN
+	fSLzsTwj6NacWSKl+VP1j15psW6a1/kLcAKOwucbk2HCaUqvtm1W3is0rtOUMai4RMZGmAryUyE
+	CXON2ugKm/BNXrXdHFwWuJhXxLQXSJZWBCggyQhsJ4jlDEGsWg0FzAtoJnNp1c31gh7GwZvWRoi
+	x0D6IgIlt8wpBnqxHKXvSH/M/uKbCbcA+hQ++xp14+rsy8rFdNxyTMm4K/3s3LhELAgtFY3Wbvp
+	CMlWqbJNdwQdScGqV4hIw7ovUThJnZ+o6XFvYC630YgmtR33zNcbXhOTqKehZXgMwicZqCWni/8
+	ffBUs6D+xA830OspXXVH/P8yPjPgxx4BYj7CRmVS
+X-Received: by 2002:a05:600c:17d1:b0:49e:795e:ba89 with SMTP id 5b1f17b1804b1-4bb861398d2mr396602295e9.6.1795801964219;
+        Fri, 27 Nov 2026 09:52:44 -0800 (PST)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6c4353d6sm46675405f8f.56.2026.11.27.09.52.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Nov 2026 09:52:43 -0800 (PST)
+From: Dan Carpenter <dan@pereq.eu>
+Date: Fri, 27 Nov 2026 20:52:37 +0300
+Subject: [PATCH] KVM: arm64: Drop a pending MMIO access when injecting an
+ unmasked SError
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -64,102 +91,86 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261127152237.108363-1-usama.arif@linux.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261127-serror-drop-mmio-v2-v1-1-96bd01bef6d8@pereq.eu>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22MQQ7CMAwEv1L5jCWSQwt8BXFIYpcaqUllQ4VU9
+ e8kcOU4q9nZwFiFDS7dBsqrmJRcwR06SFPId0ahyuCPvnfOD1h9LYqkZcF5loKrR6KBKJ7OyfU
+ j1OeiPMr7W73efmyv+OD0bKlmxGCMUUNOU5v+RZsC+/4BM0yFlKIAAAA=
+X-Change-ID: 20261127-serror-drop-mmio-v2-dd7ddb89c16f
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+ Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Mark Rutland <mark.rutland@arm.com>
+Cc: Karthik Bhargavan <karthik@pereq.eu>, 
+ =?utf-8?q?Cl=C3=A9ment_Blaudeau?= <clement@cryspen.com>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ Dan Carpenter <dan@pereq.eu>
+X-Mailer: b4 0.16.0
 
-On Fri, Nov 27, 2026 at 07:22:36AM -0800, Usama Arif wrote:
-> On Thu, 26 Nov 2026 17:28:29 +0000 "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
->
-> > The S2 user fault path tops up the MMU memcache (used for page table
-> > pre-allocation as the point at which page tables are installed may not
-> > allocate) except when:
-> >
-> > * It's a permission fault AND
-> > * dirty page logging is disabled AND
-> > * pKVM is disabled
-> >
-> > At which point it is assumed no page table will be allocated.
-> >
-> > However nested virtualisation adds another edge case - the mapping size of
-> > a shadow S2 is clamped to that of the guest's own S2. If the guest
-> > hypervisor replaces a block mapping with a table, a permission fault on the
-> > shadow block has to be mapped at PAGE_SIZE, which requires a page table to
-> > collapse the block into.
-> >
-> > With the memcache empty, kvm_mmu_memory_cache_alloc() hits its
-> > guest-triggerable WARN_ON(!nobjs) and falls back to a GFP_ATOMIC allocation
-> > under mmu_lock, with a BUG_ON() if that fails.
-> >
-> > Therefore, also top up the memcache for permission faults taken on a
-> > shadow S2.
-> >
-> > Note that dirty logging had a similar issue, addressed in commit
-> > 56fd1fc526e6 ("KVM: arm64: Top up stage-2 memcache for dirty logging
-> > faults").
-> >
-> > Fixes: fd276e71d1e7 ("KVM: arm64: nv: Handle shadow stage 2 page faults")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > ---
-> >  arch/arm64/kvm/mmu.c | 8 +++++---
-> >  1 file changed, 5 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index a0d4981ebb99..e09a8f2c0482 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -2256,16 +2256,18 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd,
-> >
-> >  	/*
-> >  	 * Permission faults just need to update the existing leaf entry,
-> > -	 * and so normally don't require allocations from the memcache. The
-> > -	 * only exception to this is when dirty logging is enabled at runtime
-> > +	 * and so normally don't require allocations from the memcache. One
-> > +	 * exception to this is when dirty logging is enabled at runtime
-> >  	 * and a fault needs to collapse a block entry into a table.
-> >  	 * Under pKVM a permission fault can also collapse pages into a block,
-> >  	 * which needs a fresh mapping object, and the hypervisor requires the
-> >  	 * min-pages memcache even when the install allocates nothing.
-> > +	 * With nested, a shadow stage-2 block may also need to be collapsed
-> > +	 * into a table if the guest's own stage-2 mapping has become smaller.
-> >  	 */
-> >  	memcache = get_mmu_memcache(s2fd->vcpu);
-> >  	if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
-> > -	    is_protected_kvm_enabled()) {
-> > +	    is_protected_kvm_enabled() || s2fd->nested) {
-> >  		ret = topup_mmu_memcache(s2fd->mmu, memcache);
-> >  		if (ret)
-> >  			return ret;
-> >
->
-> Thanks for the fix!
->
-> On the narrow condition being the smaller backport: I don't think it
-> is. The hunk already conflicts on 7.3, where topup_mmu_memcache() still
-> takes the vCPU, and the condition looks different on 7.2 and older, so
-> every stable tree needs a small manual backport either way.
->
-> A permission fault can also allocate outside NV. For example, take an
-> exec permission fault on a THP block, where the VMM replaces that
-> memory with 64K hugetlb pages before the fault looks up the VMA:
->
->   - the MMU notifier unmaps the block, and mmu_seq is read afterwards
->   - kvm_s2_resolve_vma_size() forces PAGE_SIZE for the CONT_PTE hugetlb
->   - PAGE_SIZE != perm_fault_granule, so kvm_pgtable_stage2_map() runs
->     and allocates a table, with no top-up
->
-> That one is narrow and VMM-driven, but topping up for every fault would
-> cover it too, and it costs a single comparison when the cache already
-> holds enough pages.
->
+Oliver's commit bfb7a30b1986 ("KVM: arm64: Don't retire MMIO instruction
+w/ pending (emulated) SError") established the rule that when userspace
+injects an SError that we drop the MMIO.  An MMIO access dropped this way
+runs again when the guest returns from the SError.
 
-Reads a little schloppy ;) But I think you're right yeah.
+However, since commit 3bd107ed6b23 ("KVM: arm64: Only emulate an SError's
+entry for vCPUs with NV"), a vcpu without EL2 pends the SError through
+HCR_EL2.VSE instead.  The next KVM_RUN completes the access, and then
+the guest takes the SError.  So the behavior is not consistent depending
+on whether the vcpu has EL2 (MMIO dropped) or not (MMIO completes).
 
-Good bloody lord @ 64 KiB hugetlb pages being a thing... obscene :)
+To make things consistent, drop the pending MMIO access in the non-EL2
+case as well.
 
-Anyway, I'll send an unconditional v2, it's really not that much delta in
-general.
+This change only affects unmasked SErrors, if they are masked the MMIO
+always completes.  The host's copy of a protected vcpu's PSTATE always
+has SErrors masked, so for protected vcpus the MMIO always completes.
 
---
-Cheers, Lorenzo
+I discovered this inconsistency while writing a selftest and I don't
+believe real life users have noticed it.
+
+Fixes: 3bd107ed6b23 ("KVM: arm64: Only emulate an SError's entry for vCPUs with NV")
+Signed-off-by: Dan Carpenter <dan@pereq.eu>
+---
+v2: Fuad pointed out a bug in v1.  I was checking serror_is_masked()
+    but I should have been checking PSR_A_BIT instead.  The
+    serror_is_masked() function returns false if effective_sctlr2_nmea()
+    is set so we would have dropped the access but left the SError
+    pending.
+
+    Checking PSTATE.A also means we can drop the !vcpu_is_protected()
+    condition.
+---
+ arch/arm64/kvm/inject_fault.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 1d5dfd4b9e00..cdb4fcc71d94 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -396,6 +396,13 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
+ 		return 1;
+ 	}
+ 
++	/*
++	 * Like the emulated entry above, an unmasked SError cancels the MMIO
++	 * access the vcpu exited on.
++	 */
++	if (!(*vcpu_cpsr(vcpu) & PSR_A_BIT))
++		vcpu->mmio_needed = false;
++
+ 	vcpu_set_vsesr(vcpu, esr & ESR_ELx_ISS_MASK);
+ 	*vcpu_hcr(vcpu) |= HCR_EL2_VSE;
+ 	return 1;
+
+---
+base-commit: 4a1b7259e337e8a2ea999436b47151a75c7572dc
+change-id: 20261127-serror-drop-mmio-v2-dd7ddb89c16f
+
+Best regards,
+--  
+Dan Carpenter <dan@pereq.eu>
+
