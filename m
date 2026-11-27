@@ -1,79 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.4
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795792966;
-	b=oq7iU8u4+xMFEhVvc0jZXe4RZfcOuQ4hU+wJ7O7XSxckf1c6AtSWjqrMzRBCwUxHLLOH
-	 z7IDZoH+/yynzNcL5tS9RhRgLYvhwqoFKyVmBfC5NQKeFOa2BaV9Ssq6hGirkrbKe+Hoq
-	 eVl5jJ96dwUFHjAZJj+6R+AnyIfQdP2/7qHAcVO3lFF07YClwNcxHA6m4PSBzT9h0DQer
-	 EWCADIQ70EqnI/Uhy1hV9lhSixl98kz+vovM6Xvor/OsdXuk25O9dLw3W5Td0/STfKdGF
-	 CPmJEfutTkqMp7oLX4QCDBAu+pi7k6PQqDzvsdCQn1ljsP6CUF2haULIwlH57PVP8zg==
+	t=1795793507;
+	b=3tNJ52cZjEYzlpA4QRqHXfGA75QcZIPxH3gOBeBtd/UkAGphObH6zqZWsTvAEFgPjrIu
+	 mPKsRSMnwMGbWr5r7bWh/rT8L4ZDtAUqBhE/+/281eIjQX+LsK24nrumu5GUrV523vNP3
+	 qPMo93RIzw1TtVPY+bcb+Ywj4fYbeiNarjbQd4hQkDdXxacYEdry5dJt71644X+gQ7VP6
+	 3c6w/xT0nY2Nl8emzybolkFUud0r6rudj0vHepCFduRWYoz35WrJHxUpYeMDTFwZNaIEC
+	 /31rTQRPvOrZSP4K5OJ2xJPPRlm93EGWOxAuxQRtMTHa7PM8PsWiWLIWay/8bmaRmQg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795792966;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=JqX1UC6kwIb0brNhPGfSFAacJXmA2iM0S4sE9CFXj80=;
-	b=Gsg3UKjyM7CgFE00lltd0ZNjlwOQUZaYTHbk6/WomfBGn/QoWuUc/1zfV15cod7a9/2M
-	 wbN5mmu2OKSZBHrA+2smEihPWCMumJEE6s5KUTMHKgnm5rG7COAiObxv36NDKHa8TJmnk
-	 4or9Qfky0YOF2VjzBYoakZ+QwV1McfcUoRhXXccdLXoa4gtYwXzV9GpQ2ZewZqOmcK9mr
-	 V4oLwknpduoD8rWReTNsJiiJA12JSz5F+jcxkXLQZINvF77FBl9Z2GnsCPIcR0FCqhFll
-	 +ws5p7EBg6nseMZDduk+i9ldvdeHKJ44OoSGkesXGwfFTEf9RoAIv6rl58NFcEoGDsQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795793507;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer;
+	bh=Dshu9qpsSYZT8eeZu5f7BohnpZTCm94WxOmlyxYqBw4=;
+	b=LiuVHeUHy6vTXIDBl+eD5PeXzW0PKkkil/QvjWlKfoa4opoj2fjT0aKti39G/OH6rWul
+	 hXfciuXZ+f/rE7EFNKcLrOukBg97DO5+K/pZK2ZglGhyD+j6O4JWcmucDEs8WPXULEUqX
+	 qMG2pP1ru4oNX/cyR3W0OHy+epZm/aCoNbHCVMG2wUJxhTlOjPdQltJ2LR6bi+4kR8sYg
+	 G1nhmUJshtwo41rOrwJLYlOJiAQGdnfnRiw5nK9ORiWL7cwxVlDj4xv26migOztf58zdT
+	 cG93uG6XqYue51NFjeoUIjqv21R1idDvF54Aa13Xhof8kbarldndMvBZm6FT6b5ENMQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=bN5x7BYj;
-	arc=none smtp.remote-ip=91.218.175.4
-Received: from mta0.migadu.com (out-4.mta0.migadu.com [91.218.175.4])
+	dmarc=pass header.from=pereq.eu;
+	spf=pass smtp.mailfrom=cryspen.com;
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=LqMwTZUR;
+	arc=none smtp.remote-ip=209.85.218.45
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD90A606A333
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 15:22:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BD90A606A333
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BE9606A321
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 15:31:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 71BE9606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=bN5x7BYj
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=jaHAG3arDq1i/w2Er13DYrLBHLaFInp5P2f0Du89gkg=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795792960; v=1; x=1796397760;
- b=bN5x7BYj2oK08SzQHjqVYp64DRBjpUUZfEUYY9fjLfbpfsmSQZkZm7POVtIieOppUpkYTW4z
- 8PfEY+pgs4FA2VtgugiGGxteSv++SQqbywZa2dYsYg/Q4MK8g3FsMLI3CW6RTIJja2+4y95gZ1v
- CK7NZzmvL+TNPthyBueRtRGE=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by mta12.migadu.com with ESMTPS id 07c1014b8ba360ff;
-	Fri, 27 Nov 2026 15:22:40 +0000
-X-Mizu-Trace-ID: 07c1014b8ba360ff
-X-Migadu-Flow: FLOW_OUT
-From: Usama Arif <usama.arif@linux.dev>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Usama Arif <usama.arif@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Christoffer Dall <christoffer.dall@linaro.org>,
-	Jintack Lim <jintack.lim@linaro.org>,
-	Leonardo Bras <leo.bras@arm.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Top up the mmu memcache on user fault for NV
-Date: Fri, 27 Nov 2026 07:22:36 -0800
-Message-ID: <20261127152237.108363-1-usama.arif@linux.dev>
-X-Mailer: git-send-email 2.53.1
-In-Reply-To: <20261126-fix-nv-cache-topup-v1-1-a22c936872fe@kernel.org>
-References: 
+	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=LqMwTZUR
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c4d2b741ed9so1317480766b.2
+        for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 07:31:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pereq.eu; s=google; t=1795793505; x=1796398305; darn=lists.linux.dev;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Dshu9qpsSYZT8eeZu5f7BohnpZTCm94WxOmlyxYqBw4=;
+        b=LqMwTZUR5zVLVeBFwlkrRanSF3KkWTrl7631w5IzW5bGgHG7vw/0kBIej7l9UvJweU
+         T0L9pi95MfBudOydgmiNIvf0SXgynSOYefTah82MTmy0haA1EIWmM6C+2aBGlD7gW1AX
+         qC4xlqhDn4L1Cx/tWw0DW8UHiUWq+Bgk8wxLodODpgOeEZVZYRjS7i+jhGnDYmX5nljZ
+         EHJCf7D4jFoditcz/DU3uwEbUe2PXj0y2mBt8ppIyP/DF5YsyF+8NgW/PvXmX3bQwTO9
+         ByEUwd5GnWA32QL4cn8sSAeH4zwmWrmv28VAwD1mcvjqI1vgd0PWaxH17B5hiMzXUVtk
+         KgCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795793505; x=1796398305;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Dshu9qpsSYZT8eeZu5f7BohnpZTCm94WxOmlyxYqBw4=;
+        b=VC35UyunCCOP0KXVWvdtMH16/DHHsK2wat6F0pkWLixA1VtZ0/fSMh4nV0gQ5VNdW+
+         ZmkZyLrQo7rkBO56f2l3z3yfG8gNBPh4jaPO8TpN3nh/YmGvcSJXI3EkrDZTOWgU0gKL
+         L+C/CPsHtIq48x8E9IiBUwMDPmW23xMwvbCq1eoy/cw7olVaKAWvWDRuZuMB8P5JzQNi
+         R8R3TGH7omQ9b42H4UGl5ejgRYoU65OAgR6NvH9b9+BDbFF+MdI65NNiooD8h+30NE0P
+         F6oox3E4wjqFn8p48dn+CD/uePSZTw1sCZeG+qCxJb3Cu0khYtH0B0qI8kL+onkOsLwO
+         khAg==
+X-Forwarded-Encrypted: i=1; AL+hErFHLFcRgPdI0ce9YSIRR7zANk7mjtwD9OEZbJAF0zfg6lX+Rdh95Hwk7/+GawxJXFQpxRauU+U=@lists.linux.dev
+X-Gm-Message-State: APuU4Z81hOYX+tgoLu1Hj7odyytCYlA2tT/bXtXWkNaGUrKduNaCkpDF
+	IqB9Z4xRStgD8mOtX7ax5Qblq7b24PUhg6UughQgl46WKRW9ZfHOT5wisncG1WpfFb0=
+X-Gm-Gg: AZFdTZdK5V/as44d0zZPA811HwGfu2uOfiQ6z0/oFeRFD8e+tcxd3Ma9LJQbgRW17AT
+	YVquAXSf92l+8SfdMb/+PfxooIjgByiF+ZZwngRnuxtSdChAMTq+J0D5ZVcLn0np7tamIP050Sh
+	23zeWHO4kES4fJDusUc4RhEu+N4aSJ2Mt5DYrExupCedsR/s+2xkO+45vvvySYb9fWWs95pQRrP
+	00/oqdhU1QzUhSJwXFKJ35ixzOQKybzHHntjCb/NzLYs2tkV6+SOiEcuWwCVBM225PFZPLx4Ody
+	zXRw3QwzUB8Zz4n5Br4V6qzQ7kHeQkWycnD07ypy1jQN2xfZJ2esfU23eqOAp5PNjAgkTb+B3A9
+	kIPvOmHJjhlHeMJRmTpusudTuXC5jq1efUwcOjWyEuhdYhLeixRAG337vQrm+3yX77P0vmye7R8
+	1fVeUB3XERPb7QbGFWO9FPoNA/uVCjH7275q5X+ebhJ/0nAIhInPq3Gn9ljADDD+WqIGLNMRzFR
+	GgspJoU8Qj97n4zwts1XqpXQQ1yi8C4nzSD3fTrPRLYPVc5RdTKaeoi3axJ2Xn6Oxkm4aWKH9/K
+	3znX8ePgxUDqRkwUwb8=
+X-Received: by 2002:a17:907:9584:b0:c34:e9fe:82ed with SMTP id a640c23a62f3a-c513a88223amr1963994966b.28.1795793505180;
+        Fri, 27 Nov 2026 07:31:45 -0800 (PST)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6baa3882sm47092498f8f.49.2026.11.27.07.31.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Nov 2026 07:31:44 -0800 (PST)
+From: Dan Carpenter <dan@pereq.eu>
+Subject: [PATCH 0/3] KVM: arm64: nv: Fix AT emulation for nested
+ virtualization
+Date: Fri, 27 Nov 2026 18:31:37 +0300
+Message-Id: <20261127-nv-tcr2-v3-v1-0-9c15c1cabe01@pereq.eu>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -83,98 +92,68 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/y2MTQ4CIQxGrzLp2hqhotGrGBdQq1MXaOhITCZzd
+ 0Fdvu/nzWBSVAyOwwxFqpo+cgO3GoDHmG+CemkMfuN3zvk95ooTF4+VMJBw2IYDEUVoh2eRq76
+ /stP5x/ZKd+GpG/oiRRNMJWYee/R3rZurN7AsH6p+2A2QAAAA
+X-Change-ID: 20261127-nv-tcr2-v3-53ec5459333a
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+ Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Mark Rutland <mark.rutland@arm.com>
+Cc: Karthik Bhargavan <karthik@pereq.eu>, 
+ =?utf-8?q?Cl=C3=A9ment_Blaudeau?= <clement@cryspen.com>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ Dan Carpenter <dan@pereq.eu>, stable@vger.kernel.org
+X-Mailer: b4 0.16.0
 
-On Thu, 26 Nov 2026 17:28:29 +0000 "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
+This series fixes 3 issues found by our formal analysis at Pereq.
 
-> The S2 user fault path tops up the MMU memcache (used for page table
-> pre-allocation as the point at which page tables are installed may not
-> allocate) except when:
-> 
-> * It's a permission fault AND
-> * dirty page logging is disabled AND
-> * pKVM is disabled
-> 
-> At which point it is assumed no page table will be allocated.
-> 
-> However nested virtualisation adds another edge case - the mapping size of
-> a shadow S2 is clamped to that of the guest's own S2. If the guest
-> hypervisor replaces a block mapping with a table, a permission fault on the
-> shadow block has to be mapped at PAGE_SIZE, which requires a page table to
-> collapse the block into.
-> 
-> With the memcache empty, kvm_mmu_memory_cache_alloc() hits its
-> guest-triggerable WARN_ON(!nobjs) and falls back to a GFP_ATOMIC allocation
-> under mmu_lock, with a BUG_ON() if that fails.
-> 
-> Therefore, also top up the memcache for permission faults taken on a
-> shadow S2.
-> 
-> Note that dirty logging had a similar issue, addressed in commit
-> 56fd1fc526e6 ("KVM: arm64: Top up stage-2 memcache for dirty logging
-> faults").
-> 
-> Fixes: fd276e71d1e7 ("KVM: arm64: nv: Handle shadow stage 2 page faults")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> ---
->  arch/arm64/kvm/mmu.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index a0d4981ebb99..e09a8f2c0482 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2256,16 +2256,18 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd,
->  
->  	/*
->  	 * Permission faults just need to update the existing leaf entry,
-> -	 * and so normally don't require allocations from the memcache. The
-> -	 * only exception to this is when dirty logging is enabled at runtime
-> +	 * and so normally don't require allocations from the memcache. One
-> +	 * exception to this is when dirty logging is enabled at runtime
->  	 * and a fault needs to collapse a block entry into a table.
->  	 * Under pKVM a permission fault can also collapse pages into a block,
->  	 * which needs a fresh mapping object, and the hypervisor requires the
->  	 * min-pages memcache even when the install allocates nothing.
-> +	 * With nested, a shadow stage-2 block may also need to be collapsed
-> +	 * into a table if the guest's own stage-2 mapping has become smaller.
->  	 */
->  	memcache = get_mmu_memcache(s2fd->vcpu);
->  	if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
-> -	    is_protected_kvm_enabled()) {
-> +	    is_protected_kvm_enabled() || s2fd->nested) {
->  		ret = topup_mmu_memcache(s2fd->mmu, memcache);
->  		if (ret)
->  			return ret;
-> 
+* VMs were potentially using the TCR2 bits which weren't intended for
+  them.
+* It turns out that guests could write to the TCR2 bits even when those
+  bits are "hidden".
+* The VMID wasn't handled correctly.  Roll over could happen before or
+  during the AT execution leading to invalid results.
 
-Thanks for the fix!
+Changes in v3:
+In v2 patches 2 and 3 added traps to prevent writes to hidden TCR2
+bits.  Marc didn't like this approach and to be honest, the patch
+had other issues as well.  Marc suggested that we load load
+PIR/PIRE0/POR unconditionally instead and that's the approach here
+in patch 2.
 
-On the narrow condition being the smaller backport: I don't think it
-is. The hunk already conflicts on 7.3, where topup_mmu_memcache() still
-takes the vCPU, and the condition looks different on 7.2 and older, so
-every stable tree needs a small manual backport either way.
+The other thing is that I have been trying to improve my review
+process so I ended up fixing a bug handling POR_EL0 in __kvm_at_s1e01_fast().
+That fix is now merged into patch 1 since it feels very related and
+it gets backported to the same kernel.
 
-A permission fault can also allocate outside NV. For example, take an
-exec permission fault on a THP block, where the VMM replaces that
-memory with 64K hugetlb pages before the fault looks up the VMA:
+Changes in v2:
+1) Sashiko pointed out that we need to restore the original TCR2
+   bits at the end of the AT command.
+2) Clean up based on Marc's feedback.
+3) Trap the writes to the TCR2 registers (normal and nested)
 
-  - the MMU notifier unmaps the block, and mmu_seq is read afterwards
-  - kvm_s2_resolve_vma_size() forces PAGE_SIZE for the CONT_PTE hugetlb
-  - PAGE_SIZE != perm_fault_granule, so kvm_pgtable_stage2_map() runs
-    and allocates a table, with no top-up
+Signed-off-by: Dan Carpenter <dan@pereq.eu>
+---
+Dan Carpenter (3):
+      KVM: arm64: nv: Fix AT emulation for TCR2_EL1
+      KVM: arm64: Load no-access permissions when S1PIE or S1POE is hidden
+      KVM: arm64: nv: Update the shadow MMU's VMID for AT emulation
 
-That one is narrow and VMM-driven, but topping up for every fault would
-cover it too, and it costs a single comparison when the cache already
-holds enough pages.
+ arch/arm64/kvm/at.c                        | 61 ++++++++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 40 +++++++++++++++-----
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 15 +++++---
+ 3 files changed, 97 insertions(+), 19 deletions(-)
+---
+base-commit: 5a7235e9adff42aa043ac9473dbeb0354dca0967
+change-id: 20261127-nv-tcr2-v3-53ec5459333a
 
-> ---
-> base-commit: 012e4bc01e339a65dc7c59181b5efb33b171d12c
-> change-id: 20261126-fix-nv-cache-topup-9ab1fd829014
-> 
-> Cheers,
-> -- 
-> Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> 
-> 
+Best regards,
+--  
+Dan Carpenter <dan@pereq.eu>
+
