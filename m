@@ -1,62 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.4
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795792235;
-	b=O/bRRE1pUoBSx/tjHgEhmbRIDHKVGVwhKasbv1ZmRydnw3AIV0mF7hUsmyrD6FiImkE+
-	 LVImwCYE/CJEM0HyH1Q6ekMYGJKxmpMm3TBB20BS/rXH+wAFMJQuLWmWHMNP+TTq1lKeK
-	 7YCEFkYy+uG/1e9JD3LbTGcjPUWGl71zdtdIwBpuNzjJW5WpU4Iwfjz4Jp6UXs08KDZ6T
-	 ckjnqAkZ0GUv/Z0trAITjs9Yy9tTsygmPJ6zoGFw7HSxnSIvSlaJO9YPqqPa4shIgtMyd
-	 ITU98i0HVer1zHO6HgOceSElkjchB0wI2EFH2axX9x75+CY7kvwD6+tt4LeKAkzeMiQ==
+	t=1795792966;
+	b=oq7iU8u4+xMFEhVvc0jZXe4RZfcOuQ4hU+wJ7O7XSxckf1c6AtSWjqrMzRBCwUxHLLOH
+	 z7IDZoH+/yynzNcL5tS9RhRgLYvhwqoFKyVmBfC5NQKeFOa2BaV9Ssq6hGirkrbKe+Hoq
+	 eVl5jJ96dwUFHjAZJj+6R+AnyIfQdP2/7qHAcVO3lFF07YClwNcxHA6m4PSBzT9h0DQer
+	 EWCADIQ70EqnI/Uhy1hV9lhSixl98kz+vovM6Xvor/OsdXuk25O9dLw3W5Td0/STfKdGF
+	 CPmJEfutTkqMp7oLX4QCDBAu+pi7k6PQqDzvsdCQn1ljsP6CUF2haULIwlH57PVP8zg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795792235;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=8UzSE5s19hmDLWKrvHWQ929kQ9lOeg6Wx1lbFsCH0T8=;
-	b=f+Uv3PkGU4mJeV1GpHMaXAMEvzQicq3gNiNSmm67v8WaSIi01kIxGUKe6As6z7uJiwbo
-	 jPXy5UZT87x8rJ8qQTLLsf23eqiZ1e+OQHaaFHRfKxWkzahtSZ87Lw4bqPtzSKb7LYTTp
-	 0d46ToaEN5KjXODr/D2kQfFp7BRIRKEJQra0k0EUSNXkg25WsshrjIDiN8poMevxa7cQw
-	 +WGV5p5Qdn0OKjIuBflVByDqno8vJIDDuHNsP0WQoYnbYAsQsvFEor9xdf6nnJw5ZAB0N
-	 PiA0UV64Z4a4hNBDZtOkeYFL3o6+0p42MAdlxBblt6aW6NhI+qx97ZYM3ouVZZxwM4g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795792966;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=JqX1UC6kwIb0brNhPGfSFAacJXmA2iM0S4sE9CFXj80=;
+	b=Gsg3UKjyM7CgFE00lltd0ZNjlwOQUZaYTHbk6/WomfBGn/QoWuUc/1zfV15cod7a9/2M
+	 wbN5mmu2OKSZBHrA+2smEihPWCMumJEE6s5KUTMHKgnm5rG7COAiObxv36NDKHa8TJmnk
+	 4or9Qfky0YOF2VjzBYoakZ+QwV1McfcUoRhXXccdLXoa4gtYwXzV9GpQ2ZewZqOmcK9mr
+	 V4oLwknpduoD8rWReTNsJiiJA12JSz5F+jcxkXLQZINvF77FBl9Z2GnsCPIcR0FCqhFll
+	 +ws5p7EBg6nseMZDduk+i9ldvdeHKJ44OoSGkesXGwfFTEf9RoAIv6rl58NFcEoGDsQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="cvI/KY++";
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D75A606A323
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 15:10:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3D75A606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=bN5x7BYj;
+	arc=none smtp.remote-ip=91.218.175.4
+Received: from mta0.migadu.com (out-4.mta0.migadu.com [91.218.175.4])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD90A606A333
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 15:22:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BD90A606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=cvI/KY++
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B9B5F169E;
-	Fri, 27 Nov 2026 07:10:31 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A7E393F632;
-	Fri, 27 Nov 2026 07:10:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795792234; bh=m/nbdcGqKkeJN9d3QUnWCROPJi+91iueJPuEGYf787c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cvI/KY++KjF3uEu/jxp/dzyNfQ0qHncVM8FPivKsdCafuYH5d+NSbfrTXgVQ09min
-	 9Poy30OtdmHTpN/3efttaAGjKzRrByXF4FaeTro6IggIVhmGe/CkV25E6pKYsI2gR4
-	 WeXaiFN4F9wdKkVyiHYLE9/m4XS7rxyAjz6OX4jU=
-Date: Fri, 27 Nov 2026 15:10:28 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=bN5x7BYj
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=jaHAG3arDq1i/w2Er13DYrLBHLaFInp5P2f0Du89gkg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795792960; v=1; x=1796397760;
+ b=bN5x7BYj2oK08SzQHjqVYp64DRBjpUUZfEUYY9fjLfbpfsmSQZkZm7POVtIieOppUpkYTW4z
+ 8PfEY+pgs4FA2VtgugiGGxteSv++SQqbywZa2dYsYg/Q4MK8g3FsMLI3CW6RTIJja2+4y95gZ1v
+ CK7NZzmvL+TNPthyBueRtRGE=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by mta12.migadu.com with ESMTPS id 07c1014b8ba360ff;
+	Fri, 27 Nov 2026 15:22:40 +0000
+X-Mizu-Trace-ID: 07c1014b8ba360ff
+X-Migadu-Flow: FLOW_OUT
+From: Usama Arif <usama.arif@linux.dev>
 To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev,
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, will@kernel.org, mark.rutland@arm.com,
-	linux-perf-users@vger.kernel.org, catalin.marinas@arm.com,
-	james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 13/28] KVM: arm64: Add SPE VCPU device attribute
- to set the SPE device
-Message-ID: <awmdZLXCSa8fBtJw@raptor>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-14-alexandru.elisei@arm.com>
- <auHUUHYtQXg0imDt@gremlin>
+Cc: Usama Arif <usama.arif@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Christoffer Dall <christoffer.dall@linaro.org>,
+	Jintack Lim <jintack.lim@linaro.org>,
+	Leonardo Bras <leo.bras@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Top up the mmu memcache on user fault for NV
+Date: Fri, 27 Nov 2026 07:22:36 -0800
+Message-ID: <20261127152237.108363-1-usama.arif@linux.dev>
+X-Mailer: git-send-email 2.53.1
+In-Reply-To: <20261126-fix-nv-cache-topup-v1-1-a22c936872fe@kernel.org>
+References: 
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,573 +83,98 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <auHUUHYtQXg0imDt@gremlin>
+Content-Transfer-Encoding: 8bit
 
-Hi Lorenzo,
+On Thu, 26 Nov 2026 17:28:29 +0000 "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
 
-On Wed, Oct 28, 2026 at 01:11:54PM +0000, Lorenzo Stoakes (ARM) wrote:
-> On Thu, Sep 03, 2026 at 05:06:08PM +0100, Alexandru Elisei wrote:
-> > To support systems where there is more than one SPE instance, or where not
-> > all the PEs have SPE, add KVM_ARM_VCPU_SPE_CTRL(KVM_ARM_VCPU_SPE_ID) for
-> > userspace to set the SPE instance it wants the virtual machine to use.
-> > Similar to the PMU, it is entirely up to userspace to make sure the VCPUs
-> > are run only on the physical CPUs which share this SPE instance.
+> The S2 user fault path tops up the MMU memcache (used for page table
+> pre-allocation as the point at which page tables are installed may not
+> allocate) except when:
 > 
-> OK but this is enforced by KVM right? So while it's up to userspace to
-> ensure affinity, this is checked for and if the user gets it wrong KVM will
-> bail AFAICT?
+> * It's a permission fault AND
+> * dirty page logging is disabled AND
+> * pKVM is disabled
+> 
+> At which point it is assumed no page table will be allocated.
+> 
+> However nested virtualisation adds another edge case - the mapping size of
+> a shadow S2 is clamped to that of the guest's own S2. If the guest
+> hypervisor replaces a block mapping with a table, a permission fault on the
+> shadow block has to be mapped at PAGE_SIZE, which requires a page table to
+> collapse the block into.
+> 
+> With the memcache empty, kvm_mmu_memory_cache_alloc() hits its
+> guest-triggerable WARN_ON(!nobjs) and falls back to a GFP_ATOMIC allocation
+> under mmu_lock, with a BUG_ON() if that fails.
+> 
+> Therefore, also top up the memcache for permission faults taken on a
+> shadow S2.
+> 
+> Note that dirty logging had a similar issue, addressed in commit
+> 56fd1fc526e6 ("KVM: arm64: Top up stage-2 memcache for dirty logging
+> faults").
+> 
+> Fixes: fd276e71d1e7 ("KVM: arm64: nv: Handle shadow stage 2 page faults")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> ---
+>  arch/arm64/kvm/mmu.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index a0d4981ebb99..e09a8f2c0482 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2256,16 +2256,18 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd,
+>  
+>  	/*
+>  	 * Permission faults just need to update the existing leaf entry,
+> -	 * and so normally don't require allocations from the memcache. The
+> -	 * only exception to this is when dirty logging is enabled at runtime
+> +	 * and so normally don't require allocations from the memcache. One
+> +	 * exception to this is when dirty logging is enabled at runtime
+>  	 * and a fault needs to collapse a block entry into a table.
+>  	 * Under pKVM a permission fault can also collapse pages into a block,
+>  	 * which needs a fresh mapping object, and the hypervisor requires the
+>  	 * min-pages memcache even when the install allocates nothing.
+> +	 * With nested, a shadow stage-2 block may also need to be collapsed
+> +	 * into a table if the guest's own stage-2 mapping has become smaller.
+>  	 */
+>  	memcache = get_mmu_memcache(s2fd->vcpu);
+>  	if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
+> -	    is_protected_kvm_enabled()) {
+> +	    is_protected_kvm_enabled() || s2fd->nested) {
+>  		ret = topup_mmu_memcache(s2fd->mmu, memcache);
+>  		if (ret)
+>  			return ret;
+> 
 
-Yes.
+Thanks for the fix!
 
-> 
-> So I'd probably add something here about what happens if you don't do this
-> - i.e. 'this is checked on vCPU load via kvm_arch_vcpu_load(), and if the
-> CPU does not share the SPE instance specified, KVM will eventually error
-> out to userspace.'
+On the narrow condition being the smaller backport: I don't think it
+is. The hunk already conflicts on 7.3, where topup_mmu_memcache() still
+takes the vCPU, and the condition looks different on 7.2 and older, so
+every stable tree needs a small manual backport either way.
 
-Ok.
+A permission fault can also allocate outside NV. For example, take an
+exec permission fault on a THP block, where the VMM replaces that
+memory with 64K hugetlb pages before the fault looks up the VMA:
 
-> 
-> >
-> > If the ioctl is called for multiple VCPUs, userspace must use the same
-> > SPE identifier for each of the VCPUs.
-> >
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >  Documentation/virt/kvm/devices/vcpu.rst | 32 +++++++++
-> >  arch/arm64/include/asm/kvm_host.h       |  4 ++
-> >  arch/arm64/include/asm/kvm_spe.h        | 19 ++++++
-> >  arch/arm64/include/uapi/asm/kvm.h       |  1 +
-> >  arch/arm64/kvm/arm.c                    | 43 ++++++++++++
-> >  arch/arm64/kvm/pmu-emul.c               | 11 ++-
-> >  arch/arm64/kvm/spe.c                    | 90 +++++++++++++++++++++++++
-> >  7 files changed, 198 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> > index d30b2f7fec9a..d60dd1daa67f 100644
-> > --- a/Documentation/virt/kvm/devices/vcpu.rst
-> > +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> > @@ -329,3 +329,35 @@ Specifies the Profiling Buffer management interrupt number. The interrupt number
-> >  must be a PPI and the interrupt number must be the same for each VCPU. Arm
-> >  recommends 21 as the interrupt number. SPE virtualization requires an in-kernel
-> >  vGIC implementation.
-> > +
-> > +5.2 ATTRIBUTE: KVM_ARM_VCPU_SPE_ID
-> > +------------------------------------------
-> > +
-> > +:Parameters: in kvm_device_attr.addr the address to an int representing the SPE
-> > +             identifier.
-> > +
-> > +:Returns:
-> 
-> Hmm this is a nit obviously but this is inconsistent from the previous doc
-> edit which uses 'Returns:' so I think better to choose one and stick with
-> it :)
+  - the MMU notifier unmaps the block, and mmu_seq is read afterwards
+  - kvm_s2_resolve_vma_size() forces PAGE_SIZE for the CONT_PTE hugetlb
+  - PAGE_SIZE != perm_fault_granule, so kvm_pgtable_stage2_map() runs
+    and allocates a table, with no top-up
 
-I have chosen 'Returns:'.
+That one is narrow and VMM-driven, but topping up for every fault would
+cover it too, and it costs a single comparison when the cache already
+holds enough pages.
 
+> ---
+> base-commit: 012e4bc01e339a65dc7c59181b5efb33b171d12c
+> change-id: 20261126-fix-nv-cache-topup-9ab1fd829014
 > 
-> > +
-> > +	 =======  =========================================================
-> > +	 -EBUSY   Virtual machine has already run
-> > +	 -EFAULT  Error accessing the SPE identifier
-> > +	 -EINVAL  A different SPE instance already assigned, or no physical
-> > +                  CPUs found
+> Cheers,
+> -- 
+> Lorenzo Stoakes (ARM) <ljs@kernel.org>
 > 
-> With the introduction of kvm_update_supported_cpus() and PMU also using
-> that, I think you need to add an -EINVAL line to the PMU doc entry too.
-
-Will do.
-
 > 
-> > +	 -ENXIO   SPE not supported or not properly configured, or the SPE
-> > +                  module not loaded
-> > +	 -ENODEV  KVM_ARM_VCPU_HAS_SPE VCPU feature not set
-> 
-> Should be KVM_ARM_VCPU_SPE? Looking back I think you also typo'd this in
-> the previous commit? Very easily done obviously :P
-
-Yeah, I kept going back and forth on the names.
-
-> 
-> > +	 =======  =========================================================
-> > +
-> > +Required.
-> > +
-> > +Request that the VCPU uses the specified SPE instance. The SPE identifier can be
-> > +read from the 'type' file for the desired SPE instance under /sys/devices (or,
-> > +equivalent, /sys/bus/event_source). Must be set for at least one VCPU, in which
-> > +case all the other VCPUs will use the same SPE instance. Once a SPE instance has
-> > +been set, attempting to set a different one will result in an error.
-> > +
-> 
-> I think you need a paragraph here to explain that you must ensure that
-> physical CPUs assigned to vCPUs must share the same SPE instance, and
-> failing to do so will result in KVM returning an error when the vCPU is
-> attempted to be run.
-
-Ok.
-
-> 
-> > +Similar to KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_SET_PMU), userspace is
-> > +responsible for making sure that the VCPU is run only on physical CPUs which
-> > +share the specified SPE instance. If the VCPU has a PMU assigned, and there are
-> 
-> I think the 'userspace is responsible for making sure that the VCPU is run
-> only on physical CPUs which share the specified SPE instance' bit can be
-> hoisted into the suggested paragraph above, leaving this one to focus on
-> SPE/PMU interactions.
-> 
-> And I think the SPE-specific bit shouldn't mention a similarity to PMU, I
-> think that's confusing in itself.
-
-Ok.
-
-> 
-> > +no physical CPUs which share the same SPE and PMU instance, an error is
-> > +returned.
-> 
-> This is overall unclear I think. It starts with 'similar to PMU' then
-> mentions an actual interaction between PMU/SPE. So, as above, I suggest
-> separating these two out.
-> 
-> And here I think you should be a lot clearer about that PMU/SPE
-> interaction, something like:
-> 
-> "Both SPE and PMU restrict supported physical CPUs to the subset which
-> share the selected SPE or PMU instance.
-> 
-> If both are selected, the subsets must overlap, otherwise there would be no
-> physical CPU on which the vCPUs could run.
-> 
-> If this happens, whichever of KVM_ARM_VCPU_SPE_ID or
-> KVM_ARM_VCPU_PMU_V3_SET_PMU specified it returns -EINVAL.
-> 
-> Note that the default PMU selected by KVM is not taken into account by this
-> check, it only applies when a specific PMU instance has been selected via
-> KVM_ARM_VCPU_PMU_V3_SET_PMU."
-
-Ok.
-
-> 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index e7332bd82bf3..10fa223bdbda 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -382,6 +382,7 @@ struct kvm_arch {
-> >  	 */
-> >  	unsigned long *pmu_filter;
-> >  	struct arm_pmu *arm_pmu;
-> > +	struct kvm_spe kvm_spe;
-> 
-> I think we can do away with the kvm_ prefix on the value name?
-
-I don't see a reason to change it.
-
-This is an **RFC**, and I would rather we focus on the general approach and on
-correctness, and leave variable name changes that propagate to almost all
-remaining patches for when the series stabilizes.
-
-> 
-> >
-> >  	cpumask_var_t supported_cpus;
-> >
-> > @@ -1499,6 +1500,9 @@ void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu);
-> >  int __init kvm_set_ipa_limit(void);
-> >  u32 kvm_get_pa_bits(struct kvm *kvm);
-> >
-> > +int kvm_update_supported_cpus(struct kvm *kvm, cpumask_t *pmu_cpus,
-> > +			      cpumask_t *spe_cpus);
-> > +
-> >  #define __KVM_HAVE_ARCH_VM_ALLOC
-> >  struct kvm *kvm_arch_alloc_vm(void);
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
-> > index 8ded2d821bff..b8afb419c851 100644
-> > --- a/arch/arm64/include/asm/kvm_spe.h
-> > +++ b/arch/arm64/include/asm/kvm_spe.h
-> > @@ -11,6 +11,11 @@ struct kvm_vcpu;
-> >  struct kvm_device_attr;
-> >
-> >  #ifdef CONFIG_KVM_ARM_SPE
-> > +struct arm_spe_pmu;
-> > +struct kvm_spe {
-> > +	struct arm_spe_pmu *spe_pmu;
-> 
-> I feel like 'spe_pmu' as a name is pretty confusing as there is PMU as
-> regards the perf driver thing, which SPE is implemented as, and also the
-> general PMUv3 architecture :)
-> 
-> Maybe the _pmu suffix makes sense then on the type (which has to be a
-> performance monitoring unit driver), but could we replace '_pmu' with
-> '_instance' in the field, etc. names?
-
-The driver that KVM depends on calls it a spe_pmu, and this comes directly from
-the driver. I think the name is appropriate.
-
-> 
-> > +};
-> 
-> This looks a little silly as a one field struct, but presumably because you
-> add more later. I think worth saying so in the commit message?
-
-I don't think it's worth it.
-
-> 
-> > +
-> >  struct kvm_vcpu_spe {
-> >  	int irq_num;		/* Buffer management interrupt number */
-> >  };
-> > @@ -20,10 +25,17 @@ bool kvm_supports_spe(void);
-> >  #define vcpu_has_spe(vcpu)					\
-> >  	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_SPE))
-> >
-> > +void kvm_spe_destroy_vm(struct kvm *kvm);
-> 
-> This naming feels weird, reads to me like 'spe, destroy the vm' which is
-> probably not the intent :P
-
-I see your point.
-
-> 
-> Maybe just kvm_spe_destroy()?
-
-I have changed it to kvm_destroy_vm_spe(kvm).
-
-> 
-> > +
-> >  int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
-> >  int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
-> >  int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
-> > +
-> > +bool kvm_spe_pmu_set(struct kvm *kvm);
-> >  #else
-> > +struct kvm_spe {
-> > +};
-> > +
-> >  struct kvm_vcpu_spe {
-> >  };
-> >
-> > @@ -34,6 +46,9 @@ static __always_inline bool kvm_supports_spe(void)
-> >
-> >  #define vcpu_has_spe(vcpu)	false
-> >
-> > +static inline void kvm_spe_destroy_vm(struct kvm *kvm)
-> > +{
-> > +}
-> >  static inline int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> >  {
-> >  	return -ENXIO;
-> > @@ -46,6 +61,10 @@ static inline int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr
-> >  {
-> >  	return -ENXIO;
-> >  }
-> > +static inline bool kvm_spe_pmu_set(struct kvm *kvm)
-> > +{
-> > +	return false;
-> > +}
-> >  #endif /* CONFIG_KVM_ARM_SPE */
-> >
-> >  #endif /* __ARM64_KVM_SPE_H__ */
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index b9e5019181eb..8ffa3e89d38c 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -448,6 +448,7 @@ enum {
-> >  #define   KVM_ARM_VCPU_PVTIME_IPA	0
-> >  #define KVM_ARM_VCPU_SPE_CTRL		3
-> >  #define   KVM_ARM_VCPU_SPE_IRQ		0
-> > +#define   KVM_ARM_VCPU_SPE_ID		1
-> >
-> >  /* KVM_IRQ_LINE irq field index values */
-> >  #define KVM_ARM_IRQ_VCPU2_SHIFT		28
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 763b102dc51f..132df44c3088 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -336,6 +336,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
-> >  	kfree(kvm->arch.sysreg_masks);
-> >  	kvm_destroy_vcpus(kvm);
-> >
-> > +	kvm_spe_destroy_vm(kvm);
-> > +
-> >  	kvm_unshare_hyp(kvm, kvm + 1);
-> >
-> >  	kvm_arm_teardown_hypercalls(kvm);
-> > @@ -612,6 +614,47 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
-> >
-> >  }
-> >
-> > +int kvm_update_supported_cpus(struct kvm *kvm, cpumask_t *pmu_cpus,
-> > +			      cpumask_t *spe_cpus)
-> 
-> This interface is really awkward - it's unclear whether you need to pass
-> one + other NULL, or both, and what happens in each situation.
-
-Yeah, it's not great, I'll try to make it better.
-
-> 
-> And it turns out that actually you should only specify one of them with the
-> other NULL as it stands.
-> 
-> It seems to me SPE vs. PMU is just immaterial here, and you should simply
-> have:
-> 
-> int kvm_restrict_supported_cpus(struct kvm *kvm, const cpumask_t *mask)
-> {
-> 	lockdep_assert_held(&kvm->arch.config_lock);
-> 
-> 	if (!cpumask_intersects(kvm->arch.supported_cpus, mask))
-> 		return -EINVAL;
-> 
-> 	cpumask_and(kvm->arch.supported_cpus, kvm->arch.supported_cpus, mask);
-> 	return 0;
-> }
-> 
-> Then all the complexity goes away.
-> 
-> I think it's then simplest to simply disallow re-selection for both SPE and
-> PMU, returning -EBUSY if they're already selected.
-> 
-> That way it's very clear-cut - you set these once and only once.
-
-I don't think it's a good idea to introduce a potentially userspace breaking
-change because you don't like the code.
-
-If you feel strongly about it, you can send a patch right now to forbid
-userspace from changing the PMU.
-
-[..]
-> 
-> > +
-> >  static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
-> >  {
-> >  	struct kvm *kvm = vcpu->kvm;
-> > @@ -1104,8 +1109,11 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
-> >  				break;
-> >  			}
-> >
-> > +			ret = kvm_pmu_update_supported_cpus(kvm, &arm_pmu->supported_cpus);
-> > +			if (ret)
-> > +				break;
-> >  			kvm_arm_set_pmu(kvm, arm_pmu);
-> > -			cpumask_copy(kvm->arch.supported_cpus, &arm_pmu->supported_cpus);
-> > +
-> 
-> Looks like a stray extra line here?
-
-Fixed.
-
-> 
-> >
-> >  			/*
-> >  			 * Since a specific PMU is explicitly selected,
-> > @@ -1117,7 +1125,6 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
-> >  				kvm->arch.pmmir_slots =
-> >  					FIELD_GET(ARMV8_PMU_SLOTS,
-> >  						  arm_pmu->reg_pmmir);
-> > -			ret = 0;
-> 
-> I guess because you assign ret above (and if non-zero bail) you don't need
-> to reset here, but probably worth keeping just to be really clear as to
-> intent?
-
-Ok.
-
-> 
-> >  			break;
-> >  		}
-> >  	}
-> > diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-> > index dd5f80318ba4..87fcdbbcbd67 100644
-> > --- a/arch/arm64/kvm/spe.c
-> > +++ b/arch/arm64/kvm/spe.c
-> > @@ -59,6 +59,71 @@ bool kvm_supports_spe(void)
-> >  	return !list_empty(&spe_pmus);
-> >  }
-> >
-> > +void kvm_spe_destroy_vm(struct kvm *kvm)
-> 
-> See above re: naming.
-> 
-> > +{
-> > +	struct arm_spe_pmu *spe_pmu;
-> > +
-> > +	guard(mutex)(&spe_pmus_lock);
-> > +
-> > +	spe_pmu = kvm->arch.kvm_spe.spe_pmu;
-> > +	if (!spe_pmu)
-> > +		return;
-> > +
-> > +	module_put(spe_pmu->pmu.module);
-> 
-> Does spe_pmus_lock (hopefully spe_instances_lock in future :P) need to be
-> held over module_put()? Seems unnecessary.
-
-Looks alright to me.
-
-> 
-> > +}
-> > +
-> > +bool kvm_spe_pmu_set(struct kvm *kvm)
-> 
-> See comments above re: naming.
-> 
-> > +{
-> > +	return !!kvm->arch.kvm_spe.spe_pmu;
-> 
-> This !! is unnecessary. The conversion to bool handles it for you.
-
-Ok.
-
-> 
-> > +}
-> > +
-> > +static int kvm_spe_update_supported_cpus(struct kvm *kvm, cpumask_t *spe_cpus)
-> > +{
-> > +	return kvm_update_supported_cpus(kvm, NULL, spe_cpus);
-> > +}
-> 
-> See above re: the helpers.
-> 
-> > +
-> > +static int kvm_spe_set_spe_id(struct kvm_vcpu *vcpu, int spe_id)
-> > +{
-> > +	struct kvm *kvm = vcpu->kvm;
-> > +	struct kvm_spe *kvm_spe = &kvm->arch.kvm_spe;
-> > +	struct arm_spe_pmu *existing_spe_pmu, *spe_pmu = NULL;
-> 
-> Obviously similar comments to above about 'spe_pmu' -> 'spe_instance' :)
-> 
-> > +	struct spe_pmu_entry *entry;
-> > +
-> > +	if (kvm_vm_has_ran_once(kvm))
-> > +		return -EBUSY;
-> > +
-> > +	guard(mutex)(&spe_pmus_lock);
-> > +
-> > +	list_for_each_entry(entry, &spe_pmus, link) {
-> > +		if (entry->spe_pmu->pmu.type == spe_id) {
-> > +			spe_pmu = entry->spe_pmu;
-> > +			break;
-> > +		}
-> > +	}
-> > +
-> > +	if (!spe_pmu)
-> > +		return -ENXIO;
-> > +
-> > +	existing_spe_pmu = kvm_spe->spe_pmu;
-> > +	if (existing_spe_pmu) {
-> > +		if (existing_spe_pmu != spe_pmu)
-> > +			return -EINVAL;
-> 
-> This really should be -EBUSY for consistency I think.
-
-Consistency with what?
-
-> 
-> See above for suggested change to the code for setting up the CPU mask.
-> 
-> > +		return 0;
-> > +	}
-> > +
-> > +	if (!try_module_get(spe_pmu->pmu.module))
-> > +		return -ENXIO;
-> > +
-> > +	if (kvm_spe_update_supported_cpus(kvm, &spe_pmu->supported_cpus)) {
-> 
-> You're ignoring the error here, better to do:
-
-I'm not ignoring the error, I am deliberately choosing to return -EINVAL to
-userspace, as per the documentation, instead of propagating the error code from
-the internal function.
-
-> 
-> 	int err;
-> 	...
-> 	err = kvm_spe_update_supported_cpus(kvm, &spe_pmu->supported_cpus);
-> 	if (err) {
-> 		...
-> 		return err;
-> 	}
-> 
-> > +		module_put(spe_pmu->pmu.module);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	kvm_spe->spe_pmu = spe_pmu;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static bool kvm_spe_irq_is_valid(struct kvm *kvm, int irq)
-> >  {
-> >  	struct kvm_vcpu *vcpu;
-> > @@ -108,6 +173,15 @@ int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> >  		vcpu_spe->irq_num = irq;
-> >  		return 0;
-> >  	}
-> > +	case KVM_ARM_VCPU_SPE_ID: {
-> > +		int __user *uaddr = (int __user *)(long)attr->addr;
-> > +		int spe_id;
-> > +
-> > +		if (get_user(spe_id, uaddr))
-> > +			return -EFAULT;
-> > +
-> > +		return kvm_spe_set_spe_id(vcpu, spe_id);
-> > +	}
-> >  	}
-> >
-> >  	return -ENXIO;
-> > @@ -117,6 +191,7 @@ int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> >  {
-> >  	struct kvm_vcpu_spe *vcpu_spe = &vcpu->arch.vcpu_spe;
-> >  	struct kvm *kvm = vcpu->kvm;
-> > +	struct kvm_spe *kvm_spe = &kvm->arch.kvm_spe;
-> >
-> >  	if (!vcpu_has_spe(vcpu))
-> >  		return -ENODEV;
-> > @@ -138,6 +213,20 @@ int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> >
-> >  		return 0;
-> >  	}
-> > +	case KVM_ARM_VCPU_SPE_ID: {
-> > +		struct arm_spe_pmu *spe_pmu = kvm_spe->spe_pmu;
-> > +		int __user *uaddr = (int __user *)(long)attr->addr;
-> > +		int spe_id;
-> > +
-> > +		if (!spe_pmu)
-> > +			return -ENXIO;
-> > +
-> > +		spe_id = spe_pmu->pmu.type;
-> > +		if (put_user(spe_id, uaddr))
-> > +			return -EFAULT;
-> > +
-> > +		return 0;
-> > +	}
-> >  	}
-> >
-> >  	return -ENXIO;
-> > @@ -150,6 +239,7 @@ int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> >
-> >  	switch(attr->attr) {
-> >  	case KVM_ARM_VCPU_SPE_IRQ:
-> > +	case KVM_ARM_VCPU_SPE_ID:
-> >  		return 0;
-> >  	}
-> >
-> > --
-> > 2.43.0
-> >
-> >
-> 
-> Assuming you are on board with the suggested rework, I feel like this patch
-> needs splitting up into:
-
-I'm not going to risk breaking userspace, and without that I don't see the need
-to create a separate patch to introduce a one line helper.
-
-Thanks,
-Alex
