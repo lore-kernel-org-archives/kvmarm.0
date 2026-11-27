@@ -1,66 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.72
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795804797;
-	b=dU5yeySxPc2/Lwr6nhqYzigUl0BjO+tFBDe20HHV7EXHu/sFs75TtmmzarrM58t40Oe+
-	 83Mls1qQMPTmZcKlHadkWthxwxmJBZVSC1dSjkjnChJeay4Gy0k6QSbSegxq3LlW9cPvE
-	 N1MMP9wJMMG8BP9pT+bO84N7LYO7Gyr9CKo7HKh1im8AFGAPt4IHQACOlzixmBILAMgg7
-	 6Deg9b4ND8ySpAJTmu13U/YD+rYAUI7uUItbmgh462H5CjSpE42y+Lw0xElSSyxlfY5lY
-	 FagRchtInlpmeT8wwIcDeZnTCSoIKI5IN6nZEig3+KMwQ/1qocuGdoV+3CDTbp/0XQw==
+	t=1795814897;
+	b=y2qrlXcL+RIQpECAp1OPWLxdwRl12oxzPX+Ob5h3k3F9DUHRH+oQXxRFAyTeRdM5GZpE
+	 Tbof3n5TEP4+svI4clGjyXnFYr0QiHEP3ZHJyVd57En6gJIb2kg2Kcq4NXGKvDJK2atpv
+	 nkFlu3W38zseF0wH/DJiuZY1qB5dK8ZOn4qX95trFKz/ObqXF5Y4WWayZUv9k4LYFkPBx
+	 /9KAFrke/IZgXb9UNgt7iNJALeXR12YiEottVQVDMc5fDpDSKK4FFccDO8MlOx2m9L2bx
+	 F1KJbEA+TUD9SpU5gXyXxcwjMboXN2jHPga78nsxYaDXisTa8/GmO7mFVLw+MVbjyqg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795804797;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=LvY8gpHqcKWeG4yrA+GvRV59Qao1sbgMMnjy/o9b65w=;
-	b=L2ecHtj0Wtj5e2NI7rfuMYwf/o7bEj/b3MjRk9/SkrgyJLe5nUuX+/NOdbNyCQQZB0CX
-	 1N1Fnll9hkJTQufmNDW2Mx7MWYRkVD3sGE3l3ALF2w2O14eRnZo88fWGqd0e46w0TLxTl
-	 3gNHSF4AZUz9JyZmlD1JI8inlasajXIpmp5IzIOk20Igx3YrTklHSoMUAZAXRq2Rx17fo
-	 JfUa4QKVWX5kvfAUbirzOD0oPA9CxwWTPy8FJDmu2tBCXnKeXSON+fxeFOgnPEbd6ZRRQ
-	 Lh9Dvbr8RsNGTBhjBFNe9UmWz2S05X7VzXD1ctSAc3mOOhAnnqalwlOX4rt+scdU/wQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795814897;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=+mb9rF6VJRzXR4i4y89PW+yVWJyrkXOWuPHAFuVlX7c=;
+	b=ToQbjJNMId9l9R4oJlFRtvRLqzIJ+n+1MlQM80FeTNVibPWCnwKHVsl9o+ZXlBFVEISx
+	 vQO9m5g0emI0In0/zyJvAWEKqciU3+KyLKjJ3ZYM2e1SxlK2Q5lkVv0WVSS57oGEb4g/v
+	 dDmLl4c1b1EAcr4nIUTs5lexZup4Uj6TDSY8PNlpJu097lyYpu9tfOcDJIlOKLiwq5qOe
+	 wW2etyKuSmO67Tx8zSEF4c/weQSRAl62oGCP+lN0MZdr7wpbW0AvxxrN9mj756D8CPwkJ
+	 cJBXeoS742/5YGXoyO1belm0eMMO5rq7rsBX57LZI1OL7b6ZO8aFQnuCCyn8pKXmJPw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OWxheuhR;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=n4hgj3JI;
+	arc=none smtp.remote-ip=209.85.218.72
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA05660A2608;
-	Fri, 27 Nov 2026 18:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3953A606A31E
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 21:28:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3953A606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OWxheuhR
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18D361F0093B;
-	Fri, 27 Nov 2026 18:39:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795804796;
-	bh=LvY8gpHqcKWeG4yrA+GvRV59Qao1sbgMMnjy/o9b65w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=OWxheuhR0q4soGEPRstxNfAs/40rpsDgln8LJ7NfDzFSiP3D/3Ifd9+V7XEXB6ZN1
-	 03KyNQyf5Zf1vCn9aiaTW5zjBpu5/864zYRAgUx8WQWHeloc7wkJAaCfqa3Tqycvv7
-	 C3AuK1ilUA4XtozXCkO8WVMdlSHsXXFil5LC/FA2pmz0V9/vl4+tKsAy0CekDl1OE5
-	 9KBbwpJYiXg9Cq2MJ9K3A5iE9nu/h82aOW1poOMd6k+Rosq9MjVpUV5i0MDvx2m3f6
-	 n7xhB7tG/EV1hGQvyazwOCMCDNvYwhkQSfD3V8xq13NKDiqQOC3ER/PeXvZi8g35aB
-	 aseIDyFeM1gnw==
-From: Will Deacon <will@kernel.org>
-To: julien.thierry.kdev@gmail.com,
-	Vincent Donnefort <vdonnefort@google.com>
-Cc: catalin.marinas@arm.com,
-	mark.rutland@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	suzuki.poulose@arm.com,
-	alexandru.elisei@arm.com,
-	andre.przywara@arm.com
-Subject: Re: [PATCH v2 0/2] arm64: THPs for systems with pages bigger than 4K
-Date: Fri, 27 Nov 2026 18:39:18 +0000
-Message-ID: <179580213399.1767284.8136918755635870447.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261127165843.709034-1-vdonnefort@google.com>
-References: <20261127165843.709034-1-vdonnefort@google.com>
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=n4hgj3JI
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-c42888c50c4so785078966b.0
+        for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 13:28:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1795814895; x=1796419695; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=+mb9rF6VJRzXR4i4y89PW+yVWJyrkXOWuPHAFuVlX7c=;
+        b=n4hgj3JIaShoIM6TLWqAexGrju7C8E4MM0PcN+QsBoGN8Hf8rQJmRIMcsJoiRA4opX
+         mgVAMNWykN9DrUQo+IJbFrTk9xqtS4k+q5vUXqu41+ZO1/ShJCINtNfDDmYFTVjvWCuV
+         E37QS3Fn5rMjWg06eKMtYHal7+dtQ3/P/nvXNVIwWuGkYTRJvJrfikzrGwnv/TSAnrm2
+         Oe6gPxLCOWXJjLde4Ne74NVLh+74AIeJoPdiF0azdF9LIeip+5LyRES8fKuaDDGqL1TA
+         pJtxsSWCbWoGoEWJEdJv0+yco3txY2RZkMC5ajF43ZN7z+lI5A3964gS8qHsW8YcNa0a
+         xB9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795814895; x=1796419695;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+mb9rF6VJRzXR4i4y89PW+yVWJyrkXOWuPHAFuVlX7c=;
+        b=a9ygkYsEwqKdvMaLOgUK58J4TzgRyCTJMBqzh9qQT7UEmekyQJVyUZi8m3u2gnhe81
+         R/dhHguduqrj3dYtNnKqlFsM4KUF5+Wbb+e/hnNx9dl161pjdUu4NYrAVm7BqWIL6+Cy
+         7iQH+WCl8vklXYyy1bs9sbCa7IaOtn10PzURjtri8U3hXzpi1XFBrtkLcRXRYN90xzet
+         C6EgdIQ3TMUiWRGlHhA8mgH4FX8t+Oe9XwvnjbBEXqMH1KoewGK12Lv95Gof4990CLNr
+         HkQUjbeOWxMR4Le1S6OmP2grXXqsoVccF229BjRzF7rEVN+I6kpsCtRHnwNtU6ClsPOq
+         DYhg==
+X-Forwarded-Encrypted: i=1; AL+hErHnQGr0Y459GXoHIgWrjBE7RQk3Xq2wDQKuuR8zMiRGT9qI0aoZEbnZ+QeF7aMLHhgcWI8VdZY=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/aFXgGPfq3yDP8wgIq39K1fPTfFLTS3GAMha5JQRRasfYiXhg4
+	96yc2zm+kLDujfWdCEvoZOS6mRm8ZwDcaT055XW+uZ7c9L7LozqIVN+SdUYDzVwKtnF8yMvMdW+
+	3IMTN/1If0gEDOTpRcXyJ+w==
+X-Received: from ejbbx9.prod.google.com ([2002:a17:906:a1c9:b0:c50:487b:9fb8])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:906:c10e:b0:c41:5e31:5184 with SMTP id a640c23a62f3a-c513a99abe6mr2130168566b.13.1795814895264;
+ Fri, 27 Nov 2026 13:28:15 -0800 (PST)
+Date: Fri, 27 Nov 2026 21:27:43 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -69,34 +75,63 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.1.839.g22a8290db9-goog
+Message-ID: <20261127212743.1139739-1-vdonnefort@google.com>
+Subject: [PATCH v1] KVM: arm64: Use CNTPCT_EL0 for hyp trace clock
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, 
+	Vincent Donnefort <vdonnefort@google.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 27 Nov 2026 16:58:40 +0000, Vincent Donnefort wrote:
-> Enable THP support for arm64 guests on hosts with a page size larger
-> than 4K.
-> 
-> Changelog:
-> 
-> v2:
->   * Memoize sysconf(_SC_PAGE_SIZE) in host_page_size() and back
->     PAGE_SIZE with it to avoid repeated sysconf() calls. (Will)
->   * Rebase on origin/master (2f3abe56dcd2).
-> 
-> [...]
+trace_hyp_clock() reads the virtual counter (CNTVCT_EL0). Under nVHE
+(and pKVM without hVHE), loading a guest with a non-zero offset applies
+that offset to CNTVCT_EL0, corrupting the trace timestamps. Use
+CNTPCT_EL0 instead.
 
-Applied to kvmtool (master), thanks!
+Cc: stable@vger.kernel.org
+Fixes: b22888917fa4 ("KVM: arm64: Sync boot clock with the nVHE/pKVM hyp")
+Reported-by: Fuad Tabba <fuad.tabba@linux.dev>
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/clock.c | 2 +-
+ arch/arm64/kvm/hyp_trace.c      | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-[1/2] util: Use a memoized value for PAGE_SIZE
-      https://git.kernel.org/will/kvmtool/c/fe0c220df025
-[2/2] arm64: THPs for systems with pages bigger than 4K
-      https://git.kernel.org/will/kvmtool/c/4b4aceb1dae7
+diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/clock.c
+index f3e2619db4e4..ea4412e6737c 100644
+--- a/arch/arm64/kvm/hyp/nvhe/clock.c
++++ b/arch/arm64/kvm/hyp/nvhe/clock.c
+@@ -54,7 +54,7 @@ u64 trace_hyp_clock(void)
+ 	u64 bank = smp_load_acquire(&clock->cur);
+ 	u64 cyc, ns;
+ 
+-	cyc = __arch_counter_get_cntvct() - clock->data[bank].epoch_cyc;
++	cyc = __arch_counter_get_cntpct() - clock->data[bank].epoch_cyc;
+ 
+ 	if (likely(cyc < clock->data[bank].cyc_overflow64)) {
+ 		ns = cyc * clock->data[bank].mult;
+diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+index b9404496f977..06d6bd7aeac7 100644
+--- a/arch/arm64/kvm/hyp_trace.c
++++ b/arch/arm64/kvm/hyp_trace.c
+@@ -510,8 +510,8 @@ int __init kvm_hyp_trace_init(void)
+ 			per_cpu(timer_unstable_counter_workaround, cpu);
+ 
+ 		if (IS_ENABLED(CONFIG_ARM_ARCH_TIMER_OOL_WORKAROUND) &&
+-		    wa && wa->read_cntvct_el0) {
+-			pr_warn("hyp trace can't handle CNTVCT workaround '%s'\n", wa->desc);
++		    wa && wa->read_cntpct_el0) {
++			pr_warn("hyp trace can't handle CNTPCT workaround '%s'\n", wa->desc);
+ 			return -EOPNOTSUPP;
+ 		}
+ 	}
 
-Cheers,
+base-commit: b6a9fa34ce4187cb69d3c588a4bbffc31ce5db8f
 -- 
-Will
+2.56.1.839.g22a8290db9-goog
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
