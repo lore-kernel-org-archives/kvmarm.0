@@ -1,98 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.120
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795767253;
-	b=I87rcOJdZPeDL1NeSIRYm6BMkTiTLmiNsnuydVK35WCQJQMQQlHdQbVb1fAsFj4Xyx7A
-	 yTayZeKhnBnwDULEkv+JO4/mhXT45eCszJxR69BLM5IT+c+Q7bk06XvbsblyU4kQavz5M
-	 geOAhZLSDc34yd1xxVudHQWaIgbwkdPwXL1AnsjPMRoI7w/hvYeUUJZvqEzwnX8HSnL1o
-	 B8YqJlHryQvWTzMObZUKrU0ZTM4NH8hWvfrmKWJ92PR6gIcENi+pvSrGDP+buGuGlFtjZ
-	 sVQJFAEULv0SeyEhhmE3rfAYKqJatnBirXhYpuh5gKQBzF0t3X8AfsdYrMx+ijIsA8Q==
+	t=1795768032;
+	b=1b8UCeIr872+byG9sKU7QxqtNmqk4OCOGbQg2I3e6aoFf8akhGpfkjlgZuCvioVaR+Vg
+	 QfdEiPT5ewpY7ftQ7NNxah/onWPN/NgUIPTbdOadf/v0f9zDuduDzlOAW89XBsh9CYNmL
+	 vSKb/cD2/XR8gndVVf+sRm6sNcf5Lzg25QYdAFm0c5+jXq8/I36ZoDuZUoCh5+M/KUTCy
+	 /A4ZpXq8+SIxyQ+ApsSqJ6QjR+ZViI6xJCv6F1hWsPX1tpFq+/xGqnvEms+QZKIO9lz/h
+	 GdH9df9t1DeimOKz3k+A0PBkLtyGrx3mV1dvTj8B8HR+7v4e6sCOffPlWy6+IVNsQ8w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795767253;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=Apk+wF3JIOKu8ET+h25TVTVOKsViveOnjA4s7dlaLmI=;
-	b=r1uLNI6IriGcEGPRZMj4Rne/fHc8OXiil+kimGusKostAE604RYd0eR7W/pek1Ib16Uk
-	 7wQqAO7l79RYu+JK1vRSwrZzRFdvgyNSFclijH2yzx8p9yO81JQaISriVU4Cb7LV42e+g
-	 FE6xkcDAZrNmv7bG/4SxB7UvrKo2nrcYQ4DWqJcLM0TUK7ygMGY5O6AQjoxPpkeKqW8Vk
-	 VmqGQcPUv4P5mo20sYE7KS0YtPBv3XnWJNnpH9y4Xwhc283EkLQQd8soOO0F2beoYgmd5
-	 DE2mXWQ9AWMgW3Vqy+TlcuOu9BFIbNk6yy2FRWvaoaLecogKrtEuc3TzfpEmhEDD1gw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795768032;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=0qdXfgFbrt8cELQOGisVmBrQ50jtAJGNxPG8ew5/7vY=;
+	b=HmwZ+Pidib/OEQUCkv3flWvNctDu85sPouxd15UEL210+M2i2Vy+OpRpa+vLYSrhfChW
+	 mnkV+qYZz8qIQETSVHccVa+7v7jesBBzxTxZk2Oz6mHMXtFxn1isVfiTvq5+VPt/9llvk
+	 3QByBqJ11Rva1muP3NSWKwAtHfSNCsl3KO6F08jwBghzVcc1kyUWCsK2PzKbbZBmhz90m
+	 f+alRXRieO9zd42yjhHnQWdnuoK8YGP7l9aTikMbgSGGgEovAgx7vvJ6RrDoXtNQtkW2S
+	 mk0Rh4rCmAUnsFhKLD30dL0dhkw6AxXnH6qPD24IckhHuhoIolMmsTu8sKicVAlKSFQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=pereq.eu;
-	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=BkKFUNGE;
-	arc=none smtp.remote-ip=209.85.221.41
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nWxVVwyo;
+	arc=none smtp.remote-ip=95.215.58.120
+Received: from mta1.migadu.com (out-120.mta1.migadu.com [95.215.58.120])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A7C606A327
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 08:14:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C1A7C606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79A9606A31C
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 08:27:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A79A9606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=BkKFUNGE
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-4a3e706b5dfso4896641f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 00:14:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1795767251; x=1796372051; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Apk+wF3JIOKu8ET+h25TVTVOKsViveOnjA4s7dlaLmI=;
-        b=BkKFUNGEX86z2tUe7K2Z4mydLbA/EdYUrg23GUeXwZGOmb8sK/op3vU7EOK2D0y8K3
-         ofez2k05BmbTx7/PO1lNFEDXuU0ZL/QuCWD6yYlm/lX0/6LM+/AS9gE1feY1yPnLVrAt
-         PhuwNx8kmqKR9Bhxl3qylj+L6Trlu4DtILJhe5cBPU5OTflKqwpTLJTkNfJHegn+KVoe
-         RmsgchLjTGBEVDCaRYo0OurRXR7r3MvbRnN+g79a2p4Ui/FbHyb5Fj/9MPy0ubI2hLAa
-         KIbaowZn7Yz+txoYL1HriNs5brhV6cvTSVzQH1jC9CyrGJDFR6Ypr12Hgie0UbSx7xDG
-         HTAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795767251; x=1796372051;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Apk+wF3JIOKu8ET+h25TVTVOKsViveOnjA4s7dlaLmI=;
-        b=2HhBLjHcYHTZtPdCHyWVDSpdPXJ6kpnCvU49yd5y09/z+o1RFzztG4T4HjT7yr4cw/
-         DVL59GBJt7dZ7NzhLaDV0iJZ/uFVpw/Y21WxvgD0or0wSZFbQKJGYo3OXTkAMxFsFIKt
-         BaWNIuPn6FsSuiwpmI8NTdF9j01UBSwcO/5So+FzASuGnXBB5+ehwxUngJdUtP8WG3lg
-         ZHQBMmiNzagjRQr+yNgA/o0uXe+tx7pEf5c45IiUGyMVRA75xBhx4VD0QLZRIb+UZEcC
-         jE8f0OVN+Cu6Jmp2be2/hqmFPuaAywgKBcCKxYWPhbo6OE5VbhaP3n06BpjL4m/yqrsl
-         wQIQ==
-X-Gm-Message-State: APuU4Z84H3tQrMWRkjD7KmKAZpkqrS/4mPH6eLFxHy4eCFgN3Ib7biTK
-	IChb/dy69YFLiiL3cAURm5GfzMPugv6IESgnb53T77+Ra8k6IjPbRbOYdx8MAgwfeDM=
-X-Gm-Gg: AZFdTZdUyhihHjdV+fywr2BDuOTz0mrQ+pyqYxFQwcFYyy2poZbR4uNTuB7SyVGydJp
-	y1HWMQxHG9jSz/F2otPb55xok/6BI8l69jkb75HXfH6S1biFNxeFwXikE1FBqq3p3AEaG0m4eSo
-	G5vHOpYCOxJoClasn3R3lKbnv+VI1oeINJDN7uqtoj5e2/esPhIP4azDCxXZu5mfYdINfMF3i6+
-	Ldby/CLC1laAl6YgRp7Apt4hKJmTgJhbfi/Baxak5rkK6fgPkEpG/TBrYb3d+vXRytTMG1WzP6T
-	x75oSSp8Z8t6gYyrbP4TKgV13xxMWDj9gMZWIK9hhgIKOmAC4BPrJ+adkIXnM065aQG/qvK3M+H
-	9GYnrB54NhnlqF63KrkSj3ooEN2xhLtLkdKG9IXJBYK7EQ10zCaDa1f7x2fNVcfsEhvinUU1f90
-	jrycSQcWwoprfT+CKQBE1eTuLy1cUBQsJkLvetW5+0g92cOr07HatA/6BWY9UzWogiiGg+Dpizm
-	5ZdRei7VVbjQUOHT6q7fmwLRWoqG8y9D7c/Ynd8hX6zrQrvIU1CcABfgeTCCkbS8crejaXgaLxv
-	jvtv35YJ1brn0439rBI=
-X-Received: by 2002:a05:6000:40ca:b0:4a3:976e:27a2 with SMTP id ffacd0b85a97d-4abb5146238mr46038597f8f.34.1795767250897;
-        Fri, 27 Nov 2026 00:14:10 -0800 (PST)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6a67fe75sm52271979f8f.24.2026.11.27.00.14.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 00:14:10 -0800 (PST)
-Date: Fri, 27 Nov 2026 11:14:07 +0300
-From: Dan Carpenter <dan@pereq.eu>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Karthik Bhargavan <karthik@pereq.eu>,
-	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
-Subject: Re: [PATCH v2 09/16] KVM: arm64: Report faults from S1 walk setup at
- the expected start level
-Message-ID: <awk7z5-ZlzQDqfcz@stanley.mountain>
-References: <20250915114451.660351-1-maz@kernel.org>
- <20250915114451.660351-10-maz@kernel.org>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nWxVVwyo
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=P7zTh4ysMCYZDF5Ib3q0oR+g3D93VzbkeVMGD4akERA=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795768029; v=1; x=1796372829;
+ b=nWxVVwyo3nhf9qDpV8God0aKFJHJ/M7C00Dw8roHhe6nwbPSARmFR80ODLAiv8qtTE0e/YV9
+ /2KGFYT9zOpcjrVXpJMFItjHxJSxRKKkYpiIS/EFp1dGKnN4BGdT+Wwy+0Os/i3mgorTN89+31M
+ 8n78XOiC2aG7OmKfZmr3qqgg=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 137acc9baf8eed0f;
+	Fri, 27 Nov 2026 08:27:09 +0000
+X-Mizu-Trace-ID: 137acc9baf8eed0f
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5c144eb2f43so42436e87.1
+        for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 00:27:09 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErHA5lTf3oAC853layz871Q073rV2Fxacf3xoFshlA4NK1M5ZS9cJlglbpFVde1V4ZUZ4/8JOuo=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8ys4VtYszuIv2GwdA/OPUyiceeso9I+Kfay0UVSJyMWkF1lc9A
+	k5ZYrKN//MyNpXKpydWyDQnwaArRspSd3V/kJ+ShruDWfzfT3OOOFNfleTmgMFgfs0wRjF9IbnV
+	nlcJPdIVf/5XsctF4m53qILhhIfXVN+bffBv4Mvvt
+X-Received: by 2002:a05:6512:3041:b0:5c0:7c6e:4559 with SMTP id
+ 2adb3069b0e04-5c21a2490b8mr800282e87.9.1795768028694; Fri, 27 Nov 2026
+ 00:27:08 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -102,65 +66,47 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250915114451.660351-10-maz@kernel.org>
+References: <20261009072147.474952-1-fuad.tabba@linux.dev> <awV15Rv-caDclC9K@arm.com>
+In-Reply-To: <awV15Rv-caDclC9K@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Fri, 27 Nov 2026 08:26:32 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTw_T_HhfNUytcqf6xefkOoOHgpFq3=J7bgsZSMyu1ON-A@mail.gmail.com>
+X-Gm-Features: Aa3M54qBZ_c98t9Ayo9A6TeJjo0TeideV9tW7aQLWPW5qkPop4MRVlx3am7GbX8
+Message-ID: <CA+EHjTw_T_HhfNUytcqf6xefkOoOHgpFq3=J7bgsZSMyu1ON-A@mail.gmail.com>
+Subject: Re: [PATCH] arm64: Use symbolic constants for the ccmp NZCV immediates
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: will@kernel.org, mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Marc,
+On Tue, 24 Nov 2026 at 11:32, Catalin Marinas <catalin.marinas@arm.com> wrote:
+>
+> On Fri, Oct 09, 2026 at 08:21:47AM +0100, Fuad Tabba wrote:
+> > diff --git a/arch/arm64/include/asm/ptrace.h b/arch/arm64/include/asm/ptrace.h
+> > index f7dc5fb9427d6..15c381ef7d2c2 100644
+> > --- a/arch/arm64/include/asm/ptrace.h
+> > +++ b/arch/arm64/include/asm/ptrace.h
+> > @@ -30,6 +30,10 @@
+> >  #define PSR_MODE_THREAD_BIT  (1 << 0)
+> >  #define PSR_IL_BIT           (1 << 20)
+> >
+> > +/* CCMP NZCV immediates that make the named condition hold */
+> > +#define CCMP_NZCV_EQ         (PSR_Z_BIT >> 28)
+> > +#define CCMP_NZCV_LT         (PSR_N_BIT >> 28)
+> > +
+> >  /* AArch32-specific ptrace requests */
+> >  #define COMPAT_PTRACE_GETREGS                12
+> >  #define COMPAT_PTRACE_SETREGS                13
+>
+> One nit: I'd place the definitions above (or below) the
+> ARM64_S390_COMMON block, the generated s390 header shouldn't need them.
+> Otherwise it greatly improves clarity.
+>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 
-On Mon, Sep 15, 2025 at 12:44:44PM +0100, Marc Zyngier wrote:
-> Translation faults from TTBR must be reported on the start level,
-> and not level-0. Enforcing this requires moving quite a lot of
-> code around so that the start level can be computed early enough
-> that it is usable.
-> 
+Thanks, I'll respin it as you suggest.
 
-[ snip ]
-
-> @@ -351,12 +351,17 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  
->  	return 0;
->  
-> -addrsz:				/* Address Size Fault level 0 */
-> +addrsz:
-> +	/*
-> +	 * Address Size Fault level 0 to indicate it comes from TTBR.
-> +	 * yes, this is an oddity.
-> +	 */
->  	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(0), false);
->  	return -EFAULT;
->  
-> -transfault_l0:			/* Translation Fault level 0 */
-> -	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(0), false);
-> +transfault:
-> +	/* Translation Fault on start level */
-> +	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(wi->sl), false);
-                                             ^^^^^^
-Switching this from 0 to wi->sl was obvoiusly done deliberately but Pereq
-is trying to do formal verification based on reading the ARM docs and
-matching it with the kernel and the AArch64.AArch64_S1Translate() pseudo
-code uses a zero here.
-
->  	return -EFAULT;
->  }
-
-Part of the issue is that wi->sl can be totally bogus.
-
-   274          ia_bits = get_ia_size(wi);
-                                      ^^
-ia_bits is based on wl->txsz
-
-   275  
-   276          /* AArch64.S1StartLevel() */
-   277          stride = wi->pgshift - 3;
-   278          wi->sl = 3 - (((ia_bits - 1) - wi->pgshift) / stride);
-
-so wi->sl is based on ->txsx and the "- wi->pgshift" subtract can
-underflow.  We check txsz if is invalid later "if (wi->txsz > 39)" etc
-but we still end up using the original "wi->sl" invalid start level.
-
-If we made invalid values of ->txsz use zero that would fix my test
-cases but it still wouldn't match the doc.
-
-regards,
-dan carpenter
+Cheers,
+/fuad
