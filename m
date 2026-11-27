@@ -1,60 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.243
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795790163;
-	b=oMdMjW05FB9ePrJasqqqGWEBdgGN0nsKwNSGvmFsil3QujaiAixgfVB4plWaIkG9d34j
-	 7dJOiSimN9MjFsU4Sz+8ZYhN0/qxaPiGHS7lONmF7eSpa+g29pc3yAHbzDaRgVyey1eFe
-	 +4mEuZUzkEwEJwjJz1rZfQQcyyjbTRfKxGOsFZcWuSHCT8crSvgTqnN6/PDoTCGbOWo+2
-	 FUlq8hezyevixRz6J21wo6uZsnwl7FxhSjjVoa0wGPiLAz194mIF2h/KgAI0opVQcNyDu
-	 TCButyummLxpAi+TM0fADKzmv6epbFDaWxIu4FDZ2SSr8rPflGV/6klXLPs8dD+EF+A==
+	t=1795790308;
+	b=kRWywhQGpOkn3izrVEhP0267SPoMIMb1GA1EE1si/ST9v0VfWbJH+Iw82OhjmwSuJFjC
+	 e2kMf214+e8g1YCHK7QDxrh80CTX3bYEmpF7XWIJmc/O3q5FGeCe7kYkO5q9jegcUnroy
+	 GqUF785asR1hEd35j2yM6AR6yTIbCQIQ+S52EyQrVllteWRD1LnytRYofD072O/jWzjRE
+	 CYp7iq3UliTn+8fwVHojANlxscJMwj4PAKl/xSBNrNVzLBLyTmVllISuwD/4HWOUvT7eZ
+	 BR8bRgElDmwwyf3Tk3X8xBgNviNxNoMXaDlkov8rxH0EkJs6FbbcaaUkoXzFUWSsUcw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795790163;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=7C5gBPIj69ddVv9sMUWt40x1laoC666bCWFRg/Enq4U=;
-	b=Gf3cDoFRP7uOk1KNrfG6X0pnVBwqRlTyLVNn2/yDT5Br/wjWC9TQTOHlhjJ0e4dZRoJj
-	 rfFSHVjqgpXfF8+WLpM6n7buAmZftORgDVHOZvRLxIPy22nxHfXEXm+GWpaZHMLZmHf3h
-	 vDlXkfFbSO2WAQBGa8hyREU+saAC6nFdY/Nov2w8QJnzJiH5P4CKPdIiHEBk8seyV+Nl+
-	 PQ8ilcyvRH4isrthqJO7s/zCmi5lzSEJoz9lWBSwd2KPlKFYk5ZfW3zEsYt9Ff7PMeOkJ
-	 NfBnYVDLtvOvDUEScJz5Hwu5MZZCDf1HJfSs+dvPOW6XKxZZ3XC0AFuD7laKBTX36SQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795790308;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=tLn9NlBdSVUSz58JdtDu+F9qp+vEUxjH2T7H0cAfX+E=;
+	b=vvCuq2sRc9wmhJkx3LVGWxwHTrOkRwXvz4VuT/7CjVQ3ljwPwM/i4Jw/MDCJvANLEXxf
+	 iGDvLOkcWf1GPfO3X+yCP+Oi9pOkhdVlM5NEv8b52KnocrdqjQNK0MsAU7ylMkUrNc25z
+	 g+nUKcMk80PWCEoDD0MSTHZ1ZQTHtUGkNlVstHF+Y4/EYocaWrwl1yyX7+Ay7y1hWld7F
+	 /k3eY7x4P4fTIf0b2/kdaFKOXrrIGLZ8ypa1nUqiXJs7ZcCXJ0VBLDyoaJ0l++7+i21/K
+	 lqe3blHw6DMgXxpxPeSz5HBjfsO/8MyRcQDgIQgQjejWUxLdyOkxA4b83wQVtBSL30g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QE1Ia2dN;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="lW139yi/";
+	arc=none smtp.remote-ip=95.215.58.243
+Received: from mta1.migadu.com (out-243.mta1.migadu.com [95.215.58.243])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5E1606A31C;
-	Fri, 27 Nov 2026 14:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC06606A32A
+	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 14:38:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7BC06606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QE1Ia2dN
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D6781F00893;
-	Fri, 27 Nov 2026 14:36:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795790163;
-	bh=7C5gBPIj69ddVv9sMUWt40x1laoC666bCWFRg/Enq4U=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=QE1Ia2dNQMICHouDS/6GfDyGz273RcERT4pxi4jGdNZcZ6ALFL3qf+zyNet2IP/am
-	 RSrlanazmy1As9mnJeRYt2tpkx/VopvQnHI895qKGEouj8Y6MYrygFn6PCvuINyh9N
-	 0tCFG3orM+6Dy/c8YE89HWpp6fe81s83EisnJdYapd7X4bfQ671FDG4TX9W11Zs8fQ
-	 nnH1aF1FoK7zdKLD7OJIlzEfP0IB+b7/BysjlezPtc7CwGBkv1IrGn+D0H7ZPDKiHN
-	 uR5ZIOvR4PDkSOGCEjgK9IVPFZkosj6uFNreyRHjgG/t9u3i3/8DjyU9EnUzyzl5L2
-	 TES9FGCCnqpYA==
-Message-ID: <sashiko-outbox-237571@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 10/25] KVM: arm64: Share system register code with
- s390
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Heiko
- Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>
-In-Reply-To: <20261127-sysreg-v4-10-a6318d18aab5@linux.ibm.com>
-References: <20261127-sysreg-v4-0-a6318d18aab5@linux.ibm.com>
- <20261127-sysreg-v4-10-a6318d18aab5@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 27 Nov 2026 14:36:02 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=lW139yi/
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=8AxK7nkx6Q25xccXZzMNTLYsT/LG228EyrVgmqLTQ9U=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795790305; v=1; x=1796395105;
+ b=lW139yi/SVGyw6xlKY050XNGYJjgtfTAzD56ebhNHSE/TOd8QtAtYnxbfj2qzH7yJ9HXtsum
+ 04rZa4FBJRtI1Mf4FjVr8KMFrDMTg7HWY9N2FkcpwajaWmrIZmk5823HU0raLFyAu57zaeJdzU3
+ Oe0mwkGWgWG6fEQSJVXutI1A=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id a1f3988772b981e8;
+	Fri, 27 Nov 2026 14:38:25 +0000
+X-Mizu-Trace-ID: a1f3988772b981e8
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <aa937018-0454-4dbb-9e32-a65b46fc7635@linux.dev>
+Date: Fri, 27 Nov 2026 14:38:24 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -63,133 +57,79 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: Reduce the stage-2 page cache on 64 KiB hosts
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, Leonardo Bras <leo.bras@arm.com>
+Cc: Wei-Lin Chang <weilin.chang@arm.com>, maz@kernel.org, oupton@kernel.org,
+ fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com,
+ suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
+ will@kernel.org, mark.rutland@arm.com, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ riel@surriel.com, shakeel.butt@linux.dev, kernel-team@meta.com,
+ rkeilty@meta.com, atish.patra@linux.dev, dgreid@meta.com
+References: <20261124152842.2634495-1-usama.arif@linux.dev>
+ <awcXhk885lqDRAHy@LeoBrasDK> <06a69a4f-59bb-49b8-9ed0-f4cfe0ecad37@linux.dev>
+ <awcoCklLOKeuXPhh@LeoBrasDK> <e7bdcfa9-bbd8-4649-8318-2f6dc236db15@linux.dev>
+ <4jxdf2pkuu2f7dftvf6ltpv27jctfuvvrfcrbfxudsgnp3hdfk@taur55wftexq>
+ <awhH1Dpu0uIwP6ea@gremlin> <awh5pmXCbNoFP5Ez@LeoBrasDK>
+ <awmDZoqzL_t6A7go@gremlin>
+Content-Language: en-US
+From: Usama Arif <usama.arif@linux.dev>
+In-Reply-To: <awmDZoqzL_t6A7go@gremlin>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] KVM: arm64: piecemeal sys_regs.c sharing and mixed PAuth/SVE
-  changes
---
 
-commit 674857ecf2e2398c1a40ecd629858a2ef61bc1be
-Author: Steffen Eiden <seiden@linux.ibm.com>
 
-KVM: arm64: Share system register code with s390
+On 27/11/2026 05:29, Lorenzo Stoakes (ARM) wrote:
+> On Thu, Nov 26, 2026 at 06:25:43PM +0000, Leonardo Bras wrote:
+>>>>> diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
+>>>>> index 9a126b9e2d7c99..5b61285d317e28 100644
+>>>>> --- a/arch/arm64/include/asm/kvm_types.h
+>>>>> +++ b/arch/arm64/include/asm/kvm_types.h
+>>>>> @@ -2,7 +2,12 @@
+>>>>>  #ifndef _ASM_ARM64_KVM_TYPES_H
+>>>>>  #define _ASM_ARM64_KVM_TYPES_H
+>>>>>
+>>>>> -#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
+>>>>> +#define KVM_PGTABLE_FIRST_LEVEL		-1
+>>>>> +#define KVM_PGTABLE_LAST_LEVEL		3
+>>>>> +
+>>>
+>>> The -1 isn't needed here at all right? So why not just import
+>>> KVM_PGTABLE_LAST_LEVEL and do:
+>>>
+>>> #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE       KVM_PGTABLE_LAST_LEVEL
+>>>
+>>> ?
+>>
+>> Well, it kind of is :)
+>> The lowest level we have in a PGTABLE is level -1. (See RKSBQV)
+>>
+>> It could now be mathematically correct, but it could break in the future if
+>> we got a level-2, for instance. We could have (LAST - FIRST - 1), if that
+>> one page makes any diference.
+> 
+> Yup it's level -1 but isn't that only something meaningful for stage-1 I believe
+> due to concatenation? As per stage2_pgtable_levels() [where ipa is the number of
+> bits not the ipa... :)].
+> 
+> But you make a good point re: future changes!
+> 
+> Anyway, Marc has made it clear he wants something based on
+> kvm_mmu_cache_min_pages() at runtime, so it's all moot anyway, this needs to be
+> reworked for that.
+> 
+> Usama - I assume you are looking at that now?
+> 
 
-This commit wraps selected system register helpers, pointer authentication
-checks, and SVE register definitions in ARM64_S390_COMMON guards so they
-can be compiled into the s390 KVM implementation for arm64 guests.
+Yes, sorry I didnt see this discussion until now, I was trying to prototype
+something that fit Marc's suggestion [1] and measure potential cost of it.
+Hopefully its reasonable.
 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a148e80d0aef7..4d44b638b7d38 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -361,6 +361,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->  	kvm_arm_teardown_hypercalls(kvm);
->  }
-> =20
-> +#if ARM64_S390_COMMON =3D=3D 1
->  static bool kvm_has_full_ptr_auth(void)
->  {
->  	bool apa, gpa, api, gpi, apa3, gpa3;
-> @@ -395,6 +396,8 @@ static bool kvm_has_full_ptr_auth(void)
->  		(apa + api + apa3) =3D=3D 1);
->  }
-> =20
-> +#endif /* ARM64_S390_COMMON =3D=3D 1 */
-> +
->  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  {
->  	int r;
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index ba4570c52a916..c9780845ef177 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -307,12 +307,12 @@ static int set_core_reg(struct kvm_vcpu *vcpu, cons=
-t struct kvm_one_reg *reg)
->  	return err;
->  }
-> =20
-> -#endif /* ARM64_S390_COMMON =3D=3D 1 */
-> -
->  #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
->  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
->  #define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
-> =20
-> +#endif /* ARM64_S390_COMMON =3D=3D 1 */
-> +
->  static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *=
-reg)
+[1] https://lore.kernel.org/all/d2b6e735-a685-4e79-bb39-2fb75ebecd09@linux.dev/
 
-[ ... ]
+> --
+> Cheers, Lorenzo
 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index abc49d4968f6c..6bd200694b143 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-
-[ ... ]
-
-> @@ -3219,6 +3237,7 @@ static void init_imp_id_regs(void)
->  	boot_cpu_aidr_val =3D read_sysreg(aidr_el1);
->  }
-> =20
-> +#if ARM64_S390_COMMON =3D=3D 1
->  static u64 reset_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_=
-desc *r)
->  {
->  	switch (reg_to_encoding(r)) {
-> @@ -3276,6 +3295,8 @@ static int set_imp_id_reg(struct kvm_vcpu *vcpu, co=
-nst struct sys_reg_desc *r,
->  	.val =3D mask,					\
->  	}
-> =20
-> +#endif /* ARM64_S390_COMMON =3D=3D 1 */
-> +
->  static u64 reset_mdcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *=
-r)
->  {
->  	__vcpu_assign_sys_reg(vcpu, r->reg, vcpu->kvm->arch.nr_pmu_counters);
-
-[ ... ]
-
-> @@ -5446,6 +5470,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
->  	return 1;
->  }
-> =20
-> +#if ARM64_S390_COMMON =3D=3D 1
->  static void reset_vm_ftr_id_reg(struct kvm_vcpu *vcpu, const struct sys_=
-reg_desc *reg)
->  {
->  	u32 id =3D reg_to_encoding(reg);
-> @@ -5787,6 +5812,8 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *v=
-cpu, u64 __user *uindices)
->  	return write_demux_regids(uindices);
->  }
-> =20
-> +#endif /* ARM64_S390_COMMON =3D=3D 1 */
-> +
->  #define KVM_ARM_FEATURE_ID_RANGE_INDEX(r)			\
-
-[Severity: Medium]
-As reported by Marc Zyngier on v2 [1], why does this patch slice
-arch/arm64/kvm/sys_regs.c into nine scattered ARM64_S390_COMMON blocks
-instead of sharing the file and sys_reg_descs as a whole through state
-access indirection?
-
-Leaving sys_reg_descs, kvm_reset_sys_regs(), kvm_handle_sys_reg(),
-arm64_check_features(), and finalize_sys_regs() outside the shared sections
-causes commit "KVM: s390: arm64: Implement arm system register managing
-infrastructure" to duplicate the architectural system register table and
-core handling logic in arch/s390/kvm/arm64/sys_regs.c.
-
-In addition, bundling kvm_has_full_ptr_auth() in arch/arm64/kvm/arm.c and
-SVE helpers in arch/arm64/kvm/guest.c into this commit mixes unrelated
-pointer authentication and SVE changes (including moving ARM64_S390_COMMON
-markers added earlier in commit "KVM: arm64: Share arm64 code with s390")
-with system register sharing.
-
-[1] https://lore.kernel.org/r/87o6ehmkzz.wl-maz@kernel.org
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261127-sysreg-v4-=
-0-a6318d18aab5@linux.ibm.com?part=3D10
