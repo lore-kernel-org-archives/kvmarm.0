@@ -1,62 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795861441;
-	b=q2vYhD/FsMF2+0q0lqWb5jh7kjr32RAJ4pueXZwSLLlaIOyp+ASjDYcRMkYyqAsaFl1G
-	 53nYn0P3a5XFDWwunMxWdGmQCOhsdlL/Sia7sRxwfuN8oY+9lLvY3+8tcDqU/elLoDlBs
-	 P+EIdk8b0DDCcVBMBKceIaboa/PJY5Ugvb1izV7Y3ypMKEKoOeO7aw2ay+MRYMxzbdkM0
-	 erqHkqgMbcvngDI+g7edtRcx4pfChKLVEF5rLahAuQUtehFhbXx/9SDz3vn+QlWjbewtM
-	 pr4uuJO1eeOP7NVnyzgYc3+fUcX/cQdsjuIQcBJlQKL0md4vR15ham4DDvTwD6HmTpA==
+	t=1795865247;
+	b=cBdo+syne9SuqoVqnfTesz/cjHzllwJ1LWowpi0ghDT9BdCevAOfuKIK6sA8qeGJm55d
+	 MDs39T5Em/jxSlcVYvUCHvvMeI/DUKkQ6tew9f9mDTTwQx+lGktZH7lxlljXfPbgQ173A
+	 36SUAeIdqt+ZEGho9HO4Z+IzIgspBK8tjZ3KdgoA5O4sml78NTd2acx/0jLoE3EgXg5fd
+	 4buXEIviNh7ai6GK7927Cc9Z4K/XFWLJR4AZg1dslLCSNSqBbAN/7/PI7gblw0OZMvJRF
+	 tdBoTn9nscmbWYVNgSjiwo6k/0j2tgrzgWFgWvuwFHYV9ZBweQHi0keRfjF9gJMUi8w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795861441;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=8q0lR6QsKstdpDF4gJX9VbdnKsOKt9hZucknTnB2NSs=;
-	b=D88A9kOKRp2mqi4v3dkqHOevbwxHzpiQe/7otRRuPndkN9gXXt/TnVjIGQ23zUk95AvO
-	 YJWaiS65iFoOuBChILiDDUJY6ODWXsRqdNa3ZzstqBvrX6keUVBZ89tL+mli97lw/ZzZD
-	 3iledUdhADVwnR8Yq9138tTBQSCe/NXS39VesDEoR2pH0AQj15CuzeAv9g+mGJwBen/6/
-	 nbv2fBthsMG4lbAF8ZoTHQQByArbT7Zq5XdAGRt4VylKQbFMR27Y/lxV+O4Iggp3pRN5Z
-	 m7IyaZTqZJ151Klp/d3wzfwKug/CmU2nvHVEI+FZat3zeiEQU4LTKE08qte1ApC8JCw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795865247;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=okDC0B46PRRTetiRAIilWFQEeJzVgf5e7rHEzSv3oT8=;
+	b=jtqsu1OWn27q6BNWXuvWkUeb41L+ACue5XAr3VQM3lUm2f0A8wtxJztcldY85YHALz2h
+	 cbn6skyjojDRywb918MUKc5jmZepM5crhHu4duiW69ANr2P5DE/zzrd+nZ3Qf7L/WXmPC
+	 LflKmUvAd9YiJq97u2VnOnB8CRt5WaD26XneaP/Bjr/jdAQYds9LjXfx2812xcCncEmVC
+	 FHj6dXeO1BOEMuseExOycsK+l9V8uPDLUqPjUg02kSPVPOotWWBCCVoVFB0oqOekhF/XG
+	 7TxkZX81sISmr+UVVAue/X5ehVTRK+SK6iJ0hb4qTRtvOLOj+AW/5AZ1pNwrqexLXow==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Mi3UhtNu;
-	arc=none smtp.remote-ip=95.215.58.184
-Received: from mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="eWdS/LKl";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03983606A326
-	for <kvmarm@lists.linux.dev>; Sat, 28 Nov 2026 10:24:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 03983606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC78B606A31C;
+	Sat, 28 Nov 2026 11:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Mi3UhtNu
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=8q0lR6QsKstdpDF4gJX9VbdnKsOKt9hZucknTnB2NSs=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795861439; v=1; x=1796466239;
- b=Mi3UhtNuTTf7N4V+S9P+nLOMu0jB7HCGPb4JqpAXaZnIV63abR4M2MIc/LnI7RCU5KVs32VS
- +wXgzMWwPvEST43wxZR/xBwDRUOxMsVN9MJFmJWIfokpq8RRvRIVRUFBwikU7I4/J+RQ9lj8mEA
- jaS4ftD/zMiRniT5wdKjUVuA=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 31c04bc271fb9e7c;
-	Sat, 28 Nov 2026 10:23:58 +0000
-X-Mizu-Trace-ID: 31c04bc271fb9e7c
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5c144eb2f43so48826e87.1
-        for <kvmarm@lists.linux.dev>; Sat, 28 Nov 2026 02:23:57 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErHcpKypnKdfD6s8CAU/saEDIVtjyqyW4j9MNJsxXRiRnQQGRMvKt+R8wn8q2H4LwoHc1UQMUys=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9A9A/opGIZOD3NfkRbndeLwNjXI+vefbdjCBFtza4Bvzsw8CGM
-	nfVBtyM4TSg4bdn1nO3SCwzNtfp10vPl2fNv8Zo9lju0prDRtztiOzs+36AK7pr5vGN+I5CiWQr
-	qYpUTTXSftUvIcGlCzoS8IYiYICOpbbkI2184qWhu
-X-Received: by 2002:a05:6512:a84:b0:5c1:5bc5:f373 with SMTP id
- 2adb3069b0e04-5c222dc93ccmr890373e87.15.1795861436887; Sat, 28 Nov 2026
- 02:23:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eWdS/LKl
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91E991F00893;
+	Sat, 28 Nov 2026 11:27:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795865246;
+	bh=okDC0B46PRRTetiRAIilWFQEeJzVgf5e7rHEzSv3oT8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=eWdS/LKla95Ne7XPm8FmGtUx0GoGIeaje4xXP7Rvlid/ChHdk/UOkzfXt+xkq/V4b
+	 Jewgv07Is5FwrKcDe7yRLI9sajA6OWtI+xFgbpDaY7LrC4FlhizwQNTraY22jci/BJ
+	 FuHfS5rXZifYNNOusCHTlI+2j4GhGwwBjMfY9dEoNCNvgD34WemBuXv7xZVziRbTg4
+	 jo52JmcFp8zDJ3lwOm8h3+wlR2DiARbq5PT/tjK4KJD4b4lQaX1KxAnjYS/qTeGX5l
+	 hfirAqEseWU9SMkmrzWLCPE+tgFicK9PijLEm4OLvP4PeaHS0x9K49sNGD9dY2rTE4
+	 E6xGBxxzgNEYw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xXGaS-00000004Oco-1rw6;
+	Sat, 28 Nov 2026 11:27:24 +0000
+Date: Sat, 28 Nov 2026 11:27:23 +0000
+Message-ID: <86qzg5xkkk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Vincent Donnefort <vdonnefort@google.com>,
+	oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kernel-team@android.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1] KVM: arm64: Use CNTPCT_EL0 for hyp trace clock
+In-Reply-To: <CA+EHjTy15GC3=c7MvQu7eKON1g-v8KFzYXruoTfWvoSdBOnMCA@mail.gmail.com>
+References: <20261127212743.1139739-1-vdonnefort@google.com>
+	<86se0lxpti.wl-maz@kernel.org>
+	<CA+EHjTy15GC3=c7MvQu7eKON1g-v8KFzYXruoTfWvoSdBOnMCA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,41 +79,88 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <20261127212743.1139739-1-vdonnefort@google.com> <86se0lxpti.wl-maz@kernel.org>
-In-Reply-To: <86se0lxpti.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Sat, 28 Nov 2026 10:23:20 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTy15GC3=c7MvQu7eKON1g-v8KFzYXruoTfWvoSdBOnMCA@mail.gmail.com>
-X-Gm-Features: Aa3M54rBUeM9GDr14iZtDQNqhNurSw8bWhfxNqaGvkRf8d9q6kTODFktkvbCXtk
-Message-ID: <CA+EHjTy15GC3=c7MvQu7eKON1g-v8KFzYXruoTfWvoSdBOnMCA@mail.gmail.com>
-Subject: Re: [PATCH v1] KVM: arm64: Use CNTPCT_EL0 for hyp trace clock
-To: Marc Zyngier <maz@kernel.org>
-Cc: Vincent Donnefort <vdonnefort@google.com>, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
-
-On Sat, 28 Nov 2026 09:34:01 +0000, Marc Zyngier <maz@kernel.org> wrote:
-> On Fri, 27 Nov 2026 21:27:43 +0000,
-> Vincent Donnefort <vdonnefort@google.com> wrote:
+On Sat, 28 Nov 2026 10:23:20 +0000,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> Hi Marc,
+> 
+> On Sat, 28 Nov 2026 09:34:01 +0000, Marc Zyngier <maz@kernel.org> wrote:
+> > On Fri, 27 Nov 2026 21:27:43 +0000,
+> > Vincent Donnefort <vdonnefort@google.com> wrote:
+> > >
+> > > trace_hyp_clock() reads the virtual counter (CNTVCT_EL0). Under nVHE
+> > > (and pKVM without hVHE), loading a guest with a non-zero offset applies
+> > > that offset to CNTVCT_EL0, corrupting the trace timestamps. Use
+> > > CNTPCT_EL0 instead.
 > >
-> > trace_hyp_clock() reads the virtual counter (CNTVCT_EL0). Under nVHE
-> > (and pKVM without hVHE), loading a guest with a non-zero offset applies
-> > that offset to CNTVCT_EL0, corrupting the trace timestamps. Use
-> > CNTPCT_EL0 instead.
->
-> pKVM mandates CNTVOFF_EL2 being 0. Has that changed?
+> > pKVM mandates CNTVOFF_EL2 being 0. Has that changed?
+> 
+> Not for non-protected VMs. flush_hyp_timer_state() zeroes CNTVOFF_EL2
+> only for a protected vCPU, and a non-protected VM in pKVM uses the
+> offset the host sets. Without hVHE, the hypervisor's CNTVCT_EL0 reads
+> then include that offset. I saw the trace timestamps jump on QEMU with
+> pKVM on a cortex-a57, running a non-protected guest.
 
-Not for non-protected VMs. flush_hyp_timer_state() zeroes CNTVOFF_EL2
-only for a protected vCPU, and a non-protected VM in pKVM uses the
-offset the host sets. Without hVHE, the hypervisor's CNTVCT_EL0 reads
-then include that offset. I saw the trace timestamps jump on QEMU with
-pKVM on a cortex-a57, running a non-protected guest.
+I don't doubt you saw it. But frankly, it is high time we stop piling
+more and more stuff on nVHE. It is *dead*. So making things measurably
+worse for everyone else is not on.
 
-Cheers,
-/fuad
+If tracing on nVHE is that useful (which I find debatable), then
+context switch CNTVOFF_EL2 appropriately in the tracing code.
+Something like below.
+
+	M.
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/clock.c
+index f3e2619db4e4..b339340cea40 100644
+--- a/arch/arm64/kvm/hyp/nvhe/clock.c
++++ b/arch/arm64/kvm/hyp/nvhe/clock.c
+@@ -47,6 +47,28 @@ void trace_hyp_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
+ 	smp_store_release(&clock->cur, bank);
+ }
+ 
++static u64 get_counter(void)
++{
++	u64 cntvoff = 0, cyc;
++
++	if (!has_hvhe()) {
++		cntvoff = read_sysreg(cntvoff_el2);
++		if (cntvoff) {
++			write_sysreg(0, cntvoff_el2);
++			isb();
++		}
++	}
++
++	cyc = __arch_counter_get_cntvct();
++
++	if (!has_hvhe() && cntvoff) {
++		write_sysreg(cntvoff, cntvoff_el2);
++		isb();
++	}
++
++	return cyc;
++}
++
+ /* Use untrusted host data */
+ u64 trace_hyp_clock(void)
+ {
+@@ -54,7 +76,7 @@ u64 trace_hyp_clock(void)
+ 	u64 bank = smp_load_acquire(&clock->cur);
+ 	u64 cyc, ns;
+ 
+-	cyc = __arch_counter_get_cntvct() - clock->data[bank].epoch_cyc;
++	cyc = get_counter() - clock->data[bank].epoch_cyc;
+ 
+ 	if (likely(cyc < clock->data[bank].cyc_overflow64)) {
+ 		ns = cyc * clock->data[bank].mult;
+
+
+-- 
+Without deviation from the norm, progress is not possible.
