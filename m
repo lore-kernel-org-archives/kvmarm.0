@@ -1,72 +1,70 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.72
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795814897;
-	b=y2qrlXcL+RIQpECAp1OPWLxdwRl12oxzPX+Ob5h3k3F9DUHRH+oQXxRFAyTeRdM5GZpE
-	 Tbof3n5TEP4+svI4clGjyXnFYr0QiHEP3ZHJyVd57En6gJIb2kg2Kcq4NXGKvDJK2atpv
-	 nkFlu3W38zseF0wH/DJiuZY1qB5dK8ZOn4qX95trFKz/ObqXF5Y4WWayZUv9k4LYFkPBx
-	 /9KAFrke/IZgXb9UNgt7iNJALeXR12YiEottVQVDMc5fDpDSKK4FFccDO8MlOx2m9L2bx
-	 F1KJbEA+TUD9SpU5gXyXxcwjMboXN2jHPga78nsxYaDXisTa8/GmO7mFVLw+MVbjyqg==
+	t=1795828523;
+	b=Xmfud+KUAfH50J35tNYkcwNxLEhbDKLYzK05zDtoHGtjCqp6xbi690Djb7ERLKhTwdcM
+	 qki3psaQYP5SKcIczC1vYloHlu9WdEmoBjOOBx2nRt8g9GMLOkWINk235P4BWQlCLz64F
+	 HO/ix4dULbP0MoEGUqcZe9AhEe6flfHwht8niIvxqQUx2hjFp/p7qT0WxBtlkzmu+5Ryx
+	 4qB02g85bDRUupVu5TP3/Oa00CJ0/XunJhToT36AZIWpMpawHemLWVjJErvKoeISecbpp
+	 GE6sHVSwHw+948SF0J8nvPyBlAmvvwGLfV9Jq6Xfi64WN+PP3mSwMI3jJhuZSf8X5hA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795814897;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
-	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
-	bh=+mb9rF6VJRzXR4i4y89PW+yVWJyrkXOWuPHAFuVlX7c=;
-	b=ToQbjJNMId9l9R4oJlFRtvRLqzIJ+n+1MlQM80FeTNVibPWCnwKHVsl9o+ZXlBFVEISx
-	 vQO9m5g0emI0In0/zyJvAWEKqciU3+KyLKjJ3ZYM2e1SxlK2Q5lkVv0WVSS57oGEb4g/v
-	 dDmLl4c1b1EAcr4nIUTs5lexZup4Uj6TDSY8PNlpJu097lyYpu9tfOcDJIlOKLiwq5qOe
-	 wW2etyKuSmO67Tx8zSEF4c/weQSRAl62oGCP+lN0MZdr7wpbW0AvxxrN9mj756D8CPwkJ
-	 cJBXeoS742/5YGXoyO1belm0eMMO5rq7rsBX57LZI1OL7b6ZO8aFQnuCCyn8pKXmJPw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795828523;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=9854QH4TMdL6guUMAEcKJ+FttltmbvocYCBGe/+Uhqo=;
+	b=jmfL/RKH1KuFLVMqCAdtJiV7O6GOSlIcOe6A+9Hktx1ckqgYaCBGEx4cFHWxBmJLTQuk
+	 elbwo2xi0om06QZSBjCezhHSd8t94b/7fu1FZBVIduHLX47pkBhZnPZyhHFa54uUbO1c1
+	 rqPACFpur4+pkvnGJk+ALI/Z0cndy/nK7P+n66bumhYsjfTGKrn59isdCKkVLItEMcgKn
+	 7URab8uUV9fS5d2q7lXSXHhJEBqpN5YgFrizm75VSiE8B04uiVcG7T6gVKmGyRJJrebl1
+	 VlfZn+yh7l+5Fl4qxesl69+E/6ESj3O/GOvrXKKeOSuYWaju9Cb6BM5+fzppkcCQS4w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=n4hgj3JI;
-	arc=none smtp.remote-ip=209.85.218.72
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3953A606A31E
-	for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 21:28:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3953A606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=jSo9ZDls;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD3EB606A31E
+	for <kvmarm@lists.linux.dev>; Sat, 28 Nov 2026 01:15:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CD3EB606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=n4hgj3JI
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-c42888c50c4so785078966b.0
-        for <kvmarm@lists.linux.dev>; Fri, 27 Nov 2026 13:28:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795814895; x=1796419695; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=+mb9rF6VJRzXR4i4y89PW+yVWJyrkXOWuPHAFuVlX7c=;
-        b=n4hgj3JIaShoIM6TLWqAexGrju7C8E4MM0PcN+QsBoGN8Hf8rQJmRIMcsJoiRA4opX
-         mgVAMNWykN9DrUQo+IJbFrTk9xqtS4k+q5vUXqu41+ZO1/ShJCINtNfDDmYFTVjvWCuV
-         E37QS3Fn5rMjWg06eKMtYHal7+dtQ3/P/nvXNVIwWuGkYTRJvJrfikzrGwnv/TSAnrm2
-         Oe6gPxLCOWXJjLde4Ne74NVLh+74AIeJoPdiF0azdF9LIeip+5LyRES8fKuaDDGqL1TA
-         pJtxsSWCbWoGoEWJEdJv0+yco3txY2RZkMC5ajF43ZN7z+lI5A3964gS8qHsW8YcNa0a
-         xB9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795814895; x=1796419695;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=+mb9rF6VJRzXR4i4y89PW+yVWJyrkXOWuPHAFuVlX7c=;
-        b=a9ygkYsEwqKdvMaLOgUK58J4TzgRyCTJMBqzh9qQT7UEmekyQJVyUZi8m3u2gnhe81
-         R/dhHguduqrj3dYtNnKqlFsM4KUF5+Wbb+e/hnNx9dl161pjdUu4NYrAVm7BqWIL6+Cy
-         7iQH+WCl8vklXYyy1bs9sbCa7IaOtn10PzURjtri8U3hXzpi1XFBrtkLcRXRYN90xzet
-         C6EgdIQ3TMUiWRGlHhA8mgH4FX8t+Oe9XwvnjbBEXqMH1KoewGK12Lv95Gof4990CLNr
-         HkQUjbeOWxMR4Le1S6OmP2grXXqsoVccF229BjRzF7rEVN+I6kpsCtRHnwNtU6ClsPOq
-         DYhg==
-X-Forwarded-Encrypted: i=1; AL+hErHnQGr0Y459GXoHIgWrjBE7RQk3Xq2wDQKuuR8zMiRGT9qI0aoZEbnZ+QeF7aMLHhgcWI8VdZY=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/aFXgGPfq3yDP8wgIq39K1fPTfFLTS3GAMha5JQRRasfYiXhg4
-	96yc2zm+kLDujfWdCEvoZOS6mRm8ZwDcaT055XW+uZ7c9L7LozqIVN+SdUYDzVwKtnF8yMvMdW+
-	3IMTN/1If0gEDOTpRcXyJ+w==
-X-Received: from ejbbx9.prod.google.com ([2002:a17:906:a1c9:b0:c50:487b:9fb8])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:906:c10e:b0:c41:5e31:5184 with SMTP id a640c23a62f3a-c513a99abe6mr2130168566b.13.1795814895264;
- Fri, 27 Nov 2026 13:28:15 -0800 (PST)
-Date: Fri, 27 Nov 2026 21:27:43 +0000
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=jSo9ZDls
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A80C01575;
+	Fri, 27 Nov 2026 17:15:17 -0800 (PST)
+Received: from entos-yitian-01.Arm.com (unknown [10.168.196.233])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 33FFB3F632;
+	Fri, 27 Nov 2026 17:15:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795828520; bh=XgGdTO+fLL8ATBkcKpsheH2Fam2xVx2g5zcyj4vdLus=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jSo9ZDlsqBhaK4ZXAB1mgci1w3tc2p6rIkZPYzomz4otiDF3EpPzXSIPrFlg/XRZ/
+	 9e7/oi308QYswege6FG7vs4CSCtWlSxB8m76DjXTXQRh+5hZtd6vLmtxHZF2CitfZp
+	 cOlBrPqKWvSetCL9G6RHP751kgvIjx2K1s95584Y=
+From: Jia He <justin.he@arm.com>
+To: maz@kernel.org,
+	oupton@kernel.org
+Cc: fuad.tabba@linux.dev,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	mark.rutland@arm.com,
+	pbonzini@redhat.com,
+	seanjc@google.com,
+	shuah@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jia He <justin.he@arm.com>
+Subject: [PATCH v3 0/4] KVM: arm64: nv: VNCR page mapping fixes
+Date: Sat, 28 Nov 2026 01:14:43 +0000
+Message-Id: <20261128011447.3588988-1-justin.he@arm.com>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -75,63 +73,74 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.56.1.839.g22a8290db9-goog
-Message-ID: <20261127212743.1139739-1-vdonnefort@google.com>
-Subject: [PATCH v1] KVM: arm64: Use CNTPCT_EL0 for hyp trace clock
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, fuad.tabba@linux.dev, 
-	Vincent Donnefort <vdonnefort@google.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-trace_hyp_clock() reads the virtual counter (CNTVCT_EL0). Under nVHE
-(and pKVM without hVHE), loading a guest with a non-zero offset applies
-that offset to CNTVCT_EL0, corrupting the trace timestamps. Use
-CNTPCT_EL0 instead.
+On a VNCR abort, KVM walks the guest hypervisor's EL2 stage-1 tables,
+maps the page that VNCR_EL2 points to at a fixmap, and points the
+hardware VNCR_EL2 at that fixmap. This series fixes three cases where
+this goes wrong.
 
-Cc: stable@vger.kernel.org
-Fixes: b22888917fa4 ("KVM: arm64: Sync boot clock with the nVHE/pKVM hyp")
-Reported-by: Fuad Tabba <fuad.tabba@linux.dev>
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
----
- arch/arm64/kvm/hyp/nvhe/clock.c | 2 +-
- arch/arm64/kvm/hyp_trace.c      | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Patch 1 fixes the address that KVM programs into VNCR_EL2 on a host
+with 16K or 64K pages. The fixmap maps the host page that contains the
+VNCR page, and KVM takes the offset of the VNCR page in it from the VA.
+If the guest hypervisor uses a smaller stage-1 granule, the VA and the
+PA can have different offsets, and the nested context accesses another
+page of the guest. Patch 1 takes the offset from the PA.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/clock.c
-index f3e2619db4e4..ea4412e6737c 100644
---- a/arch/arm64/kvm/hyp/nvhe/clock.c
-+++ b/arch/arm64/kvm/hyp/nvhe/clock.c
-@@ -54,7 +54,7 @@ u64 trace_hyp_clock(void)
- 	u64 bank = smp_load_acquire(&clock->cur);
- 	u64 cyc, ns;
- 
--	cyc = __arch_counter_get_cntvct() - clock->data[bank].epoch_cyc;
-+	cyc = __arch_counter_get_cntpct() - clock->data[bank].epoch_cyc;
- 
- 	if (likely(cyc < clock->data[bank].cyc_overflow64)) {
- 		ns = cyc * clock->data[bank].mult;
-diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
-index b9404496f977..06d6bd7aeac7 100644
---- a/arch/arm64/kvm/hyp_trace.c
-+++ b/arch/arm64/kvm/hyp_trace.c
-@@ -510,8 +510,8 @@ int __init kvm_hyp_trace_init(void)
- 			per_cpu(timer_unstable_counter_workaround, cpu);
- 
- 		if (IS_ENABLED(CONFIG_ARM_ARCH_TIMER_OOL_WORKAROUND) &&
--		    wa && wa->read_cntvct_el0) {
--			pr_warn("hyp trace can't handle CNTVCT workaround '%s'\n", wa->desc);
-+		    wa && wa->read_cntpct_el0) {
-+			pr_warn("hyp trace can't handle CNTPCT workaround '%s'\n", wa->desc);
- 			return -EOPNOTSUPP;
- 		}
- 	}
+Patch 2 fixes a walk that cannot set the AF. If TCR_EL2.HA is set and
+the descriptor that maps VNCR_EL2 is in a read-only memslot, the walk
+returns -EPERM. kvm_handle_vncr_abort() has no case for -EPERM, so the
+vCPU takes the same abort forever. Patch 2 injects the SEA that the
+walk recorded.
 
-base-commit: b6a9fa34ce4187cb69d3c588a4bbffc31ce5db8f
+Patch 3 adds a selftest for both. It maps the VNCR page at a VA whose
+offset in a 16K or 64K page differs from that of its PA, and puts the
+table that maps it in a read-only memslot.
+
+Patch 4 allows the VNCR page in a cacheable VM_PFNMAP or VM_MIXEDMAP
+VMA. The stage-2 fault path already maps such memory as cacheable, but
+kvm_translate_vncr() rejects it and injects an SEA.
+
+Patches 1 and 2 fix bugs that predate this series, and each can be
+applied on its own.
+
+Based on v7.4-rc3.
+
+Patch numbers below are those of v3.
+
+Changes since v2:
+- New patch 1 (Sashiko).
+- Patch 3: size the read-only memslot to whole host pages, and map the
+  VNCR page at a VA whose bits [15:12] differ from those of its PA
+  (Sashiko).
+
+Changes since v1:
+- New patches 2 and 3 (Sashiko).
+- Patch 4: get the HVA with gfn_to_hva_memslot_prot() so that a VNCR
+  page in a read-only memslot is not rejected (Sashiko).
+- Patch 4: limit the stage-2 comparison in the commit message to
+  VM_PFNMAP and VM_MIXEDMAP VMAs.
+
+v2: https://lore.kernel.org/r/20261125024426.3464050-1-justin.he@arm.com
+v1: https://lore.kernel.org/r/20261124025336.4107575-1-justin.he@arm.com
+
+Jia He (4):
+  KVM: arm64: nv: Locate the VNCR page in the host page from its PA
+  KVM: arm64: nv: Inject an SEA when the VNCR walk cannot set the AF
+  KVM: arm64: selftests: Add a test for VNCR_EL2 translation faults
+  KVM: arm64: nv: Allow the L1 VNCR page in cacheable PFNMAP memory
+
+ arch/arm64/include/asm/kvm_mmu.h              |   2 +
+ arch/arm64/include/asm/kvm_nested.h           |   1 +
+ arch/arm64/kvm/hyp/vhe/switch.c               |   9 +-
+ arch/arm64/kvm/mmu.c                          |   2 +-
+ arch/arm64/kvm/nested.c                       |  47 +++-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/arm64/nv_vncr_abort.c       | 221 ++++++++++++++++++
+ 7 files changed, 273 insertions(+), 10 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/arm64/nv_vncr_abort.c
+
 -- 
-2.56.1.839.g22a8290db9-goog
+2.34.1
 
