@@ -1,94 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795858141;
-	b=cyE+qbQEHB6KXglBLWBnQvVY3KiEDc8C/x+KrTI81UMOfj6NLs5tuPuU9BSMXW8Qc6iZ
-	 CUDkQJK9ZIF5wP0wb4IXG4DOVdUIs0G+KoP3yHNKx7V0VXS1SddMv7HexH6TqWeluCr/X
-	 jiW2BmPLUpue72dcEK34SmeYZyPuk/G2B725g2p0F5PqdtHGUxDlqvFOvopsbYb53rP4K
-	 c3hyuCPxGvd7BbUiZDbGL05gnB29ICB9+NZKYDVQ1SVZ/Mwl7Azl77YeXxxxq+OpFSRVi
-	 8G0yEf6Cirr/xuyginTXy+KalCeneh98/lBQwrnvXGj3EC0RHui+SG9TdbzSsOh9RdA==
+	t=1795858444;
+	b=m24LsfkNVwHWG3Vh/DCaU6iBvKA+MZ+QUTPzJfQ4iTmmKap082QrB7QQfydLVMtBZ4Ti
+	 xy8FrSfPK1kQnZtK+JUE5jEP8vkX0b5XqJDgI9S1f9a8jCxrF8FHuqBkgXMorvI7hKcTs
+	 k+jffyV3hiZBQtx5hRln2PYg0dsmoIJTBkAR/4yVRyCYZjFrGlMlAixxyFe1Ev8ua3Dqz
+	 3x5q6Zi0veo3X3kl8y/rkp45SmQQRSjtDsbcbyul3l4gtOS38qs82rEQnXBOA1KN4SRaQ
+	 K2flBCpHpE5nEvTRbW3YAFVjJADyQc5h/pc3wD94QTR/RiYLNCSrCEs2XViMXkK6jYw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795858141;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=+T4002pIw3rZ91yEJ61NQuLQSTrjOSKQ29W7WLBm84o=;
-	b=r4Y976qX7GX8AiRabAO6N+WwKCQupPi86FS1Ljhl68cy7COFFNu0crKSTk7aftVdkIzc
-	 dJcee2PzJizWxkM5ge0/L9OBKFEJ5cqQmYOtfB8HmWE82dmt0cKwDDIs5PlVWIyF5v0z2
-	 jyT8QUdpGSKCE9nDQ2/h0naWn7CTwpQwWFWSRU5etwwkEtG8rpTGr5DGaoNs+06vQX9qg
-	 DrqqfRuR3byZfGqnS6r5AABwmBdr7qclOWxfpxS8gthhHMOKWZI9G/YAFmPxghtoDyUGe
-	 gkSsViMWDyKAlTm5i6kzAMRfyLYlB/4NCG5Lp+wX+EGtiDbFtM93rNIUdjX6SnTpsOw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795858444;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=u+0ihA5DMPlMVfQI34XhLEoABffe8P8SEDqNF7Wa5hM=;
+	b=o1s/u4jBtBG/s6hkdYv4EhV/ZDdq5dSWCMz6I6zXbfJKuLYN08FP0dUwxzF0vBJZ8x/n
+	 ZCyXkbvv7gtlGQrT/FJgow7F6aR0QDqcwcnqWxXdW+uO9yLllAoYekgnEJT2SFtfNvIgp
+	 9qsQMu8T8H+gtQWo1LQqUp00Yh/sX358FAzcQl2dzjY7JRC7co3wS2dxbQWB3C9ZeG/wi
+	 3+TqP4RBgBhFtvHo32qp17eXPlYGYJdAmlvumpvJoc7gVk+3JKpqkludus9LEFm5Bvg7h
+	 fs1NWzNLe1sCnkKfTIHaETe+THlZJ7hGgPrBdjH+qQR4zIRj/7gXA4ktbVwhjjpdrUg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=pereq.eu;
-	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=T+B+CzDB;
-	arc=none smtp.remote-ip=209.85.221.44
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P7wtle0f;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD6E606A31F
-	for <kvmarm@lists.linux.dev>; Sat, 28 Nov 2026 09:29:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BAD6E606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18F8606A31C;
+	Sat, 28 Nov 2026 09:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=T+B+CzDB
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-48e20ed3b9dso7832970f8f.2
-        for <kvmarm@lists.linux.dev>; Sat, 28 Nov 2026 01:29:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1795858139; x=1796462939; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=+T4002pIw3rZ91yEJ61NQuLQSTrjOSKQ29W7WLBm84o=;
-        b=T+B+CzDBbgmOBbDXp8E8xZotufbo/ugkIh57ynvSyECYLGKafRa/1a6iz2z3aGenmW
-         kR1zqNDoTfj4JL+n6E/HHK1dbTHNr1NzCshnHDxj6vf67AvfyoXJaCEzB0LHyJlHewrK
-         dWiEDgoo3ukIu0SBVB+qHBQnm4xtmdcprSPL9n8e2rNRg7kl8/q8WqlKHsz9K0wE1tgM
-         zeCM5ZzahMvVUXXAH65ziAoForEKBVJvFaac9glJ8ju5JkTJggJppumnUpSERUcteuLe
-         kdtkggJtA0JWdkE1x9tff0uKmk3wUtRI/TLIgKaOtP7A7f7+ysRyHW6Cyar8CJge7MXx
-         DnoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795858139; x=1796462939;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=+T4002pIw3rZ91yEJ61NQuLQSTrjOSKQ29W7WLBm84o=;
-        b=QPskiMW5DpHxVNd8H8sp/6jGrTvYzOhrulPYWGuQVMD2jSxlKrnvQ7vmIJu8JTwb1+
-         yEajCS7Le+eXZB6u9m5POqltO+8tU6HPqMXpoey+lowpOPRCFSCvEDcodMKnaIv3W/JX
-         q5lulg38jKh0EILo1vfeKKITpXFUZFMyvDjR7TwAERTpUFQ09wqFUT4ZQCgr+jZANvYk
-         r9CyT3D81DcWlMeRAtZc5E4e5qa1pjb0I9sTqrP2dTVHEkgKx9u0tWRki60UWMbP7FB7
-         rj4RhatA78UDGpeg7FfH6IDcJAIrlpkZ/R/OlIOQE3OnYKtv4twOyfMV9nukwE47biBZ
-         cndA==
-X-Gm-Message-State: APuU4Z9BytrdeNA0ghKXzqG6W7cJNhA6Ma1f2yB6TikOdYA97rnKYHxg
-	uzR9OhT5/5KkYpyINLrStgYBS0+oOXNOHdt6AiRFUMVSstv3LmQ7q8SU7HB2wvTwV8veeOuuhbP
-	mBNEpbmlodw==
-X-Gm-Gg: AZFdTZersebwHBXluVTtRzpyfBLaRv6AM7Ur8Io090PElD+uQvYk2pX/2kwNOqOBzzm
-	ebuPJycOa+YB7ao5Z5rleJ4siALnwNtj5BTmynhg21hR64CPDYbopoBTtyF0l0Mee1AGiXqKoic
-	BfgzTK2JCbIQRyiqop6PTKenlbxdbnuoBsd5DDXaSCa1xFCdzf8f1rpxoccCxNOxBxNtvukbPHK
-	ljxYMJlq3pq7bEKm276hKYFu7F4nBvtuflHLtZMIBuFUUqAlOVkN1aK9IArAe4dTJk1aoU8Hawi
-	VlTHdtvmBMM5j4FVZFmfV7vPFvBV+ypNfk8Bl4CBlPQxzTFif5AMxfZAjuRxihn2yOJrjB9zgpa
-	lQhWQ6P07WBcvxvRO5Qox/mhoGjfAixJgvocQFD+3sXjrFDc13//mJU2Q9QWMZsKcWUMHLCqMii
-	nd64gE+1vmCK3LB/2ApI3DCHrCW/tmosQ5k8hmRKFBSFCx/fr1oQ6QGJWLDTUgSgu6yy3Nmf0Q6
-	UeQOE3abNUYTlJQf6vcohTW6X2YbQsCD/F1shgrUQD5WLlxPwcPzriuEJddKahqaNq4Lc4aQJIn
-	ZJVIScatjIdD3Cwylmw=
-X-Received: by 2002:a05:6000:26ca:b0:4a6:4687:2ce9 with SMTP id ffacd0b85a97d-4abad5ac73dmr53013677f8f.4.1795858138844;
-        Sat, 28 Nov 2026 01:28:58 -0800 (PST)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4b1ed8b6a05sm31097138f8f.43.2026.11.28.01.28.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Nov 2026 01:28:58 -0800 (PST)
-Date: Sat, 28 Nov 2026 12:28:55 +0300
-From: Dan Carpenter <dan@pereq.eu>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/3] KVM: arm64: nv: Fix AT emulation for TCR2_EL1
-Message-ID: <awqe16An2pmXAmfO@stanley.mountain>
-References: <20261127-nv-tcr2-v3-v1-0-9c15c1cabe01@pereq.eu>
- <20261127-nv-tcr2-v3-v1-1-9c15c1cabe01@pereq.eu>
- <sashiko-outbox-237810@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P7wtle0f
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E0D01F00893;
+	Sat, 28 Nov 2026 09:34:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795858444;
+	bh=u+0ihA5DMPlMVfQI34XhLEoABffe8P8SEDqNF7Wa5hM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=P7wtle0f3UftnbhoQIC3mhRtfjN6U2eAEDarR2ZpqR2EgdlC4Cr/asNnQtuK7iEgj
+	 zMV/JKPtgzRIxiYvwVVpJWoCCQMtXVPyk/8LWig/6L5yrfH0ootOf5T4JCK4/cjtq/
+	 SC5Rr3I7uZCbFEFi+QZwhCFRAlmwb/6JaEAgmRa46HpHl6q/jwXkR5bVBTLa0rgFmu
+	 iyw7BdzVMCS5fp0NCliBP7A4AhZGmoIfvs+9RkY7Fdqt/tyD+ZwgooCl853KqJC5aP
+	 8QbGV8wRVj4f0dmuD3TTXvpKaFF9GggUCKomtXa6Cpeqtkbnb5bJ6uDYShy4mjn8HP
+	 liIPwpa8M2eEQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xXEoj-00000004NJB-3Set;
+	Sat, 28 Nov 2026 09:34:01 +0000
+Date: Sat, 28 Nov 2026 09:34:01 +0000
+Message-ID: <86se0lxpti.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kernel-team@android.com,
+	fuad.tabba@linux.dev,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1] KVM: arm64: Use CNTPCT_EL0 for hyp trace clock
+In-Reply-To: <20261127212743.1139739-1-vdonnefort@google.com>
+References: <20261127212743.1139739-1-vdonnefort@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -97,42 +77,72 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <sashiko-outbox-237810@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Btw, sorry for not putting v3 in the subject.  I'm just seeing that
-I missed that now.
-
-On Fri, Nov 27, 2026 at 04:01:09PM +0000, sashiko-bot@kernel.org wrote:
-> > @@ -1437,8 +1463,9 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-> >  	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TTBR1_EL1),	SYS_TTBR1);
-> >  	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR_EL1),	SYS_TCR);
-> >  	write_sysreg_el1(vcpu_read_sys_reg(vcpu, MAIR_EL1),	SYS_MAIR);
-> > +	if (cpus_have_final_cap(ARM64_HAS_TCR2))
-> > +		write_sysreg_el1(effective_tcr2(vcpu, TR_EL10), SYS_TCR2);
-> >  	if (kvm_has_tcr2(vcpu->kvm)) {
-> > -		write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR2_EL1), SYS_TCR2);
-> >  		if (kvm_has_s1pie(vcpu->kvm)) {
-> >  			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIR_EL1), SYS_PIR);
-> >  			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIRE0_EL1), SYS_PIRE0);
-> > @@ -1452,6 +1479,17 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-> >  	__load_stage2(mmu);
+On Fri, 27 Nov 2026 21:27:43 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> [Severity: High]
-> This problem wasn't introduced by this patch, but when __kvm_at_s1e01_fast()
-> switches to the shadow stage-2 MMU here [1], does it need to call
-> kvm_arm_vmid_update(&mmu->vmid) and check and update mmu->last_vcpu_ran
-> the way vcpu_prepare_mmu() does?
+> trace_hyp_clock() reads the virtual counter (CNTVCT_EL0). Under nVHE
+> (and pKVM without hVHE), loading a guest with a non-zero offset applies
+> that offset to CNTVCT_EL0, corrupting the trace timestamps. Use
+> CNTPCT_EL0 instead.
 
-Patch 3 does the VMID stuff, but it doesn't handle the mmu->last_vcpu_ran
-check.  Probably it's simpler to use the slow path when they don't
-match.
+pKVM mandates CNTVOFF_EL2 being 0. Has that changed?
 
-That fix would go in as a separate patch at the end.  I'll resend the
-series next week.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: b22888917fa4 ("KVM: arm64: Sync boot clock with the nVHE/pKVM hyp")
+> Reported-by: Fuad Tabba <fuad.tabba@linux.dev>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/clock.c | 2 +-
+>  arch/arm64/kvm/hyp_trace.c      | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/clock.c
+> index f3e2619db4e4..ea4412e6737c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/clock.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/clock.c
+> @@ -54,7 +54,7 @@ u64 trace_hyp_clock(void)
+>  	u64 bank = smp_load_acquire(&clock->cur);
+>  	u64 cyc, ns;
+>  
+> -	cyc = __arch_counter_get_cntvct() - clock->data[bank].epoch_cyc;
+> +	cyc = __arch_counter_get_cntpct() - clock->data[bank].epoch_cyc;
+>  
+>  	if (likely(cyc < clock->data[bank].cyc_overflow64)) {
+>  		ns = cyc * clock->data[bank].mult;
+> diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+> index b9404496f977..06d6bd7aeac7 100644
+> --- a/arch/arm64/kvm/hyp_trace.c
+> +++ b/arch/arm64/kvm/hyp_trace.c
+> @@ -510,8 +510,8 @@ int __init kvm_hyp_trace_init(void)
+>  			per_cpu(timer_unstable_counter_workaround, cpu);
+>  
+>  		if (IS_ENABLED(CONFIG_ARM_ARCH_TIMER_OOL_WORKAROUND) &&
+> -		    wa && wa->read_cntvct_el0) {
+> -			pr_warn("hyp trace can't handle CNTVCT workaround '%s'\n", wa->desc);
+> +		    wa && wa->read_cntpct_el0) {
+> +			pr_warn("hyp trace can't handle CNTPCT workaround '%s'\n", wa->desc);
+>  			return -EOPNOTSUPP;
+>  		}
+>  	}
+> 
 
-regards,
-dan carpenter
+This is a bad idea. Virtualising the physical counter is extremely
+expensive, while the virtual counter is basically free. On top of
+that, nVHE is a dried up turd we shouldn't invest any effort into.
 
+I can see two options: disabling trace on nVHE altogether (my
+favourite one, because let's face it, *nobody* is using pKVM on that),
+or reset CNTVOFF_EL2 to 0 across the read of the counter when on nVHE.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
